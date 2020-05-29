@@ -1,0 +1,286 @@
+---
+# -------------------------------------------------------------
+# NOTE: This Lint setting is an example. Customize it for your project.
+# -------------------------------------------------------------
+linters-settings:
+  # https://github.com/golangci/golangci-lint
+  # Checks assignments with too many blank identifiers (e.g. x, _, _, _, := f())
+  dogsled:
+    # checks assignments with too many blank identifiers; default is 2
+    max-blank-identifiers: 2
+  depguard:
+    list-type: blacklist
+    packages:
+      # logging is allowed only by logutils.Log, logrus
+      # is allowed to use only in logutils package
+      - github.com/sirupsen/logrus
+    packages-with-error-message:
+      - github.com/sirupsen/logrus: "logging is allowed only by logutils.Log"
+  # https://github.com/mibk/dupl
+  # Tool for code clone detection
+  dupl:
+    # tokens count to trigger issue, 150 by default
+    threshold: 100
+  errcheck:
+    # report about not checking of errors in type assertions: `a := b.(MyStruct)`;
+    # default is false: such cases aren't reported by default.
+    check-type-assertions: false
+
+    # report about assignment of errors to blank identifier: `num, _ := strconv.Atoi(numStr)`;
+    # default is false: such cases aren't reported by default.
+    check-blank: false
+
+    # path to a file containing a list of functions to exclude from checking
+    # see https://github.com/kisielk/errcheck#excluding-functions for details
+    #     exclude: /path/to/file.txt
+  # https://github.com/ultraware/funlen
+  # Tool for detection of long functions
+  funlen:
+    lines: 100
+    statements: 50
+  # https://github.com/uudashr/gocognit
+  # Computes and checks the cognitive complexity of functions
+  gocognit:
+    # minimal code complexity to report, 30 by default (but we recommend 10-20)
+    min-complexity: 10
+  # https://github.com/jgautheron/goconst
+  # Finds repeated strings that could be replaced by a constant
+  goconst:
+    min-len: 2
+    min-occurrences: 2
+  # https://github.com/go-critic/go-critic
+  # The most opinionated Go source code linter
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+    disabled-checks:
+      - dupImport # https://github.com/go-critic/go-critic/issues/845
+      - ifElseChain
+      - octalLiteral
+      - whyNoLint
+      - wrapperFunc
+  # https://github.com/alecthomas/gocyclo
+  # Computes and checks the cyclomatic complexity of functions
+  gocyclo:
+    min-complexity: 15
+  # https://github.com/tetafro/godot
+  # Check if comments end in a period
+  godot:
+    # check all top-level comments, not only declarations
+    check-all: false
+  # https://github.com/matoous/godox
+  # Tool for detection of FIXME, TODO and other comment keywords
+  godox:
+    # report any comments starting with keywords, this is useful for TODO or FIXME comments that
+    # might be left in the code accidentally and should be resolved before merging
+    keywords: # default keywords are TODO, BUG, and FIXME, these can be overwritten by this setting
+      - NOTE
+      - OPTIMIZE # marks code that should be optimized before merging
+      - HACK # marks hack-arounds that should be removed before merging
+  # https://golang.org/cmd/gofmt/
+  # Gofmt checks whether code was gofmt-ed. By default this tool runs with -s option to check for code simplification
+  gofmt:
+    # simplify code: gofmt with `-s` option, true by default
+    simplify: true
+  # https://godoc.org/golang.org/x/tools/cmd/goimports
+  # Goimports does everything that gofmt does. Additionally it checks unused imports
+  goimports:
+    local-prefixes: github.com/golangci/golangci-lint
+  # https://github.com/golang/lint
+  # Golint differs from gofmt. Gofmt reformats Go source code, whereas golint prints out style mistakes
+  golint:
+    min-confidence: 0.7
+  # https://github.com/tommy-muehle/go-mnd
+  # An analyzer to detect magic numbers.
+  gomnd:
+    settings:
+      mnd:
+        # don't include the "operation" and "assign"
+        checks: argument,case,condition,return
+  # https://golang.org/cmd/vet/
+  # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string
+  govet:
+    check-shadowing: true
+    settings:
+      printf:
+        funcs:
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Infof
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Warnf
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Errorf
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
+  # https://github.com/walle/lll
+  # Reports long lines
+  lll:
+    line-length: 200
+  # https://github.com/mdempsky/maligned
+  # Tool to detect Go structs that would take less memory if their fields were sorted
+  maligned:
+    suggest-new: true
+  # https://github.com/client9/misspell
+  # Finds commonly misspelled English words in comments
+  misspell:
+    locale: US
+  # https://github.com/alexkohler/nakedret
+  # Finds naked returns in functions greater than a specified function length
+  nakedret:
+    # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
+    max-func-lines: 30
+  # https://github.com/nakabonne/nestif
+  # Reports deeply nested if statements
+  nestif:
+    # minimal complexity of if statements to report, 5 by default
+    min-complexity: 4
+  # https://github.com/golangci-lint/pkg/golinters/nolintlint
+  # Reports ill-formed or insufficient nolint directives
+  nolintlint:
+    allow-leading-space: true # don't require machine-readable nolint directives (i.e. with no leading space)
+    allow-unused: false # report any unused nolint directives
+    require-explanation: false # don't require an explanation for nolint directives
+    require-specific: false # don't require nolint directives to be specific about which linter is being skipped
+  # https://github.com/alexkohler/prealloc
+  # Finds slice declarations that could potentially be preallocated
+  prealloc:
+    # XXX: we don't recommend using this linter before doing performance profiling.
+    # For most programs usage of prealloc will be a premature optimization.
+
+    # Report preallocation suggestions only on simple loops that have no returns/breaks/continues/gotos in them.
+    # True by default.
+    simple: true
+    range-loops: true # Report preallocation suggestions on range loops, true by default
+    for-loops: false # Report preallocation suggestions on for loops, false by default
+  # https://github.com/jingyugao/rowserrcheck
+  # checks whether Err of rows is checked successfully
+  rowserrcheck:
+    packages:
+      - github.com/jmoiron/sqlx
+  # https://github.com/maratori/testpackage
+  # linter that makes you use a separate _test package
+  testpackage:
+    # regexp pattern to skip files
+    skip-regexp: (export|internal)_test\.go
+  # https://github.com/mvdan/unparam
+  # Reports unused function parameters
+  unparam:
+    # Inspect exported functions, default is false. Set to true if no external program/library imports your code.
+    # XXX: if you enable this setting, unparam will report a lot of false-positives in text editors:
+    # if it's called for subdir of a project it can't find external interfaces. All text editor integrations
+    # with golangci-lint call it on a directory with the changed file.
+    check-exported: false
+  # https://github.com/dominikh/go-tools/tree/master/unused
+  # Checks Go code for unused constants, variables, functions and types
+  unused:
+    # treat code as a program (not a library) and report unused exported identifiers; default is false.
+    # XXX: if you enable this setting, unused will report a lot of false-positives in text editors:
+    # if it's called for subdir of a project it can't find funcs usages. All text editor integrations
+    # with golangci-lint call it on a directory with the changed file.
+    check-exported: false
+  # https://github.com/ultraware/whitespace
+  # Tool for detection of leading and trailing whitespace
+  whitespace:
+    multi-if: false # Enforces newlines (or comments) after every multi-line if statement
+    multi-func: false # Enforces newlines (or comments) after every multi-line function signature
+  # https://github.com/bombsimon/wsl
+  # Whitespace Linter - Forces you to use empty lines!
+  wsl:
+    # If true append is only allowed to be cuddled if appending value is
+    # matching variables, fields or types on line above. Default is true.
+    strict-append: true
+    # Allow calls and assignments to be cuddled as long as the lines have any
+    # matching variables, fields or types. Default is true.
+    allow-assign-and-call: true
+    # Allow multiline assignments to be cuddled. Default is true.
+    allow-multiline-assign: true
+    # Allow declarations (var) to be cuddled.
+    allow-cuddle-declarations: false
+    # Allow trailing comments in ending of blocks
+    allow-trailing-comment: false
+    # Force newlines in end of case at this limit (0 = never).
+    force-case-trailing-whitespace: 0
+    # Force cuddling of err checks with err var assignment
+    force-err-cuddling: false
+    # Allow leading comments to be separated with empty liens
+    allow-separated-leading-comment: false
+linters:
+  # please, do not use `enable-all`: it's deprecated and will be removed soon.
+  # inverted configuration with `enable-all` and `disable` is not scalable during updates of golangci-lint
+  disable-all: true
+  enable:
+    - bodyclose # checks whether HTTP response body is closed successfully
+    - deadcode # Finds unused code
+    - dogsled # Checks assignments with too many blank identifiers (e.g. x, _, _, _, := f())
+    - errcheck # Errcheck is a program for checking for unchecked errors in go programs. These unchecked errors can be critical bugs in some cases
+    - gochecknoinits # Checks that no init functions are present in Go code
+    - gocritic # The most opinionated Go source code linter
+    - gocyclo # Computes and checks the cyclomatic complexity of functions
+    - gofmt # Gofmt checks whether code was gofmt-ed. By default this tool runs with -s option to check for code simplification
+    - goimports # Goimports does everything that gofmt does. Additionally it checks unused imports
+    - golint # Golint differs from gofmt. Gofmt reformats Go source code, whereas golint prints out style mistakes
+    - gomnd # An analyzer to detect magic numbers.
+    - goprintffuncname # Checks that printf-like functions are named with `f` at the end
+    - gosec # Inspects source code for security problems
+    - gosimple # Linter for Go source code that specializes in simplifying a code
+    - govet # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string
+    - ineffassign # Detects when assignments to existing variables are not used
+    - interfacer # Linter that suggests narrower interface types
+    - lll # Reports long lines
+    - scopelint # Scopelint checks for unpinned variables in go programs
+    - staticcheck # Staticcheck is a go vet on steroids, applying a ton of static analysis checks
+    - structcheck # Finds unused struct fields
+    - typecheck # Like the front-end of a Go compiler, parses and type-checks Go code
+    - unconvert # Remove unnecessary type conversions
+    - unparam # Reports unused function parameters
+    - unused # Checks Go code for unused constants, variables, functions and types
+    - varcheck # Finds unused global variables and constants
+
+  # don't enable:
+  # - asciicheck # Simple linter to check that your code does not contain non-ASCII identifiers
+  # - depguard # Go linter that checks if package imports are in a list of acceptable packages
+  # - dupl # Tool for code clone detection
+  # - funlen # Tool for detection of long functions
+  # - gochecknoglobals # Checks that no globals are present in Go code
+  # - gocognit # Computes and checks the cognitive complexity of functions
+  # - goconst # Finds repeated strings that could be replaced by a constant
+  # - godot # Check if comments end in a period
+  # - godox # Tool for detection of FIXME, TODO and other comment keywords
+  # - goerr113 # Golang linter to check the errors handling expressions
+  # - maligned # Tool to detect Go structs that would take less memory if their fields were sorted
+  # - misspell # Finds commonly misspelled English words in comments
+  # - nakedret # Finds naked returns in functions greater than a specified function length
+  # - nestif # Reports deeply nested if statements
+  # - nolintlint # Reports ill-formed or insufficient nolint directives
+  # - prealloc # Finds slice declarations that could potentially be preallocated
+  # - rowserrcheck # checks whether Err of rows is checked successfully
+  # - stylecheck # Stylecheck is a replacement for golint
+  # - testpackage # linter that makes you use a separate _test package
+  # - whitespace # Tool for detection of leading and trailing whitespace
+  # - wsl # Whitespace Linter - Forces you to use empty lines!
+
+issues:
+  # Excluding configuration per-path, per-linter, per-text and per-source
+  exclude-rules:
+    - path: internal/(cache|renameio)/
+      linters:
+        - lll
+        - gochecknoinits
+        - gocyclo
+        - funlen
+run:
+  skip-dirs:
+    - test/testdata_etc
+    - internal/cache
+    - internal/renameio
+    - internal/robustio
+
+# golangci.com configuration
+# https://github.com/golangci/golangci/wiki/Configuration
+service:
+  # project-path - by default the project source code will be placed in $GOPATH/src/github.com/project/repo. By if vanity imports are necessary you may specify the import path by this directive. For example, the github.com/kubernetes/kubernetes project may specify project-path: k8s.io/kubernetes.
+  # project-path: mysite.com/goproject # vanity import path if needed
+  # use the fixed version to not introduce new linters unexpectedly
+  # golangci-lint-version: 1.26.x
+  prepare:
+    - echo "here I can run custom commands, but no preparation needed for this repo"
