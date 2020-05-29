@@ -5,7 +5,7 @@ import (
 )
 
 // NewLogger returns an instance of logger
-func NewLogger(logger *logrus.Logger) (*logrus.Logger, error) {
+func NewLogger(logger *logrus.Logger) *logrus.Logger {
 	var log = logrus.New()
 	// Log as JSON instead of the default ASCII formatter.
 	log.SetFormatter(logger.Formatter)
@@ -14,5 +14,5 @@ func NewLogger(logger *logrus.Logger) (*logrus.Logger, error) {
 	log.SetOutput(logger.Out)
 	// Only log the warning severity or above.
 	log.SetLevel(logger.Level)
-	return log, nil
+	return log
 }
