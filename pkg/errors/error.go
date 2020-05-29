@@ -4,12 +4,12 @@ import "golang.org/x/xerrors"
 
 // New uses xerrors.New.
 func New(format string) error {
-	return xerrors.New(string)
+	return xerrors.New(format)
 }
 
 // Wrap uses xerrors.Errorf  need to add ": %w".
-func Wrap(format string, format string, a ...interface{}) error {
-	return xerrors.Errorf(string+": %w", a)
+func Wrap(format string, a ...interface{}) error {
+	return xerrors.Errorf(format+": %w", a)
 }
 
 // UnWrap uses xerrors.Unwrap.
@@ -18,7 +18,7 @@ func Unwrap(err error) error {
 }
 
 // Is uses xerrors.Is().
-func Is(err error, target error) bool {
+func Is(err, target error) bool {
 	return xerrors.Is(err, target)
 }
 

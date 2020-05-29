@@ -12,12 +12,13 @@ import (
 )
 
 // NewConfig to read config
-func NewConfig(configPath string, fileName string) error {
+func NewConfig(configPath, configFileName string) error {
 	viper.AddConfigPath(configPath) // path to look for the config file in
-	viper.SetConfigName(fileName)
+	viper.SetConfigName(configFileName)
 	viper.SetConfigType("yaml") // can viper.SetConfigType("YAML")
 	viper.AutomaticEnv()
 	err := viper.ReadInConfig() // Find and read the config file
+
 	if err != nil {
 		return errors.Wrap("viper can't read config.", err)
 	}
