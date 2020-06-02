@@ -1,6 +1,7 @@
 ---
 # -------------------------------------------------------------
 # NOTE: This Lint setting is an example. Customize it for your project.
+# https://golangci-lint.run/usage/configuration/
 # -------------------------------------------------------------
 linters-settings:
   # https://github.com/golangci/golangci-lint
@@ -93,7 +94,7 @@ linters-settings:
   # https://github.com/golang/lint
   # Golint differs from gofmt. Gofmt reformats Go source code, whereas golint prints out style mistakes
   golint:
-    min-confidence: 0.7
+    min-confidence: 0.8
   # https://github.com/tommy-muehle/go-mnd
   # An analyzer to detect magic numbers.
   gomnd:
@@ -260,6 +261,11 @@ linters:
   # - wsl # Whitespace Linter - Forces you to use empty lines!
 
 issues:
+  # Independently from option `exclude` we use default exclude patterns,
+  # it can be disabled by this option. To list all
+  # excluded by default patterns execute `golangci-lint run --help`.
+  # Default value for this option is true.
+  exclude-use-default: false
   # Excluding configuration per-path, per-linter, per-text and per-source
   exclude-rules:
     - path: internal/(cache|renameio)/

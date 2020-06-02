@@ -30,37 +30,37 @@ func NewConfig(configPath, configFileName string) error {
 	return nil
 }
 
-// SetConfig set value to config file.
+// SetConfig sets value to config file.
 func SetConfig(key string, value interface{}) {
 	viper.Set(key, value)
 }
 
-// GetConfigString get string from config file.
+// GetConfigString gets string from config file.
 func GetConfigString(key string) string {
 	return viper.GetString(key)
 }
 
-// GetConfigInt get int from config file.
+// GetConfigInt gets int from config file.
 func GetConfigInt(key string) int {
 	return viper.GetInt(key)
 }
 
-// GetConfigInt64 get int64 from config file.
+// GetConfigInt64 gets int64 from config file.
 func GetConfigInt64(key string) int64 {
 	return viper.GetInt64(key)
 }
 
-// GetConfigBool get bool from config file.
+// GetConfigBool gets bool from config file.
 func GetConfigBool(key string) bool {
 	return viper.GetBool(key)
 }
 
-// GetConfigStringMap get bool from config file.
+// GetConfigStringMap gets bool from config file.
 func GetConfigStringMap(key string) interface{} {
 	return viper.GetStringMap(key)
 }
 
-// GetConfigByte get []byte from config file.
+// GetConfigByte gets []byte from config file.
 func GetConfigByte(key string) []byte {
 	return []byte(viper.GetString(key))
 }
@@ -70,7 +70,7 @@ func GetConfigEnv(key string) string {
 	return os.Getenv(key)
 }
 
-// GetConfigTime get time from config file.
+// GetConfigDuration gets time from config file.
 func GetConfigDuration(key string) time.Duration {
 	return viper.GetDuration(key)
 }
