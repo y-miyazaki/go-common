@@ -12,7 +12,7 @@ func Wrap(format string, a ...interface{}) error {
 	return xerrors.Errorf(format+": %w", a)
 }
 
-// UnWrap uses xerrors.Unwrap.
+// Unwrap uses xerrors.Unwrap.
 func Unwrap(err error) error {
 	return xerrors.Unwrap(err)
 }

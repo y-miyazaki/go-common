@@ -1,0 +1,57 @@
+# https://help.github.com/ja/actions/reference/workflow-syntax-for-github-actions
+name: Check Cloud-Commands
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+      - pkg/**"
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/**"
+      - pkg/**"
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "code: check out code"
+        uses: actions/checkout@v2
+      - name: "parameters: set parameters"
+        id: parameters
+        run: |
+          PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
+          echo "::set-output name=pr_number::${PR_NUMBER}"
+      - name: "go: test"
+        run: |
+          echo $SSH_PRIVATE_KEY >> ./id_rsa
+          chmod +x scripts/*
+          docker pull ymiyazakixyz/golang-test:latest
+          docker run --rm -v $PWD:/go/src/github.com/y-miyazaki/go-common -v $PWD/id_rsa:/root/.ssh/id_rsa -w /go/src/github.com/y-miyazaki/go-common --name golang-test ymiyazakixyz/golang-test:latest ./scripts/gotest.sh
+          rm ./id_rsa
+      - name: "go: upload coverage"
+        uses: actions/upload-artifact@master
+        with:
+          name: coverage
+          path: coverage
+      - name: "go: golangci-lint for lint"
+        uses: reviewdog/action-golangci-lint@v1
+        with:
+          golangci_lint_flags: "--config golangci.yaml"
+          level: error
+          fail_on_error: true
+      - name: "slack: notification for failed build."
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2.0.2
+        env:
+          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL_ID }}
+          SLACK_COLOR: "danger"
+          SLACK_ICON: ""
+          SLACK_TITLE: Failed check
+          SLACK_MESSAGE: |
+            This Github Actions workflow failed check.
+
+            Pull Request
+            https://github.com/${{github.repository}}/pull/${{ steps.parameters.outputs.pr_number }}
+          SLACK_USERNAME: y-miyazaki
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}

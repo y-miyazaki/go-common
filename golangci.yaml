@@ -116,7 +116,7 @@ linters-settings:
   # https://github.com/walle/lll
   # Reports long lines
   lll:
-    line-length: 200
+    line-length: 300
   # https://github.com/mdempsky/maligned
   # Tool to detect Go structs that would take less memory if their fields were sorted
   maligned:
