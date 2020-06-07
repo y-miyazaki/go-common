@@ -1,5 +1,5 @@
 # https://help.github.com/ja/actions/reference/workflow-syntax-for-github-actions
-name: Check Cloud-Commands
+name: Check go-common
 on:
   pull_request:
     paths:
