@@ -157,7 +157,7 @@ linters-settings:
   # checks whether Err of rows is checked successfully
   rowserrcheck:
     packages:
-      - github.com/jmoiron/sqlx
+      - github.com/xxxxx/
   # https://github.com/maratori/testpackage
   # linter that makes you use a separate _test package
   testpackage:
@@ -168,7 +168,7 @@ linters-settings:
   unparam:
     # Inspect exported functions, default is false. Set to true if no external program/library imports your code.
     # XXX: if you enable this setting, unparam will report a lot of false-positives in text editors:
-    # if it's called for subdir of a project it can't find external interfaces. All text editor integrations
+    # if it's called for sub directory of a project it can't find external interfaces. All text editor integrations
     # with golangci-lint call it on a directory with the changed file.
     check-exported: false
   # https://github.com/dominikh/go-tools/tree/master/unused
@@ -176,7 +176,7 @@ linters-settings:
   unused:
     # treat code as a program (not a library) and report unused exported identifiers; default is false.
     # XXX: if you enable this setting, unused will report a lot of false-positives in text editors:
-    # if it's called for subdir of a project it can't find funcs usages. All text editor integrations
+    # if it's called for sub directory of a project it can't find funcs usages. All text editor integrations
     # with golangci-lint call it on a directory with the changed file.
     check-exported: false
   # https://github.com/ultraware/whitespace
@@ -268,24 +268,16 @@ issues:
   exclude-use-default: false
   # Excluding configuration per-path, per-linter, per-text and per-source
   exclude-rules:
-    - path: internal/(cache|renameio)/
-      linters:
-        - lll
-        - gochecknoinits
-        - gocyclo
-        - funlen
-run:
-  skip-dirs:
-    - test/testdata_etc
-    - internal/cache
-    - internal/renameio
-    - internal/robustio
+    # Exclude some staticcheck messages
+    - linters:
+        - gosec
+      text: "G204:" # G204: Subprocess launched with variable (gosec)
 
 # golangci.com configuration
 # https://github.com/golangci/golangci/wiki/Configuration
 service:
   # project-path - by default the project source code will be placed in $GOPATH/src/github.com/project/repo. By if vanity imports are necessary you may specify the import path by this directive. For example, the github.com/kubernetes/kubernetes project may specify project-path: k8s.io/kubernetes.
-  # project-path: mysite.com/goproject # vanity import path if needed
+  # project-path: site.com/project # vanity import path if needed
   # use the fixed version to not introduce new linters unexpectedly
   # golangci-lint-version: 1.26.x
   prepare:

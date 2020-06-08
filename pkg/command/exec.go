@@ -5,7 +5,7 @@ import (
 	"os/exec"
 )
 
-// Output execute exec.Command and output command.
+// CombinedOutput execute exec.Command and output command.
 func CombinedOutput(command string, output bool, options ...string) (string, error) {
 	out, err := exec.Command(command, options...).CombinedOutput()
 	outputCommand := command + " "
@@ -19,7 +19,7 @@ func CombinedOutput(command string, output bool, options ...string) (string, err
 	return string(out), err
 }
 
-// OutputStr execute exec.Command and output command.
+// CombinedOutputStr execute exec.Command and output command.
 func CombinedOutputStr(command string, output bool) (string, error) {
 	out, err := exec.Command("sh", "-c", command).CombinedOutput()
 	if output {
