@@ -5,12 +5,6 @@ on:
     paths:
       - ".github/workflows/**"
       - pkg/**"
-  push:
-    branches:
-      - master
-    paths:
-      - ".github/workflows/**"
-      - pkg/**"
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -27,7 +21,7 @@ jobs:
           echo $SSH_PRIVATE_KEY >> ./id_rsa
           chmod +x scripts/*
           docker pull ymiyazakixyz/golang-test:latest
-          docker run --rm -v $PWD:/go/src/github.com/y-miyazaki/go-common -v $PWD/id_rsa:/root/.ssh/id_rsa -w /go/src/github.com/y-miyazaki/go-common --name golang-test ymiyazakixyz/golang-test:latest ./scripts/gotest.sh
+          docker run --rm -v $PWD:/go/src/github.com/y-miyazaki/go-common -v $PWD/id_rsa:/root/.ssh/id_rsa -w /go/src/github.com/y-miyazaki/go-common --name golang-test ymiyazakixyz/golang-test:latest ./scripts/go_test.sh
           rm ./id_rsa
       - name: "go: upload coverage"
         uses: actions/upload-artifact@master
