@@ -268,7 +268,6 @@ issues:
   exclude-use-default: false
   # Excluding configuration per-path, per-linter, per-text and per-source
   exclude-rules:
-    # Exclude some staticcheck messages
     - linters:
         - gosec
       text: "G204:" # G204: Subprocess launched with variable (gosec)
