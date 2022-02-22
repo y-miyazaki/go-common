@@ -56,6 +56,7 @@ func (l *Logger) WithContext(ctx context.Context) *Logger {
 	}
 }
 
+// WithContextValue calls WithField function of logger entry.
 func (l *Logger) WithContextValue(key string) *Logger {
 	return &Logger{
 		e: l.e.WithField(key, l.e.Context.Value(key)),

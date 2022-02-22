@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+// Interface Gorm Logger interface.
 type Interface interface {
 	LogMode(logger.LogLevel) Interface
 	Info(context.Context, string, ...interface{})
@@ -17,16 +18,21 @@ type Interface interface {
 	Trace(ctx context.Context, begin time.Time, fc func() (sql string, rowsAffected int64), err error)
 }
 
-// LogLevel log level
+// LogLevel log level.
 type LogLevel int
 
 const (
+	// Silent silent log level
 	Silent LogLevel = iota + 1
+	// Error error log level
 	Error
+	// Warn warn log level
 	Warn
+	// Info info log level
 	Info
 )
 
+// GormConfig set configurations.
 type GormConfig struct {
 	SlowThreshold             time.Duration
 	IgnoreRecordNotFoundError bool
@@ -74,14 +80,14 @@ func (l *LoggerGorm) LogMode(level logger.LogLevel) logger.Interface {
 	return newlogger
 }
 
-// Error print the info level log.
+// Info print the info level log.
 func (l *LoggerGorm) Info(ctx context.Context, msg string, data ...interface{}) {
 	if l.gormConfig.LogLevel >= Info {
 		l.e.WithContext(ctx).Infof(msg, data...)
 	}
 }
 
-// Error print the warn level log.
+// Warn print the warn level log.
 func (l *LoggerGorm) Warn(ctx context.Context, msg string, data ...interface{}) {
 	if l.gormConfig.LogLevel >= Warn {
 		l.e.WithContext(ctx).Warnf(msg, data...)

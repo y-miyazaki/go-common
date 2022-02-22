@@ -29,6 +29,7 @@ type SQLServerConfigSetting struct {
 	DBConfig
 }
 
+// DBConfig set configurations.
 type DBConfig struct {
 	// ConnMaxLifetime sets max life time(sec)
 	ConnMaxLifetime time.Duration
@@ -73,6 +74,7 @@ func NewSQLServer(c *SQLServerConfigSetting, gc *gorm.Config) *gorm.DB {
 	return db
 }
 
+// GetDefaultGormConfig get default config.
 func GetDefaultGormConfig() *gorm.Config {
 	return &gorm.Config{
 		DisableAutomaticPing: true,
@@ -83,12 +85,12 @@ func GetDefaultGormConfig() *gorm.Config {
 }
 
 func initDB(db *gorm.DB, dbConfig DBConfig) {
-	sqldb, err := db.DB()
+	d, err := db.DB()
 	if err != nil {
 		panic(fmt.Sprintf("can't get db instance error. %v", err))
 	}
-	sqldb.SetConnMaxIdleTime(dbConfig.ConnMaxIdletime * time.Second)
-	sqldb.SetConnMaxLifetime(dbConfig.ConnMaxLifetime * time.Second)
-	sqldb.SetMaxIdleConns(dbConfig.MaxIdleConns)
-	sqldb.SetMaxOpenConns(dbConfig.MaxOpenConns)
+	d.SetConnMaxIdleTime(dbConfig.ConnMaxIdletime * time.Second)
+	d.SetConnMaxLifetime(dbConfig.ConnMaxLifetime * time.Second)
+	d.SetMaxIdleConns(dbConfig.MaxIdleConns)
+	d.SetMaxOpenConns(dbConfig.MaxOpenConns)
 }
