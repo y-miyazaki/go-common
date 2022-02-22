@@ -10,11 +10,17 @@ type SlackClient struct {
 	ChannelID string
 }
 
-// NewSlack returns an instance of logger
-func NewSlack(oauthAccessToken, channelID string) *SlackClient {
+// SlackConfigSetting sets configurations.
+type SlackConfigSetting struct {
+	OauthAccessToken string
+	ChannelID        string
+}
+
+// NewSlack returns an SlackClient instance.
+func NewSlack(c *SlackConfigSetting) *SlackClient {
 	slackClient := &SlackClient{}
-	slackClient.API = slack.New(oauthAccessToken)
-	slackClient.ChannelID = channelID
+	slackClient.API = slack.New(c.OauthAccessToken)
+	slackClient.ChannelID = c.ChannelID
 	return slackClient
 }
 

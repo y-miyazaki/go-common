@@ -56,6 +56,12 @@ func (l *Logger) WithContext(ctx context.Context) *Logger {
 	}
 }
 
+func (l *Logger) WithContextValue(key string) *Logger {
+	return &Logger{
+		e: l.e.WithField(key, l.e.Context.Value(key)),
+	}
+}
+
 // Debugf outputs debug level log.
 func (l *Logger) Debugf(format string, args ...interface{}) {
 	l.e.Debugf(format, args...)
@@ -94,4 +100,84 @@ func (l *Logger) Fatalf(format string, args ...interface{}) {
 // Panicf outputs panic log.
 func (l *Logger) Panicf(format string, args ...interface{}) {
 	l.e.Panicf(format, args...)
+}
+
+// Debug outputs debug level log.
+func (l *Logger) Debug(args ...interface{}) {
+	l.e.Debug(args...)
+}
+
+// Info outputs info level log.
+func (l *Logger) Info(args ...interface{}) {
+	l.e.Info(args...)
+}
+
+// Print outputs printf.
+func (l *Logger) Print(args ...interface{}) {
+	l.e.Print(args...)
+}
+
+// Warn outputs warn level log.
+func (l *Logger) Warn(args ...interface{}) {
+	l.e.Warn(args...)
+}
+
+// Warning outputs warn level log.
+func (l *Logger) Warning(args ...interface{}) {
+	l.e.Warning(args...)
+}
+
+// Error outputs error level log.
+func (l *Logger) Error(args ...interface{}) {
+	l.e.Error(args...)
+}
+
+// Fatal outputs fatal level log.
+func (l *Logger) Fatal(args ...interface{}) {
+	l.e.Fatal(args...)
+}
+
+// Panic outputs panic log.
+func (l *Logger) Panic(args ...interface{}) {
+	l.e.Panic(args...)
+}
+
+// Debugln outputs debug level log.
+func (l *Logger) Debugln(args ...interface{}) {
+	l.e.Debugln(args...)
+}
+
+// Infoln outputs info level log.
+func (l *Logger) Infoln(args ...interface{}) {
+	l.e.Infoln(args...)
+}
+
+// Println outputs printf.
+func (l *Logger) Println(args ...interface{}) {
+	l.e.Println(args...)
+}
+
+// Warnln outputs warn level log.
+func (l *Logger) Warnln(args ...interface{}) {
+	l.e.Warnln(args...)
+}
+
+// Warningln outputs warn level log.
+func (l *Logger) Warningln(args ...interface{}) {
+	l.e.Warningln(args...)
+}
+
+// Errorln outputs error level log.
+func (l *Logger) Errorln(args ...interface{}) {
+	l.e.Errorln(args...)
+}
+
+// Fatalln outputs fatal level log.
+func (l *Logger) Fatalln(args ...interface{}) {
+	l.e.Fatalln(args...)
+}
+
+// Panicln outputs panic log.
+func (l *Logger) Panicln(args ...interface{}) {
+	l.e.Panicln(args...)
 }

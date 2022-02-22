@@ -1,4 +1,4 @@
-package infrastructure
+package config
 
 import (
 	"fmt"
@@ -6,12 +6,13 @@ import (
 	"strings"
 
 	"github.com/sirupsen/logrus"
+	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 )
 
 // LambdaConfig sets lambda configurations.
 type LambdaConfig struct {
-	Logger      *Logger
-	SlackClient *SlackClient
+	Logger      *infrastructure.Logger
+	SlackClient *infrastructure.SlackClient
 }
 
 // LambdaConfigSetting sets lambda configurations.
@@ -24,14 +25,15 @@ type LambdaConfigSetting struct {
 }
 
 // NewLambdaConfig sets lambda configurations.
-func NewLambdaConfig(lcs *LambdaConfigSetting) *LambdaConfig {
+func NewLambdaConfig(c *LambdaConfigSetting) *LambdaConfig {
 	config := &LambdaConfig{}
+
 	// -------------------------------------------------------------
 	// set Logger
 	// -------------------------------------------------------------
 	logger := &logrus.Logger{}
 	// formatter
-	formatter := strings.ToLower(lcs.LoggerFormatter)
+	formatter := strings.ToLower(c.LoggerFormatter)
 	if formatter == "json" {
 		logger.Formatter = &logrus.JSONFormatter{}
 	} else if formatter == "text" {
@@ -40,25 +42,29 @@ func NewLambdaConfig(lcs *LambdaConfigSetting) *LambdaConfig {
 		panic("Only json and text can be selected for formatter.")
 	}
 	// out
-	out := strings.ToLower(lcs.LoggerOut)
+	out := strings.ToLower(c.LoggerOut)
 	if out == "stdout" {
 		logger.Out = os.Stdout
 	} else {
 		panic("Only stdout can be selected for out.")
 	}
 	// level
-	level, err := logrus.ParseLevel(lcs.LoggerLevel)
+	level, err := logrus.ParseLevel(c.LoggerLevel)
 	if err != nil {
 		panic(fmt.Sprintf("level can't set %v", level))
 	}
 	logger.Level = level
-	config.Logger = NewLogger(logger)
+	config.Logger = infrastructure.NewLogger(logger)
 
 	// -------------------------------------------------------------
 	// set Slack
 	// -------------------------------------------------------------
-	if lcs.SlackOauthAccessToken != "" && lcs.SlackChannelID != "" {
-		config.SlackClient = NewSlack(lcs.SlackOauthAccessToken, lcs.SlackChannelID)
+	if c.SlackOauthAccessToken != "" && c.SlackChannelID != "" {
+		config.SlackClient = infrastructure.NewSlack(
+			&infrastructure.SlackConfigSetting{
+				OauthAccessToken: c.SlackOauthAccessToken,
+				ChannelID:        c.SlackChannelID,
+			})
 	}
 	return config
 }
