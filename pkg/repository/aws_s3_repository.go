@@ -3,6 +3,7 @@ package repository
 import (
 	"bytes"
 	"io"
+	"net/http"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -50,20 +51,32 @@ func (r *AWSS3Repository) PutObjectFile(bucket, key, filePath string) (*s3.PutOb
 		return nil, err
 	}
 	defer file.Close()
+
+	// Get content-type
+	buf := make([]byte, 512)
+	_, err = file.Read(buf)
+	if err != nil {
+		return nil, err
+	}
+	contentType := http.DetectContentType(buf)
+
 	return r.s3.PutObject(&s3.PutObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(r.normalizePath(key)),
-		Body:   file,
+		Bucket:      aws.String(bucket),
+		Key:         aws.String(r.normalizePath(key)),
+		Body:        file,
+		ContentType: &contentType,
 	})
 }
 
 // PutObject adds an object to a bucket.
 // https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html
-func (r *AWSS3Repository) PutObjectText(bucket, key, text string) (*s3.PutObjectOutput, error) {
+func (r *AWSS3Repository) PutObjectText(bucket string, key string, text *string) (*s3.PutObjectOutput, error) {
+	contentType := http.DetectContentType([]byte(*text))
 	return r.s3.PutObject(&s3.PutObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(r.normalizePath(key)),
-		Body:   bytes.NewReader([]byte(text)),
+		Bucket:      aws.String(bucket),
+		Key:         aws.String(r.normalizePath(key)),
+		Body:        bytes.NewReader([]byte(*text)),
+		ContentType: &contentType,
 	})
 }
 
@@ -72,10 +85,19 @@ func (r *AWSS3Repository) PutObjectText(bucket, key, text string) (*s3.PutObject
 // any objects but will still respond that the command was successful.
 // https://docs.aws.amazon.com/AmazonS3/latest/API/API_DeleteObject.html
 func (r *AWSS3Repository) DeleteObject(bucket, key string) (*s3.DeleteObjectOutput, error) {
-	return r.s3.DeleteObject(&s3.DeleteObjectInput{
+	o, err := r.s3.DeleteObject(&s3.DeleteObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(r.normalizePath(key)),
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.s3.WaitUntilObjectNotExists(&s3.HeadObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(r.normalizePath(key)),
+	})
+	return o, err
 }
 
 // DeleteObjects action enables you to delete multiple objects from a bucket using a single HTTP request.
@@ -115,6 +137,32 @@ func (r *AWSS3Repository) ListObjectsV2(bucket, prefix string) (*s3.ListObjectsV
 // https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListBuckets.html
 func (r *AWSS3Repository) ListBuckets() (*s3.ListBucketsOutput, error) {
 	return r.s3.ListBuckets(&s3.ListBucketsInput{})
+}
+
+// CreateBucket creates a new S3 bucket. To create a bucket, you must register with Amazon S3
+// and have a valid AWS Access Key ID to authenticate requests. Anonymous requests are never allowed
+// to create buckets. By creating the bucket, you become the bucket owner.
+// https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateBucket.html
+func (r *AWSS3Repository) CreateBucket(bucket string) (*s3.CreateBucketOutput, error) {
+	return r.s3.CreateBucket(&s3.CreateBucketInput{
+		Bucket: aws.String(bucket),
+	})
+}
+
+// DeleteBucket deletes the S3 bucket. All objects (including all object versions and delete markers) in the bucket
+// must be deleted before the bucket itself can be deleted.
+// https://docs.aws.amazon.com/AmazonS3/latest/API/API_DeleteBucket.html
+func (r *AWSS3Repository) DeleteBucket(bucket string) (*s3.DeleteBucketOutput, error) {
+	o, err := r.s3.DeleteBucket(&s3.DeleteBucketInput{
+		Bucket: aws.String(bucket),
+	})
+	if err != nil {
+		return nil, err
+	}
+	err = r.s3.WaitUntilBucketNotExists(&s3.HeadBucketInput{
+		Bucket: aws.String(bucket),
+	})
+	return o, err
 }
 
 // Normalizes normalizes the path (removing any leading slash)
