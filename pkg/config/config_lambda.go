@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/nlopes/slack"
+	"github.com/slack-go/slack"
 	"github.com/sirupsen/logrus"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 )

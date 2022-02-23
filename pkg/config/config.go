@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/nlopes/slack"
+	"github.com/slack-go/slack"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
@@ -23,7 +23,6 @@ type ConfigSetting struct {
 	ConfigPath            string
 	ConfigFileName        string
 	SlackOauthAccessToken string
-	SlackChannelID        string
 }
 
 // NewConfig to read config
@@ -76,7 +75,7 @@ func NewConfig(c *ConfigSetting) *Config {
 	// -------------------------------------------------------------
 	// set Slack
 	// -------------------------------------------------------------
-	if c.SlackOauthAccessToken != "" && c.SlackChannelID != "" {
+	if c.SlackOauthAccessToken != "" {
 		config.SlackClient = infrastructure.NewSlack(
 			&infrastructure.SlackConfigSetting{
 				OauthAccessToken: c.SlackOauthAccessToken,

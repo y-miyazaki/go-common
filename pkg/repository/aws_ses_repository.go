@@ -22,8 +22,8 @@ type AWSSESRepository struct {
 	isOutputLogPersonalInformation bool
 }
 
-// NewAWSSERepository returns AWSSESRepository instance.
-func NewAWSSERepository(
+// NewAWSSESRepository returns AWSSESRepository instance.
+func NewAWSSESRepository(
 	e *logrus.Entry,
 	ses *ses.SES,
 	configurationSetName *string,
@@ -131,8 +131,9 @@ func (r *AWSSESRepository) log(
 	responseError error,
 ) {
 	e := r.e
+	// Check output personal information flag.
 	if r.isOutputLogPersonalInformation {
-		e := e.
+		e = e.
 			WithField("to", to).
 			WithField("subject", subject)
 	}
