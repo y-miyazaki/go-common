@@ -1,2 +1,2 @@
 # go-common
-goでよく使う共通ライブラリです。
+It is a common library used by go.
