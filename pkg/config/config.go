@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/nlopes/slack"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
@@ -14,7 +15,7 @@ import (
 // Config sets lambda configurations.
 type Config struct {
 	Logger      *infrastructure.Logger
-	SlackClient *infrastructure.SlackClient
+	SlackClient *slack.Client
 }
 
 // ConfigSetting sets configurations.
@@ -79,7 +80,6 @@ func NewConfig(c *ConfigSetting) *Config {
 		config.SlackClient = infrastructure.NewSlack(
 			&infrastructure.SlackConfigSetting{
 				OauthAccessToken: c.SlackOauthAccessToken,
-				ChannelID:        c.SlackChannelID,
 			})
 	}
 	return config

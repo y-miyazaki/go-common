@@ -11,7 +11,7 @@ import (
 	"github.com/y-miyazaki/go-common/pkg/transport"
 )
 
-// NewS3 return session.
+// NewS3 returns s3 instance.
 func NewS3(o *session.Options, c *aws.Config) *s3.S3 {
 	s := session.Must(session.NewSessionWithOptions(*o))
 	return s3.New(s, c)
@@ -25,8 +25,8 @@ func GetDefaultOptions() *session.Options {
 	}
 }
 
-// GetConfig get config.
-func GetConfig(e *logrus.Entry, id, secret, token, region, endpoint string, isMinio bool) *aws.Config {
+// GetS3Config get config.
+func GetS3Config(e *logrus.Entry, id, secret, token, region, endpoint string, isMinio bool) *aws.Config {
 	return &aws.Config{
 		Credentials: credentials.NewStaticCredentials(
 			id,
@@ -38,16 +38,16 @@ func GetConfig(e *logrus.Entry, id, secret, token, region, endpoint string, isMi
 		S3ForcePathStyle: aws.Bool(isMinio),
 		HTTPClient: &http.Client{
 			Transport: transport.NewTransportHTTPLogger(
-				e,
+				e.WithField("service", "aws-s3"),
 				transport.TransportHTTPLoggerTypeExternal,
 			),
 		},
 	}
 }
 
-// GetConfigNoCredentials get no credentials config.
+// GetS3ConfigNoCredentials get no credentials config.
 // If AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are environment variables and are in the execution environment, Credentials is not required.
-func GetConfigNoCredentials(e *logrus.Entry, region, endpoint string, isMinio bool) *aws.Config {
+func GetS3ConfigNoCredentials(e *logrus.Entry, region, endpoint string, isMinio bool) *aws.Config {
 	return &aws.Config{
 		Region:           aws.String(region),
 		Endpoint:         aws.String(endpoint),
@@ -55,7 +55,7 @@ func GetConfigNoCredentials(e *logrus.Entry, region, endpoint string, isMinio bo
 		S3ForcePathStyle: aws.Bool(isMinio),
 		HTTPClient: &http.Client{
 			Transport: transport.NewTransportHTTPLogger(
-				e,
+				e.WithField("service", "aws-s3"),
 				transport.TransportHTTPLoggerTypeExternal,
 			),
 		},

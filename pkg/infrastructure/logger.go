@@ -28,6 +28,11 @@ func NewLogger(logger *logrus.Logger) *Logger {
 	}
 }
 
+// GetEntry gets *logrus.Entry.
+func (l *Logger) GetEntry() *logrus.Entry {
+	return l.e
+}
+
 // WithField calls WithField function of logger entry.
 func (l *Logger) WithField(key string, value interface{}) *Logger {
 	return &Logger{

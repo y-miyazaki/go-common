@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -30,7 +31,12 @@ func GinHTTPLogger(
 		if traceIDHeader != "" {
 			fields["traceID"] = c.Request.Header.Get(traceIDHeader)
 		}
-		e.WithFields(fields).Info()
+
+		if c.Writer.Status() >= http.StatusInternalServerError {
+			e.WithFields(fields).Error()
+		} else {
+			e.WithFields(fields).Info()
+		}
 	}
 }
 
