@@ -46,14 +46,14 @@ type LoggerGorm struct {
 	gormConfig *GormConfig
 }
 
-// LoggerGormSetting sets configurations.
-type LoggerGormSetting struct {
+// LoggerGormConfig sets configurations.
+type LoggerGormConfig struct {
 	Logger     *logrus.Logger
 	GormConfig *GormConfig
 }
 
 // NewLoggerGorm func
-func NewLoggerGorm(c *LoggerGormSetting) *LoggerGorm {
+func NewLoggerGorm(c *LoggerGormConfig) *LoggerGorm {
 	var l = logrus.New()
 
 	// Log as JSON instead of the default ASCII formatter.
