@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/slack-go/slack"
 	"github.com/sirupsen/logrus"
+	"github.com/slack-go/slack"
 	"github.com/spf13/viper"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 )
@@ -77,7 +77,7 @@ func NewConfig(c *ConfigSetting) *Config {
 	// -------------------------------------------------------------
 	if c.SlackOauthAccessToken != "" {
 		config.SlackClient = infrastructure.NewSlack(
-			&infrastructure.SlackConfigSetting{
+			&infrastructure.SlackConfig{
 				OauthAccessToken: c.SlackOauthAccessToken,
 			})
 	}

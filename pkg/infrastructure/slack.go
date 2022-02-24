@@ -4,12 +4,12 @@ import (
 	"github.com/slack-go/slack"
 )
 
-// SlackConfigSetting sets configurations.
-type SlackConfigSetting struct {
+// SlackConfig sets configurations.
+type SlackConfig struct {
 	OauthAccessToken string
 }
 
 // NewSlack returns an SlackClient instance.
-func NewSlack(c *SlackConfigSetting) *slack.Client {
+func NewSlack(c *SlackConfig) *slack.Client {
 	return slack.New(c.OauthAccessToken)
 }

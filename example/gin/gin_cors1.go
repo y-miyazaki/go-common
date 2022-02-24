@@ -14,8 +14,8 @@ func main() {
 	// - Origin header
 	// - Credentials share
 	// - Preflight requests cached for 12 hours
-	router.Use(middleware.GinHTTPHeaderAccessControlAllow(
-		&middleware.GinHTTPHeaderAccessControlConfigSetting{
+	router.Use(middleware.GinCors(
+		&middleware.GinCorsConfig{
 			AllowAllOrigins:  false,
 			AllowOrigins:     []string{"https://foo.com"},
 			AllowMethods:     []string{"PUT", "PATCH"},

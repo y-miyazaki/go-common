@@ -61,7 +61,7 @@ func NewLambdaConfig(c *LambdaConfigSetting) *LambdaConfig {
 	// -------------------------------------------------------------
 	if c.SlackOauthAccessToken != "" {
 		config.SlackClient = infrastructure.NewSlack(
-			&infrastructure.SlackConfigSetting{
+			&infrastructure.SlackConfig{
 				OauthAccessToken: c.SlackOauthAccessToken,
 			})
 	}

@@ -11,20 +11,20 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-// MySQLConfigSetting sets configurations.
-type MySQLConfigSetting struct {
+// MySQLConfig sets configurations.
+type MySQLConfig struct {
 	Config *mysql.Config
 	DBConfig
 }
 
-// PostgresConfigSetting sets configurations.
-type PostgresConfigSetting struct {
+// PostgresConfig sets configurations.
+type PostgresConfig struct {
 	Config *postgres.Config
 	DBConfig
 }
 
-// SQLServerConfigSetting sets configurations.
-type SQLServerConfigSetting struct {
+// SQLServerConfig sets configurations.
+type SQLServerConfig struct {
 	Config *sqlserver.Config
 	DBConfig
 }
@@ -42,7 +42,7 @@ type DBConfig struct {
 }
 
 // NewMySQL returns an gorm db instance.
-func NewMySQL(c *MySQLConfigSetting, gc *gorm.Config) *gorm.DB {
+func NewMySQL(c *MySQLConfig, gc *gorm.Config) *gorm.DB {
 	i := mysql.New(*c.Config)
 	db, err := gorm.Open(i, gc)
 	if err != nil {
@@ -53,7 +53,7 @@ func NewMySQL(c *MySQLConfigSetting, gc *gorm.Config) *gorm.DB {
 }
 
 // NewPostgres returns an gorm db instance.
-func NewPostgres(c *PostgresConfigSetting, gc *gorm.Config) *gorm.DB {
+func NewPostgres(c *PostgresConfig, gc *gorm.Config) *gorm.DB {
 	i := postgres.New(*c.Config)
 	db, err := gorm.Open(i, gc)
 	if err != nil {
@@ -64,7 +64,7 @@ func NewPostgres(c *PostgresConfigSetting, gc *gorm.Config) *gorm.DB {
 }
 
 // NewSQLServer returns an gorm db instance.
-func NewSQLServer(c *SQLServerConfigSetting, gc *gorm.Config) *gorm.DB {
+func NewSQLServer(c *SQLServerConfig, gc *gorm.Config) *gorm.DB {
 	i := sqlserver.New(*c.Config)
 	db, err := gorm.Open(i, gc)
 	if err != nil {
