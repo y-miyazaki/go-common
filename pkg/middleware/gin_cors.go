@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -137,8 +136,6 @@ func (cs *GinCorsConfig) validateOrigin(origin string) bool {
 	if cs.AllowAllOrigins {
 		return true
 	}
-	fmt.Printf("cs.AllowAllOrigins = %v", cs.AllowAllOrigins)
-	fmt.Printf("cs.AllowOrigins = %v", cs.AllowOrigins)
 	for _, v := range cs.AllowOrigins {
 		if v == origin {
 			return true

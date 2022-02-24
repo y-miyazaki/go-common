@@ -29,7 +29,7 @@ func GinHTTPLogger(
 			"userAgent": c.Request.UserAgent(),
 		}
 		if traceIDHeader != "" {
-			fields["traceID"] = c.Request.Header.Get(traceIDHeader)
+			fields[traceIDHeader] = c.Request.Header.Get(traceIDHeader)
 		}
 
 		if c.Writer.Status() >= http.StatusInternalServerError {
