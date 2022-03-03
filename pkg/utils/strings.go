@@ -28,10 +28,20 @@ func CheckStringCount(str string, maxLen int) bool {
 func SliceUTF8(str string, pos int) string {
 	s := utf8string.NewString(str)
 	len := GetStringCount(str)
-	if pos > len {
+	if pos >= len {
 		return s.Slice(0, len)
 	}
 	return s.Slice(0, pos)
+}
+// SliceUTF8AddString gets the characters from the beginning to the specified position,
+// in UTF-8-based characters.
+func SliceUTF8AddString(str string, pos int, addString string) string {
+	s := utf8string.NewString(str)
+	len := GetStringCount(str)
+	if pos >= len {
+		return s.Slice(0, len)
+	}
+	return s.Slice(0, pos) + addString
 }
 
 // ConvertToString converts a basic type to a string type.

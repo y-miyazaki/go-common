@@ -133,6 +133,62 @@ func TestSliceUTF8(t *testing.T) {
 	}
 }
 
+func TestSliceUTF8AddString(t *testing.T) {
+	type args struct {
+		str       string
+		pos       int
+		addString string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "normal1",
+			args: args{
+				str:       "あいうえお",
+				pos:       1,
+				addString: "...",
+			},
+			want: "あ...",
+		},
+		{
+			name: "normal2",
+			args: args{
+				str:       "あいうえお",
+				pos:       2,
+				addString: "...",
+			},
+			want: "あい...",
+		},
+		{
+			name: "normal3",
+			args: args{
+				str:       "あいうえお",
+				pos:       5,
+				addString: "...",
+			},
+			want: "あいうえお",
+		},
+		{
+			name: "normal4",
+			args: args{
+				str:       "あいうえお",
+				pos:       6,
+				addString: "...",
+			},
+			want: "あいうえお",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SliceUTF8AddString(tt.args.str, tt.args.pos, tt.args.addString); got != tt.want {
+				t.Errorf("SliceUTF8AddString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
 func TestConvertToString(t *testing.T) {
 	type args struct {
 		input interface{}
