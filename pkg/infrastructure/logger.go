@@ -9,7 +9,7 @@ import (
 
 // Logger struct.
 type Logger struct {
-	e *logrus.Entry
+	Entry *logrus.Entry
 }
 
 // NewLogger returns an instance of logger
@@ -24,166 +24,166 @@ func NewLogger(logger *logrus.Logger) *Logger {
 	// Only log the warning severity or above.
 	l.SetLevel(logger.Level)
 	return &Logger{
-		e: l.WithFields(logrus.Fields{}),
+		Entry: l.WithFields(logrus.Fields{}),
 	}
 }
 
 // GetEntry gets *logrus.Entry.
 func (l *Logger) GetEntry() *logrus.Entry {
-	return l.e
+	return l.Entry
 }
 
 // WithField calls WithField function of logger entry.
 func (l *Logger) WithField(key string, value interface{}) *Logger {
 	return &Logger{
-		e: l.e.WithField(key, value),
+		Entry: l.Entry.WithField(key, value),
 	}
 }
 
 // WithFields calls WithField function of logger entry.
 func (l *Logger) WithFields(fields logrus.Fields) *Logger {
 	return &Logger{
-		e: l.e.WithFields(fields),
+		Entry: l.Entry.WithFields(fields),
 	}
 }
 
 // WithError calls WithError function of logger entry.
 func (l *Logger) WithError(err error) *Logger {
 	return &Logger{
-		e: l.e.WithField("stacktrace", fmt.Sprintf("%+v", err)).WithError(err),
+		Entry: l.Entry.WithField("stacktrace", fmt.Sprintf("%+v", err)).WithError(err),
 	}
 }
 
 // WithContext calls WithContext function of logger entry.
 func (l *Logger) WithContext(ctx context.Context) *Logger {
 	return &Logger{
-		e: l.e.WithContext(ctx),
+		Entry: l.Entry.WithContext(ctx),
 	}
 }
 
 // WithContextValue calls WithField function of logger entry.
 func (l *Logger) WithContextValue(key string) *Logger {
 	return &Logger{
-		e: l.e.WithField(key, l.e.Context.Value(key)),
+		Entry: l.Entry.WithField(key, l.Entry.Context.Value(key)),
 	}
 }
 
 // Debugf outputs debug level log.
 func (l *Logger) Debugf(format string, args ...interface{}) {
-	l.e.Debugf(format, args...)
+	l.Entry.Debugf(format, args...)
 }
 
 // Infof outputs info level log.
 func (l *Logger) Infof(format string, args ...interface{}) {
-	l.e.Infof(format, args...)
+	l.Entry.Infof(format, args...)
 }
 
 // Printf outputs printf.
 func (l *Logger) Printf(format string, args ...interface{}) {
-	l.e.Printf(format, args...)
+	l.Entry.Printf(format, args...)
 }
 
 // Warnf outputs warn level log.
 func (l *Logger) Warnf(format string, args ...interface{}) {
-	l.e.Warnf(format, args...)
+	l.Entry.Warnf(format, args...)
 }
 
 // Warningf outputs warn level log.
 func (l *Logger) Warningf(format string, args ...interface{}) {
-	l.e.Warningf(format, args...)
+	l.Entry.Warningf(format, args...)
 }
 
 // Errorf outputs error level log.
 func (l *Logger) Errorf(format string, args ...interface{}) {
-	l.e.Errorf(format, args...)
+	l.Entry.Errorf(format, args...)
 }
 
 // Fatalf outputs fatal level log.
 func (l *Logger) Fatalf(format string, args ...interface{}) {
-	l.e.Fatalf(format, args...)
+	l.Entry.Fatalf(format, args...)
 }
 
 // Panicf outputs panic log.
 func (l *Logger) Panicf(format string, args ...interface{}) {
-	l.e.Panicf(format, args...)
+	l.Entry.Panicf(format, args...)
 }
 
 // Debug outputs debug level log.
 func (l *Logger) Debug(args ...interface{}) {
-	l.e.Debug(args...)
+	l.Entry.Debug(args...)
 }
 
 // Info outputs info level log.
 func (l *Logger) Info(args ...interface{}) {
-	l.e.Info(args...)
+	l.Entry.Info(args...)
 }
 
 // Print outputs printf.
 func (l *Logger) Print(args ...interface{}) {
-	l.e.Print(args...)
+	l.Entry.Print(args...)
 }
 
 // Warn outputs warn level log.
 func (l *Logger) Warn(args ...interface{}) {
-	l.e.Warn(args...)
+	l.Entry.Warn(args...)
 }
 
 // Warning outputs warn level log.
 func (l *Logger) Warning(args ...interface{}) {
-	l.e.Warning(args...)
+	l.Entry.Warning(args...)
 }
 
 // Error outputs error level log.
 func (l *Logger) Error(args ...interface{}) {
-	l.e.Error(args...)
+	l.Entry.Error(args...)
 }
 
 // Fatal outputs fatal level log.
 func (l *Logger) Fatal(args ...interface{}) {
-	l.e.Fatal(args...)
+	l.Entry.Fatal(args...)
 }
 
 // Panic outputs panic log.
 func (l *Logger) Panic(args ...interface{}) {
-	l.e.Panic(args...)
+	l.Entry.Panic(args...)
 }
 
 // Debugln outputs debug level log.
 func (l *Logger) Debugln(args ...interface{}) {
-	l.e.Debugln(args...)
+	l.Entry.Debugln(args...)
 }
 
 // Infoln outputs info level log.
 func (l *Logger) Infoln(args ...interface{}) {
-	l.e.Infoln(args...)
+	l.Entry.Infoln(args...)
 }
 
 // Println outputs printf.
 func (l *Logger) Println(args ...interface{}) {
-	l.e.Println(args...)
+	l.Entry.Println(args...)
 }
 
 // Warnln outputs warn level log.
 func (l *Logger) Warnln(args ...interface{}) {
-	l.e.Warnln(args...)
+	l.Entry.Warnln(args...)
 }
 
 // Warningln outputs warn level log.
 func (l *Logger) Warningln(args ...interface{}) {
-	l.e.Warningln(args...)
+	l.Entry.Warningln(args...)
 }
 
 // Errorln outputs error level log.
 func (l *Logger) Errorln(args ...interface{}) {
-	l.e.Errorln(args...)
+	l.Entry.Errorln(args...)
 }
 
 // Fatalln outputs fatal level log.
 func (l *Logger) Fatalln(args ...interface{}) {
-	l.e.Fatalln(args...)
+	l.Entry.Fatalln(args...)
 }
 
 // Panicln outputs panic log.
 func (l *Logger) Panicln(args ...interface{}) {
-	l.e.Panicln(args...)
+	l.Entry.Panicln(args...)
 }

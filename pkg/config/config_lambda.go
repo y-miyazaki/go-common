@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/nlopes/slack"
 	"github.com/sirupsen/logrus"
+	"github.com/slack-go/slack"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 )
 
@@ -22,7 +22,6 @@ type LambdaConfigSetting struct {
 	LoggerOut             string
 	LoggerLevel           string
 	SlackOauthAccessToken string
-	SlackChannelID        string
 }
 
 // NewLambdaConfig sets lambda configurations.
@@ -62,7 +61,7 @@ func NewLambdaConfig(c *LambdaConfigSetting) *LambdaConfig {
 	// -------------------------------------------------------------
 	if c.SlackOauthAccessToken != "" {
 		config.SlackClient = infrastructure.NewSlack(
-			&infrastructure.SlackConfigSetting{
+			&infrastructure.SlackConfig{
 				OauthAccessToken: c.SlackOauthAccessToken,
 			})
 	}

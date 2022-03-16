@@ -23,7 +23,7 @@ func TestNewGormLogger(t *testing.T) {
 	logger.Out = os.Stdout
 	logger.Level, _ = logrus.ParseLevel("Info")
 
-	loggerGorm := NewLoggerGorm(&LoggerGormSetting{
+	loggerGorm := NewLoggerGorm(&LoggerGormConfig{
 		Logger: logger,
 		GormConfig: &GormConfig{
 			SlowThreshold:             time.Duration(1000),
