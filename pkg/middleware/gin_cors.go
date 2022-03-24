@@ -35,7 +35,7 @@ func GinCors(
 ) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		origin := c.Request.Header.Get("Origin")
-		if len(origin) == 0 {
+		if origin == "" {
 			// request is not a CORS request.
 			c.Next()
 			return
