@@ -33,6 +33,7 @@ func SliceUTF8(str string, pos int) string {
 	}
 	return s.Slice(0, pos)
 }
+
 // SliceUTF8AddString gets the characters from the beginning to the specified position,
 // in UTF-8-based characters.
 func SliceUTF8AddString(str string, pos int, addString string) string {
