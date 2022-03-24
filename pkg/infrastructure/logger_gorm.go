@@ -34,9 +34,13 @@ const (
 
 // GormConfig set configurations.
 type GormConfig struct {
-	SlowThreshold             time.Duration
+	// If the time specified by SlowThreshold is exceeded, it is displayed in the log as a SlowQuery.
+	SlowThreshold time.Duration
+	// If true is specified for IgnoreRecordNotFoundError, no log is output at the error level even if the record does not exist as a search result.
+	// If false, logs are output at the error level when a record does not exist as a search result.
 	IgnoreRecordNotFoundError bool
-	LogLevel                  LogLevel
+	// LogLevel outputs logs above the specified level.
+	LogLevel LogLevel
 }
 
 // LoggerGorm struct.
