@@ -10,13 +10,13 @@ import (
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 )
 
-// LambdaConfig sets lambda configurations.
-type LambdaConfig struct {
+// Config sets base configurations.
+type Config struct {
 	Logger      *infrastructure.Logger
 	SlackClient *slack.Client
 }
 
-// ConfigSetting sets lambda configurations.
+// ConfigSetting sets base configurations.
 type ConfigSetting struct {
 	LoggerFormatter       string
 	LoggerOut             string
@@ -24,9 +24,9 @@ type ConfigSetting struct {
 	SlackOauthAccessToken string
 }
 
-// NewConfig sets lambda configurations.
-func NewConfig(c *ConfigSetting) *LambdaConfig {
-	config := &LambdaConfig{}
+// NewConfig sets base configurations.
+func NewConfig(c *ConfigSetting) *Config {
+	config := &Config{}
 
 	// -------------------------------------------------------------
 	// set Logger

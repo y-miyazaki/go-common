@@ -7,16 +7,9 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/sirupsen/logrus"
-	"github.com/slack-go/slack"
 	"github.com/spf13/viper"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 )
-
-// Config sets lambda configurations.
-type Config struct {
-	Logger      *infrastructure.Logger
-	SlackClient *slack.Client
-}
 
 // ConfigFileSetting sets configurations.
 type ConfigFileSetting struct {
