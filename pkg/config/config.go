@@ -5,51 +5,35 @@ import (
 	"os"
 	"strings"
 
-	"github.com/fsnotify/fsnotify"
 	"github.com/sirupsen/logrus"
 	"github.com/slack-go/slack"
-	"github.com/spf13/viper"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 )
 
-// Config sets lambda configurations.
-type Config struct {
+// LambdaConfig sets lambda configurations.
+type LambdaConfig struct {
 	Logger      *infrastructure.Logger
 	SlackClient *slack.Client
 }
 
-// ConfigSetting sets configurations.
+// ConfigSetting sets lambda configurations.
 type ConfigSetting struct {
-	ConfigPath            string
-	ConfigFileName        string
+	LoggerFormatter       string
+	LoggerOut             string
+	LoggerLevel           string
 	SlackOauthAccessToken string
 }
 
-// NewConfig to read config
-func NewConfig(c *ConfigSetting) *Config {
-	config := &Config{}
-	// -------------------------------------------------------------
-	// get config
-	// -------------------------------------------------------------
-	viper.AddConfigPath(c.ConfigPath) // path to look for the config file in
-	viper.SetConfigName(c.ConfigFileName)
-	viper.SetConfigType("yaml") // can viper.SetConfigType("YAML")
-	viper.AutomaticEnv()
-	err := viper.ReadInConfig() // Find and read the config file
+// NewConfig sets lambda configurations.
+func NewConfig(c *ConfigSetting) *LambdaConfig {
+	config := &LambdaConfig{}
 
-	if err != nil {
-		panic("viper can't read config.")
-	}
-	viper.WatchConfig()
-	viper.OnConfigChange(func(e fsnotify.Event) {
-		fmt.Println("ConfigHandler file changed:", e.Name)
-	})
 	// -------------------------------------------------------------
 	// set Logger
 	// -------------------------------------------------------------
 	logger := &logrus.Logger{}
 	// formatter
-	formatter := strings.ToLower(viper.GetString("logger.formatter"))
+	formatter := strings.ToLower(c.LoggerFormatter)
 	if formatter == "json" {
 		logger.Formatter = &logrus.JSONFormatter{}
 	} else if formatter == "text" {
@@ -58,14 +42,14 @@ func NewConfig(c *ConfigSetting) *Config {
 		panic("Only json and text can be selected for formatter.")
 	}
 	// out
-	out := strings.ToLower(viper.GetString("logger.out"))
+	out := strings.ToLower(c.LoggerOut)
 	if out == "stdout" {
 		logger.Out = os.Stdout
 	} else {
 		panic("Only stdout can be selected for out.")
 	}
 	// level
-	level, err := logrus.ParseLevel(viper.GetString("logger.level"))
+	level, err := logrus.ParseLevel(c.LoggerLevel)
 	if err != nil {
 		panic(fmt.Sprintf("level can't set %v", level))
 	}
