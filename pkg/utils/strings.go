@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"strconv"
 
 	"github.com/rivo/uniseg"
@@ -64,4 +66,11 @@ func ConvertToString(input interface{}) (string, error) {
 		err = fmt.Errorf("Undefined type to convert %T", v)
 	}
 	return output, err
+}
+
+// GetStringFromReadCloser gets string
+func GetStringFromReadCloser(r io.ReadCloser) string {
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(r)
+	return buf.String()
 }
