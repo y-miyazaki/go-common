@@ -127,7 +127,12 @@ func main() {
 	}
 	rc := object.Body
 	defer rc.Close()
-	logger.Infof("text.txt = %s", utils.GetStringFromReadCloser(rc))
+
+	text, err = utils.GetStringFromReadCloser(rc)
+	if err != nil {
+		logger.WithError(err).Errorf("can't get text")
+	}
+	logger.Infof("text.txt = %s", text)
 
 	// ListObjectV2
 	listObjects, err := awsS3Repository.ListObjectsV2(bucket, "")
