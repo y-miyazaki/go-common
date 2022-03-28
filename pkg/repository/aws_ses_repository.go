@@ -17,7 +17,7 @@ type AWSSESRepositoryInterface interface {
 // AWSSESRepository struct.
 type AWSSESRepository struct {
 	e                              *logrus.Entry
-	ses                            *ses.SES
+	s                              *ses.SES
 	configurationSetName           *string
 	isOutputLogPersonalInformation bool
 }
@@ -25,21 +25,22 @@ type AWSSESRepository struct {
 // NewAWSSESRepository returns AWSSESRepository instance.
 func NewAWSSESRepository(
 	e *logrus.Entry,
-	ses *ses.SES,
+	s *ses.SES,
 	configurationSetName *string,
 	isOutputLogPersonalInformation bool,
 
 ) *AWSSESRepository {
 	return &AWSSESRepository{
 		e:                              e,
-		ses:                            ses,
+		s:                              s,
 		configurationSetName:           configurationSetName,
 		isOutputLogPersonalInformation: isOutputLogPersonalInformation,
 	}
 }
 
+// SendTextEmail sends text email.
 func (r *AWSSESRepository) SendTextEmail(from, to, subject, content string) error {
-	response, err := r.ses.SendEmail(&ses.SendEmailInput{
+	response, err := r.s.SendEmail(&ses.SendEmailInput{
 		ConfigurationSetName: r.configurationSetName,
 		Destination: &ses.Destination{
 			ToAddresses: []*string{
@@ -66,8 +67,9 @@ func (r *AWSSESRepository) SendTextEmail(from, to, subject, content string) erro
 	return err
 }
 
-func (r *AWSSESRepository) SendHtmlEmail(from, to, subject, content string) error {
-	response, err := r.ses.SendEmail(&ses.SendEmailInput{
+// SendHTMLEmail sends HTML email.
+func (r *AWSSESRepository) SendHTMLEmail(from, to, subject, content string) error {
+	response, err := r.s.SendEmail(&ses.SendEmailInput{
 		ConfigurationSetName: r.configurationSetName,
 		Destination: &ses.Destination{
 			ToAddresses: []*string{
@@ -94,8 +96,9 @@ func (r *AWSSESRepository) SendHtmlEmail(from, to, subject, content string) erro
 	return err
 }
 
-func (r *AWSSESRepository) SendEmail(from, to, subject, contentText, contentHtml string) error {
-	response, err := r.ses.SendEmail(&ses.SendEmailInput{
+// SendEmail sends email.
+func (r *AWSSESRepository) SendEmail(from, to, subject, contentText, contentHTML string) error {
+	response, err := r.s.SendEmail(&ses.SendEmailInput{
 		ConfigurationSetName: r.configurationSetName,
 		Destination: &ses.Destination{
 			ToAddresses: []*string{
@@ -110,7 +113,7 @@ func (r *AWSSESRepository) SendEmail(from, to, subject, contentText, contentHtml
 				},
 				Html: &ses.Content{
 					Charset: aws.String("UTF-8"),
-					Data:    aws.String(contentHtml),
+					Data:    aws.String(contentHTML),
 				},
 			},
 			Subject: &ses.Content{

@@ -5,10 +5,15 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/sirupsen/logrus"
+)
+
+const (
+	maxBufferSize int = 512
 )
 
 // AWSS3RepositoryInterface interface.
@@ -43,17 +48,21 @@ func (r *AWSS3Repository) GetObject(bucket, key string) (*s3.GetObjectOutput, er
 	})
 }
 
-// PutObject adds an object to a bucket.
+// PutObjectFile adds an object to a bucket.
 // https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html
 func (r *AWSS3Repository) PutObjectFile(bucket, key, filePath string) (*s3.PutObjectOutput, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
-
+	defer func() {
+		err = file.Close()
+		if err != nil {
+			r.e.WithError(err).Errorf("can't close file(%s)", filePath)
+		}
+	}()
 	// Get content-type
-	buf := make([]byte, 512)
+	buf := make([]byte, maxBufferSize)
 	_, err = file.Read(buf)
 	if err != nil {
 		return nil, err
@@ -68,9 +77,9 @@ func (r *AWSS3Repository) PutObjectFile(bucket, key, filePath string) (*s3.PutOb
 	})
 }
 
-// PutObject adds an object to a bucket.
+// PutObjectText adds an object to a bucket.
 // https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html
-func (r *AWSS3Repository) PutObjectText(bucket string, key string, text *string) (*s3.PutObjectOutput, error) {
+func (r *AWSS3Repository) PutObjectText(bucket, key string, text *string) (*s3.PutObjectOutput, error) {
 	contentType := http.DetectContentType([]byte(*text))
 	return r.s3.PutObject(&s3.PutObjectInput{
 		Bucket:      aws.String(bucket),
@@ -165,8 +174,18 @@ func (r *AWSS3Repository) DeleteBucket(bucket string) (*s3.DeleteBucketOutput, e
 	return o, err
 }
 
-// Normalizes normalizes the path (removing any leading slash)
-func (fur *AWSS3Repository) normalizePath(path string) string {
+// GetPresignedURL creates a Pre-Singed URL.
+// https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/s3-example-presigned-urls.html
+func (r *AWSS3Repository) GetPresignedURL(bucket, key string, expire time.Duration) (string, error) {
+	req, _ := r.s3.GetObjectRequest(&s3.GetObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(r.normalizePath(key)),
+	})
+	return req.Presign(expire)
+}
+
+// normalizePath normalizes the path (removing any leading slash)
+func (r *AWSS3Repository) normalizePath(path string) string {
 	if len(path) > 0 && path[0] == '/' {
 		path = path[1:]
 	}

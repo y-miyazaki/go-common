@@ -29,9 +29,9 @@ func CheckStringCount(str string, maxLen int) bool {
 // in UTF-8-based characters.
 func SliceUTF8(str string, pos int) string {
 	s := utf8string.NewString(str)
-	len := GetStringCount(str)
-	if pos >= len {
-		return s.Slice(0, len)
+	length := GetStringCount(str)
+	if pos >= length {
+		return s.Slice(0, length)
 	}
 	return s.Slice(0, pos)
 }
@@ -40,9 +40,9 @@ func SliceUTF8(str string, pos int) string {
 // in UTF-8-based characters.
 func SliceUTF8AddString(str string, pos int, addString string) string {
 	s := utf8string.NewString(str)
-	len := GetStringCount(str)
-	if pos >= len {
-		return s.Slice(0, len)
+	length := GetStringCount(str)
+	if pos >= length {
+		return s.Slice(0, length)
 	}
 	return s.Slice(0, pos) + addString
 }
@@ -69,8 +69,11 @@ func ConvertToString(input interface{}) (string, error) {
 }
 
 // GetStringFromReadCloser gets string
-func GetStringFromReadCloser(r io.ReadCloser) string {
+func GetStringFromReadCloser(r io.ReadCloser) (string, error) {
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(r)
-	return buf.String()
+	_, err := buf.ReadFrom(r)
+	if err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }

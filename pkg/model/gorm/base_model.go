@@ -13,7 +13,6 @@ type BaseModel struct {
 }
 
 // BaseModelWithDeleted struct
-
 type BaseModelWithDeleted struct {
 	BaseModel
 	DeletedAt soft_delete.DeletedAt `mapstructure:"deleted_at" gorm:"column:deleted_at;type:int(11);default:0"`

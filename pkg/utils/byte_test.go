@@ -13,21 +13,28 @@ func TestGetBufferFromReadCloser(t *testing.T) {
 		r io.ReadCloser
 	}
 	tests := []struct {
-		name string
-		args args
-		want []byte
+		name    string
+		args    args
+		want    []byte
+		wantErr bool
 	}{
 		{
 			name: "test1",
 			args: args{
 				r: ioutil.NopCloser(strings.NewReader("Hello, world!")),
 			},
-			want: []byte("Hello, world!"),
+			want:    []byte("Hello, world!"),
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetBufferFromReadCloser(tt.args.r); !reflect.DeepEqual(got, tt.want) {
+			got, err := GetBufferFromReadCloser(tt.args.r)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetBufferFromReadCloser() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetBufferFromReadCloser() = %v, want %v", got, tt.want)
 			}
 		})
