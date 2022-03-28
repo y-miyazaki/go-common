@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -49,8 +50,13 @@ func (l *Logger) WithFields(fields logrus.Fields) *Logger {
 
 // WithError calls WithError function of logger entry.
 func (l *Logger) WithError(err error) *Logger {
+	if e, ok := err.(interface{ StackTrace() errors.StackTrace }); ok {
+		return &Logger{
+			Entry: l.Entry.WithField("stacktrace", fmt.Sprintf("%+v", e.StackTrace())).WithError(err),
+		}
+	}
 	return &Logger{
-		Entry: l.Entry.WithField("stacktrace", fmt.Sprintf("%+v", err)).WithError(err),
+		Entry: l.Entry.WithError(err),
 	}
 }
 

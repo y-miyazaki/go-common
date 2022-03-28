@@ -1,6 +1,9 @@
 package utils
 
 import (
+	"io"
+	"io/ioutil"
+	"strings"
 	"testing"
 )
 
@@ -266,6 +269,32 @@ func TestConvertToString(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("ConvertToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGetStringFromReadCloser(t *testing.T) {
+	type args struct {
+		r io.ReadCloser
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "test1",
+			args: args{
+				r: ioutil.NopCloser(strings.NewReader("Hello, world!")),
+			},
+			want: "Hello, world!",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GetStringFromReadCloser(tt.args.r); got != tt.want {
+				t.Errorf("GetStringFromReadCloser() = %v, want %v", got, tt.want)
 			}
 		})
 	}
