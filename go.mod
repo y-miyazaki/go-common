@@ -9,13 +9,14 @@ require (
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.7.7
-	github.com/golang/mock v1.6.0 // indirect
+	github.com/golang/mock v1.6.0
 	github.com/nlopes/slack v0.6.0
 	github.com/pkg/errors v0.9.1
 	github.com/rivo/uniseg v0.2.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/slack-go/slack v0.10.2
 	github.com/spf13/viper v1.10.1
+	github.com/stretchr/testify v1.7.0
 	golang.org/x/exp v0.0.0-20220218215828-6cf2b201936e
 	gorm.io/driver/mysql v1.3.2
 	gorm.io/driver/postgres v1.3.1
