@@ -8,6 +8,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewLogger(t *testing.T) {
@@ -47,6 +48,10 @@ func TestNewLogger(t *testing.T) {
 	log.Errorln("Errorln")
 	// log.Fatalln("Fatalln")
 	// log.Panicln("Panicln")
+	log.WithField("test", "data").WithFields(logrus.Fields{"Type": "unk", "State": "oops"}).Info("test")
+
+	e := log.GetEntry()
+	assert.NotNil(t, e)
 
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "contextKey", "contextValue")
