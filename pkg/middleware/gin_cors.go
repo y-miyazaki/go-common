@@ -9,6 +9,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	decimal int = 10
+)
+
 type converter func(string) string
 
 // GinCorsConfig sets configurations.
@@ -62,7 +66,7 @@ func GinCors(
 			}
 			// Access-Control-Max-Age
 			if cs.MaxAge > time.Duration(0) {
-				value := strconv.FormatInt(int64(cs.MaxAge/time.Second), 10)
+				value := strconv.FormatInt(int64(cs.MaxAge/time.Second), decimal)
 				c.Header("Access-Control-Max-Age", value)
 			}
 		}

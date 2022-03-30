@@ -2,6 +2,8 @@ module github.com/y-miyazaki/go-common
 
 go 1.14
 
+replace github.com/y-miyazaki/go-common v0.0.0 => ./
+
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/aws/aws-sdk-go v1.43.3
@@ -22,5 +24,5 @@ require (
 	gorm.io/driver/postgres v1.3.1
 	gorm.io/driver/sqlserver v1.3.1
 	gorm.io/gorm v1.23.1
-	gorm.io/plugin/soft_delete v1.1.0 // indirect
+	gorm.io/plugin/soft_delete v1.1.0
 )
