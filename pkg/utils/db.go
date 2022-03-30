@@ -16,8 +16,6 @@ func GetMySQLDsn(username, password, server, port, db, parameter string) string 
 }
 
 // GetPostgresDsn creates a Postgres DSN string.
-// about DSN document.
-// https://github.com/go-sql-driver/postgres#dsn-data-source-name
 func GetPostgresDsn(user, password, host, port, dbname, parameter string) string {
 	return fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s %s", user, password, host, port, dbname, parameter)
 }
