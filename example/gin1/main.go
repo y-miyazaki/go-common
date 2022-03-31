@@ -8,6 +8,7 @@ import (
 	helmet "github.com/danielkov/gin-helmet"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"github.com/y-miyazaki/go-common/example/gin1/handler"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 	"github.com/y-miyazaki/go-common/pkg/middleware"
 )
@@ -25,6 +26,7 @@ func main() {
 	}
 	l.Level = level
 	logger := infrastructure.NewLogger(l)
+	h := handler.NewHTTPHandler(logger)
 
 	router := gin.Default()
 	// CORS for https://foo.com and https://github.com origins, allowing:
@@ -43,6 +45,13 @@ func main() {
 			MaxAge:           12 * time.Hour,
 		}))
 	router.Use(helmet.Default())
-	router.Use(middleware.GinHTTPLogger(logger.Entry, "request-id", "test"))
-	router.Run()
+	router.Use(middleware.GinHTTPLogger(logger, "request-id", "test"))
+	{
+		router.GET("/hello", h.GetHello)
+		router.GET("/error_500", h.GetError500)
+	}
+	err = router.Run()
+	if err != nil {
+		logger.WithError(err).Error("router.Run() error...")
+	}
 }

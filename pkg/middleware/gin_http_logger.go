@@ -6,11 +6,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 )
 
 // GinHTTPLogger retrieves the request/response logs.
 func GinHTTPLogger(
-	e *logrus.Entry,
+	logger *infrastructure.Logger,
 	traceIDHeader string,
 	clientIPHeader string,
 ) gin.HandlerFunc {
@@ -33,9 +34,17 @@ func GinHTTPLogger(
 		}
 
 		if c.Writer.Status() >= http.StatusInternalServerError {
-			e.WithFields(fields).Error()
+			l := logger
+			var tmp interface{}
+			tmp, _ = c.Get("error")
+			if err, ok := tmp.(error); ok {
+				l = logger.WithError(err)
+			}
+			messages, _ := c.Get("messages")
+			l = l.WithField("messages", messages)
+			l.WithFields(fields).Error()
 		} else {
-			e.WithFields(fields).Info()
+			logger.WithFields(fields).Info()
 		}
 	}
 }

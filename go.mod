@@ -15,6 +15,7 @@ require (
 	github.com/nlopes/slack v0.6.0
 	github.com/pkg/errors v0.9.1
 	github.com/rivo/uniseg v0.2.0
+	github.com/rubenv/sql-migrate v1.1.1 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/slack-go/slack v0.10.2
 	github.com/spf13/viper v1.10.1
