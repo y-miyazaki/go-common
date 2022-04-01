@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"github.com/y-miyazaki/go-common/pkg/context"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 )
 
@@ -34,19 +33,10 @@ func GinHTTPLogger(
 			fields[traceIDHeader] = c.Request.Header.Get(traceIDHeader)
 		}
 		// get error
-		l := logger
-		if err, err2 := context.GetGinContextError(c); err2 == nil {
-			l = l.WithError(err)
-		}
-		// get error message
-		if messages, err := context.GetGinContextErrorMessage(c); err == nil {
-			l = l.WithField("messages", messages)
-		}
-
 		if c.Writer.Status() >= http.StatusInternalServerError {
-			l.WithFields(fields).Error()
+			logger.WithFields(fields).WithContext(c).Error()
 		} else {
-			l.WithFields(fields).Info()
+			logger.WithFields(fields).WithContext(c).Info()
 		}
 	}
 }

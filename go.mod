@@ -2,8 +2,6 @@ module github.com/y-miyazaki/go-common
 
 go 1.16
 
-replace github.com/y-miyazaki/go-common v0.0.0 => ./
-
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/aws/aws-sdk-go v1.43.3
