@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"github.com/nlopes/slack"
 	"github.com/sirupsen/logrus"
+	"github.com/slack-go/slack"
 )
 
 // SlackRepositoryInterface interface

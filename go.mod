@@ -13,7 +13,6 @@ require (
 	github.com/gin-gonic/gin v1.7.7
 	github.com/golang/mock v1.6.0
 	github.com/mattn/go-sqlite3 v1.14.6 // indirect
-	github.com/nlopes/slack v0.6.0
 	github.com/pkg/errors v0.9.1
 	github.com/rivo/uniseg v0.2.0
 	github.com/sirupsen/logrus v1.8.1
