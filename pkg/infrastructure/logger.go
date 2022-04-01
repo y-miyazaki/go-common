@@ -70,13 +70,6 @@ func (l *Logger) WithContext(ctx context.Context) *Logger {
 	}
 }
 
-func (l *Logger) WithContextValues(ctx context.Context) *Logger {
-	ctx.
-	return &Logger{
-		Entry: l.Entry.WithField(key, l.Entry.Context.Value(key)),
-	}
-}
-
 // WithContextValue calls WithField function of logger entry.
 func (l *Logger) WithContextValue(key string) *Logger {
 	return &Logger{
