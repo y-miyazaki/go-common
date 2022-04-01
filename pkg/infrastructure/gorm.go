@@ -89,7 +89,7 @@ func initDB(db *gorm.DB, dbConfig DBConfig) {
 	if err != nil {
 		panic(fmt.Sprintf("can't get db instance error. %v", err))
 	}
-	// d.SetConnMaxIdleTime(dbConfig.ConnMaxIdletime * time.Second)
+	d.SetConnMaxIdleTime(dbConfig.ConnMaxIdletime * time.Second)
 	d.SetConnMaxLifetime(dbConfig.ConnMaxLifetime * time.Second)
 	d.SetMaxIdleConns(dbConfig.MaxIdleConns)
 	d.SetMaxOpenConns(dbConfig.MaxOpenConns)

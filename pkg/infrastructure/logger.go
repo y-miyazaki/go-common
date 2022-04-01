@@ -50,6 +50,9 @@ func (l *Logger) WithFields(fields logrus.Fields) *Logger {
 
 // WithError calls WithError function of logger entry.
 func (l *Logger) WithError(err error) *Logger {
+	if err == nil {
+		return l
+	}
 	if e, ok := err.(interface{ StackTrace() errors.StackTrace }); ok {
 		return &Logger{
 			Entry: l.Entry.WithField("stacktrace", fmt.Sprintf("%+v", e.StackTrace())).WithError(err),
@@ -64,6 +67,13 @@ func (l *Logger) WithError(err error) *Logger {
 func (l *Logger) WithContext(ctx context.Context) *Logger {
 	return &Logger{
 		Entry: l.Entry.WithContext(ctx),
+	}
+}
+
+func (l *Logger) WithContextValues(ctx context.Context) *Logger {
+	ctx.
+	return &Logger{
+		Entry: l.Entry.WithField(key, l.Entry.Context.Value(key)),
 	}
 }
 

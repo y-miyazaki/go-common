@@ -144,7 +144,7 @@ func (r *AWSSESRepository) log(
 		e = e.WithField("messageId", *responseObject.MessageId)
 	}
 	if responseError == nil {
-		e.Info("Successfully sent an SES email")
+		e.Debug("Successfully sent an SES email")
 	} else {
 		e.WithError(responseError).Error("Error while sending an SES email")
 	}
