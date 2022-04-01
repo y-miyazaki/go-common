@@ -35,11 +35,11 @@ func GinHTTPLogger(
 		}
 		// get error
 		l := logger
-		if err, err2 := context.GetContextError(c); err2 == nil {
+		if err, err2 := context.GetGinContextError(c); err2 == nil {
 			l = l.WithError(err)
 		}
 		// get error message
-		if messages, err := context.GetContextErrorMessage(c); err == nil {
+		if messages, err := context.GetGinContextErrorMessage(c); err == nil {
 			l = l.WithField("messages", messages)
 		}
 

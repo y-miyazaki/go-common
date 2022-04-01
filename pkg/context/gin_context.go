@@ -11,8 +11,8 @@ const (
 	contextKeyErrorMessage string = "errormessage"
 )
 
-// GetContextError gets error.
-func GetContextError(c *gin.Context) (err, err2 error) {
+// GetGinContextError gets error.
+func GetGinContextError(c *gin.Context) (err, err2 error) {
 	if tmp, exists := c.Get(contextKeyError); exists {
 		if err, ok := tmp.(error); ok {
 			return err, nil
@@ -22,8 +22,8 @@ func GetContextError(c *gin.Context) (err, err2 error) {
 	return nil, nil
 }
 
-// GetContextErrorMessage gets error message.
-func GetContextErrorMessage(c *gin.Context) (string, error) {
+// GetGinContextErrorMessage gets error message.
+func GetGinContextErrorMessage(c *gin.Context) (string, error) {
 	if tmp, exists := c.Get(contextKeyErrorMessage); exists {
 		if message, ok := tmp.(string); ok {
 			return message, nil
@@ -33,12 +33,12 @@ func GetContextErrorMessage(c *gin.Context) (string, error) {
 	return "", nil
 }
 
-// SetContextError sets error.
-func SetContextError(c *gin.Context, err error) {
+// SetGinContextError sets error.
+func SetGinContextError(c *gin.Context, err error) {
 	c.Set(contextKeyError, err)
 }
 
-// SetContextErrorMessage sets error message.
-func SetContextErrorMessage(c *gin.Context, message interface{}) {
+// SetGinContextErrorMessage sets error message.
+func SetGinContextErrorMessage(c *gin.Context, message interface{}) {
 	c.Set(contextKeyErrorMessage, message)
 }
