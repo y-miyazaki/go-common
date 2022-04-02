@@ -8,7 +8,9 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/sirupsen/logrus"
 )
 
@@ -23,19 +25,21 @@ type AWSS3RepositoryInterface interface {
 
 // AWSS3Repository struct.
 type AWSS3Repository struct {
-	e  *logrus.Entry
-	s3 *s3.S3
+	e       *logrus.Entry
+	s3      *s3.S3
+	session *session.Session
 }
 
 // NewAWSS3Repository returns AWSS3Repository instance.
 func NewAWSS3Repository(
 	e *logrus.Entry,
-	s3 *s3.S3,
-
+	session *session.Session,
+	config *aws.Config,
 ) *AWSS3Repository {
 	return &AWSS3Repository{
-		e:  e,
-		s3: s3,
+		e:       e,
+		s3:      s3.New(session, config),
+		session: session,
 	}
 }
 
@@ -182,6 +186,57 @@ func (r *AWSS3Repository) GetPresignedURL(bucket, key string, expire time.Durati
 		Key:    aws.String(r.normalizePath(key)),
 	})
 	return req.Presign(expire)
+}
+
+// Upload adds an object to a bucket.
+func (r *AWSS3Repository) Upload(bucket, key, filePath string) (*s3manager.UploadOutput, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		err = file.Close()
+		if err != nil {
+			r.e.WithError(err).Errorf("can't close file(%s)", filePath)
+		}
+	}()
+
+	// Get content-type
+	buf := make([]byte, maxBufferSize)
+	_, err = file.Read(buf)
+	if err != nil {
+		return nil, err
+	}
+	contentType := http.DetectContentType(buf)
+
+	uploader := s3manager.NewUploader(r.session)
+	return uploader.Upload(&s3manager.UploadInput{
+		Bucket:      aws.String(bucket),
+		Body:        file,
+		Key:         aws.String(r.normalizePath(key)),
+		ContentType: &contentType,
+	})
+}
+
+// Download retrieves objects from Amazon S3.
+func (r *AWSS3Repository) Download(bucket, key, filePath string) error {
+	file, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		err = file.Close()
+		if err != nil {
+			r.e.WithError(err).Errorf("can't close file(%s)", filePath)
+		}
+	}()
+
+	downloader := s3manager.NewDownloader(r.session)
+	_, err = downloader.Download(file, &s3.GetObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(r.normalizePath(key)),
+	})
+	return err
 }
 
 // normalizePath normalizes the path (removing any leading slash)

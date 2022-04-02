@@ -8,5 +8,4 @@ type HTTPBaseErrorResponse struct {
 // HTTPErrorResponse struct.
 type HTTPErrorResponse struct {
 	Message interface{} `json:"message"`
-	Details interface{} `json:"details"`
 }

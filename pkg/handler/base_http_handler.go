@@ -66,7 +66,5 @@ func (h *BaseHTTPHandler) ResponseStatusNotFound(c *gin.Context, messages interf
 func (h *BaseHTTPHandler) ResponseStatusInternalServerError(c *gin.Context, messages interface{}, err error) {
 	context.SetGinContextError(c, err)
 	context.SetGinContextErrorMessage(c, messages)
-	c.JSON(http.StatusInternalServerError, gin.H{
-		"message": messages,
-	})
+	c.JSON(http.StatusInternalServerError, messages)
 }

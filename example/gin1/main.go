@@ -48,7 +48,8 @@ func main() {
 	router.Use(middleware.GinHTTPLogger(logger, "request-id", "test"))
 	{
 		router.GET("/hello", h.GetHello)
-		router.GET("/error_500", h.GetError500)
+		router.GET("/error_1", h.GetError1)
+		router.GET("/error_2", h.GetError2)
 	}
 	err = router.Run()
 	if err != nil {

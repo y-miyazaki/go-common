@@ -31,12 +31,12 @@ func main() {
 
 	s3SessionOptions := infrastructure.GetDefaultOptions()
 	s3Config := infrastructure.GetS3Config(logger.Entry, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
-	s3 := infrastructure.NewS3(s3SessionOptions, s3Config)
+	session := infrastructure.NewS3Session(s3SessionOptions)
 
 	// --------------------------------------------------------------
 	// example: S3
 	// --------------------------------------------------------------
-	awsS3Repository := repository.NewAWSS3Repository(logger.Entry, s3)
+	awsS3Repository := repository.NewAWSS3Repository(logger.Entry, session, s3Config)
 	text := "aaaaaaaab"
 	bucket := "test"
 
@@ -97,4 +97,10 @@ func main() {
 	if err != nil {
 		logger.WithError(err).Errorf("can't delete s3 bucket")
 	}
+
+	// // Upload
+	// _, err = awsS3Repository.Upload(bucket, "test.txt", "./example/s3/cmd.zip")
+	// if err != nil {
+	// 	logger.WithError(err).Errorf("can't upload file")
+	// }
 }

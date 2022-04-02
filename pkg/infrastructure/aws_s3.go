@@ -7,14 +7,30 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/sirupsen/logrus"
 	"github.com/y-miyazaki/go-common/pkg/transport"
 )
 
-// NewS3 returns s3 instance.
+// NewS3Session returns Session.
+func NewS3Session(o *session.Options) *session.Session {
+	return session.Must(session.NewSessionWithOptions(*o))
+}
+
+// NewS3 returns S3.
 func NewS3(o *session.Options, c *aws.Config) *s3.S3 {
 	s := session.Must(session.NewSessionWithOptions(*o))
 	return s3.New(s, c)
+}
+
+// NewDownloader returns Downloader.
+func NewDownloader(s *session.Session) *s3manager.Downloader {
+	return s3manager.NewDownloader(s)
+}
+
+// NewUploader returns Uploader.
+func NewUploader(s *session.Session) *s3manager.Uploader {
+	return s3manager.NewUploader(s)
 }
 
 // GetDefaultOptions retrieves the options that enable SharedConfigState.
