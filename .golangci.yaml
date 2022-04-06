@@ -293,7 +293,7 @@ linters:
     - revive # Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in replacement of golint. Revive provides a framework for development of custom rules, and lets you define a strict preset for enhancing your development & code review processes.
     - staticcheck # Staticcheck is a go vet on steroids, applying a ton of static analysis checks
     - structcheck # Finds unused struct fields
-    - typecheck # Like the front-end of a Go compiler, parses and type-checks Go code
+    # - typecheck # Like the front-end of a Go compiler, parses and type-checks Go code
     - unconvert # Remove unnecessary type conversions
     - unparam # Reports unused function parameters
     - unused # Checks Go code for unused constants, variables, functions and types

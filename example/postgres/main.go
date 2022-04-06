@@ -21,13 +21,13 @@ func main() {
 	logrusLogger.Formatter = &logrus.JSONFormatter{}
 	logrusLogger.Out = os.Stdout
 	logrusLogger.Level, _ = logrus.ParseLevel("Info")
-	logger := logger.NewLogger(logrusLogger)
+	loggerNew := logger.NewLogger(logrusLogger)
 
 	// --------------------------------------------------------------
 	// logger for gorm
 	// --------------------------------------------------------------
 	loggerGorm := logger.NewLoggerGorm(&logger.LoggerGormConfig{
-		Logger: logger.Entry.Logger,
+		Logger: loggerNew.Entry.Logger,
 		GormConfig: &logger.GormConfig{
 			// slow query time: 3 sec
 			SlowThreshold:             time.Second * 3,
@@ -82,5 +82,5 @@ func main() {
 		panic("can't drop table")
 	}
 
-	logrusLogger.Infof("name = %s, email = %s", user2.Name, user2.Email)
+	loggerNew.Infof("name = %s, email = %s", user2.Name, user2.Email)
 }
