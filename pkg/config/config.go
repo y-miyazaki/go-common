@@ -32,20 +32,20 @@ func NewConfig(c *ConfigSetting) *Config {
 	// -------------------------------------------------------------
 	// set Logger
 	// -------------------------------------------------------------
-	logger := &logrus.Logger{}
+	l := &logrus.Logger{}
 	// formatter
 	formatter := strings.ToLower(c.LoggerFormatter)
 	if formatter == "json" {
-		logger.Formatter = &logrus.JSONFormatter{}
+		l.Formatter = &logrus.JSONFormatter{}
 	} else if formatter == "text" {
-		logger.Formatter = &logrus.TextFormatter{}
+		l.Formatter = &logrus.TextFormatter{}
 	} else {
 		panic("Only json and text can be selected for formatter.")
 	}
 	// out
 	out := strings.ToLower(c.LoggerOut)
 	if out == "stdout" {
-		logger.Out = os.Stdout
+		l.Out = os.Stdout
 	} else {
 		panic("Only stdout can be selected for out.")
 	}
@@ -54,8 +54,8 @@ func NewConfig(c *ConfigSetting) *Config {
 	if err != nil {
 		panic(fmt.Sprintf("level can't set %v", level))
 	}
-	logger.Level = level
-	config.Logger = logger.NewLogger(logger)
+	l.Level = level
+	config.Logger = logger.NewLogger(l)
 
 	// -------------------------------------------------------------
 	// set Slack

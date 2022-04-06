@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/y-miyazaki/go-common/example/mysql/entity"
+	"github.com/y-miyazaki/go-common/example/gin1/entity"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 	"github.com/y-miyazaki/go-common/pkg/logger"
 	"github.com/y-miyazaki/go-common/pkg/utils"
@@ -20,7 +20,7 @@ func (h *HTTPHandler) GetPostgres(c *gin.Context) {
 	// logger for gorm
 	// --------------------------------------------------------------
 	loggerGorm := logger.NewLoggerGorm(&logger.LoggerGormConfig{
-		Logger: h.Logger.Entry.Logger,
+		Logger: h.Logger,
 		GormConfig: &logger.GormConfig{
 			// slow query time: 3 sec
 			SlowThreshold:             time.Second * 3,

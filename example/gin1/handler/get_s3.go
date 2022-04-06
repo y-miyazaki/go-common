@@ -23,7 +23,7 @@ func (h *HTTPHandler) GetS3(c *gin.Context) {
 	s3Token := os.Getenv("S3_TOKEN")
 
 	s3SessionOptions := infrastructure.GetS3DefaultOptions()
-	s3Config := infrastructure.GetS3Config(h.Logger.Entry, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
+	s3Config := infrastructure.GetS3Config(h.Logger, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
 	session := infrastructure.NewS3Session(s3SessionOptions)
 
 	// --------------------------------------------------------------

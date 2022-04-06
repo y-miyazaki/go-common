@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
+	"github.com/y-miyazaki/go-common/pkg/logger"
 )
 
 // ConfigFileSetting sets configurations.
@@ -40,20 +41,20 @@ func NewConfigFile(c *ConfigFileSetting) *Config {
 	// -------------------------------------------------------------
 	// set Logger
 	// -------------------------------------------------------------
-	logger := &logrus.Logger{}
+	l := &logrus.Logger{}
 	// formatter
 	formatter := strings.ToLower(viper.GetString("logger.formatter"))
 	if formatter == "json" {
-		logger.Formatter = &logrus.JSONFormatter{}
+		l.Formatter = &logrus.JSONFormatter{}
 	} else if formatter == "text" {
-		logger.Formatter = &logrus.TextFormatter{}
+		l.Formatter = &logrus.TextFormatter{}
 	} else {
 		panic("Only json and text can be selected for formatter.")
 	}
 	// out
 	out := strings.ToLower(viper.GetString("logger.out"))
 	if out == "stdout" {
-		logger.Out = os.Stdout
+		l.Out = os.Stdout
 	} else {
 		panic("Only stdout can be selected for out.")
 	}
@@ -62,8 +63,8 @@ func NewConfigFile(c *ConfigFileSetting) *Config {
 	if err != nil {
 		panic(fmt.Sprintf("level can't set %v", level))
 	}
-	logger.Level = level
-	config.Logger = logger.NewLogger(logger)
+	l.Level = level
+	config.Logger = logger.NewLogger(l)
 
 	// -------------------------------------------------------------
 	// set Slack
