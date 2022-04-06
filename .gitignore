@@ -2,3 +2,6 @@
 coverage
 .vscode
 .editorconfig
+env/*
+main
+db

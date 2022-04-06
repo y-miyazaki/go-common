@@ -21,6 +21,17 @@ const (
 // AWSS3RepositoryInterface interface.
 type AWSS3RepositoryInterface interface {
 	GetObject(bucket, path string) io.ReaderAt
+	PutObjectFile(bucket, key, filePath string) (*s3.PutObjectOutput, error)
+	PutObjectText(bucket, key string, text *string) (*s3.PutObjectOutput, error)
+	DeleteObject(bucket, key string) (*s3.DeleteObjectOutput, error)
+	DeleteObjects(bucket string, keys []string) (*s3.DeleteObjectsOutput, error)
+	ListObjectsV2(bucket, prefix string) (*s3.ListObjectsV2Output, error)
+	ListBuckets() (*s3.ListBucketsOutput, error)
+	CreateBucket(bucket string) (*s3.CreateBucketOutput, error)
+	DeleteBucket(bucket string) (*s3.DeleteBucketOutput, error)
+	GetPresignedURL(bucket, key string, expire time.Duration) (string, error)
+	Upload(bucket, key, filePath string) (*s3manager.UploadOutput, error)
+	Download(bucket, key, filePath string) error
 }
 
 // AWSS3Repository struct.
@@ -33,13 +44,13 @@ type AWSS3Repository struct {
 // NewAWSS3Repository returns AWSS3Repository instance.
 func NewAWSS3Repository(
 	e *logrus.Entry,
-	session *session.Session,
+	s *session.Session,
 	config *aws.Config,
 ) *AWSS3Repository {
 	return &AWSS3Repository{
 		e:       e,
-		s3:      s3.New(session, config),
-		session: session,
+		s3:      s3.New(s, config),
+		session: s,
 	}
 }
 

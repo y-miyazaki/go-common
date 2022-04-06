@@ -35,7 +35,7 @@ func NewUploader(s *session.Session) *s3manager.Uploader {
 
 // GetDefaultOptions retrieves the options that enable SharedConfigState.
 // Basically, Options assumes that an IAM role has been assigned in the execution environment.
-func GetDefaultOptions() *session.Options {
+func GetS3DefaultOptions() *session.Options {
 	return &session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}

@@ -29,7 +29,7 @@ func main() {
 	s3Secret := os.Getenv("S3_SECRET")
 	s3Token := os.Getenv("S3_TOKEN")
 
-	s3SessionOptions := infrastructure.GetDefaultOptions()
+	s3SessionOptions := infrastructure.GetS3DefaultOptions()
 	s3Config := infrastructure.GetS3Config(logger.Entry, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
 	session := infrastructure.NewS3Session(s3SessionOptions)
 

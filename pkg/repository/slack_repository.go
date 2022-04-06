@@ -8,6 +8,7 @@ import (
 // SlackRepositoryInterface interface
 type SlackRepositoryInterface interface {
 	PostMessage(attachment *slack.Attachment) error
+	PostMessageAttachment(attachment *slack.Attachment) error
 }
 
 // SlackRepository struct.
