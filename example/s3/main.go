@@ -68,8 +68,12 @@ func main() {
 		logger.WithError(err).Errorf("can't get s3 object")
 	}
 	rc := object.Body
-	defer rc.Close()
-
+	defer func() {
+		err = rc.Close()
+		if err != nil {
+			logger.WithError(err).Errorf("can't close body")
+		}
+	}()
 	text, err = utils.GetStringFromReadCloser(rc)
 	if err != nil {
 		logger.WithError(err).Errorf("can't get text")
@@ -97,10 +101,4 @@ func main() {
 	if err != nil {
 		logger.WithError(err).Errorf("can't delete s3 bucket")
 	}
-
-	// // Upload
-	// _, err = awsS3Repository.Upload(bucket, "test.txt", "./example/s3/cmd.zip")
-	// if err != nil {
-	// 	logger.WithError(err).Errorf("can't upload file")
-	// }
 }

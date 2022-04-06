@@ -43,9 +43,9 @@ func GinHTTPLogger(
 			l = l.WithField("messages", messages)
 		}
 		if c.Writer.Status() >= http.StatusInternalServerError {
-			logger.WithFields(fields).Error()
+			l.WithFields(fields).Error()
 		} else {
-			logger.WithFields(fields).Info()
+			l.WithFields(fields).Info()
 		}
 	}
 }

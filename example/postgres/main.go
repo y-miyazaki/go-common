@@ -67,13 +67,19 @@ func main() {
 	// --------------------------------------------------------------
 	// example: Postgres
 	// --------------------------------------------------------------
-	db.Migrator().CreateTable(&entity.User{})
+	err := db.Migrator().CreateTable(&entity.User{})
+	if err != nil {
+		panic("can't create table")
+	}
 	user1 := &entity.User{Name: "test", Email: "test@test.com"}
-	db.Create(user1)
+	_ = db.Create(user1)
 
 	user2 := &entity.User{}
 	db.Take(user2)
-	db.Migrator().DropTable(&entity.User{})
+	err = db.Migrator().DropTable(&entity.User{})
+	if err != nil {
+		panic("can't drop table")
+	}
 
 	logrusLogger.Infof("name = %s, email = %s", user2.Name, user2.Email)
 }
