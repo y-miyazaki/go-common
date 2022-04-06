@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"github.com/sirupsen/logrus"
 	"github.com/slack-go/slack"
+	"github.com/y-miyazaki/go-common/pkg/logger"
 )
 
 // SlackRepositoryInterface interface
@@ -13,19 +13,15 @@ type SlackRepositoryInterface interface {
 
 // SlackRepository struct.
 type SlackRepository struct {
-	e         *logrus.Entry
+	logger    *logger.Logger
 	client    *slack.Client
 	channelID string
 }
 
 // NewSlackRepository returns SlackRepository instance.
-func NewSlackRepository(
-	e *logrus.Entry,
-	client *slack.Client,
-	channelID string,
-) *SlackRepository {
+func NewSlackRepository(logger *logger.Logger, client *slack.Client, channelID string) *SlackRepository {
 	return &SlackRepository{
-		e:         e,
+		logger:    logger,
 		client:    client,
 		channelID: channelID,
 	}

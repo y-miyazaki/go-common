@@ -63,7 +63,7 @@ func NewConfigFile(c *ConfigFileSetting) *Config {
 		panic(fmt.Sprintf("level can't set %v", level))
 	}
 	logger.Level = level
-	config.Logger = infrastructure.NewLogger(logger)
+	config.Logger = logger.NewLogger(logger)
 
 	// -------------------------------------------------------------
 	// set Slack

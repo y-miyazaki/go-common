@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/sirupsen/logrus"
+	"github.com/y-miyazaki/go-common/pkg/logger"
 )
 
 // RedisRepositoryInterface interface.
@@ -14,15 +14,15 @@ type RedisRepositoryInterface interface {
 
 // RedisRepository struct.
 type RedisRepository struct {
-	e     *logrus.Entry
-	redis *redis.Client
+	logger *logger.Logger
+	redis  *redis.Client
 }
 
 // NewRedisRepository returns RedisRepository instance.
-func NewRedisRepository(e *logrus.Entry, r *redis.Client) *RedisRepository {
+func NewRedisRepository(logger *logger.Logger, r *redis.Client) *RedisRepository {
 	return &RedisRepository{
-		e:     e,
-		redis: r,
+		logger: logger,
+		redis:  r,
 	}
 }
 

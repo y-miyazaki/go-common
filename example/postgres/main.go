@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/y-miyazaki/go-common/example/postgres/entity"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
+	"github.com/y-miyazaki/go-common/pkg/logger"
 	"github.com/y-miyazaki/go-common/pkg/utils"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -20,18 +21,18 @@ func main() {
 	logrusLogger.Formatter = &logrus.JSONFormatter{}
 	logrusLogger.Out = os.Stdout
 	logrusLogger.Level, _ = logrus.ParseLevel("Info")
-	logger := infrastructure.NewLogger(logrusLogger)
+	logger := logger.NewLogger(logrusLogger)
 
 	// --------------------------------------------------------------
 	// logger for gorm
 	// --------------------------------------------------------------
-	loggerGorm := infrastructure.NewLoggerGorm(&infrastructure.LoggerGormConfig{
+	loggerGorm := logger.NewLoggerGorm(&logger.LoggerGormConfig{
 		Logger: logger.Entry.Logger,
-		GormConfig: &infrastructure.GormConfig{
+		GormConfig: &logger.GormConfig{
 			// slow query time: 3 sec
 			SlowThreshold:             time.Second * 3,
 			IgnoreRecordNotFoundError: false,
-			LogLevel:                  infrastructure.Info,
+			LogLevel:                  logger.Info,
 		},
 	})
 	gc := &gorm.Config{

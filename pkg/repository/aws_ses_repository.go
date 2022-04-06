@@ -3,7 +3,7 @@ package repository
 import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ses"
-	"github.com/sirupsen/logrus"
+	"github.com/y-miyazaki/go-common/pkg/logger"
 )
 
 // AWSSESRepositoryInterface interface.
@@ -16,22 +16,16 @@ type AWSSESRepositoryInterface interface {
 
 // AWSSESRepository struct.
 type AWSSESRepository struct {
-	e                              *logrus.Entry
+	logger                         *logger.Logger
 	s                              *ses.SES
 	configurationSetName           *string
 	isOutputLogPersonalInformation bool
 }
 
 // NewAWSSESRepository returns AWSSESRepository instance.
-func NewAWSSESRepository(
-	e *logrus.Entry,
-	s *ses.SES,
-	configurationSetName *string,
-	isOutputLogPersonalInformation bool,
-
-) *AWSSESRepository {
+func NewAWSSESRepository(logger *logger.Logger, s *ses.SES, configurationSetName *string, isOutputLogPersonalInformation bool) *AWSSESRepository {
 	return &AWSSESRepository{
-		e:                              e,
+		logger:                         logger,
 		s:                              s,
 		configurationSetName:           configurationSetName,
 		isOutputLogPersonalInformation: isOutputLogPersonalInformation,
@@ -133,19 +127,20 @@ func (r *AWSSESRepository) log(
 	responseObject *ses.SendEmailOutput,
 	responseError error,
 ) {
-	e := r.e
+	logger := r.logger
+
 	// Check output personal information flag.
 	if r.isOutputLogPersonalInformation {
-		e = e.
+		logger = r.logger.
 			WithField("to", to).
 			WithField("subject", subject)
 	}
 	if responseObject.MessageId != nil {
-		e = e.WithField("messageId", *responseObject.MessageId)
+		logger = logger.WithField("messageId", *responseObject.MessageId)
 	}
 	if responseError == nil {
-		e.Debug("Successfully sent an SES email")
+		logger.Debug("Successfully sent an SES email")
 	} else {
-		e.WithError(responseError).Error("Error while sending an SES email")
+		logger.WithError(responseError).Error("Error while sending an SES email")
 	}
 }

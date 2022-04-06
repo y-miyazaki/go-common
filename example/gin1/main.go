@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/y-miyazaki/go-common/example/gin1/handler"
-	"github.com/y-miyazaki/go-common/pkg/infrastructure"
+	"github.com/y-miyazaki/go-common/pkg/logger"
 	"github.com/y-miyazaki/go-common/pkg/middleware"
 )
 
@@ -25,7 +25,7 @@ func main() {
 		panic(fmt.Sprintf("level can't set %v", level))
 	}
 	l.Level = level
-	logger := infrastructure.NewLogger(l)
+	logger := logger.NewLogger(l)
 	h := handler.NewHTTPHandler(logger)
 
 	router := gin.Default()
@@ -47,9 +47,13 @@ func main() {
 	router.Use(helmet.Default())
 	router.Use(middleware.GinHTTPLogger(logger, "request-id", "test"))
 	{
+		router.GET("/healthcheck", h.GetHealthcheck)
 		router.GET("/hello", h.GetHello)
 		router.GET("/error_1", h.GetError1)
 		router.GET("/error_2", h.GetError2)
+		router.GET("/mysql", h.GetMySQL)
+		router.GET("/postgres", h.GetPostgres)
+		router.GET("/s3", h.GetS3)
 	}
 	err = router.Run()
 	if err != nil {

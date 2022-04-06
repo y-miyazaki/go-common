@@ -1,15 +1,13 @@
 package service
 
-import (
-	"github.com/y-miyazaki/go-common/pkg/infrastructure"
-)
+import "github.com/y-miyazaki/go-common/pkg/logger"
 
 // BaseService struct.
 type BaseService struct {
-	Logger *infrastructure.Logger
+	Logger *logger.Logger
 }
 
 // NewBaseService returns BaseService instance.
-func NewBaseService(logger *infrastructure.Logger) *BaseService {
+func NewBaseService(logger *logger.Logger) *BaseService {
 	return &BaseService{Logger: logger}
 }

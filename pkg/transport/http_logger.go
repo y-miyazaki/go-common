@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"github.com/y-miyazaki/go-common/pkg/logger"
 )
 
 // TransportHTTPLoggerType defines the transport type.
@@ -20,18 +21,18 @@ const (
 // TransportHTTPLogger struct.
 type TransportHTTPLogger struct {
 	http.RoundTripper
-	Entry *logrus.Entry
-	Type  TransportHTTPLoggerType
+	logger *logger.Logger
+	Type   TransportHTTPLoggerType
 }
 
 // NewTransportHTTPLogger get http.RoundTripper.
 func NewTransportHTTPLogger(
-	entry *logrus.Entry,
+	logger *logger.Logger,
 	transportType TransportHTTPLoggerType,
 ) http.RoundTripper {
 	return &TransportHTTPLogger{
 		http.DefaultTransport,
-		entry,
+		logger,
 		transportType,
 	}
 }
@@ -42,19 +43,20 @@ func (t TransportHTTPLogger) RoundTrip(req *http.Request) (*http.Response, error
 	response, err := t.RoundTripper.RoundTrip(req)
 	timeAfter := time.Now()
 
-	e := t.Entry.WithFields(logrus.Fields{
+	logger := t.logger.WithFields(logrus.Fields{
 		"url":           req.URL.String(),
 		"method":        req.Method,
 		"protocol":      req.Proto,
 		"duration":      timeAfter.Sub(timeBefore).String(),
 		"transportType": t.Type,
-		"status":        response.Status,
 	})
-
+	if response != nil {
+		logger = logger.WithField("status", response.StatusCode)
+	}
 	if err != nil || response.StatusCode/100 >= 4 {
-		e.WithError(err).Error()
+		logger.WithError(err).Error()
 	} else {
-		e.Info()
+		logger.Info()
 	}
 	return response, err
 }

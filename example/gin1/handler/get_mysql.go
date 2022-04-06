@@ -1,10 +1,11 @@
-package main
+package handler
 
 import (
+	"net/http"
 	"os"
 	"time"
 
-	"github.com/sirupsen/logrus"
+	"github.com/gin-gonic/gin"
 	"github.com/y-miyazaki/go-common/example/mysql/entity"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 	"github.com/y-miyazaki/go-common/pkg/logger"
@@ -13,21 +14,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func main() {
-	// --------------------------------------------------------------
-	// logrus
-	// --------------------------------------------------------------
-	logrusLogger := &logrus.Logger{}
-	logrusLogger.Formatter = &logrus.JSONFormatter{}
-	logrusLogger.Out = os.Stdout
-	logrusLogger.Level, _ = logrus.ParseLevel("Info")
-	logger := logger.NewLogger(logrusLogger)
-
+// GetMySQL handler
+func (h *HTTPHandler) GetMySQL(c *gin.Context) {
 	// --------------------------------------------------------------
 	// logger for gorm
 	// --------------------------------------------------------------
 	loggerGorm := logger.NewLoggerGorm(&logger.LoggerGormConfig{
-		Logger: logger.Entry.Logger,
+		Logger: h.Logger.Entry.Logger,
 		GormConfig: &logger.GormConfig{
 			// slow query time: 3 sec
 			SlowThreshold:             time.Second * 3,
@@ -86,6 +79,5 @@ func main() {
 	if err != nil {
 		panic("can't drop table")
 	}
-
-	logrusLogger.Infof("name = %s, email = %s", user2.Name, user2.Email)
+	c.JSON(http.StatusOK, gin.H{"message": "ok"})
 }

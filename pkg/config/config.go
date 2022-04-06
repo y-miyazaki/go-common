@@ -8,11 +8,12 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/slack-go/slack"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
+	"github.com/y-miyazaki/go-common/pkg/logger"
 )
 
 // Config sets base configurations.
 type Config struct {
-	Logger      *infrastructure.Logger
+	Logger      *logger.Logger
 	SlackClient *slack.Client
 }
 
@@ -54,7 +55,7 @@ func NewConfig(c *ConfigSetting) *Config {
 		panic(fmt.Sprintf("level can't set %v", level))
 	}
 	logger.Level = level
-	config.Logger = infrastructure.NewLogger(logger)
+	config.Logger = logger.NewLogger(logger)
 
 	// -------------------------------------------------------------
 	// set Slack

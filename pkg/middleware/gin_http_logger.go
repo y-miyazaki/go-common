@@ -7,12 +7,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/y-miyazaki/go-common/pkg/context"
-	"github.com/y-miyazaki/go-common/pkg/infrastructure"
+	"github.com/y-miyazaki/go-common/pkg/logger"
 )
 
 // GinHTTPLogger retrieves the request/response logs.
 func GinHTTPLogger(
-	logger *infrastructure.Logger,
+	logger *logger.Logger,
 	traceIDHeader string,
 	clientIPHeader string,
 ) gin.HandlerFunc {

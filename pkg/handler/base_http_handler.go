@@ -7,12 +7,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/y-miyazaki/go-common/pkg/context"
-	"github.com/y-miyazaki/go-common/pkg/infrastructure"
+	"github.com/y-miyazaki/go-common/pkg/logger"
 )
 
 // BaseHTTPHandler base handler struct.
 type BaseHTTPHandler struct {
-	Logger *infrastructure.Logger
+	Logger *logger.Logger
 }
 
 // ResponseCSV responses csv data.
