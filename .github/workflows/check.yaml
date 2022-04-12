@@ -1,6 +1,11 @@
 # https://help.github.com/ja/actions/reference/workflow-syntax-for-github-actions
 name: Check go-common
 on:
+  push:
+    branches: [develop, master]
+    paths:
+      - ".github/workflows/**"
+      - pkg/**"
   pull_request:
     paths:
       - ".github/workflows/**"
