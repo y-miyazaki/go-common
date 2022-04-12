@@ -7,6 +7,7 @@ import (
 
 	helmet "github.com/danielkov/gin-helmet"
 	"github.com/gin-gonic/gin"
+	redis "github.com/go-redis/redis/v8"
 	"github.com/sirupsen/logrus"
 	"github.com/y-miyazaki/go-common/example/gin1/handler"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
@@ -118,9 +119,24 @@ func main() {
 	awsS3Repository := repository.NewAWSS3Repository(loggerNew, session, s3Config)
 
 	// --------------------------------------------------------------
+	// Redis
+	// --------------------------------------------------------------
+	redisAddr := os.Getenv("REDIS_ADDR")
+	redisUsername := os.Getenv("REDIS_Username")
+	redisPassword := os.Getenv("REDIS_Password")
+
+	o := &redis.Options{
+		Addr:     redisAddr,
+		Username: redisUsername,
+		Password: redisPassword,
+	}
+	r := infrastructure.NewRedis(o)
+	redisRepository := repository.NewRedisRepository(loggerNew, r)
+
+	// --------------------------------------------------------------
 	// Handler
 	// --------------------------------------------------------------
-	h := handler.NewHTTPHandler(loggerNew, mysqlDB, postgresDB, awsS3Repository)
+	h := handler.NewHTTPHandler(loggerNew, mysqlDB, postgresDB, awsS3Repository, redisRepository)
 
 	router := gin.Default()
 	// CORS for https://foo.com and https://github.com origins, allowing:
@@ -148,6 +164,7 @@ func main() {
 		router.GET("/mysql", h.GetMySQL)
 		router.GET("/postgres", h.GetPostgres)
 		router.GET("/s3", h.GetS3)
+		router.GET("/redis", h.GetRedis)
 	}
 	err = router.Run()
 	if err != nil {

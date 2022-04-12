@@ -13,10 +13,11 @@ type HTTPHandler struct {
 	mysqlDB         *gorm.DB
 	postgresDB      *gorm.DB
 	awsS3Repository *repository.AWSS3Repository
+	redisRepository *repository.RedisRepository
 }
 
 // NewHTTPHandler returns HTTPHandler struct.
-func NewHTTPHandler(logger *logger.Logger, mysqlDB, postgresDB *gorm.DB, awsS3Repository *repository.AWSS3Repository) *HTTPHandler {
+func NewHTTPHandler(logger *logger.Logger, mysqlDB, postgresDB *gorm.DB, awsS3Repository *repository.AWSS3Repository, redisRepository *repository.RedisRepository) *HTTPHandler {
 	return &HTTPHandler{
 		BaseHTTPHandler: &handler.BaseHTTPHandler{
 			Logger: logger,
@@ -24,5 +25,6 @@ func NewHTTPHandler(logger *logger.Logger, mysqlDB, postgresDB *gorm.DB, awsS3Re
 		mysqlDB:         mysqlDB,
 		postgresDB:      postgresDB,
 		awsS3Repository: awsS3Repository,
+		redisRepository: redisRepository,
 	}
 }

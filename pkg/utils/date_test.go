@@ -85,7 +85,7 @@ func TestGetDateFormatString(t *testing.T) {
 			name: "test9",
 			args: args{
 				t:      tt,
-				format: DateFormatYearMonthDay,
+				format: DateFormatSlashYearMonthDay,
 			},
 			want: "2019/02/09",
 		},
@@ -93,7 +93,7 @@ func TestGetDateFormatString(t *testing.T) {
 			name: "test10",
 			args: args{
 				t:      tt,
-				format: DateFormatYearMonthDayHourMinuteSecond,
+				format: DateFormatSlashYearMonthDayHourMinuteSecond,
 			},
 			want: "2019/02/09 08:07:04",
 		},
@@ -101,7 +101,7 @@ func TestGetDateFormatString(t *testing.T) {
 			name: "test11",
 			args: args{
 				t:      tt,
-				format: DateFormatMonthDayYear,
+				format: DateFormatSlashMonthDayYear,
 			},
 			want: "02/09/2019",
 		},
@@ -109,7 +109,7 @@ func TestGetDateFormatString(t *testing.T) {
 			name: "test12",
 			args: args{
 				t:      tt,
-				format: DateFormatMonthDayYearHourMinuteSecond,
+				format: DateFormatSlashMonthDayYearHourMinuteSecond,
 			},
 			want: "02/09/2019 08:07:04",
 		},
@@ -117,7 +117,7 @@ func TestGetDateFormatString(t *testing.T) {
 			name: "test13",
 			args: args{
 				t:      tt,
-				format: DateFormatDayMonthYear,
+				format: DateFormatSlashDayMonthYear,
 			},
 			want: "09/02/2019",
 		},
@@ -125,7 +125,7 @@ func TestGetDateFormatString(t *testing.T) {
 			name: "test14",
 			args: args{
 				t:      tt,
-				format: DateFormatDayMonthYearHourMinuteSecond,
+				format: DateFormatSlashDayMonthYearHourMinuteSecond,
 			},
 			want: "09/02/2019 08:07:04",
 		},
@@ -133,7 +133,7 @@ func TestGetDateFormatString(t *testing.T) {
 			name: "test15",
 			args: args{
 				t:      tt,
-				format: DateFormatMonthDay,
+				format: DateFormatSlashMonthDay,
 			},
 			want: "02/09",
 		},
@@ -141,7 +141,7 @@ func TestGetDateFormatString(t *testing.T) {
 			name: "test16",
 			args: args{
 				t:      tt,
-				format: DateFormatDayMonth,
+				format: DateFormatSlashDayMonth,
 			},
 			want: "09/02",
 		},
