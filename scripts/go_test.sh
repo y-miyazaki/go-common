@@ -7,6 +7,9 @@ echo "Host ${GIT_DOMAIN}\n\tStrictHostKeyChecking no\n\tIdentityFile /root/.ssh/
 ssh-keyscan -H ${GIT_DOMAIN} >> /root/.ssh/known_hosts
 git config --global url."git@${GIT_DOMAIN}:".insteadOf "https://${GIT_DOMAIN}/"
 
+gvm install go1.16
+gvm use go1.16
+
 # go mod download
 go mod download
 

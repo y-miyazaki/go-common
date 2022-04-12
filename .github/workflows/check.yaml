@@ -25,7 +25,7 @@ jobs:
         run: |
           echo $SSH_PRIVATE_KEY >> ./id_rsa
           chmod +x scripts/*
-          docker pull ymiyazakixyz/golang-test:latest
+          docker pull ghcr.io/y-miyazaki/go-test:latest
           docker run --rm -v $PWD:/go/src/github.com/y-miyazaki/go-common -v $PWD/id_rsa:/root/.ssh/id_rsa -w /go/src/github.com/y-miyazaki/go-common --name golang-test ymiyazakixyz/golang-test:latest ./scripts/go_test.sh
           rm ./id_rsa
       - name: "go: upload coverage"
