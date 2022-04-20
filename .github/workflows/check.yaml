@@ -50,9 +50,9 @@ jobs:
           SLACK_ICON: ""
           SLACK_TITLE: Failed check
           SLACK_MESSAGE: |
-            This Github Actions workflow failed check.
+This Github Actions workflow failed check.
 
-            Pull Request
-            https://github.com/${{github.repository}}/pull/${{ steps.parameters.outputs.pr_number }}
+- Pull Request
+https://github.com/${{github.repository}}/pull/${{ steps.parameters.outputs.pr_number }}
           SLACK_USERNAME: y-miyazaki
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
