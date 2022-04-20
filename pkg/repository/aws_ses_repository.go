@@ -23,9 +23,9 @@ type AWSSESRepository struct {
 }
 
 // NewAWSSESRepository returns AWSSESRepository instance.
-func NewAWSSESRepository(logger *logger.Logger, s *ses.SES, configurationSetName *string, isOutputLogPersonalInformation bool) *AWSSESRepository {
+func NewAWSSESRepository(l *logger.Logger, s *ses.SES, configurationSetName *string, isOutputLogPersonalInformation bool) *AWSSESRepository {
 	return &AWSSESRepository{
-		logger:                         logger,
+		logger:                         l,
 		s:                              s,
 		configurationSetName:           configurationSetName,
 		isOutputLogPersonalInformation: isOutputLogPersonalInformation,
@@ -127,20 +127,20 @@ func (r *AWSSESRepository) log(
 	responseObject *ses.SendEmailOutput,
 	responseError error,
 ) {
-	logger := r.logger
+	log := r.logger
 
 	// Check output personal information flag.
 	if r.isOutputLogPersonalInformation {
-		logger = r.logger.
+		log = r.logger.
 			WithField("to", to).
 			WithField("subject", subject)
 	}
 	if responseObject.MessageId != nil {
-		logger = logger.WithField("messageId", *responseObject.MessageId)
+		log = log.WithField("messageId", *responseObject.MessageId)
 	}
 	if responseError == nil {
-		logger.Debug("Successfully sent an SES email")
+		log.Debug("Successfully sent an SES email")
 	} else {
-		logger.WithError(responseError).Error("Error while sending an SES email")
+		log.WithError(responseError).Error("Error while sending an SES email")
 	}
 }

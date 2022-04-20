@@ -8,6 +8,6 @@ type BaseService struct {
 }
 
 // NewBaseService returns BaseService instance.
-func NewBaseService(logger *logger.Logger) *BaseService {
-	return &BaseService{Logger: logger}
+func NewBaseService(l *logger.Logger) *BaseService {
+	return &BaseService{Logger: l}
 }

@@ -19,9 +19,9 @@ type SlackRepository struct {
 }
 
 // NewSlackRepository returns SlackRepository instance.
-func NewSlackRepository(logger *logger.Logger, client *slack.Client, channelID string) *SlackRepository {
+func NewSlackRepository(l *logger.Logger, client *slack.Client, channelID string) *SlackRepository {
 	return &SlackRepository{
-		logger:    logger,
+		logger:    l,
 		client:    client,
 		channelID: channelID,
 	}

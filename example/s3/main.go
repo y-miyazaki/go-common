@@ -19,7 +19,7 @@ func main() {
 	logrusLogger.Formatter = &logrus.JSONFormatter{}
 	logrusLogger.Out = os.Stdout
 	logrusLogger.Level, _ = logrus.ParseLevel("Info")
-	logger := logger.NewLogger(logrusLogger)
+	l := logger.NewLogger(logrusLogger)
 
 	// --------------------------------------------------------------
 	// S3(minio)
@@ -31,75 +31,75 @@ func main() {
 	s3Token := os.Getenv("S3_TOKEN")
 
 	s3SessionOptions := infrastructure.GetS3DefaultOptions()
-	s3Config := infrastructure.GetS3Config(logger, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
+	s3Config := infrastructure.GetS3Config(l, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
 	session := infrastructure.NewS3Session(s3SessionOptions)
 
 	// --------------------------------------------------------------
 	// example: S3
 	// --------------------------------------------------------------
-	awsS3Repository := repository.NewAWSS3Repository(logger, session, s3Config)
+	awsS3Repository := repository.NewAWSS3Repository(l, session, s3Config)
 	text := "aaaaaaaab"
 	bucket := "test"
 
 	// Create Bucket
 	_, err := awsS3Repository.CreateBucket(bucket)
 	if err != nil {
-		logger.WithError(err).Errorf("can't create s3 bucket")
+		l.WithError(err).Errorf("can't create s3 bucket")
 	}
 
 	// ListBuckets
 	listBuckets, err := awsS3Repository.ListBuckets()
 	if err == nil {
 		for _, b := range listBuckets.Buckets {
-			logger.Infof("bucket = %s(%s)", aws.StringValue(b.Name), aws.TimeValue(b.CreationDate))
+			l.Infof("bucket = %s(%s)", aws.StringValue(b.Name), aws.TimeValue(b.CreationDate))
 		}
 	} else {
-		logger.WithError(err).Errorf("can't list of s3 bucket")
+		l.WithError(err).Errorf("can't list of s3 bucket")
 	}
 
 	// Put Object
 	_, err = awsS3Repository.PutObjectText(bucket, "test.txt", &text)
 	if err != nil {
-		logger.WithError(err).Errorf("can't put s3 object")
+		l.WithError(err).Errorf("can't put s3 object")
 	}
 
 	// Get Object
 	object, err := awsS3Repository.GetObject(bucket, "test.txt")
 	if err != nil {
-		logger.WithError(err).Errorf("can't get s3 object")
+		l.WithError(err).Errorf("can't get s3 object")
 	}
 	rc := object.Body
 	defer func() {
 		err = rc.Close()
 		if err != nil {
-			logger.WithError(err).Errorf("can't close body")
+			l.WithError(err).Errorf("can't close body")
 		}
 	}()
 	text, err = utils.GetStringFromReadCloser(rc)
 	if err != nil {
-		logger.WithError(err).Errorf("can't get text")
+		l.WithError(err).Errorf("can't get text")
 	}
-	logger.Infof("text.txt = %s", text)
+	l.Infof("text.txt = %s", text)
 
 	// ListObjectV2
 	listObjects, err := awsS3Repository.ListObjectsV2(bucket, "")
 	if err == nil {
 		for _, o := range listObjects.Contents {
-			logger.Infof("Object key = %s", aws.StringValue(o.Key))
+			l.Infof("Object key = %s", aws.StringValue(o.Key))
 		}
 	} else {
-		logger.WithError(err).Errorf("can't list of s3 object")
+		l.WithError(err).Errorf("can't list of s3 object")
 	}
 
 	// Delete Object
 	_, err = awsS3Repository.DeleteObject(bucket, "test.txt")
 	if err != nil {
-		logger.WithError(err).Errorf("can't delete s3 object")
+		l.WithError(err).Errorf("can't delete s3 object")
 	}
 
 	// Delete Bucket
 	_, err = awsS3Repository.DeleteBucket(bucket)
 	if err != nil {
-		logger.WithError(err).Errorf("can't delete s3 bucket")
+		l.WithError(err).Errorf("can't delete s3 bucket")
 	}
 }

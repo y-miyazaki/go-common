@@ -8,6 +8,6 @@ type BaseRepository struct {
 }
 
 // NewBaseRepository returns BaseRepository instance.
-func NewBaseRepository(logger *logger.Logger) *BaseRepository {
-	return &BaseRepository{Logger: logger}
+func NewBaseRepository(l *logger.Logger) *BaseRepository {
+	return &BaseRepository{Logger: l}
 }

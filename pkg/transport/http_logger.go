@@ -8,42 +8,42 @@ import (
 	"github.com/y-miyazaki/go-common/pkg/logger"
 )
 
-// TransportHTTPLoggerType defines the transport type.
-type TransportHTTPLoggerType string
+// HTTPLoggerType defines the transport type.
+type HTTPLoggerType string
 
 const (
-	// TransportHTTPLoggerTypeExternal defines the external type.
-	TransportHTTPLoggerTypeExternal TransportHTTPLoggerType = "external"
-	// TransportHTTPLoggerTypeInternal defines the internal type.
-	TransportHTTPLoggerTypeInternal TransportHTTPLoggerType = "internal"
+	// HTTPLoggerTypeExternal defines the external type.
+	HTTPLoggerTypeExternal HTTPLoggerType = "external"
+	// HTTPLoggerTypeInternal defines the internal type.
+	HTTPLoggerTypeInternal HTTPLoggerType = "internal"
 )
 
-// TransportHTTPLogger struct.
-type TransportHTTPLogger struct {
+// HTTPLogger struct.
+type HTTPLogger struct {
 	http.RoundTripper
 	logger *logger.Logger
-	Type   TransportHTTPLoggerType
+	Type   HTTPLoggerType
 }
 
 // NewTransportHTTPLogger get http.RoundTripper.
 func NewTransportHTTPLogger(
-	logger *logger.Logger,
-	transportType TransportHTTPLoggerType,
+	l *logger.Logger,
+	transportType HTTPLoggerType,
 ) http.RoundTripper {
-	return &TransportHTTPLogger{
+	return &HTTPLogger{
 		http.DefaultTransport,
-		logger,
+		l,
 		transportType,
 	}
 }
 
 // RoundTrip logs transparently.
-func (t TransportHTTPLogger) RoundTrip(req *http.Request) (*http.Response, error) {
+func (t HTTPLogger) RoundTrip(req *http.Request) (*http.Response, error) {
 	timeBefore := time.Now()
 	response, err := t.RoundTripper.RoundTrip(req)
 	timeAfter := time.Now()
 
-	logger := t.logger.WithFields(logrus.Fields{
+	log := t.logger.WithFields(logrus.Fields{
 		"url":           req.URL.String(),
 		"method":        req.Method,
 		"protocol":      req.Proto,
@@ -51,12 +51,12 @@ func (t TransportHTTPLogger) RoundTrip(req *http.Request) (*http.Response, error
 		"transportType": t.Type,
 	})
 	if response != nil {
-		logger = logger.WithField("status", response.StatusCode)
+		log = log.WithField("status", response.StatusCode)
 	}
 	if err != nil || response.StatusCode/100 >= 4 {
-		logger.WithError(err).Error()
+		log.WithError(err).Error()
 	} else {
-		logger.Info()
+		log.Info()
 	}
 	return response, err
 }

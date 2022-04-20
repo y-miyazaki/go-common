@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -42,9 +43,9 @@ type AWSS3Repository struct {
 }
 
 // NewAWSS3Repository returns AWSS3Repository instance.
-func NewAWSS3Repository(logger *logger.Logger, s *session.Session, config *aws.Config) *AWSS3Repository {
+func NewAWSS3Repository(l *logger.Logger, s *session.Session, config *aws.Config) *AWSS3Repository {
 	return &AWSS3Repository{
-		logger:  logger,
+		logger:  l,
 		s3:      s3.New(s, config),
 		session: s,
 	}
@@ -62,7 +63,8 @@ func (r *AWSS3Repository) GetObject(bucket, key string) (*s3.GetObjectOutput, er
 // PutObjectFile adds an object to a bucket.
 // https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html
 func (r *AWSS3Repository) PutObjectFile(bucket, key, filePath string) (*s3.PutObjectOutput, error) {
-	file, err := os.Open(filePath)
+	path := filepath.Clean(filePath)
+	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +199,8 @@ func (r *AWSS3Repository) GetPresignedURL(bucket, key string, expire time.Durati
 
 // Upload adds an object to a bucket.
 func (r *AWSS3Repository) Upload(bucket, key, filePath string) (*s3manager.UploadOutput, error) {
-	file, err := os.Open(filePath)
+	path := filepath.Clean(filePath)
+	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
@@ -227,7 +230,8 @@ func (r *AWSS3Repository) Upload(bucket, key, filePath string) (*s3manager.Uploa
 
 // Download retrieves objects from Amazon S3.
 func (r *AWSS3Repository) Download(bucket, key, filePath string) error {
-	file, err := os.Create(filePath)
+	path := filepath.Clean(filePath)
+	file, err := os.Create(path)
 	if err != nil {
 		return err
 	}

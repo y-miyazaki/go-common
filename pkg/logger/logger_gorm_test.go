@@ -23,7 +23,7 @@ func TestNewGormLogger(t *testing.T) {
 	logger.Out = os.Stdout
 	logger.Level, _ = logrus.ParseLevel("Info")
 
-	loggerGorm := NewLoggerGorm(&LoggerGormConfig{
+	loggerGorm := NewLoggerGorm(&GormSetting{
 		Logger: logger,
 		GormConfig: &GormConfig{
 			SlowThreshold:             time.Duration(1000),
@@ -61,7 +61,7 @@ func TestNewGormLoggerSilent(t *testing.T) {
 	logger.Out = os.Stdout
 	logger.Level, _ = logrus.ParseLevel("Silent")
 
-	loggerGorm := NewLoggerGorm(&LoggerGormConfig{
+	loggerGorm := NewLoggerGorm(&GormSetting{
 		Logger: logger,
 		GormConfig: &GormConfig{
 			SlowThreshold:             time.Duration(1000),
@@ -99,7 +99,7 @@ func TestNewGormLoggerSlowQuery(t *testing.T) {
 	logger.Out = os.Stdout
 	logger.Level, _ = logrus.ParseLevel("Info")
 
-	loggerGorm := NewLoggerGorm(&LoggerGormConfig{
+	loggerGorm := NewLoggerGorm(&GormSetting{
 		Logger: logger,
 		GormConfig: &GormConfig{
 			SlowThreshold:             time.Duration(1),

@@ -37,7 +37,7 @@ func main() {
 	// --------------------------------------------------------------
 	// logger for gorm
 	// --------------------------------------------------------------
-	loggerGorm := logger.NewLoggerGorm(&logger.LoggerGormConfig{
+	loggerGorm := logger.NewLoggerGorm(&logger.GormSetting{
 		Logger: loggerNew.Entry.Logger,
 		GormConfig: &logger.GormConfig{
 			// slow query time: 3 sec
@@ -156,16 +156,15 @@ func main() {
 		}))
 	router.Use(helmet.Default())
 	router.Use(middleware.GinHTTPLogger(loggerNew, "request-id", "test"))
-	{
-		router.GET("/healthcheck", h.GetHealthcheck)
-		router.GET("/hello", h.GetHello)
-		router.GET("/error_1", h.GetError1)
-		router.GET("/error_2", h.GetError2)
-		router.GET("/mysql", h.GetMySQL)
-		router.GET("/postgres", h.GetPostgres)
-		router.GET("/s3", h.GetS3)
-		router.GET("/redis", h.GetRedis)
-	}
+	router.GET("/healthcheck", h.GetHealthcheck)
+	router.GET("/hello", h.GetHello)
+	router.GET("/error_1", h.GetError1)
+	router.GET("/error_2", h.GetError2)
+	router.GET("/mysql", h.GetMySQL)
+	router.GET("/postgres", h.GetPostgres)
+	router.GET("/s3", h.GetS3)
+	router.GET("/redis", h.GetRedis)
+
 	err = router.Run()
 	if err != nil {
 		loggerNew.WithError(err).Error("router.Run() error...")

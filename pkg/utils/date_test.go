@@ -221,7 +221,7 @@ func TestGetDateTime(t *testing.T) {
 
 func TestConvertUTCToJST(t *testing.T) {
 	tt := time.Date(2019, time.February, 9, 8, 7, 4, 0, time.UTC)
-	tt2 := tt.In(time.FixedZone("Asia/Tokyo", DateConvertUTCToJSTOffset))
+	tt2 := tt.In(time.FixedZone("Asia/Tokyo", dateConvertUTCToJSTOffset))
 	type args struct {
 		t time.Time
 	}
@@ -270,7 +270,7 @@ func TestConvertUTCToJST(t *testing.T) {
 
 func TestConvertJSTToUTC(t *testing.T) {
 	tt := time.Date(2019, time.February, 9, 8, 7, 4, 0, time.UTC)
-	tt2 := tt.In(time.FixedZone("Asia/Tokyo", DateConvertUTCToJSTOffset))
+	tt2 := tt.In(time.FixedZone("Asia/Tokyo", dateConvertUTCToJSTOffset))
 	type args struct {
 		t time.Time
 	}

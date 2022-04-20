@@ -42,13 +42,13 @@ func GetS3DefaultOptions() *session.Options {
 }
 
 // GetS3Config get config.
-func GetS3Config(logger *logger.Logger, id, secret, token, region, endpoint string, isMinio bool) *aws.Config {
+func GetS3Config(l *logger.Logger, id, secret, token, region, endpoint string, isMinio bool) *aws.Config {
 	var httpClient *http.Client
-	if logger != nil {
+	if l != nil {
 		httpClient = &http.Client{
 			Transport: transport.NewTransportHTTPLogger(
-				logger.WithField("service", "aws-s3"),
-				transport.TransportHTTPLoggerTypeExternal,
+				l.WithField("service", "aws-s3"),
+				transport.HTTPLoggerTypeExternal,
 			),
 		}
 	}
@@ -67,13 +67,13 @@ func GetS3Config(logger *logger.Logger, id, secret, token, region, endpoint stri
 
 // GetS3ConfigNoCredentials get no credentials config.
 // If AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are environment variables and are in the execution environment, Credentials is not required.
-func GetS3ConfigNoCredentials(logger *logger.Logger, region, endpoint string, isMinio bool) *aws.Config {
+func GetS3ConfigNoCredentials(l *logger.Logger, region, endpoint string, isMinio bool) *aws.Config {
 	var httpClient *http.Client
-	if logger != nil {
+	if l != nil {
 		httpClient = &http.Client{
 			Transport: transport.NewTransportHTTPLogger(
-				logger.WithField("service", "aws-s3"),
-				transport.TransportHTTPLoggerTypeExternal,
+				l.WithField("service", "aws-s3"),
+				transport.HTTPLoggerTypeExternal,
 			),
 		}
 	}

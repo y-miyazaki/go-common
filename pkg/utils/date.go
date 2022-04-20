@@ -3,28 +3,46 @@ package utils
 import "time"
 
 const (
-	DateFormatHyphenYearMonthDay                 = "2006-01-02"
+	// DateFormatHyphenYearMonthDay : yyyy-mm-dd
+	DateFormatHyphenYearMonthDay = "2006-01-02"
+	// DateFormatHyphenYearMonthDayHourMinuteSecond : yyyy-mm-dd hh:mm:ss
 	DateFormatHyphenYearMonthDayHourMinuteSecond = "2006-01-02 15:04:05"
-	DateFormatHyphenMonthDayYear                 = "01-02-2006"
+	// DateFormatHyphenMonthDayYear : mm-dd-yyyy
+	DateFormatHyphenMonthDayYear = "01-02-2006"
+	// DateFormatHyphenMonthDayYearHourMinuteSecond : mm-dd-yyyy hh:mm:ss
 	DateFormatHyphenMonthDayYearHourMinuteSecond = "01-02-2006 15:04:05"
-	DateFormatHyphenDayMonthYear                 = "02-01-2006"
+	// DateFormatHyphenDayMonthYear : dd-mm-yyyy
+	DateFormatHyphenDayMonthYear = "02-01-2006"
+	// DateFormatHyphenDayMonthYearHourMinuteSecond : dd-mm-yyyy hh:mm:ss
 	DateFormatHyphenDayMonthYearHourMinuteSecond = "02-01-2006 15:04:05"
-	DateFormatHyphenMonthDay                     = "01-02"
-	DateFormatHyphenDayMonth                     = "02-01"
+	// DateFormatHyphenMonthDay : mm-dd
+	DateFormatHyphenMonthDay = "01-02"
+	// DateFormatHyphenDayMonth : dd-mm
+	DateFormatHyphenDayMonth = "02-01"
 
-	DateFormatSlashYearMonthDay                 = "2006/01/02"
+	// DateFormatSlashYearMonthDay : yyyy/mm/dd
+	DateFormatSlashYearMonthDay = "2006/01/02"
+	// DateFormatSlashYearMonthDayHourMinuteSecond : yyyy/mm/dd hh:mm:ss
 	DateFormatSlashYearMonthDayHourMinuteSecond = "2006/01/02 15:04:05"
-	DateFormatSlashMonthDayYear                 = "01/02/2006"
+	// DateFormatSlashMonthDayYear : mm/dd/yyyy
+	DateFormatSlashMonthDayYear = "01/02/2006"
+	// DateFormatSlashMonthDayYearHourMinuteSecond : mm/dd/yyyy hh:mm:ss
 	DateFormatSlashMonthDayYearHourMinuteSecond = "01/02/2006 15:04:05"
-	DateFormatSlashDayMonthYear                 = "02/01/2006"
+	// DateFormatSlashDayMonthYear : dd/mm/yyyy
+	DateFormatSlashDayMonthYear = "02/01/2006"
+	// DateFormatSlashDayMonthYearHourMinuteSecond : dd/mm/yyyy hh:mm:ss
 	DateFormatSlashDayMonthYearHourMinuteSecond = "02/01/2006 15:04:05"
-	DateFormatSlashMonthDay                     = "01/02"
-	DateFormatSlashDayMonth                     = "02/01"
+	// DateFormatSlashMonthDay : mm/dd
+	DateFormatSlashMonthDay = "01/02"
+	// DateFormatSlashDayMonth : dd/mm
+	DateFormatSlashDayMonth = "02/01"
 
-	DateFormatYear             = "2006"
+	// DateFormatYear : yyyy
+	DateFormatYear = "2006"
+	// DateFormatHourMinuteSecond : hh:mm:ss
 	DateFormatHourMinuteSecond = "15:04:05"
 
-	DateConvertUTCToJSTOffset = 9 * 60 * 60
+	dateConvertUTCToJSTOffset = 9 * 60 * 60
 )
 
 // GetDateFormatString gets format date string.
@@ -39,7 +57,7 @@ func GetDateTime(str, format string) (time.Time, error) {
 
 // ConvertUTCToJST converts UTC to JST
 func ConvertUTCToJST(t time.Time) time.Time {
-	return t.In(time.FixedZone("Asia/Tokyo", DateConvertUTCToJSTOffset))
+	return t.In(time.FixedZone("Asia/Tokyo", dateConvertUTCToJSTOffset))
 }
 
 // ConvertJSTToUTC converts JST to UTC

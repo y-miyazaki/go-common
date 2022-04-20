@@ -17,8 +17,8 @@ type Config struct {
 	SlackClient *slack.Client
 }
 
-// ConfigSetting sets base configurations.
-type ConfigSetting struct {
+// Setting sets base configurations.
+type Setting struct {
 	LoggerFormatter       string
 	LoggerOut             string
 	LoggerLevel           string
@@ -26,7 +26,7 @@ type ConfigSetting struct {
 }
 
 // NewConfig sets base configurations.
-func NewConfig(c *ConfigSetting) *Config {
+func NewConfig(setting *Setting) *Config {
 	config := &Config{}
 
 	// -------------------------------------------------------------
@@ -34,7 +34,7 @@ func NewConfig(c *ConfigSetting) *Config {
 	// -------------------------------------------------------------
 	l := &logrus.Logger{}
 	// formatter
-	formatter := strings.ToLower(c.LoggerFormatter)
+	formatter := strings.ToLower(setting.LoggerFormatter)
 	if formatter == "json" {
 		l.Formatter = &logrus.JSONFormatter{}
 	} else if formatter == "text" {
@@ -43,14 +43,14 @@ func NewConfig(c *ConfigSetting) *Config {
 		panic("Only json and text can be selected for formatter.")
 	}
 	// out
-	out := strings.ToLower(c.LoggerOut)
+	out := strings.ToLower(setting.LoggerOut)
 	if out == "stdout" {
 		l.Out = os.Stdout
 	} else {
 		panic("Only stdout can be selected for out.")
 	}
 	// level
-	level, err := logrus.ParseLevel(c.LoggerLevel)
+	level, err := logrus.ParseLevel(setting.LoggerLevel)
 	if err != nil {
 		panic(fmt.Sprintf("level can't set %v", level))
 	}
@@ -60,10 +60,10 @@ func NewConfig(c *ConfigSetting) *Config {
 	// -------------------------------------------------------------
 	// set Slack
 	// -------------------------------------------------------------
-	if c.SlackOauthAccessToken != "" {
+	if setting.SlackOauthAccessToken != "" {
 		config.SlackClient = infrastructure.NewSlack(
 			&infrastructure.SlackConfig{
-				OauthAccessToken: c.SlackOauthAccessToken,
+				OauthAccessToken: setting.SlackOauthAccessToken,
 			})
 	}
 	return config

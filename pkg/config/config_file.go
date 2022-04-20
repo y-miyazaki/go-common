@@ -12,21 +12,21 @@ import (
 	"github.com/y-miyazaki/go-common/pkg/logger"
 )
 
-// ConfigFileSetting sets configurations.
-type ConfigFileSetting struct {
+// FileSetting sets configurations.
+type FileSetting struct {
 	ConfigPath            string
 	ConfigFileName        string
 	SlackOauthAccessToken string
 }
 
 // NewConfigFile to read config
-func NewConfigFile(c *ConfigFileSetting) *Config {
+func NewConfigFile(setting *FileSetting) *Config {
 	config := &Config{}
 	// -------------------------------------------------------------
 	// get config
 	// -------------------------------------------------------------
-	viper.AddConfigPath(c.ConfigPath) // path to look for the config file in
-	viper.SetConfigName(c.ConfigFileName)
+	viper.AddConfigPath(setting.ConfigPath) // path to look for the config file in
+	viper.SetConfigName(setting.ConfigFileName)
 	viper.SetConfigType("yaml") // can viper.SetConfigType("YAML")
 	viper.AutomaticEnv()
 	err := viper.ReadInConfig() // Find and read the config file
@@ -69,10 +69,10 @@ func NewConfigFile(c *ConfigFileSetting) *Config {
 	// -------------------------------------------------------------
 	// set Slack
 	// -------------------------------------------------------------
-	if c.SlackOauthAccessToken != "" {
+	if setting.SlackOauthAccessToken != "" {
 		config.SlackClient = infrastructure.NewSlack(
 			&infrastructure.SlackConfig{
-				OauthAccessToken: c.SlackOauthAccessToken,
+				OauthAccessToken: setting.SlackOauthAccessToken,
 			})
 	}
 	return config

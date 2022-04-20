@@ -43,21 +43,21 @@ type GormConfig struct {
 	LogLevel LogLevel
 }
 
-// LoggerGorm struct.
-type LoggerGorm struct {
+// Gorm struct.
+type Gorm struct {
 	l          *logrus.Logger
 	e          *logrus.Entry
 	gormConfig *GormConfig
 }
 
-// LoggerGormConfig sets configurations.
-type LoggerGormConfig struct {
+// GormSetting sets configurations.
+type GormSetting struct {
 	Logger     *logrus.Logger
 	GormConfig *GormConfig
 }
 
 // NewLoggerGorm func
-func NewLoggerGorm(c *LoggerGormConfig) *LoggerGorm {
+func NewLoggerGorm(c *GormSetting) *Gorm {
 	var l = logrus.New()
 
 	// Log as JSON instead of the default ASCII formatter.
@@ -67,7 +67,7 @@ func NewLoggerGorm(c *LoggerGormConfig) *LoggerGorm {
 	l.SetOutput(c.Logger.Out)
 	// Only log the warning severity or above.
 	l.SetLevel(c.Logger.Level)
-	return &LoggerGorm{
+	return &Gorm{
 		l: l,
 		e: l.WithFields(logrus.Fields{}),
 		gormConfig: &GormConfig{
@@ -79,34 +79,34 @@ func NewLoggerGorm(c *LoggerGormConfig) *LoggerGorm {
 }
 
 // LogMode log mode(same logrus.level)
-func (l *LoggerGorm) LogMode(level logger.LogLevel) logger.Interface {
+func (l *Gorm) LogMode(level logger.LogLevel) logger.Interface {
 	newlogger := l
 	return newlogger
 }
 
 // Info print the info level log.
-func (l *LoggerGorm) Info(ctx context.Context, msg string, data ...interface{}) {
+func (l *Gorm) Info(ctx context.Context, msg string, data ...interface{}) {
 	if l.gormConfig.LogLevel >= Info {
 		l.e.WithContext(ctx).Infof(msg, data...)
 	}
 }
 
 // Warn print the warn level log.
-func (l *LoggerGorm) Warn(ctx context.Context, msg string, data ...interface{}) {
+func (l *Gorm) Warn(ctx context.Context, msg string, data ...interface{}) {
 	if l.gormConfig.LogLevel >= Warn {
 		l.e.WithContext(ctx).Warnf(msg, data...)
 	}
 }
 
 // Error print the error level log.
-func (l *LoggerGorm) Error(ctx context.Context, msg string, data ...interface{}) {
+func (l *Gorm) Error(ctx context.Context, msg string, data ...interface{}) {
 	if l.gormConfig.LogLevel >= Error {
 		l.e.WithContext(ctx).Errorf(msg, data...)
 	}
 }
 
 // Trace print the SQL log.
-func (l *LoggerGorm) Trace(
+func (l *Gorm) Trace(
 	ctx context.Context,
 	begin time.Time,
 	fc func() (sql string, rowsAffected int64),

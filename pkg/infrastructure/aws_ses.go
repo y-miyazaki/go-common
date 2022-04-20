@@ -21,13 +21,13 @@ func NewSES(
 }
 
 // GetSESConfig get config.
-func GetSESConfig(logger *logger.Logger, id, secret, token, region, endpoint string) *aws.Config {
+func GetSESConfig(l *logger.Logger, id, secret, token, region, endpoint string) *aws.Config {
 	var httpClient *http.Client
-	if logger != nil {
+	if l != nil {
 		httpClient = &http.Client{
 			Transport: transport.NewTransportHTTPLogger(
-				logger.WithField("service", "aws-ses"),
-				transport.TransportHTTPLoggerTypeExternal,
+				l.WithField("service", "aws-ses"),
+				transport.HTTPLoggerTypeExternal,
 			),
 		}
 	}
@@ -43,13 +43,13 @@ func GetSESConfig(logger *logger.Logger, id, secret, token, region, endpoint str
 
 // GetSESConfigNoCredentials get no credentials config.
 // If AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are environment variables and are in the execution environment, Credentials is not required.
-func GetSESConfigNoCredentials(logger *logger.Logger, region, endpoint string) *aws.Config {
+func GetSESConfigNoCredentials(l *logger.Logger, region, endpoint string) *aws.Config {
 	var httpClient *http.Client
-	if logger != nil {
+	if l != nil {
 		httpClient = &http.Client{
 			Transport: transport.NewTransportHTTPLogger(
-				logger.WithField("service", "aws-ses"),
-				transport.TransportHTTPLoggerTypeExternal,
+				l.WithField("service", "aws-ses"),
+				transport.HTTPLoggerTypeExternal,
 			),
 		}
 	}

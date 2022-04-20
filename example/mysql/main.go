@@ -26,7 +26,7 @@ func main() {
 	// --------------------------------------------------------------
 	// logger for gorm
 	// --------------------------------------------------------------
-	loggerGorm := logger.NewLoggerGorm(&logger.LoggerGormConfig{
+	loggerGorm := logger.NewLoggerGorm(&logger.GormSetting{
 		Logger: loggerNew.Entry.Logger,
 		GormConfig: &logger.GormConfig{
 			// slow query time: 3 sec

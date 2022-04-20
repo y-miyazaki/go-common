@@ -12,7 +12,7 @@ import (
 
 // GinHTTPLogger retrieves the request/response logs.
 func GinHTTPLogger(
-	logger *logger.Logger,
+	l *logger.Logger,
 	traceIDHeader string,
 	clientIPHeader string,
 ) gin.HandlerFunc {
@@ -34,7 +34,7 @@ func GinHTTPLogger(
 			fields[traceIDHeader] = c.Request.Header.Get(traceIDHeader)
 		}
 		// get error
-		l := logger
+		l := l
 		if err, err2 := context.GetGinContextError(c); err2 == nil {
 			l = l.WithError(err)
 		}

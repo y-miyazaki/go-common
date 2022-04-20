@@ -19,9 +19,9 @@ type RedisRepository struct {
 }
 
 // NewRedisRepository returns RedisRepository instance.
-func NewRedisRepository(logger *logger.Logger, r *redis.Client) *RedisRepository {
+func NewRedisRepository(l *logger.Logger, r *redis.Client) *RedisRepository {
 	return &RedisRepository{
-		logger: logger,
+		logger: l,
 		redis:  r,
 	}
 }
