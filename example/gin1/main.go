@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 	"os"
+	"syscall"
 	"time"
 
 	helmet "github.com/danielkov/gin-helmet"
@@ -14,6 +17,7 @@ import (
 	"github.com/y-miyazaki/go-common/pkg/logger"
 	"github.com/y-miyazaki/go-common/pkg/middleware"
 	"github.com/y-miyazaki/go-common/pkg/repository"
+	"github.com/y-miyazaki/go-common/pkg/signal"
 	"github.com/y-miyazaki/go-common/pkg/utils"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
@@ -79,6 +83,8 @@ func main() {
 		},
 	}
 	mysqlDB := infrastructure.NewMySQL(mysqlConfig, gc)
+	defer closeDB(loggerNew, mysqlDB)
+
 	// --------------------------------------------------------------
 	// Postgres
 	// --------------------------------------------------------------
@@ -104,6 +110,7 @@ func main() {
 		},
 	}
 	postgresDB := infrastructure.NewPostgres(postgresConfig, gc)
+	defer closeDB(loggerNew, postgresDB)
 	// --------------------------------------------------------------
 	// S3(minio)
 	// --------------------------------------------------------------
@@ -132,6 +139,7 @@ func main() {
 	}
 	r := infrastructure.NewRedis(o)
 	redisRepository := repository.NewRedisRepository(loggerNew, r)
+	defer closeRedis(loggerNew, r)
 
 	// --------------------------------------------------------------
 	// Handler
@@ -165,8 +173,47 @@ func main() {
 	router.GET("/s3", h.GetS3)
 	router.GET("/redis", h.GetRedis)
 
-	err = router.Run()
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: router,
+	}
+
+	// detect signal
+	signal.DetectSignal(func(sig os.Signal) {
+		loggerNew.Infof("signal detected: %v", sig)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err = server.Shutdown(ctx); err != nil {
+			loggerNew.Fatalf("Server Shutdown:", err)
+		}
+		loggerNew.Info("server shutdown...")
+	}, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGINT, os.Interrupt)
+
+	err = server.ListenAndServe()
+	if err != nil && err != http.ErrServerClosed {
+		loggerNew.Fatalln("An error happened while starting the HTTP server: ", err)
+	}
+}
+
+func closeDB(log *logger.Logger, gormDB *gorm.DB) {
+	if gormDB == nil {
+		return
+	}
+	db, err := gormDB.DB()
 	if err != nil {
-		loggerNew.WithError(err).Error("router.Run() error...")
+		log.Errorf("can't close db")
+		return
+	}
+	if err := db.Close(); err != nil {
+		log.Errorf("can't close db")
+	}
+}
+
+func closeRedis(log *logger.Logger, r *redis.Client) {
+	if r == nil {
+		return
+	}
+	if err := r.Close(); err != nil {
+		log.Errorf("can't close redis")
 	}
 }
