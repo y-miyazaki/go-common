@@ -36,13 +36,13 @@ func main() {
 		panic(fmt.Sprintf("level can't set %v", level))
 	}
 	l.Level = level
-	loggerNew := logger.NewLogger(l)
+	log := logger.NewLogger(l)
 
 	// --------------------------------------------------------------
 	// logger for gorm
 	// --------------------------------------------------------------
 	loggerGorm := logger.NewLoggerGorm(&logger.GormSetting{
-		Logger: loggerNew.Entry.Logger,
+		Logger: log.Entry.Logger,
 		GormConfig: &logger.GormConfig{
 			// slow query time: 3 sec
 			SlowThreshold:             time.Second * 3,
@@ -83,7 +83,7 @@ func main() {
 		},
 	}
 	mysqlDB := infrastructure.NewMySQL(mysqlConfig, gc)
-	defer closeDB(loggerNew, mysqlDB)
+	defer closeDB(log, mysqlDB)
 
 	// --------------------------------------------------------------
 	// Postgres
@@ -110,7 +110,7 @@ func main() {
 		},
 	}
 	postgresDB := infrastructure.NewPostgres(postgresConfig, gc)
-	defer closeDB(loggerNew, postgresDB)
+	defer closeDB(log, postgresDB)
 	// --------------------------------------------------------------
 	// S3(minio)
 	// --------------------------------------------------------------
@@ -121,9 +121,9 @@ func main() {
 	s3Token := os.Getenv("S3_TOKEN")
 
 	s3SessionOptions := infrastructure.GetS3DefaultOptions()
-	s3Config := infrastructure.GetS3Config(loggerNew, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
+	s3Config := infrastructure.GetS3Config(log, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
 	session := infrastructure.NewS3Session(s3SessionOptions)
-	awsS3Repository := repository.NewAWSS3Repository(loggerNew, session, s3Config)
+	awsS3Repository := repository.NewAWSS3Repository(log, session, s3Config)
 
 	// --------------------------------------------------------------
 	// Redis
@@ -138,13 +138,13 @@ func main() {
 		Password: redisPassword,
 	}
 	r := infrastructure.NewRedis(o)
-	redisRepository := repository.NewRedisRepository(loggerNew, r)
-	defer closeRedis(loggerNew, r)
+	redisRepository := repository.NewRedisRepository(log, r)
+	defer closeRedis(log, r)
 
 	// --------------------------------------------------------------
 	// Handler
 	// --------------------------------------------------------------
-	h := handler.NewHTTPHandler(loggerNew, mysqlDB, postgresDB, awsS3Repository, redisRepository)
+	h := handler.NewHTTPHandler(log, mysqlDB, postgresDB, awsS3Repository, redisRepository)
 
 	router := gin.Default()
 	// CORS for https://foo.com and https://github.com origins, allowing:
@@ -163,7 +163,7 @@ func main() {
 			MaxAge:           12 * time.Hour,
 		}))
 	router.Use(helmet.Default())
-	router.Use(middleware.GinHTTPLogger(loggerNew, "request-id", "test"))
+	router.Use(middleware.GinHTTPLogger(log, "request-id", "test"))
 	router.GET("/healthcheck", h.GetHealthcheck)
 	router.GET("/hello", h.GetHello)
 	router.GET("/error_1", h.GetError1)
@@ -180,18 +180,18 @@ func main() {
 
 	// detect signal
 	signal.DetectSignal(func(sig os.Signal) {
-		loggerNew.Infof("signal detected: %v", sig)
+		log.Infof("signal detected: %v", sig)
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
+		log.Info("server shutdown...")
 		if err = server.Shutdown(ctx); err != nil {
-			loggerNew.Fatalf("Server Shutdown:", err)
+			log.Errorf("server Shutdown:", err)
 		}
-		loggerNew.Info("server shutdown...")
 	}, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGINT, os.Interrupt)
 
 	err = server.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
-		loggerNew.Fatalln("An error happened while starting the HTTP server: ", err)
+		log.Errorf("an error occurred in Server: ", err)
 	}
 }
 
