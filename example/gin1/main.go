@@ -172,6 +172,7 @@ func main() {
 	router.GET("/postgres", h.GetPostgres)
 	router.GET("/s3", h.GetS3)
 	router.GET("/redis", h.GetRedis)
+	router.GET("/env", h.GetEnv)
 
 	server := &http.Server{
 		Addr:    ":8080",
