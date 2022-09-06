@@ -6,7 +6,7 @@ import "fmt"
 const SlackMessageLimit int = 1800
 
 // GetTitle return title string.
-func GetAWSSlackTitle(function, accountID, region, service, env string) string {
+func GetSlackAWSTitle(function, accountID, region, service, env string) string {
 	title := function
 	// AccountID
 	if accountID != "" {
