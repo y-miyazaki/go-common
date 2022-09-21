@@ -63,21 +63,21 @@ func main() {
 			MaxOpenConns: 100,
 		},
 	}
-	db := infrastructure.NewPostgres(postgresConfig, gc)
+	database := infrastructure.NewPostgres(postgresConfig, gc)
 
 	// --------------------------------------------------------------
 	// example: Postgres
 	// --------------------------------------------------------------
-	err := db.Migrator().CreateTable(&entity.User{})
+	err := database.Migrator().CreateTable(&entity.User{})
 	if err != nil {
 		panic("can't create table")
 	}
 	user1 := &entity.User{Name: "test", Email: "test@test.com"}
-	_ = db.Create(user1)
+	_ = database.Create(user1)
 
 	user2 := &entity.User{}
-	db.Take(user2)
-	err = db.Migrator().DropTable(&entity.User{})
+	database.Take(user2)
+	err = database.Migrator().DropTable(&entity.User{})
 	if err != nil {
 		panic("can't drop table")
 	}
