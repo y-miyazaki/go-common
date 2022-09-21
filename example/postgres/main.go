@@ -8,7 +8,7 @@ import (
 	"github.com/y-miyazaki/go-common/example/postgres/entity"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 	"github.com/y-miyazaki/go-common/pkg/logger"
-	"github.com/y-miyazaki/go-common/pkg/utils"
+	"github.com/y-miyazaki/go-common/pkg/utils/db"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -49,7 +49,7 @@ func main() {
 	postgresDBname := os.Getenv("POSTGRES_DBNAME")
 	postgresConfig := &infrastructure.PostgresConfig{
 		Config: &postgres.Config{
-			DSN:                  utils.GetPostgresDsn(postgresUser, postgresPassword, postgresHost, postgresPort, postgresDBname, "sslmode=disable TimeZone=Asia/Tokyo"),
+			DSN:                  db.GetPostgresDsn(postgresUser, postgresPassword, postgresHost, postgresPort, postgresDBname, "sslmode=disable TimeZone=Asia/Tokyo"),
 			PreferSimpleProtocol: true, // disables implicit prepared statement usage
 		},
 		DBConfig: infrastructure.DBConfig{

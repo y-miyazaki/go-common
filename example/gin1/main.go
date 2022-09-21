@@ -18,7 +18,7 @@ import (
 	"github.com/y-miyazaki/go-common/pkg/middleware"
 	"github.com/y-miyazaki/go-common/pkg/repository"
 	"github.com/y-miyazaki/go-common/pkg/signal"
-	"github.com/y-miyazaki/go-common/pkg/utils"
+	"github.com/y-miyazaki/go-common/pkg/utils/db"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -64,7 +64,7 @@ func main() {
 
 	mysqlConfig := &infrastructure.MySQLConfig{
 		Config: &mysql.Config{
-			DSN:                       utils.GetMySQLDsn(mysqlUsername, mysqlPassword, mysqlServer, mysqlPort, mysqlDBname, "charset=utf8mb4&parseTime=True&loc=Local"),
+			DSN:                       db.GetMySQLDsn(mysqlUsername, mysqlPassword, mysqlServer, mysqlPort, mysqlDBname, "charset=utf8mb4&parseTime=True&loc=Local"),
 			DefaultStringSize:         256,   // default size for string fields
 			DisableDatetimePrecision:  true,  // disable datetime precision, which not supported before MySQL 5.6
 			DontSupportRenameIndex:    true,  // drop & create when rename index, rename index not supported before MySQL 5.7, MariaDB
@@ -95,7 +95,7 @@ func main() {
 	postgresDBname := os.Getenv("POSTGRES_DBNAME")
 	postgresConfig := &infrastructure.PostgresConfig{
 		Config: &postgres.Config{
-			DSN:                  utils.GetPostgresDsn(postgresUser, postgresPassword, postgresHost, postgresPort, postgresDBname, "sslmode=disable TimeZone=Asia/Tokyo"),
+			DSN:                  db.GetPostgresDsn(postgresUser, postgresPassword, postgresHost, postgresPort, postgresDBname, "sslmode=disable TimeZone=Asia/Tokyo"),
 			PreferSimpleProtocol: true, // disables implicit prepared statement usage
 		},
 		DBConfig: infrastructure.DBConfig{
@@ -186,13 +186,13 @@ func main() {
 		defer cancel()
 		log.Info("server shutdown...")
 		if err = server.Shutdown(ctx); err != nil {
-			log.Errorf("server Shutdown:", err)
+			log.WithField("err", err).Error("server Shutdown")
 		}
 	}, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGINT, os.Interrupt)
 
 	err = server.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
-		log.Errorf("an error occurred in Server: ", err)
+		log.WithField("err", err).Errorf("an error occurred in Server")
 	}
 }
 
@@ -200,12 +200,12 @@ func closeDB(log *logger.Logger, gormDB *gorm.DB) {
 	if gormDB == nil {
 		return
 	}
-	db, err := gormDB.DB()
+	database, err := gormDB.DB()
 	if err != nil {
 		log.Errorf("can't close db")
 		return
 	}
-	if err := db.Close(); err != nil {
+	if err := database.Close(); err != nil {
 		log.Errorf("can't close db")
 	}
 }

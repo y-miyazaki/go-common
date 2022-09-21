@@ -8,7 +8,7 @@ import (
 	"github.com/y-miyazaki/go-common/example/mysql/entity"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 	"github.com/y-miyazaki/go-common/pkg/logger"
-	"github.com/y-miyazaki/go-common/pkg/utils"
+	"github.com/y-miyazaki/go-common/pkg/utils/db"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -50,7 +50,7 @@ func main() {
 
 	mysqlConfig := &infrastructure.MySQLConfig{
 		Config: &mysql.Config{
-			DSN:                       utils.GetMySQLDsn(mysqlUsername, mysqlPassword, mysqlServer, mysqlPort, mysqlDBname, "charset=utf8mb4&parseTime=True&loc=Local"),
+			DSN:                       db.GetMySQLDsn(mysqlUsername, mysqlPassword, mysqlServer, mysqlPort, mysqlDBname, "charset=utf8mb4&parseTime=True&loc=Local"),
 			DefaultStringSize:         256,   // default size for string fields
 			DisableDatetimePrecision:  true,  // disable datetime precision, which not supported before MySQL 5.6
 			DontSupportRenameIndex:    true,  // drop & create when rename index, rename index not supported before MySQL 5.7, MariaDB
@@ -68,21 +68,21 @@ func main() {
 			MaxOpenConns: 100,
 		},
 	}
-	db := infrastructure.NewMySQL(mysqlConfig, gc)
+	database := infrastructure.NewMySQL(mysqlConfig, gc)
 
 	// --------------------------------------------------------------
 	// example: MySQL
 	// --------------------------------------------------------------
-	err := db.Migrator().CreateTable(&entity.User{})
+	err := database.Migrator().CreateTable(&entity.User{})
 	if err != nil {
 		panic("can't create table")
 	}
 	user1 := &entity.User{Name: "test", Email: "test@test.com"}
-	db.Create(user1)
+	database.Create(user1)
 
 	user2 := &entity.User{}
-	db.Take(user2)
-	err = db.Migrator().DropTable(&entity.User{})
+	database.Take(user2)
+	err = database.Migrator().DropTable(&entity.User{})
 	if err != nil {
 		panic("can't drop table")
 	}
