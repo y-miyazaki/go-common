@@ -9,3 +9,10 @@ func GetSecureHeaders() map[string]string {
 		"Strict-Transport-Security": "max-age=86400",
 	}
 }
+
+// GetCacheControlNoStoreHeaders gets Cache-Control header.
+func GetCacheControlNoStoreHeaders() map[string]string {
+	return map[string]string{
+		"Cache-Control": "no-store",
+	}
+}
