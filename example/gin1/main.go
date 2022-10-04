@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws/session"
 	helmet "github.com/danielkov/gin-helmet"
 	"github.com/gin-gonic/gin"
 	redis "github.com/go-redis/redis/v8"
@@ -120,9 +121,11 @@ func main() {
 	s3Secret := os.Getenv("S3_SECRET")
 	s3Token := os.Getenv("S3_TOKEN")
 
-	s3SessionOptions := infrastructure.GetS3DefaultOptions()
+	sess := &session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}
 	s3Config := infrastructure.GetS3Config(log, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
-	session := infrastructure.NewS3Session(s3SessionOptions)
+	session := infrastructure.NewS3Session(sess)
 	awsS3Repository := repository.NewAWSS3Repository(log, session, s3Config)
 
 	// --------------------------------------------------------------

@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/sirupsen/logrus"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 	"github.com/y-miyazaki/go-common/pkg/logger"
@@ -30,9 +31,11 @@ func main() {
 	s3Secret := os.Getenv("S3_SECRET")
 	s3Token := os.Getenv("S3_TOKEN")
 
-	s3SessionOptions := infrastructure.GetS3DefaultOptions()
+	sess := &session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}
 	s3Config := infrastructure.GetS3Config(l, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
-	session := infrastructure.NewS3Session(s3SessionOptions)
+	session := infrastructure.NewS3Session(sess)
 
 	// --------------------------------------------------------------
 	// example: S3
