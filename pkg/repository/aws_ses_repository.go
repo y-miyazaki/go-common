@@ -135,7 +135,7 @@ func (r *AWSSESRepository) SendBulkTemplatedEmail(from, template, defaultTemplat
 	return err
 }
 
-func (r *AWSSESRepository) log(to string, subject string, responseObject *ses.SendEmailOutput, responseError error) {
+func (r *AWSSESRepository) log(to, subject string, responseObject *ses.SendEmailOutput, responseError error) {
 	log := r.logger
 
 	// Check output personal information flag.
@@ -153,7 +153,7 @@ func (r *AWSSESRepository) log(to string, subject string, responseObject *ses.Se
 		log.WithError(responseError).Error("Error while sending an SES email")
 	}
 }
-func (r *AWSSESRepository) logBulkTemplated(template string, defaultTemplateData string, responseObject *ses.SendBulkTemplatedEmailOutput, responseError error) {
+func (r *AWSSESRepository) logBulkTemplated(template, defaultTemplateData string, responseObject *ses.SendBulkTemplatedEmailOutput, responseError error) {
 	log := r.logger
 
 	log = log.WithField("template", template).WithField("defaultTemplateData", defaultTemplateData)

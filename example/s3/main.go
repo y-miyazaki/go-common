@@ -31,16 +31,15 @@ func main() {
 	s3Secret := os.Getenv("S3_SECRET")
 	s3Token := os.Getenv("S3_TOKEN")
 
-	sess := &session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-	}
 	s3Config := infrastructure.GetS3Config(l, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
-	session := infrastructure.NewS3Session(sess)
+	sess := infrastructure.NewS3Session(&session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	})
 
 	// --------------------------------------------------------------
 	// example: S3
 	// --------------------------------------------------------------
-	awsS3Repository := repository.NewAWSS3Repository(l, session, s3Config)
+	awsS3Repository := repository.NewAWSS3Repository(l, sess, s3Config)
 	text := "aaaaaaaab"
 	bucket := "test"
 
