@@ -125,21 +125,17 @@ func (r *AWSSESRepository) SendEmail(from, to, subject, contentText, contentHTML
 // Note: One or more Destination objects. All of the recipients in a Destination receive the same version of the email.
 //       You can specify up to 50 Destination objects within a Destinations array.
 func (r *AWSSESRepository) SendBulkTemplatedEmail(from, template, defaultTemplateData string, destinations []*ses.BulkEmailDestination) error {
-	_, err := r.s.SendBulkTemplatedEmail(&ses.SendBulkTemplatedEmailInput{
+	response, err := r.s.SendBulkTemplatedEmail(&ses.SendBulkTemplatedEmailInput{
 		DefaultTemplateData: aws.String(defaultTemplateData),
 		Destinations:        destinations,
 		Source:              aws.String(from),
 		Template:            aws.String(template),
 	})
+	r.logBulkTemplated(template, defaultTemplateData, response, err)
 	return err
 }
 
-func (r *AWSSESRepository) log(
-	to string,
-	subject string,
-	responseObject *ses.SendEmailOutput,
-	responseError error,
-) {
+func (r *AWSSESRepository) log(to string, subject string, responseObject *ses.SendEmailOutput, responseError error) {
 	log := r.logger
 
 	// Check output personal information flag.
@@ -150,6 +146,19 @@ func (r *AWSSESRepository) log(
 	}
 	if responseObject.MessageId != nil {
 		log = log.WithField("messageId", *responseObject.MessageId)
+	}
+	if responseError == nil {
+		log.Debug("Successfully sent an SES email")
+	} else {
+		log.WithError(responseError).Error("Error while sending an SES email")
+	}
+}
+func (r *AWSSESRepository) logBulkTemplated(template string, defaultTemplateData string, responseObject *ses.SendBulkTemplatedEmailOutput, responseError error) {
+	log := r.logger
+
+	log = log.WithField("template", template).WithField("defaultTemplateData", defaultTemplateData)
+	if responseObject.Status != nil {
+		log = log.WithField("status", responseObject.Status)
 	}
 	if responseError == nil {
 		log.Debug("Successfully sent an SES email")
