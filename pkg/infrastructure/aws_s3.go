@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/y-miyazaki/go-common/pkg/logger"
 	"github.com/y-miyazaki/go-common/pkg/transport"
+	"go.uber.org/zap"
 )
 
 // NewS3Session returns Session.
@@ -65,6 +66,51 @@ func GetS3ConfigNoCredentials(l *logger.Logger, region, endpoint string, isMinio
 		httpClient = &http.Client{
 			Transport: transport.NewTransportHTTPLogger(
 				l.WithField("service", "aws-s3"),
+				transport.HTTPLoggerTypeExternal,
+			),
+		}
+	}
+	return &aws.Config{
+		Region:           aws.String(region),
+		Endpoint:         aws.String(endpoint),
+		DisableSSL:       aws.Bool(isMinio),
+		S3ForcePathStyle: aws.Bool(isMinio),
+		HTTPClient:       httpClient,
+	}
+}
+
+// GetS3ConfigZap get config.
+func GetS3ConfigZap(l *logger.ZapLogger, id, secret, token, region, endpoint string, isMinio bool) *aws.Config {
+	var httpClient *http.Client
+	if l != nil {
+		httpClient = &http.Client{
+			Transport: transport.NewTransportHTTPZapLogger(
+				l.With(zap.String("service", "aws-s3")),
+				transport.HTTPLoggerTypeExternal,
+			),
+		}
+	}
+	return &aws.Config{
+		Credentials: credentials.NewStaticCredentials(
+			id,
+			secret,
+			token),
+		Region:           aws.String(region),
+		Endpoint:         aws.String(endpoint),
+		DisableSSL:       aws.Bool(isMinio),
+		S3ForcePathStyle: aws.Bool(isMinio),
+		HTTPClient:       httpClient,
+	}
+}
+
+// GetS3ConfigNoCredentialsZap get no credentials config.
+// If AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are environment variables and are in the execution environment, Credentials is not required.
+func GetS3ConfigNoCredentialsZap(l *logger.ZapLogger, region, endpoint string, isMinio bool) *aws.Config {
+	var httpClient *http.Client
+	if l != nil {
+		httpClient = &http.Client{
+			Transport: transport.NewTransportHTTPZapLogger(
+				l.With(zap.String("service", "aws-s3")),
 				transport.HTTPLoggerTypeExternal,
 			),
 		}
