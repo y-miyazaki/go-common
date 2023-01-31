@@ -22,53 +22,20 @@ type ZapConfig struct {
 }
 
 // NewZapLogger returns an instance of logger
-func NewZapLogger(zapConfig ZapConfig) *ZapLogger {
-	config := zap.Config{}
-	config.DisableCaller = zapConfig.DisableCaller
-	config.DisableStacktrace = zapConfig.DisableStacktrace
-
-	// Level
-	level := zap.NewAtomicLevel()
-	level.SetLevel(zapConfig.Level)
-	config.Level = level
-
+func NewZapLogger(config zap.Config) *ZapLogger {
 	// Encoding
-	if zapConfig.Encoding == "" {
+	if config.Encoding == "" {
 		config.Encoding = "json"
-	} else {
-		config.Encoding = zapConfig.Encoding
-	}
-
-	// EncoderConfig
-	if zapConfig.EncoderConfig == nil {
-		config.EncoderConfig = zapcore.EncoderConfig{
-			TimeKey:        "time",
-			LevelKey:       "level",
-			NameKey:        "name",
-			CallerKey:      "caller",
-			MessageKey:     "msg",
-			StacktraceKey:  "st",
-			EncodeLevel:    zapcore.LowercaseLevelEncoder,
-			EncodeTime:     zapcore.ISO8601TimeEncoder,
-			EncodeDuration: zapcore.StringDurationEncoder,
-			EncodeCaller:   zapcore.ShortCallerEncoder,
-		}
-	} else {
-		config.EncoderConfig = *zapConfig.EncoderConfig
 	}
 
 	// OutputPaths
-	if len(zapConfig.OutputPaths) == 0 {
+	if len(config.OutputPaths) == 0 {
 		config.OutputPaths = []string{"stdout"}
-	} else {
-		config.OutputPaths = zapConfig.OutputPaths
 	}
 
 	// ErrorOutputPaths
-	if len(zapConfig.ErrorOutputPaths) == 0 {
+	if len(config.ErrorOutputPaths) == 0 {
 		config.ErrorOutputPaths = []string{"stderr"}
-	} else {
-		config.ErrorOutputPaths = zapConfig.ErrorOutputPaths
 	}
 
 	logger, err := config.Build()

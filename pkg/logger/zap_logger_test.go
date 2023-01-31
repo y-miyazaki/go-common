@@ -19,8 +19,23 @@ func TestNewZapLogger(t *testing.T) {
 		name: "Joe",
 		sex:  "man",
 	}
-	zapConfig := ZapConfig{
-		Level: zapcore.DebugLevel,
+	level := zap.NewAtomicLevel()
+	level.SetLevel(zap.InfoLevel)
+
+	zapConfig := zap.Config{
+		Level: level,
+		EncoderConfig: zapcore.EncoderConfig{
+			TimeKey:        "time",
+			LevelKey:       "level",
+			NameKey:        "name",
+			CallerKey:      "caller",
+			MessageKey:     "msg",
+			StacktraceKey:  "st",
+			EncodeLevel:    zapcore.LowercaseLevelEncoder,
+			EncodeTime:     zapcore.ISO8601TimeEncoder,
+			EncodeDuration: zapcore.StringDurationEncoder,
+			EncodeCaller:   zapcore.ShortCallerEncoder,
+		},
 	}
 	logger := NewZapLogger(zapConfig)
 	logger.Debug("test", zap.String("Key", "String"))
@@ -28,16 +43,15 @@ func TestNewZapLogger(t *testing.T) {
 	logger.Error("test", zap.String("Key", "String"))
 	logger.Warn("test")
 
-	zapConfig2 := ZapConfig{
-		Level:             zapcore.DebugLevel,
-		DisableCaller:     true,
-		DisableStacktrace: true,
+	zapConfig2 := zap.Config{
+		Level:             level,
+		DisableCaller:     false,
+		DisableStacktrace: false,
 		Sampling: &zap.SamplingConfig{
 			Initial:    100,
 			Thereafter: 100,
 		},
-		Encoding: "json",
-		EncoderConfig: &zapcore.EncoderConfig{
+		EncoderConfig: zapcore.EncoderConfig{
 			TimeKey:        "time",
 			LevelKey:       "level",
 			NameKey:        "name",
@@ -52,6 +66,7 @@ func TestNewZapLogger(t *testing.T) {
 		OutputPaths:      []string{"stdout"},
 		ErrorOutputPaths: []string{"stderr"},
 	}
+
 	logger2 := NewZapLogger(zapConfig2)
 	logger2.Debug("test", zap.String("Key", "String"))
 	logger2.Info("test")
@@ -65,7 +80,9 @@ func TestNewZapLogger(t *testing.T) {
 	logger2.WithError(e1).Error("test1")
 	logger2.WithError(e2).Error("test2")
 	logger2.WithError(e3).Error("test3")
-	logger2.With(zap.String("key", "test")).With(zap.Any("any", testZap)).Error("with test")
+	logger2.With(zap.String("key", "test")).With(zap.Reflect("any", testZap)).Error("with test")
+	logger2.Error("with test", zap.Any("any", &testZap))
+	logger2.Info("info test", zap.String("name", testZap.name), zap.String("sex", testZap.sex))
 
 	logger2.Debugf("Debugf")
 	logger2.Infof("Infof")
