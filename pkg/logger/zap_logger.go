@@ -10,17 +10,6 @@ type ZapLogger struct {
 	Logger *zap.Logger
 }
 
-type ZapConfig struct {
-	Level             zapcore.Level
-	DisableCaller     bool
-	DisableStacktrace bool
-	Sampling          *zap.SamplingConfig
-	Encoding          string
-	EncoderConfig     *zapcore.EncoderConfig
-	OutputPaths       []string
-	ErrorOutputPaths  []string
-}
-
 // NewZapLogger returns an instance of logger
 func NewZapLogger(config zap.Config) *ZapLogger {
 	// Encoding
