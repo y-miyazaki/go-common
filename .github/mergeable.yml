@@ -3,7 +3,7 @@ mergeable:
   - when: pull_request.*
     validate:
       - do: baseRef
-        - or
+        or:
           - must_include:
             regex: '^feature/test-\d+$'
             message: "Check your branch rule name."
@@ -18,9 +18,9 @@ mergeable:
             message: "Check your branch rule name."
       - do: title
         and:
-          - or:
-              - must_include:
-                regex: '^test-\d+:.+$'
-                message: "Add your issue key"
-              - must_exclude:
-                  regex: ^\[WIP\]
+          or:
+            - must_include:
+              regex: '^test-\d+:.+$'
+              message: "Add your issue key"
+            - must_exclude:
+                regex: ^\[WIP\]
