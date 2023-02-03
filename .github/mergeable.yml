@@ -17,8 +17,10 @@ mergeable:
         and:
           - or:
               - must_include:
-                regex: '^test-\d+:.+$'
-                message: "Add your issue key"
+                  regex: 'test-\d+:.+$'
+                  message: "Add your JIRA issue key"
+              - must_include:
+                  regex: 'test1-\d+:.+$'
+                  message: "Add your JIRA issue key"
           - must_exclude:
-            regex: ^\[WIP\]
-            message: "Add your wip"
+              regex: ^\[WIP\]
