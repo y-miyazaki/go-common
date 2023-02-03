@@ -4,13 +4,13 @@ mergeable:
     validate:
       - do: baseRef
         must_include:
-          regex: "^(feature/test\-\d+|develop|staging|release/.*|hotfix/test\-\d+|master|main|test)"
+          regex: "^(feature/test\-\d+|develop|staging|release/.+|hotfix/test\-\d+|master|main|test)"
           message: "Check your branch rule name."
       - do: title
         and:
           - or:
               - must_include:
-                  regex: '^test-\d+:.+$'
-                  message: "Add your issue key"
+                regex: '^test-\d+:.+$'
+                message: "Add your issue key"
           - must_exclude:
               regex: ^\[WIP\]
