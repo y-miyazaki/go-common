@@ -153,6 +153,7 @@ func (r *AWSSESRepository) log(to, subject string, responseObject *ses.SendEmail
 		log.WithError(responseError).Error("Error while sending an SES email")
 	}
 }
+
 func (r *AWSSESRepository) logBulkTemplated(template, defaultTemplateData string, responseObject *ses.SendBulkTemplatedEmailOutput, responseError error) {
 	log := r.logger
 
