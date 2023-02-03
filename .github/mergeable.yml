@@ -3,24 +3,26 @@ mergeable:
   - when: pull_request.*
     validate:
       - do: baseRef
-        or:
-          - must_include:
-            regex: '^feature/test-\d+$'
-            message: "Check your branch rule name."
-          - must_include:
-            regex: "^release/.+$"
-            message: "Check your branch rule name."
-          - must_include:
-            regex: '^hotfix/test-\d+$'
-            message: "Check your branch rule name."
-          - must_include:
-            regex: "^(develop|staging|master|main)"
-            message: "Check your branch rule name."
+        and:
+          - or:
+              - must_include:
+                regex: '^feature/test-\d+$'
+                message: "Check your branch rule name."
+              - must_include:
+                regex: "^release/.+$"
+                message: "Check your branch rule name."
+              - must_include:
+                regex: '^hotfix/test-\d+$'
+                message: "Check your branch rule name."
+              - must_include:
+                regex: "^(develop|staging|master|main)"
+                message: "Check your branch rule name."
       - do: title
         and:
-          or:
-            - must_include:
-              regex: '^test-\d+:.+$'
-              message: "Add your issue key"
-            - must_exclude:
+          - or:
+              - must_include:
+                regex: '^test-\d+:.+$'
+                message: "Add your issue key"
+              - must_exclude:
                 regex: ^\[WIP\]
+                message: "Add your wip"
