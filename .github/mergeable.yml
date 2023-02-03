@@ -2,15 +2,11 @@ version: 2
 mergeable:
   - when: pull_request.*
     validate:
-      # - do: baseRef
-      #   must_include:
-      #   regex: "^(feature/test-.*|develop|staging|release/**|hotfix/**|master|main)"
-      #   message: "Check your branch rule name."
       - do: title
         and:
           - or:
               - must_include:
-                regex: 'test-\d+:.+$'
-                message: "Add your JIRA issue key"
-              - must_exclude:
-                regex: ^\[WIP\]
+                  regex: 'test-\d+:.+$'
+                  message: "Add your issue key"
+          - must_exclude:
+              regex: ^\[WIP\]
