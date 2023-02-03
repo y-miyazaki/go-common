@@ -3,14 +3,12 @@ mergeable:
   - when: pull_request.*
     validate:
       - do: headRef
-        and:
-          - or:
-              - must_include:
-                regex: '^(feature|hotfix)\/.+$'
-                message: "Check your branch rule name."
-              - must_include:
-                regex: "^release\/.+$"
-                message: "Check your branch rule name."
+          - must_include:
+            regex: '^(feature|hotfix)\/.+$'
+            message: "Check your branch rule name."
+          - must_include:
+            regex: "^release\/.+$"
+            message: "Check your branch rule name."
           - must_include:
             regex: "^(develop|staging|master|main)$"
             message: "Check your branch rule name."
