@@ -15,5 +15,5 @@ mergeable:
               regex: ^\[WIP\]
       - do: headRef
         must_include:
-          regex: "^(feature|hotfix|release)\/.+$"
+          regex: "^(fix\/.+|feature\/.+|hotfix\/.+|release\/.+|develop|staging|main|master)$"
           message: "Check your branch rule name."
