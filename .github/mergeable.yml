@@ -2,17 +2,6 @@ version: 2
 mergeable:
   - when: pull_request.*
     validate:
-      # - do: headRef
-      #   or:
-      #     - must_include:
-      #       regex: '^(feature|hotfix)\/.+$'
-      #       message: "Check your branch rule name."
-      #     - must_include:
-      #       regex: "^release\/.+$"
-      #       message: "Check your branch rule name."
-      #     - must_include:
-      #       regex: "^(develop|staging|master|main)$"
-      #       message: "Check your branch rule name."
       - do: title
         and:
           - or:
@@ -24,3 +13,14 @@ mergeable:
                   message: "Add your JIRA issue key"
           - must_exclude:
               regex: ^\[WIP\]
+      - do: headRef
+        or:
+          - must_include:
+            regex: '^(feature|hotfix)\/.+$'
+            message: "Check your branch rule name."
+          - must_include:
+            regex: "^release\/.+$"
+            message: "Check your branch rule name."
+          - must_include:
+            regex: "^(develop|staging|master|main)$"
+            message: "Check your branch rule name."
