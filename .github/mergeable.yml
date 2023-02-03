@@ -5,15 +5,15 @@ mergeable:
       - do: baseRef
         and:
           - or:
-            must_include:
-              regex: '^feature/test-\d+$'
-              message: "Check your branch rule name."
-            must_include:
-              regex: '^release/.+'
-              message: "Check your branch rule name."
-            must_include:
-              regex: '^hotfix/test-\d+$'
-              message: "Check your branch rule name."
+              - must_include:
+                regex: '^feature/test-\d+$'
+                message: "Check your branch rule name."
+              - must_include:
+                regex: "^release/.+$"
+                message: "Check your branch rule name."
+              - must_include:
+                regex: '^hotfix/test-\d+$'
+                message: "Check your branch rule name."
           - must_include:
             regex: "^(develop|staging|master|main)"
             message: "Check your branch rule name."
