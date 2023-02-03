@@ -6,7 +6,7 @@ mergeable:
         and:
           - or:
               - must_include:
-                  regex: 'test-\d+:.+$'
+                  regex: '^test-\d+:.+$'
                   message: "Add your issue key"
           - must_exclude:
               regex: ^\[WIP\]
