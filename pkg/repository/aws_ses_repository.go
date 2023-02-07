@@ -115,7 +115,7 @@ func (r *AWSSESRepository) SendEmail(from, to, subject, contentText, contentHTML
 
 // SendBulkTemplatedEmail sends bulk emails.
 // Note: One or more Destination objects. All of the recipients in a Destination receive the same version of the email.
-//       You can specify up to 50 Destination objects within a Destinations array.
+// You can specify up to 50 Destination objects within a Destinations array.
 func (r *AWSSESRepository) SendBulkTemplatedEmail(from, template, defaultTemplateData string, destinations []*ses.BulkEmailDestination) (*ses.SendBulkTemplatedEmailOutput, error) {
 	response, err := r.s.SendBulkTemplatedEmail(&ses.SendBulkTemplatedEmailInput{
 		DefaultTemplateData: aws.String(defaultTemplateData),

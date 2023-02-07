@@ -45,7 +45,7 @@ func NewTransportHTTPLogger(
 	}
 }
 
-// NewTransportHTTPLogger get http.RoundTripper.
+// NewTransportHTTPZapLogger get http.RoundTripper.
 func NewTransportHTTPZapLogger(
 	l *logger.ZapLogger,
 	transportType HTTPLoggerType,

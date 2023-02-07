@@ -11,7 +11,7 @@ type ZapLogger struct {
 }
 
 // NewZapLogger returns an instance of logger
-func NewZapLogger(config zap.Config) *ZapLogger {
+func NewZapLogger(config *zap.Config) *ZapLogger {
 	// Encoding
 	if config.Encoding == "" {
 		config.Encoding = "json"
@@ -34,7 +34,7 @@ func NewZapLogger(config zap.Config) *ZapLogger {
 	return &ZapLogger{Logger: logger}
 }
 
-// WithField calls WithField function of logger.
+// With calls WithField function of logger.
 func (l *ZapLogger) With(fields ...zapcore.Field) *ZapLogger {
 	return &ZapLogger{
 		Logger: l.Logger.With(fields...),

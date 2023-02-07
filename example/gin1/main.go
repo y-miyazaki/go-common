@@ -177,8 +177,9 @@ func main() {
 	router.GET("/env", h.GetEnv)
 
 	server := &http.Server{
-		Addr:    ":8080",
-		Handler: router,
+		Addr:        ":8080",
+		Handler:     router,
+		ReadTimeout: 5 * time.Second,
 	}
 
 	// detect signal

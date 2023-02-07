@@ -33,7 +33,7 @@ type GormZapConfig struct {
 	LogLevel LogLevel
 }
 
-// Gorm struct.
+// GormZap struct.
 type GormZap struct {
 	l          *zap.Logger
 	gormConfig *GormConfig
