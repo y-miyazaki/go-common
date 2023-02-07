@@ -36,12 +36,20 @@ jobs:
         with:
           name: coverage
           path: coverage
-      - name: "go: golangci-lint for lint"
-        uses: reviewdog/action-golangci-lint@v1
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        if: github.event_name != 'pull_request'
         with:
-          golangci_lint_flags: "--config golangci.yaml"
+          # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
+          version: v1.50.1
+      - name: "go: golangci-lint for lint"
+        uses: reviewdog/action-golangci-lint@v2
+        if: github.event_name == 'pull_request'
+        with:
+          golangci_lint_flags: "--config=.golangci.yaml --max-same-issues=0 --max-issues-per-linter=0"
           level: error
           fail_on_error: true
+          golangci_lint_version: v1.50.1
       - name: "slack: notification for failed build."
         if: failure()
         uses: rtCamp/action-slack-notify@v2.0.2
