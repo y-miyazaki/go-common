@@ -12,7 +12,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/y-miyazaki/go-common/pkg/logger"
 )
 
 const (
@@ -37,15 +36,13 @@ type AWSS3RepositoryInterface interface {
 
 // AWSS3Repository struct.
 type AWSS3Repository struct {
-	logger  *logger.Logger
 	s3      *s3.S3
 	session *session.Session
 }
 
 // NewAWSS3Repository returns AWSS3Repository instance.
-func NewAWSS3Repository(l *logger.Logger, s *session.Session, config *aws.Config) *AWSS3Repository {
+func NewAWSS3Repository(s *session.Session, config *aws.Config) *AWSS3Repository {
 	return &AWSS3Repository{
-		logger:  l,
 		s3:      s3.New(s, config),
 		session: s,
 	}
@@ -69,10 +66,7 @@ func (r *AWSS3Repository) PutObjectFile(bucket, key, filePath string) (*s3.PutOb
 		return nil, err
 	}
 	defer func() {
-		err = file.Close()
-		if err != nil {
-			r.logger.WithError(err).Errorf("can't close file(%s)", filePath)
-		}
+		_ = file.Close()
 	}()
 	// Get content-type
 	buf := make([]byte, maxBufferSize)
@@ -205,10 +199,7 @@ func (r *AWSS3Repository) Upload(bucket, key, filePath string) (*s3manager.Uploa
 		return nil, err
 	}
 	defer func() {
-		err = file.Close()
-		if err != nil {
-			r.logger.WithError(err).Errorf("can't close file(%s)", filePath)
-		}
+		_ = file.Close()
 	}()
 
 	// Get content-type
@@ -236,10 +227,7 @@ func (r *AWSS3Repository) Download(bucket, key, filePath string) error {
 		return err
 	}
 	defer func() {
-		err = file.Close()
-		if err != nil {
-			r.logger.WithError(err).Errorf("can't close file(%s)", filePath)
-		}
+		_ = file.Close()
 	}()
 
 	downloader := s3manager.NewDownloader(r.session)

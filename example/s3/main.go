@@ -39,7 +39,7 @@ func main() {
 	// --------------------------------------------------------------
 	// example: S3
 	// --------------------------------------------------------------
-	awsS3Repository := repository.NewAWSS3Repository(l, sess, s3Config)
+	awsS3Repository := repository.NewAWSS3Repository(sess, s3Config)
 	text := "aaaaaaaab"
 	bucket := "test"
 

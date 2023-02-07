@@ -2,7 +2,6 @@ package repository
 
 import (
 	"github.com/slack-go/slack"
-	"github.com/y-miyazaki/go-common/pkg/logger"
 )
 
 // SlackRepositoryInterface interface
@@ -13,15 +12,13 @@ type SlackRepositoryInterface interface {
 
 // SlackRepository struct.
 type SlackRepository struct {
-	logger    *logger.Logger
 	client    *slack.Client
 	channelID string
 }
 
 // NewSlackRepository returns SlackRepository instance.
-func NewSlackRepository(l *logger.Logger, client *slack.Client, channelID string) *SlackRepository {
+func NewSlackRepository(client *slack.Client, channelID string) *SlackRepository {
 	return &SlackRepository{
-		logger:    l,
 		client:    client,
 		channelID: channelID,
 	}

@@ -125,7 +125,7 @@ func main() {
 	sess := infrastructure.NewS3Session(&session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	})
-	awsS3Repository := repository.NewAWSS3Repository(log, sess, s3Config)
+	awsS3Repository := repository.NewAWSS3Repository(sess, s3Config)
 
 	// --------------------------------------------------------------
 	// Redis
@@ -140,7 +140,7 @@ func main() {
 		Password: redisPassword,
 	}
 	r := infrastructure.NewRedis(o)
-	redisRepository := repository.NewRedisRepository(log, r)
+	redisRepository := repository.NewRedisRepository(r)
 	defer closeRedis(log, r)
 
 	// --------------------------------------------------------------
