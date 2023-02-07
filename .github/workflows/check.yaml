@@ -44,7 +44,6 @@ jobs:
           version: v1.50.1
       - name: "go: golangci-lint for lint"
         uses: reviewdog/action-golangci-lint@v2
-        if: github.event_name == 'pull_request'
         with:
           golangci_lint_flags: "--config=.golangci.yaml --max-same-issues=0 --max-issues-per-linter=0"
           level: error
