@@ -161,7 +161,6 @@ func TestSetGinContextError(t *testing.T) {
 		})
 	}
 }
-
 func TestSetGinContextErrorMessage(t *testing.T) {
 	c := &gin.Context{}
 	type args struct {
