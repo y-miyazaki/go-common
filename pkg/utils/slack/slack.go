@@ -3,7 +3,7 @@ package slack
 import "fmt"
 
 // SlackMessageLimit sets slack message limit.
-const SlackMessageLimit int = 1600
+const SlackMessageLimit int = 1800
 
 // GetSlackAWSTitle returns the slack title.
 func GetSlackAWSTitle(function, accountID, region, service, env string) string {
@@ -29,7 +29,7 @@ func GetSlackAWSTitle(function, accountID, region, service, env string) string {
 
 // GetSlackLog return slack format log.
 func GetSlackLog(log string) string {
-	if len(log) > SlackMessageLimit {
+	if len([]byte(log)) > SlackMessageLimit {
 		return fmt.Sprintf("```%s\n...(too long message)```", log[:SlackMessageLimit])
 	}
 	return fmt.Sprintf("```%s```", log)
