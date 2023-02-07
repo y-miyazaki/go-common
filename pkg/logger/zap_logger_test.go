@@ -37,7 +37,7 @@ func TestNewZapLogger(t *testing.T) {
 			EncodeCaller:   zapcore.ShortCallerEncoder,
 		},
 	}
-	logger := NewZapLogger(zapConfig)
+	logger := NewZapLogger(&zapConfig)
 	logger.Debug("test", zap.String("Key", "String"))
 	logger.Info("test")
 	logger.Error("test", zap.String("Key", "String"))
@@ -67,7 +67,7 @@ func TestNewZapLogger(t *testing.T) {
 		ErrorOutputPaths: []string{"stderr"},
 	}
 
-	logger2 := NewZapLogger(zapConfig2)
+	logger2 := NewZapLogger(&zapConfig2)
 	logger2.Debug("test", zap.String("Key", "String"))
 	logger2.Info("test")
 	logger2.Error("test", zap.String("Key", "String"), zap.Error(nil))
