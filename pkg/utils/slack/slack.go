@@ -3,7 +3,7 @@ package slack
 import "fmt"
 
 // SlackMessageLimit sets slack message limit.
-const SlackMessageLimit int = 1800
+const SlackMessageLimit int = 1600
 
 // GetSlackAWSTitle returns the slack title.
 func GetSlackAWSTitle(function, accountID, region, service, env string) string {
