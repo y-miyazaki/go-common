@@ -24,10 +24,18 @@ func NewSlackRepository(client *slack.Client, channelID string) *SlackRepository
 	}
 }
 
-// PostMessage sends a message to a channel.
+// PostMessageAttachment sends a message to a channel.
 // Message is escaped by default according to https://api.slack.com/docs/formatting
 // Use http://davestevens.github.io/slack-message-builder/ to help crafting your message.
-func (r *SlackRepository) PostMessage(text string) error {
+func (r *SlackRepository) PostMessage(options ...slack.MsgOption) error {
+	_, _, err := r.client.PostMessage(r.channelID, options...)
+	return err
+}
+
+// PostMessageText sends a message to a channel.
+// Message is escaped by default according to https://api.slack.com/docs/formatting
+// Use http://davestevens.github.io/slack-message-builder/ to help crafting your message.
+func (r *SlackRepository) PostMessageText(text string) error {
 	// text
 	msgOptText := slack.MsgOptionText(text, true)
 	_, _, err := r.client.PostMessage(r.channelID, msgOptText)
