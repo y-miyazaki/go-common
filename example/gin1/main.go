@@ -126,8 +126,7 @@ func main() {
 	sess := infrastructure.NewS3Session(&session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	})
-	s3 := s3.New(sess, s3Config)
-	awsS3Repository := repository.NewAWSS3Repository(s3, sess)
+	awsS3Repository := repository.NewAWSS3Repository(s3.New(sess, s3Config), sess)
 
 	// --------------------------------------------------------------
 	// Redis

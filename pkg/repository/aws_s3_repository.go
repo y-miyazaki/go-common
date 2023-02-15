@@ -41,10 +41,10 @@ type AWSS3Repository struct {
 }
 
 // NewAWSS3Repository returns AWSS3Repository instance.
-func NewAWSS3Repository(s3 *s3.S3, s *session.Session) *AWSS3Repository {
+func NewAWSS3Repository(s *s3.S3, sess *session.Session) *AWSS3Repository {
 	return &AWSS3Repository{
-		s3:      s3,
-		session: s,
+		s3:      s,
+		session: sess,
 	}
 }
 
