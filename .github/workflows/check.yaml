@@ -15,6 +15,8 @@ on:
       - "pkg/**"
 jobs:
   check:
+    env:
+      GO_VERSION: go1.19
     runs-on: ubuntu-latest
     steps:
       - name: "code: check out code"
@@ -29,7 +31,7 @@ jobs:
           echo $SSH_PRIVATE_KEY >> ./id_rsa
           chmod +x scripts/*
           docker pull ghcr.io/y-miyazaki/go-test:latest
-          docker run --rm -v $PWD:/go/src/github.com/y-miyazaki/go-common -v $PWD/id_rsa:/root/.ssh/id_rsa -w /go/src/github.com/y-miyazaki/go-common --name golang-test ghcr.io/y-miyazaki/go-test:latest ./scripts/go_test.sh
+          docker run --rm -v $PWD:/go/src/github.com/y-miyazaki/go-common -v $PWD/id_rsa:/root/.ssh/id_rsa -w /go/src/github.com/y-miyazaki/go-common --name golang-test ghcr.io/y-miyazaki/go-test:latest ./scripts/go_test.sh ${GO_VERSION}
           rm ./id_rsa
       - name: "go: upload coverage"
         uses: actions/upload-artifact@master
