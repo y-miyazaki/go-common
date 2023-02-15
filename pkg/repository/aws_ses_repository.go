@@ -15,9 +15,8 @@ type AWSSESRepositoryInterface interface {
 
 // AWSSESRepository struct.
 type AWSSESRepository struct {
-	s                              *ses.SES
-	configurationSetName           *string
-	isOutputLogPersonalInformation bool
+	s                    *ses.SES
+	configurationSetName *string
 }
 
 // NewAWSSESRepository returns AWSSESRepository instance.
