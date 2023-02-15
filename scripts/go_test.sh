@@ -1,8 +1,8 @@
 #!/bin/bash
 
 source ~/.bashrc
-gvm install go1.18
-gvm use go1.18
+gvm install go1.19
+gvm use go1.19
 
 go mod tidy
 
