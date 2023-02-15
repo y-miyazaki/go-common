@@ -41,9 +41,9 @@ type AWSS3Repository struct {
 }
 
 // NewAWSS3Repository returns AWSS3Repository instance.
-func NewAWSS3Repository(s *session.Session, config *aws.Config) *AWSS3Repository {
+func NewAWSS3Repository(s3 *s3.S3, s *session.Session) *AWSS3Repository {
 	return &AWSS3Repository{
-		s3:      s3.New(s, config),
+		s3:      s3,
 		session: s,
 	}
 }

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	helmet "github.com/danielkov/gin-helmet"
 	"github.com/gin-gonic/gin"
 	redis "github.com/go-redis/redis/v8"
@@ -125,7 +126,8 @@ func main() {
 	sess := infrastructure.NewS3Session(&session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	})
-	awsS3Repository := repository.NewAWSS3Repository(sess, s3Config)
+	s3 := s3.New(sess, s3Config)
+	awsS3Repository := repository.NewAWSS3Repository(s3, sess)
 
 	// --------------------------------------------------------------
 	// Redis

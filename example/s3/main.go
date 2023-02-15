@@ -5,6 +5,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/sirupsen/logrus"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 	"github.com/y-miyazaki/go-common/pkg/logger"
@@ -39,8 +40,9 @@ func main() {
 	// --------------------------------------------------------------
 	// example: S3
 	// --------------------------------------------------------------
-	awsS3Repository := repository.NewAWSS3Repository(sess, s3Config)
-	text := "aaaaaaaab"
+	s3 := s3.New(sess, s3Config)
+	awsS3Repository := repository.NewAWSS3Repository(s3, sess)
+	text := "abc"
 	bucket := "test"
 
 	// Create Bucket
