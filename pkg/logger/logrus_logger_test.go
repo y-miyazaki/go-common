@@ -21,9 +21,13 @@ func TestNewLogger(t *testing.T) {
 	e1 := errors.WithStack(errors.New("test1"))
 	e2 := errors.New("test2")
 	e3 := fmt.Errorf("test3 %s", e1)
+	e4 := errors.WithStack(e1)
+
 	log.WithError(e1).Error("test1")
 	log.WithError(e2).Error("test2")
 	log.WithError(e3).Error("test3")
+	log.WithError(e4).Error("test4")
+
 	log.Debugf("Debugf")
 	log.Infof("Infof")
 	log.Printf("Printf")
