@@ -15,8 +15,8 @@ require (
 	github.com/rivo/uniseg v0.4.3
 	github.com/sirupsen/logrus v1.8.1
 	github.com/slack-go/slack v0.12.1
-	github.com/spf13/viper v1.10.1
-	github.com/stretchr/testify v1.8.0
+	github.com/spf13/viper v1.15.0
+	github.com/stretchr/testify v1.8.1
 	go.uber.org/multierr v1.9.0 // indirect
 	go.uber.org/zap v1.24.0
 	golang.org/x/exp v0.0.0-20220328175248-053ad81199eb
