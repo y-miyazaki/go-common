@@ -20,9 +20,9 @@ require (
 	go.uber.org/multierr v1.9.0 // indirect
 	go.uber.org/zap v1.24.0
 	golang.org/x/exp v0.0.0-20220328175248-053ad81199eb
-	gorm.io/driver/mysql v1.3.2
+	gorm.io/driver/mysql v1.5.0
 	gorm.io/driver/postgres v1.4.7
 	gorm.io/driver/sqlserver v1.4.1
-	gorm.io/gorm v1.24.5
+	gorm.io/gorm v1.24.7-0.20230306060331-85eaf9eeda11
 	gorm.io/plugin/soft_delete v1.2.0
 )
