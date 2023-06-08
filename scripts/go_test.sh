@@ -3,7 +3,6 @@
 source ~/.bashrc
 gvm install $1
 gvm use $1
-
 go mod tidy
 
 # go test

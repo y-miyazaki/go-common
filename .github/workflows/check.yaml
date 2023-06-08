@@ -17,7 +17,7 @@ jobs:
   check:
     env:
       GO_VERSION: go1.19
-      GOLANGCI_LINT_VERSION: v1.50.1
+      GOLANGCI_LINT_VERSION: v1.52.2
     runs-on: ubuntu-latest
     steps:
       - name: "code: check out code"
