@@ -8,9 +8,10 @@ import (
 // AWSSESRepositoryInterface interface.
 type AWSSESRepositoryInterface interface {
 	// Use via SendEmailService
-	SendTextEmail(from string, to []string, replyTo []string, subject, content string) error
-	SendHtmlEmail(from string, to []string, replyTo []string, subject, content string) error
-	SendEmail(from string, to []string, replyTo []string, subject, content string) error
+	SendTextEmail(from string, to []string, replyTo []string, subject, content string) (*ses.SendEmailOutput, error)
+	SendHTMLEmail(from string, to []string, replyTo []string, subject, content string) (*ses.SendEmailOutput, error)
+	SendEmail(from string, to []string, replyTo []string, subject, contentText, contentHTML string) (*ses.SendEmailOutput, error)
+	SendBulkTemplatedEmail(from string, replyTo []string, template, defaultTemplateData string, destinations []*ses.BulkEmailDestination) (*ses.SendBulkTemplatedEmailOutput, error)
 }
 
 // AWSSESRepository struct.
@@ -111,11 +112,12 @@ func (r *AWSSESRepository) SendEmail(from string, to []string, replyTo []string,
 // SendBulkTemplatedEmail sends bulk emails.
 // Note: One or more Destination objects. All of the recipients in a Destination receive the same version of the email.
 // You can specify up to 50 Destination objects within a Destinations array.
-func (r *AWSSESRepository) SendBulkTemplatedEmail(from, template, defaultTemplateData string, destinations []*ses.BulkEmailDestination) (*ses.SendBulkTemplatedEmailOutput, error) {
+func (r *AWSSESRepository) SendBulkTemplatedEmail(from string, replyTo []string, template, defaultTemplateData string, destinations []*ses.BulkEmailDestination) (*ses.SendBulkTemplatedEmailOutput, error) {
 	response, err := r.s.SendBulkTemplatedEmail(&ses.SendBulkTemplatedEmailInput{
-		DefaultTemplateData: aws.String(defaultTemplateData),
-		Destinations:        destinations,
 		Source:              aws.String(from),
+		Destinations:        destinations,
+		ReplyToAddresses:    aws.StringSlice(replyTo),
+		DefaultTemplateData: aws.String(defaultTemplateData),
 		Template:            aws.String(template),
 	})
 	return response, err

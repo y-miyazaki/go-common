@@ -1,40 +1,37 @@
 package repository
 
 import (
+	"context"
 	"encoding/base64"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/secretsmanager"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	"github.com/aws/aws-secretsmanager-caching-go/secretcache"
 )
 
-type AWSSecretsManagerRepositoryInterface interface {
+type AWSV2SecretsManagerRepositoryInterface interface {
 	GetSecretString(secretName string) (string, error)
 }
 
-type AWSSecretsManagerRepository struct {
-	sm      *secretsmanager.SecretsManager
-	cache   *secretcache.Cache
-	session *session.Session
+type AWSV2SecretsManagerRepository struct {
+	c     *secretsmanager.Client
+	cache *secretcache.Cache
 }
 
-func NewAWSSecretsManagerRepository(sm *secretsmanager.SecretsManager, sess *session.Session, cache *secretcache.Cache) *AWSSecretsManagerRepository {
-	return &AWSSecretsManagerRepository{
-		sm:      sm,
-		cache:   cache,
-		session: sess,
+func NewAWSV2SecretsManagerRepository(c *secretsmanager.Client, cache *secretcache.Cache) *AWSV2SecretsManagerRepository {
+	return &AWSV2SecretsManagerRepository{
+		c:     c,
+		cache: cache,
 	}
 }
 
 // GetSecretString gets a secret string from secretsmanager.
-func (r *AWSSecretsManagerRepository) GetSecretString(secretName string) (string, error) {
-	input := &secretsmanager.GetSecretValueInput{
+func (r *AWSV2SecretsManagerRepository) GetSecretString(secretName string) (string, error) {
+	result, err := r.c.GetSecretValue(context.TODO(), &secretsmanager.GetSecretValueInput{
 		SecretId: aws.String(secretName),
 		// VersionStage defaults to AWSCURRENT if unspecified
 		VersionStage: aws.String("AWSCURRENT"),
-	}
-	result, err := r.sm.GetSecretValue(input)
+	})
 	if err != nil {
 		return "", err
 	}
@@ -50,6 +47,6 @@ func (r *AWSSecretsManagerRepository) GetSecretString(secretName string) (string
 }
 
 // GetCacheSecretString gets a cache secret string from secretsmanager.
-func (r *AWSSecretsManagerRepository) GetCacheSecretString(secretName string) (string, error) {
+func (r *AWSV2SecretsManagerRepository) GetCacheSecretString(secretName string) (string, error) {
 	return r.cache.GetSecretString(secretName)
 }
