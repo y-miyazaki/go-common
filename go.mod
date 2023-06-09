@@ -22,7 +22,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/slack-go/slack v0.12.1
 	github.com/spf13/viper v1.16.0
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.8.4
 	go.uber.org/multierr v1.9.0 // indirect
 	go.uber.org/zap v1.24.0
 	golang.org/x/exp v0.0.0-20220827204233-334a2380cb91
