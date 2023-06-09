@@ -58,14 +58,10 @@ func NewAWSCognitoRepository(c *cognitoidentityprovider.CognitoIdentityProvider,
 
 // GetUser gets a user information from Cognito.
 func (r *AWSCognitoRepository) GetUser(username, password string) (*cognitoidentityprovider.AdminGetUserOutput, error) {
-	output, err := r.c.AdminGetUser(&cognitoidentityprovider.AdminGetUserInput{
+	return r.c.AdminGetUser(&cognitoidentityprovider.AdminGetUserInput{
 		UserPoolId: aws.String(r.userPoolID),
 		Username:   aws.String(username),
 	})
-	if err != nil {
-		return nil, err
-	}
-	return output, err
 }
 
 // CreateUser creates a new user for Cognito user pool.
