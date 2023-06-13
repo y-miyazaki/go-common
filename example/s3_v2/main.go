@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/sirupsen/logrus"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 	"github.com/y-miyazaki/go-common/pkg/logger"
@@ -54,7 +55,7 @@ func main() {
 	listBuckets, err := awsS3Repository.ListBuckets()
 	if err == nil {
 		for _, b := range listBuckets.Buckets {
-			l.Infof("bucket = %s(%s)", *b.Name, *b.CreationDate)
+			l.Infof("bucket = %s(%s)", aws.StringValue(b.Name), aws.TimeValue(b.CreationDate))
 		}
 	} else {
 		l.WithError(err).Errorf("can't list of s3 bucket")
@@ -88,7 +89,7 @@ func main() {
 	listObjects, err := awsS3Repository.ListObjectsV2(bucket, "")
 	if err == nil {
 		for _, o := range listObjects.Contents {
-			l.Infof("Object key = %s", *o.Key)
+			l.Infof("Object key = %s", aws.StringValue(o.Key))
 		}
 	} else {
 		l.WithError(err).Errorf("can't list of s3 object")
