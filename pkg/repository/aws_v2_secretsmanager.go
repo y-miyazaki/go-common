@@ -18,6 +18,7 @@ type AWSV2SecretsManagerRepository struct {
 	cache *secretcache.Cache
 }
 
+// NewAWSV2SecretsManagerRepository returns NewAWSV2SecretsManagerRepository instance.
 func NewAWSV2SecretsManagerRepository(c *secretsmanager.Client, cache *secretcache.Cache) *AWSV2SecretsManagerRepository {
 	return &AWSV2SecretsManagerRepository{
 		c:     c,

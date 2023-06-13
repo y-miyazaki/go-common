@@ -19,6 +19,7 @@ type AWSSecretsManagerRepository struct {
 	session *session.Session
 }
 
+// NewAWSSecretsManagerRepository returns NewAWSSecretsManagerRepository instance.
 func NewAWSSecretsManagerRepository(sm *secretsmanager.SecretsManager, sess *session.Session, cache *secretcache.Cache) *AWSSecretsManagerRepository {
 	return &AWSSecretsManagerRepository{
 		sm:      sm,
