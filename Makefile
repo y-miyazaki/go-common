@@ -25,6 +25,10 @@ build-postgres:
 	GOOS=linux GOARCH=amd64 go build example/postgres/main.go
 build-s3:
 	GOOS=linux GOARCH=amd64 go build example/s3/main.go
+build-s3-v2:
+	GOOS=linux GOARCH=amd64 go build example/s3_v2/main.go
+build-s3-v2-darwin:
+	GOOS=linux GOARCH=amd64 go build example/s3_v2/main.go
 build-gin1:
 	GOOS=linux GOARCH=amd64 go build example/gin1/main.go
 build-gin2:

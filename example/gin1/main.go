@@ -122,8 +122,8 @@ func main() {
 	s3Secret := os.Getenv("S3_SECRET")
 	s3Token := os.Getenv("S3_TOKEN")
 
-	s3Config := infrastructure.GetS3Config(log, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
-	sess := infrastructure.NewS3Session(&session.Options{
+	s3Config := infrastructure.GetAWSS3Config(log, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
+	sess := infrastructure.NewAWSS3Session(&session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	})
 	awsS3Repository := repository.NewAWSS3Repository(s3.New(sess, s3Config), sess)
@@ -138,7 +138,7 @@ func main() {
 	o := &redis.Options{
 		Addr:     redisAddr,
 		Username: redisUsername,
-		Password: redisPassword,
+		Password: redisPassword, // pragma: allowlist secret
 	}
 	r := infrastructure.NewRedis(o)
 	redisRepository := repository.NewRedisRepository(r)

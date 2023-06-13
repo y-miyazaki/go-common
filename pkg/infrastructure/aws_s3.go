@@ -13,29 +13,29 @@ import (
 	"go.uber.org/zap"
 )
 
-// NewS3Session returns Session.
-func NewS3Session(o *session.Options) *session.Session {
+// NewAWSS3Session returns Session.
+func NewAWSS3Session(o *session.Options) *session.Session {
 	return session.Must(session.NewSessionWithOptions(*o))
 }
 
-// NewS3 returns S3.
-func NewS3(o *session.Options, c *aws.Config) *s3.S3 {
+// NewAWSS3 returns S3.
+func NewAWSS3(o *session.Options, c *aws.Config) *s3.S3 {
 	s := session.Must(session.NewSessionWithOptions(*o))
 	return s3.New(s, c)
 }
 
-// NewDownloader returns Downloader.
-func NewDownloader(s *session.Session) *s3manager.Downloader {
+// NewAWSS3Downloader returns Downloader.
+func NewAWSS3Downloader(s *session.Session) *s3manager.Downloader {
 	return s3manager.NewDownloader(s)
 }
 
-// NewUploader returns Uploader.
-func NewUploader(s *session.Session) *s3manager.Uploader {
+// NewAWSS3Uploader returns Uploader.
+func NewAWSS3Uploader(s *session.Session) *s3manager.Uploader {
 	return s3manager.NewUploader(s)
 }
 
-// GetS3Config get config.
-func GetS3Config(l *logger.Logger, id, secret, token, region, endpoint string, isMinio bool) *aws.Config {
+// GetAWSS3Config get config.
+func GetAWSS3Config(l *logger.Logger, id, secret, token, region, endpoint string, isMinio bool) *aws.Config {
 	var httpClient *http.Client
 	if l != nil {
 		httpClient = &http.Client{
@@ -58,9 +58,9 @@ func GetS3Config(l *logger.Logger, id, secret, token, region, endpoint string, i
 	}
 }
 
-// GetS3ConfigNoCredentials get no credentials config.
+// GetAWSS3ConfigNoCredentials get no credentials config.
 // If AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are environment variables and are in the execution environment, Credentials is not required.
-func GetS3ConfigNoCredentials(l *logger.Logger, region, endpoint string, isMinio bool) *aws.Config {
+func GetAWSS3ConfigNoCredentials(l *logger.Logger, region, endpoint string, isMinio bool) *aws.Config {
 	var httpClient *http.Client
 	if l != nil {
 		httpClient = &http.Client{
@@ -79,8 +79,8 @@ func GetS3ConfigNoCredentials(l *logger.Logger, region, endpoint string, isMinio
 	}
 }
 
-// GetS3ConfigZap get config.
-func GetS3ConfigZap(l *logger.ZapLogger, id, secret, token, region, endpoint string, isMinio bool) *aws.Config {
+// GetAWSS3ConfigZap get config.
+func GetAWSS3ConfigZap(l *logger.ZapLogger, id, secret, token, region, endpoint string, isMinio bool) *aws.Config {
 	var httpClient *http.Client
 	if l != nil {
 		httpClient = &http.Client{
@@ -103,9 +103,9 @@ func GetS3ConfigZap(l *logger.ZapLogger, id, secret, token, region, endpoint str
 	}
 }
 
-// GetS3ConfigNoCredentialsZap get no credentials config.
+// GetAWSS3ConfigNoCredentialsZap get no credentials config.
 // If AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are environment variables and are in the execution environment, Credentials is not required.
-func GetS3ConfigNoCredentialsZap(l *logger.ZapLogger, region, endpoint string, isMinio bool) *aws.Config {
+func GetAWSS3ConfigNoCredentialsZap(l *logger.ZapLogger, region, endpoint string, isMinio bool) *aws.Config {
 	var httpClient *http.Client
 	if l != nil {
 		httpClient = &http.Client{

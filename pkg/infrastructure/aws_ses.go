@@ -12,8 +12,8 @@ import (
 	"go.uber.org/zap"
 )
 
-// NewSES returns ses instance.
-func NewSES(
+// NewAWSSES returns ses instance.
+func NewAWSSES(
 	o *session.Options,
 	c *aws.Config,
 ) *ses.SES {
@@ -21,8 +21,8 @@ func NewSES(
 	return ses.New(s, c)
 }
 
-// GetSESConfig get config.
-func GetSESConfig(l *logger.Logger, id, secret, token, region, endpoint string) *aws.Config {
+// GetAWSSESConfig get config.
+func GetAWSSESConfig(l *logger.Logger, id, secret, token, region, endpoint string) *aws.Config {
 	var httpClient *http.Client
 	if l != nil {
 		httpClient = &http.Client{
@@ -42,9 +42,9 @@ func GetSESConfig(l *logger.Logger, id, secret, token, region, endpoint string) 
 	}
 }
 
-// GetSESConfigNoCredentials get no credentials config.
+// GetAWSSESConfigNoCredentials get no credentials config.
 // If AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are environment variables and are in the execution environment, Credentials is not required.
-func GetSESConfigNoCredentials(l *logger.Logger, region, endpoint string) *aws.Config {
+func GetAWSSESConfigNoCredentials(l *logger.Logger, region, endpoint string) *aws.Config {
 	var httpClient *http.Client
 	if l != nil {
 		httpClient = &http.Client{
@@ -60,8 +60,8 @@ func GetSESConfigNoCredentials(l *logger.Logger, region, endpoint string) *aws.C
 	}
 }
 
-// GetSESConfigZap get config.
-func GetSESConfigZap(l *logger.ZapLogger, id, secret, token, region, endpoint string) *aws.Config {
+// GetAWSSESConfigZap get config.
+func GetAWSSESConfigZap(l *logger.ZapLogger, id, secret, token, region, endpoint string) *aws.Config {
 	var httpClient *http.Client
 	if l != nil {
 		httpClient = &http.Client{
@@ -81,7 +81,7 @@ func GetSESConfigZap(l *logger.ZapLogger, id, secret, token, region, endpoint st
 	}
 }
 
-// GetSESConfigNoCredentialsZap get no credentials config.
+// GetAWSSESConfigNoCredentialsZap get no credentials config.
 // If AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are environment variables and are in the execution environment, Credentials is not required.
 func GetSESConfigNoCredentialsZap(l *logger.ZapLogger, region, endpoint string) *aws.Config {
 	var httpClient *http.Client

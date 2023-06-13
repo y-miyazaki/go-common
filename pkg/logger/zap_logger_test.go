@@ -77,9 +77,15 @@ func TestNewZapLogger(t *testing.T) {
 	e1 := errors.WithStack(errors.New("test1"))
 	e2 := errors.New("test2")
 	e3 := fmt.Errorf("test3 %s", e1)
+	var e4 error
+	e4 = nil
+	e5 := errors.WithStack(e4)
 	logger2.WithError(e1).Error("test1")
 	logger2.WithError(e2).Error("test2")
 	logger2.WithError(e3).Error("test3")
+	logger2.WithError(e4).Error("test4")
+	logger2.WithError(e5).Error("test5")
+
 	logger2.With(zap.String("key", "test")).With(zap.Reflect("any", testZap)).Error("with test")
 	logger2.Error("with test", zap.Any("any", &testZap))
 	logger2.Info("info test", zap.String("name", testZap.name), zap.String("sex", testZap.sex))
