@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.18.1
 	github.com/aws/aws-sdk-go-v2/config v1.18.26
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.25
-	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.67
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.68
 	github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.22.10
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.34.0
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.19.8
