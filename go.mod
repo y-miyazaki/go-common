@@ -12,7 +12,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.22.10
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.34.0
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.19.8
-	github.com/aws/aws-sdk-go-v2/service/sesv2 v1.18.0
+	github.com/aws/aws-sdk-go-v2/service/sesv2 v1.18.2
 	github.com/aws/aws-secretsmanager-caching-go v1.1.0
 	github.com/danielkov/gin-helmet v0.0.0-20171108135313-1387e224435e
 	github.com/fsnotify/fsnotify v1.6.0
