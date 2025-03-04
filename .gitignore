@@ -1,7 +1,6 @@
 .DS_Store
 coverage
 .vscode
-.editorconfig
 env/*
 main
 db/migrations
