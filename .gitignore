@@ -5,3 +5,5 @@ env/*
 main
 db/migrations
 db/dbconfig.yaml
+.devcontainer
+.devcontainer/**
