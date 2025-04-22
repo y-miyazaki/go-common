@@ -61,7 +61,7 @@ func TestNewZapGormLogger(t *testing.T) {
 		Logger:                 loggerGorm,
 	})
 
-	// 引数として使う構造体ToDoZapのポインタ
+	// Pointer to the ToDoZap struct to be used as an argument
 	todo := &ToDoZap{
 		Name: "testToDoZap",
 	}
@@ -121,7 +121,7 @@ func TestNewZapGormLoggerSilent(t *testing.T) {
 		Logger:                 loggerGorm,
 	})
 
-	// 引数として使う構造体ToDoZapのポインタ
+	// Pointer to the ToDoZap struct to be used as an argument
 	todo := &ToDoZap{
 		Name: "testToDoZap",
 	}
@@ -181,7 +181,7 @@ func TestNewZapGormLoggerSlowQuery(t *testing.T) {
 		Logger:                 loggerGorm,
 	})
 
-	// 引数として使う構造体ToDoZapのポインタ
+	// Pointer to the ToDoZap struct to be used as an argument
 	todo := &ToDoZap{
 		Name: "testToDoZap",
 	}

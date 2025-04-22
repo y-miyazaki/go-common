@@ -40,7 +40,7 @@ func TestNewGormLogger(t *testing.T) {
 		Logger:                 loggerGorm,
 	})
 
-	// 引数として使う構造体ToDoのポインタ
+	// Pointer to the ToDo struct to be used as an argument
 	todo := &ToDo{
 		Name: "testToDo",
 	}
@@ -78,7 +78,7 @@ func TestNewGormLoggerSilent(t *testing.T) {
 		Logger:                 loggerGorm,
 	})
 
-	// 引数として使う構造体ToDoのポインタ
+	// Pointer to the ToDo struct to be used as an argument
 	todo := &ToDo{
 		Name: "testToDo",
 	}
@@ -116,7 +116,7 @@ func TestNewGormLoggerSlowQuery(t *testing.T) {
 		Logger:                 loggerGorm,
 	})
 
-	// 引数として使う構造体ToDoのポインタ
+	// Pointer to the ToDo struct to be used as an argument
 	todo := &ToDo{
 		Name: "testToDo",
 	}
