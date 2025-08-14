@@ -137,7 +137,7 @@ jobs:
           fail_level: error
           filter_mode: added
           go_version: ${{ env.GO_VERSION }}
-          golangci_lint_flags: "--config=.golangci.yml --new-from-rev=origin/${{ github.event.pull_request.base.ref }}"
+          golangci_lint_flags: "--config=.golangci.yaml --new-from-rev=origin/${{ github.event.pull_request.base.ref }}"
           golangci_lint_version: ${{ env.GOLANGCI_LINT_VERSION }}
 
       - name: Enforce golangci-lint (non-PR)
