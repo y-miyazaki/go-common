@@ -31,7 +31,7 @@ require (
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/driver/sqlserver v1.5.1
-	gorm.io/gorm v1.25.1
+	gorm.io/gorm v1.30.1
 	gorm.io/plugin/soft_delete v1.2.1
 )
 
