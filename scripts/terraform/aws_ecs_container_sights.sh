@@ -23,7 +23,7 @@ function echo_section {
 }
 
 # Show usage if -h or --help is provided
-if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
   show_usage
 fi
 
