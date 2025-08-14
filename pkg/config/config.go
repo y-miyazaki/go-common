@@ -1,3 +1,4 @@
+// Package config provides configuration management utilities.
 package config
 
 import (
@@ -5,80 +6,65 @@ import (
 	"os"
 	"strings"
 
-	"github.com/fsnotify/fsnotify"
 	"github.com/sirupsen/logrus"
 	"github.com/slack-go/slack"
-	"github.com/spf13/viper"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
+	"github.com/y-miyazaki/go-common/pkg/logger"
 )
 
-// Config sets lambda configurations.
+// Config sets base configurations.
 type Config struct {
-	Logger      *infrastructure.Logger
+	Logger      *logger.Logger
 	SlackClient *slack.Client
 }
 
-// ConfigSetting sets configurations.
-type ConfigSetting struct {
-	ConfigPath            string
-	ConfigFileName        string
+// Setting sets base configurations.
+type Setting struct {
+	LoggerFormatter       string
+	LoggerOut             string
+	LoggerLevel           string
 	SlackOauthAccessToken string
 }
 
-// NewConfig to read config
-func NewConfig(c *ConfigSetting) *Config {
+// NewConfig sets base configurations.
+func NewConfig(setting *Setting) *Config {
 	config := &Config{}
-	// -------------------------------------------------------------
-	// get config
-	// -------------------------------------------------------------
-	viper.AddConfigPath(c.ConfigPath) // path to look for the config file in
-	viper.SetConfigName(c.ConfigFileName)
-	viper.SetConfigType("yaml") // can viper.SetConfigType("YAML")
-	viper.AutomaticEnv()
-	err := viper.ReadInConfig() // Find and read the config file
 
-	if err != nil {
-		panic("viper can't read config.")
-	}
-	viper.WatchConfig()
-	viper.OnConfigChange(func(e fsnotify.Event) {
-		fmt.Println("ConfigHandler file changed:", e.Name)
-	})
 	// -------------------------------------------------------------
 	// set Logger
 	// -------------------------------------------------------------
-	logger := &logrus.Logger{}
+	l := &logrus.Logger{}
 	// formatter
-	formatter := strings.ToLower(viper.GetString("logger.formatter"))
+	formatter := strings.ToLower(setting.LoggerFormatter)
 	if formatter == "json" {
-		logger.Formatter = &logrus.JSONFormatter{}
+		l.Formatter = &logrus.JSONFormatter{}
 	} else if formatter == "text" {
-		logger.Formatter = &logrus.TextFormatter{}
+		l.Formatter = &logrus.TextFormatter{}
 	} else {
 		panic("Only json and text can be selected for formatter.")
 	}
 	// out
-	out := strings.ToLower(viper.GetString("logger.out"))
+	out := strings.ToLower(setting.LoggerOut)
 	if out == "stdout" {
-		logger.Out = os.Stdout
+		l.Out = os.Stdout
 	} else {
 		panic("Only stdout can be selected for out.")
 	}
 	// level
-	level, err := logrus.ParseLevel(viper.GetString("logger.level"))
+	level, err := logrus.ParseLevel(setting.LoggerLevel)
 	if err != nil {
 		panic(fmt.Sprintf("level can't set %v", level))
 	}
-	logger.Level = level
-	config.Logger = infrastructure.NewLogger(logger)
+	l.Level = level
+	config.Logger = logger.NewLogger(l)
 
 	// -------------------------------------------------------------
 	// set Slack
 	// -------------------------------------------------------------
-	if c.SlackOauthAccessToken != "" {
+	if setting.SlackOauthAccessToken != "" {
 		config.SlackClient = infrastructure.NewSlack(
 			&infrastructure.SlackConfig{
-				OauthAccessToken: c.SlackOauthAccessToken,
+				OauthAccessToken: setting.SlackOauthAccessToken,
 			})
 	}
 	return config

@@ -55,6 +55,7 @@ func BenchmarkStruct1(b *testing.B) {
 		base = append(base, v.TestStruct2.TestStruct3.Age3)
 	}
 }
+
 func BenchmarkStruct2(b *testing.B) {
 	data := CreateTestData()
 	var base []string = []string{}

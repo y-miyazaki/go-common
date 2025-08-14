@@ -1,6 +1,9 @@
 package utils
 
 import (
+	"io"
+	"io/ioutil"
+	"strings"
 	"testing"
 )
 
@@ -23,7 +26,7 @@ func TestGetStringCount(t *testing.T) {
 		{
 			name: "normal2",
 			args: args{
-				str: "あいavnaslksnうえお",
+				str: "あいtesttest1うえお",
 			},
 			want: 14,
 		},
@@ -189,7 +192,7 @@ func TestSliceUTF8AddString(t *testing.T) {
 		})
 	}
 }
-func TestConvertToString(t *testing.T) {
+func TestConvertToStringaa(t *testing.T) {
 	type args struct {
 		input interface{}
 	}
@@ -266,6 +269,39 @@ func TestConvertToString(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("ConvertToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGetStringFromReadCloser(t *testing.T) {
+	type args struct {
+		r io.ReadCloser
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "test1",
+			args: args{
+				r: ioutil.NopCloser(strings.NewReader("Hello, world!")),
+			},
+			want:    "Hello, world!",
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GetStringFromReadCloser(tt.args.r)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetStringFromReadCloser() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("GetStringFromReadCloser() = %v, want %v", got, tt.want)
 			}
 		})
 	}

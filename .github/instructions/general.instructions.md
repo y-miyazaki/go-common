@@ -1,0 +1,96 @@
+---
+applyTo: "**"
+---
+
+<!-- omit in toc -->
+
+# GitHub Copilot Base Instructions
+
+**Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
+
+<!-- omit in toc -->
+
+## Table of Contents
+
+- [Copilot fixed code Guidelines](#copilot-fixed-code-guidelines)
+- [General Principles](#general-principles)
+- [Documentation and Comments](#documentation-and-comments)
+- [Error Handling](#error-handling)
+- [Testing and Validation](#testing-and-validation)
+- [Security Guidelines](#security-guidelines)
+- [Development Workflow](#development-workflow)
+- [Language-specific Rules](#language-specific-rules)
+- [Reference Resources](#reference-resources)
+
+## Copilot fixed code Guidelines
+
+- コード修正後は必ずコマンド動作検証を行う
+- 修正完了報告は全て完了してから報告する
+  - 一部の場合は最後に"まだ作業中のため次の指示が必要です"と太字で記載する
+  - 残っている作業内容はリスト化して表示する
+- 複数のコード修正時でもユーザの毎回の確認は必要ない
+- 統一性
+  - 修正内容が他のコードにも適用すべき場合は、grep で他ファイルも検索し、必要なら全体を修正する
+  - 共通ライブラリの関数内容は全て把握した上で修正する
+  - 修正完了後は何を検索しても問題なかったかを grep レベルで記載する
+  - grep だけでは問題がありそうな場合は、コード自体も中身も実際に読み込む
+- エラー修正は Copilot が自律的に実行する
+- コマンド動作検証
+  - すべてワンライナーで実行し、複数回の動作確認はユーザー確認不要
+  - dry-run オプションは使用しない
+  - && で全てワンライナー対応
+  - 複数結果確認は || でワンライナー対応
+- コマンド動作実行
+  - 成果物ファイル名はデフォルトから変更しないこと。そのため output オプションは指定しない
+  - 成果物ファイルは毎回名前変更しないこと。比較が必要な場合のみ許可
+
+## General Principles
+
+- プロジェクト全体で統一性を持って記述する
+- 修正時は同ディレクトリの既存コードを参照する
+- 変数・関数・構造体・リソース名の記載方法は言語ルールに乗っ取り、統一する
+- 固有ライブラリを利用する際には事前にコンテキストとして利用できるよう把握する
+- すべての関数・リソースは明確な説明を含める
+- コードは一貫性・明瞭性を持って記述する
+- DRY 原則（重複排除）を守る
+- 明示的なコードを優先する
+- 変数・関数・ファイル名は分かりやすく記述する
+- 非自明なロジックには必ずコメントを付与する
+- 冗長性を排除したコードを書く
+
+## Documentation and Comments
+
+- すべてのファイル/スクリプト/モジュールは目的を記載したヘッダーを含める
+- すべての関数は目的・引数説明を含める
+- 複雑なロジックにはインラインコメントを付与する
+- コメント・ドキュメントは英語で記載すること（全言語共通）
+
+## Error Handling
+
+- 必ずエラーを検知し、適切に処理する
+- 具体的かつ行動可能なエラーメッセージを出す
+- デバッグしやすいよう十分な情報をログ出力する
+- 機密情報はエラーメッセージに含めない
+
+## Testing and Validation
+
+- コード修正後は必ず構文・静的解析チェックを行う
+- 可能な限り機能・統合テストを実施する
+- テスト結果は成功/失敗を明示する
+- テスト失敗時は修正案を提示する
+
+## Security Guidelines
+
+- 秘密情報はハードコーディングせず、シークレット管理や環境変数を利用する
+- 権限は最小限にする
+- 外部入力は必ずバリデーションする
+- 機密データは保存・転送時に暗号化する
+- 機密操作はログに記録するが、機密データ自体は記録しない
+
+## Development Workflow
+
+- 新規作業は feature/xxx または hotfix/xxx ブランチで行う
+- 必ずプルリクエストを作成し、コードレビューを受ける
+- マージ前に最低 1 回レビューを受ける
+- マージ前にベースブランチと同期する
+- 必要に応じてドキュメント・使用例も更新する

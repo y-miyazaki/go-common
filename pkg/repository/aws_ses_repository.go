@@ -1,148 +1,147 @@
 package repository
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/ses"
-	"github.com/sirupsen/logrus"
+	"context"
+	"fmt"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/sesv2"
+	"github.com/aws/aws-sdk-go-v2/service/sesv2/types"
 )
 
 // AWSSESRepositoryInterface interface.
+// nolint:iface,revive,unused
 type AWSSESRepositoryInterface interface {
-	// Use via SendEmailService
-	SendTextEmail(from, to, subject, content string) error
-	SendHtmlEmail(from, to, subject, content string) error
-	SendEmail(from, to, subject, content string) error
+	SendTextEmail(from string, to, replyTo []string, subject, content string) (*sesv2.SendEmailOutput, error)
+	SendHTMLEmail(from string, to, replyTo []string, subject, content string) (*sesv2.SendEmailOutput, error)
+	SendEmail(from string, to, replyTo []string, subject, contentText, contentHTML string) (*sesv2.SendEmailOutput, error)
+	SendBulkEmail(from string, replyTo []string, defaultTemplateData string, bulkEmailEntries []types.BulkEmailEntry) (*sesv2.SendBulkEmailOutput, error)
 }
 
 // AWSSESRepository struct.
 type AWSSESRepository struct {
-	e                              *logrus.Entry
-	ses                            *ses.SES
-	configurationSetName           *string
-	isOutputLogPersonalInformation bool
+	c                    *sesv2.Client
+	configurationSetName *string
 }
 
 // NewAWSSESRepository returns AWSSESRepository instance.
-func NewAWSSESRepository(
-	e *logrus.Entry,
-	ses *ses.SES,
-	configurationSetName *string,
-	isOutputLogPersonalInformation bool,
-
-) *AWSSESRepository {
+func NewAWSSESRepository(c *sesv2.Client, configurationSetName *string) *AWSSESRepository {
 	return &AWSSESRepository{
-		e:                              e,
-		ses:                            ses,
-		configurationSetName:           configurationSetName,
-		isOutputLogPersonalInformation: isOutputLogPersonalInformation,
+		c:                    c,
+		configurationSetName: configurationSetName,
 	}
 }
 
-func (r *AWSSESRepository) SendTextEmail(from, to, subject, content string) error {
-	response, err := r.ses.SendEmail(&ses.SendEmailInput{
+// SendTextEmail sends text email.
+func (r *AWSSESRepository) SendTextEmail(from string, to, replyTo []string, subject, content string) (*sesv2.SendEmailOutput, error) {
+	res, err := r.c.SendEmail(context.Background(), &sesv2.SendEmailInput{
 		ConfigurationSetName: r.configurationSetName,
-		Destination: &ses.Destination{
-			ToAddresses: []*string{
-				aws.String(to),
-			},
+		FromEmailAddress:     aws.String(from),
+		Destination: &types.Destination{
+			ToAddresses: to,
 		},
-		Message: &ses.Message{
-			Body: &ses.Body{
-				Text: &ses.Content{
+		ReplyToAddresses: replyTo,
+		Content: &types.EmailContent{
+			Simple: &types.Message{
+				Body: &types.Body{
+					Text: &types.Content{
+						Charset: aws.String("UTF-8"),
+						Data:    aws.String(content),
+					},
+				},
+				Subject: &types.Content{
 					Charset: aws.String("UTF-8"),
-					Data:    aws.String(content),
+					Data:    aws.String(subject),
 				},
 			},
-			Subject: &ses.Content{
-				Charset: aws.String("UTF-8"),
-				Data:    aws.String(subject),
-			},
 		},
-		Source: aws.String(from),
 	})
-
-	r.log(to, subject, response, err)
-
-	return err
+	if err != nil {
+		return nil, fmt.Errorf("ses SendTextEmail: %w", err)
+	}
+	return res, nil
 }
 
-func (r *AWSSESRepository) SendHtmlEmail(from, to, subject, content string) error {
-	response, err := r.ses.SendEmail(&ses.SendEmailInput{
+// SendHTMLEmail sends HTML email.
+func (r *AWSSESRepository) SendHTMLEmail(from string, to, replyTo []string, subject, content string) (*sesv2.SendEmailOutput, error) {
+	res, err := r.c.SendEmail(context.Background(), &sesv2.SendEmailInput{
 		ConfigurationSetName: r.configurationSetName,
-		Destination: &ses.Destination{
-			ToAddresses: []*string{
-				aws.String(to),
-			},
+		FromEmailAddress:     aws.String(from),
+		Destination: &types.Destination{
+			ToAddresses: to,
 		},
-		Message: &ses.Message{
-			Body: &ses.Body{
-				Html: &ses.Content{
+		ReplyToAddresses: replyTo,
+		Content: &types.EmailContent{
+			Simple: &types.Message{
+				Body: &types.Body{
+					Html: &types.Content{
+						Charset: aws.String("UTF-8"),
+						Data:    aws.String(content),
+					},
+				},
+				Subject: &types.Content{
 					Charset: aws.String("UTF-8"),
-					Data:    aws.String(content),
+					Data:    aws.String(subject),
 				},
 			},
-			Subject: &ses.Content{
-				Charset: aws.String("UTF-8"),
-				Data:    aws.String(subject),
-			},
 		},
-		Source: aws.String(from),
 	})
-
-	r.log(to, subject, response, err)
-
-	return err
+	if err != nil {
+		return nil, fmt.Errorf("ses SendHTMLEmail: %w", err)
+	}
+	return res, nil
 }
 
-func (r *AWSSESRepository) SendEmail(from, to, subject, contentText, contentHtml string) error {
-	response, err := r.ses.SendEmail(&ses.SendEmailInput{
+// SendEmail sends email.
+func (r *AWSSESRepository) SendEmail(from string, to, replyTo []string, subject, contentText, contentHTML string) (*sesv2.SendEmailOutput, error) {
+	res, err := r.c.SendEmail(context.Background(), &sesv2.SendEmailInput{
 		ConfigurationSetName: r.configurationSetName,
-		Destination: &ses.Destination{
-			ToAddresses: []*string{
-				aws.String(to),
+		FromEmailAddress:     aws.String(from),
+		Destination: &types.Destination{
+			ToAddresses: to,
+		},
+		ReplyToAddresses: replyTo,
+		Content: &types.EmailContent{
+			Simple: &types.Message{
+				Body: &types.Body{
+					Text: &types.Content{
+						Charset: aws.String("UTF-8"),
+						Data:    aws.String(contentText),
+					},
+					Html: &types.Content{
+						Charset: aws.String("UTF-8"),
+						Data:    aws.String(contentHTML),
+					},
+				},
+				Subject: &types.Content{
+					Charset: aws.String("UTF-8"),
+					Data:    aws.String(subject),
+				},
 			},
 		},
-		Message: &ses.Message{
-			Body: &ses.Body{
-				Text: &ses.Content{
-					Charset: aws.String("UTF-8"),
-					Data:    aws.String(contentText),
-				},
-				Html: &ses.Content{
-					Charset: aws.String("UTF-8"),
-					Data:    aws.String(contentHtml),
-				},
-			},
-			Subject: &ses.Content{
-				Charset: aws.String("UTF-8"),
-				Data:    aws.String(subject),
-			},
-		},
-		Source: aws.String(from),
 	})
-	r.log(to, subject, response, err)
-	return err
+	if err != nil {
+		return nil, fmt.Errorf("ses SendEmail: %w", err)
+	}
+	return res, nil
 }
 
-func (r *AWSSESRepository) log(
-	to string,
-	subject string,
-	responseObject *ses.SendEmailOutput,
-	responseError error,
-) {
-	e := r.e
-	// Check output personal information flag.
-	if r.isOutputLogPersonalInformation {
-		e = e.
-			WithField("to", to).
-			WithField("subject", subject)
+// SendBulkEmail sends bulk emails.
+// Note: One or more Destination objects. All of the recipients in a Destination receive the same version of the email.
+// You can specify up to 50 Destination objects within a Destinations array.
+func (r *AWSSESRepository) SendBulkEmail(from string, replyTo []string, defaultTemplateData string, bulkEmailEntries []types.BulkEmailEntry) (*sesv2.SendBulkEmailOutput, error) {
+	res, err := r.c.SendBulkEmail(context.Background(), &sesv2.SendBulkEmailInput{
+		FromEmailAddress: aws.String(from),
+		ReplyToAddresses: replyTo,
+		DefaultContent: &types.BulkEmailContent{
+			Template: &types.Template{
+				TemplateData: aws.String(defaultTemplateData),
+			},
+		},
+		BulkEmailEntries: bulkEmailEntries,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("ses SendBulkEmail: %w", err)
 	}
-	if responseObject.MessageId != nil {
-		e = e.WithField("messageId", *responseObject.MessageId)
-	}
-	if responseError == nil {
-		e.Info("Successfully sent an SES email")
-	} else {
-		e.WithError(responseError).Error("Error while sending an SES email")
-	}
+	return res, nil
 }
