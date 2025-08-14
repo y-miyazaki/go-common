@@ -55,7 +55,8 @@ func main() {
 	// ListBuckets
 	listBuckets, err := awsS3Repository.ListBuckets()
 	if err == nil {
-		for _, b := range listBuckets.Buckets {
+		for i := range listBuckets.Buckets {
+			b := &listBuckets.Buckets[i]
 			l.Infof("bucket = %s(%s)", aws.ToString(b.Name), aws.ToTime(b.CreationDate))
 		}
 	} else {
