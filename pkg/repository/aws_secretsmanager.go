@@ -1,43 +1,45 @@
 package repository
 
 import (
+	"context"
 	"encoding/base64"
+	"fmt"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/secretsmanager"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	"github.com/aws/aws-secretsmanager-caching-go/secretcache"
 )
 
+// AWSSecretsManagerRepositoryInterface interface.
+// nolint:iface,revive,unused
 type AWSSecretsManagerRepositoryInterface interface {
 	GetSecretString(secretName string) (string, error)
+	GetCacheSecretString(secretName string) (string, error)
 }
 
+// AWSSecretsManagerRepository struct.
 type AWSSecretsManagerRepository struct {
-	sm      *secretsmanager.SecretsManager
-	cache   *secretcache.Cache
-	session *session.Session
+	c     *secretsmanager.Client
+	cache *secretcache.Cache
 }
 
 // NewAWSSecretsManagerRepository returns NewAWSSecretsManagerRepository instance.
-func NewAWSSecretsManagerRepository(sm *secretsmanager.SecretsManager, sess *session.Session, cache *secretcache.Cache) *AWSSecretsManagerRepository {
+func NewAWSSecretsManagerRepository(c *secretsmanager.Client, cache *secretcache.Cache) *AWSSecretsManagerRepository {
 	return &AWSSecretsManagerRepository{
-		sm:      sm,
-		cache:   cache,
-		session: sess,
+		c:     c,
+		cache: cache,
 	}
 }
 
 // GetSecretString gets a secret string from secretsmanager.
 func (r *AWSSecretsManagerRepository) GetSecretString(secretName string) (string, error) {
-	input := &secretsmanager.GetSecretValueInput{
+	result, err := r.c.GetSecretValue(context.Background(), &secretsmanager.GetSecretValueInput{
 		SecretId: aws.String(secretName),
 		// VersionStage defaults to AWSCURRENT if unspecified
 		VersionStage: aws.String("AWSCURRENT"),
-	}
-	result, err := r.sm.GetSecretValue(input)
+	})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("secretsmanager GetSecretValue: %w", err)
 	}
 	if result.SecretString != nil { // pragma: allowlist secret
 		return *result.SecretString, nil
@@ -45,12 +47,16 @@ func (r *AWSSecretsManagerRepository) GetSecretString(secretName string) (string
 	decodedBinarySecretBytes := make([]byte, base64.StdEncoding.DecodedLen(len(result.SecretBinary)))
 	length, err := base64.StdEncoding.Decode(decodedBinarySecretBytes, result.SecretBinary)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("secretsmanager decode secret binary: %w", err)
 	}
 	return string(decodedBinarySecretBytes[:length]), nil
 }
 
 // GetCacheSecretString gets a cache secret string from secretsmanager.
 func (r *AWSSecretsManagerRepository) GetCacheSecretString(secretName string) (string, error) {
-	return r.cache.GetSecretString(secretName)
+	res, err := r.cache.GetSecretString(secretName)
+	if err != nil {
+		return "", fmt.Errorf("secretsmanager cache GetSecretString: %w", err)
+	}
+	return res, nil
 }

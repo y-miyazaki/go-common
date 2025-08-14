@@ -151,7 +151,9 @@ RUN go install -v golang.org/x/tools/gopls@latest && \
     go install -v github.com/go-swagger/go-swagger/cmd/swagger@latest && \
     go install -v github.com/swaggo/swag/cmd/swag@latest && \
     # Coverage outputs covertura format.
-    go install -v github.com/t-yuki/gocover-cobertura@latest 2>&1
+    go install -v github.com/t-yuki/gocover-cobertura@latest 2>&1 && \
+    # Install golangci-lint
+    curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(go env GOPATH)/bin ${GOLANGCI_LINT_VERSION}
 
 RUN chown -R vscode:golang /go/pkg
 

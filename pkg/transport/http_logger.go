@@ -1,12 +1,21 @@
+// Package transport provides HTTP transport layer utilities including logging middleware.
 package transport
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/y-miyazaki/go-common/pkg/logger"
 	"go.uber.org/zap"
+)
+
+const (
+	// HTTPStatusCodeDivisor is used for HTTP status code classification
+	HTTPStatusCodeDivisor = 100
+	// HTTPClientErrorThreshold is the minimum status code for client/server errors (4xx, 5xx)
+	HTTPClientErrorThreshold = 4
 )
 
 // HTTPLoggerType defines the transport type.
@@ -73,12 +82,15 @@ func (t HTTPLogger) RoundTrip(req *http.Request) (*http.Response, error) {
 	if response != nil {
 		log = log.WithField("status", response.StatusCode)
 	}
-	if err != nil || response.StatusCode/100 >= 4 {
+	if err != nil || (response != nil && response.StatusCode/HTTPStatusCodeDivisor >= HTTPClientErrorThreshold) {
 		log.WithError(err).Error()
 	} else {
 		log.Info()
 	}
-	return response, err
+	if err != nil {
+		return nil, fmt.Errorf("round trip: %w", err)
+	}
+	return response, nil
 }
 
 // RoundTrip logs transparently.
@@ -97,10 +109,13 @@ func (t HTTPZapLogger) RoundTrip(req *http.Request) (*http.Response, error) {
 	if response != nil {
 		log = log.With(zap.Int("status", response.StatusCode))
 	}
-	if err != nil || response.StatusCode/100 >= 4 {
+	if err != nil || (response != nil && response.StatusCode/HTTPStatusCodeDivisor >= HTTPClientErrorThreshold) {
 		log.WithError(err).Error("")
 	} else {
 		log.Info("")
 	}
-	return response, err
+	if err != nil {
+		return nil, fmt.Errorf("round trip: %w", err)
+	}
+	return response, nil
 }

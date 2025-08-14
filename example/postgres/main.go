@@ -1,3 +1,4 @@
+// Package main demonstrates PostgreSQL database connection example.
 package main
 
 import (
@@ -14,6 +15,11 @@ import (
 )
 
 func main() {
+	const slowThresholdSeconds = 3
+	const connectionLifetimeMinutes = 5
+	const maxIdleConnections = 20
+	const maxOpenConnections = 100
+
 	// --------------------------------------------------------------
 	// logrus
 	// --------------------------------------------------------------
@@ -30,7 +36,7 @@ func main() {
 		Logger: loggerNew.Entry.Logger,
 		GormConfig: &logger.GormConfig{
 			// slow query time: 3 sec
-			SlowThreshold:             time.Second * 3,
+			SlowThreshold:             time.Second * slowThresholdSeconds,
 			IgnoreRecordNotFoundError: false,
 			LogLevel:                  logger.Info,
 		},
@@ -54,13 +60,13 @@ func main() {
 		},
 		DBConfig: infrastructure.DBConfig{
 			// ConnMaxLifetime sets max life time(sec)
-			ConnMaxLifetime: time.Minute * 5,
+			ConnMaxLifetime: time.Minute * connectionLifetimeMinutes,
 			// ConnMaxIdletime sets max idle time(sec)
-			ConnMaxIdletime: time.Minute * 5,
+			ConnMaxIdletime: time.Minute * connectionLifetimeMinutes,
 			// MaxIdleConns sets idle connection
-			MaxIdleConns: 20,
+			MaxIdleConns: maxIdleConnections,
 			// MaxOpenConns sets max connection
-			MaxOpenConns: 100,
+			MaxOpenConns: maxOpenConnections,
 		},
 	}
 	database := infrastructure.NewPostgres(postgresConfig, gc)

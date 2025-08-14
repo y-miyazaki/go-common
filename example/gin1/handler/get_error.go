@@ -6,15 +6,15 @@ import (
 	"github.com/y-miyazaki/go-common/pkg/dto"
 )
 
-// GetError1 handler
-func (h *HTTPHandler) GetError1(c *gin.Context) {
+// HandleError1 responds with an internal server error for testing purposes.
+func (h *HTTPHandler) HandleError1(c *gin.Context) {
 	h.ResponseStatusInternalServerError(c, map[string]string{
 		"test": "testmessage",
 	}, errors.New("error test1"))
 }
 
-// GetError2 handler
-func (h *HTTPHandler) GetError2(c *gin.Context) {
+// HandleError2 responds with an internal server error using structured response.
+func (h *HTTPHandler) HandleError2(c *gin.Context) {
 	h.ResponseStatusInternalServerError(c, dto.HTTPErrorResponse{
 		Message: map[string]string{
 			"test": "testmessage",

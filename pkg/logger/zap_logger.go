@@ -52,37 +52,37 @@ func (l *ZapLogger) WithError(err error) *ZapLogger {
 }
 
 // Debugf outputs debug level log.
-func (l *ZapLogger) Debugf(format string, args ...interface{}) {
+func (l *ZapLogger) Debugf(format string, args ...any) {
 	l.Logger.Sugar().Debugf(format, args...)
 }
 
 // Infof outputs info level log.
-func (l *ZapLogger) Infof(format string, args ...interface{}) {
+func (l *ZapLogger) Infof(format string, args ...any) {
 	l.Logger.Sugar().Infof(format, args...)
 }
 
 // Warnf outputs warn level log.
-func (l *ZapLogger) Warnf(format string, args ...interface{}) {
+func (l *ZapLogger) Warnf(format string, args ...any) {
 	l.Logger.Sugar().Warnf(format, args...)
 }
 
 // Errorf outputs error level log.
-func (l *ZapLogger) Errorf(format string, args ...interface{}) {
+func (l *ZapLogger) Errorf(format string, args ...any) {
 	l.Logger.Sugar().Errorf(format, args...)
 }
 
 // Fatalf outputs fatal level log.
-func (l *ZapLogger) Fatalf(format string, args ...interface{}) {
+func (l *ZapLogger) Fatalf(format string, args ...any) {
 	l.Logger.Sugar().Fatalf(format, args...)
 }
 
 // Panicf outputs panic log.
-func (l *ZapLogger) Panicf(format string, args ...interface{}) {
+func (l *ZapLogger) Panicf(format string, args ...any) {
 	l.Logger.Sugar().Panicf(format, args...)
 }
 
 // DPanicf outputs panic log.
-func (l *ZapLogger) DPanicf(format string, args ...interface{}) {
+func (l *ZapLogger) DPanicf(format string, args ...any) {
 	l.Logger.Sugar().DPanicf(format, args...)
 }
 
@@ -122,36 +122,36 @@ func (l *ZapLogger) DPanic(msg string, fields ...zapcore.Field) {
 }
 
 // Debugln outputs debug level log.
-func (l *ZapLogger) Debugln(args ...interface{}) {
+func (l *ZapLogger) Debugln(args ...any) {
 	l.Logger.Sugar().Debugln(args...)
 }
 
 // Infoln outputs info level log.
-func (l *ZapLogger) Infoln(args ...interface{}) {
+func (l *ZapLogger) Infoln(args ...any) {
 	l.Logger.Sugar().Infoln(args...)
 }
 
 // Warnln outputs warn level log.
-func (l *ZapLogger) Warnln(args ...interface{}) {
+func (l *ZapLogger) Warnln(args ...any) {
 	l.Logger.Sugar().Warnln(args...)
 }
 
 // Errorln outputs error level log.
-func (l *ZapLogger) Errorln(args ...interface{}) {
+func (l *ZapLogger) Errorln(args ...any) {
 	l.Logger.Sugar().Errorln(args...)
 }
 
 // Fatalln outputs fatal level log.
-func (l *ZapLogger) Fatalln(args ...interface{}) {
+func (l *ZapLogger) Fatalln(args ...any) {
 	l.Logger.Sugar().Fatalln(args...)
 }
 
 // Panicln outputs panic log.
-func (l *ZapLogger) Panicln(args ...interface{}) {
+func (l *ZapLogger) Panicln(args ...any) {
 	l.Logger.Sugar().Panicln(args...)
 }
 
 // DPanicln outputs panic log.
-func (l *ZapLogger) DPanicln(args ...interface{}) {
+func (l *ZapLogger) DPanicln(args ...any) {
 	l.Logger.Sugar().DPanicln(args...)
 }

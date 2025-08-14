@@ -1,100 +1,109 @@
+// Package infrastructure provides AWS SES integration helpers using AWS SDK v2.
 package infrastructure
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 
-	aws "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/ses"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/sesv2"
 	"github.com/y-miyazaki/go-common/pkg/logger"
 	"github.com/y-miyazaki/go-common/pkg/transport"
 	"go.uber.org/zap"
 )
 
-// NewAWSSES returns ses instance.
-func NewAWSSES(
-	o *session.Options,
-	c *aws.Config,
-) *ses.SES {
-	s := session.Must(session.NewSessionWithOptions(*o))
-	return ses.New(s, c)
+// NewAWSSES returns SES client using AWS SDK v2.
+func NewAWSSES(c aws.Config, optFns ...func(*sesv2.Options)) *sesv2.Client { // nolint:gocritic
+	return sesv2.NewFromConfig(c, optFns...)
 }
 
-// GetAWSSESConfig get config.
-func GetAWSSESConfig(l *logger.Logger, id, secret, token, region, endpoint string) *aws.Config {
+// GetAWSSESConfig get SES config using AWS SDK v2.
+func GetAWSSESConfig(l *logger.Logger, key, secret, sessionToken, region, _ string) (aws.Config, error) { // nolint:unused
 	var httpClient *http.Client
 	if l != nil {
 		httpClient = &http.Client{
 			Transport: transport.NewTransportHTTPLogger(
-				l.WithField("service", "aws-ses"),
+				l.WithField(serviceFieldKey, awsSESService),
 				transport.HTTPLoggerTypeExternal,
 			),
 		}
 	}
-	return &aws.Config{
-		Credentials: credentials.NewStaticCredentials(
-			id,
-			secret,
-			token),
-		Region:     aws.String(region),
-		HTTPClient: httpClient,
+	cfg, err := config.LoadDefaultConfig(context.TODO(),
+		config.WithRegion(region),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(key, secret, sessionToken)),
+		config.WithHTTPClient(httpClient),
+	)
+	if err != nil {
+		return aws.Config{}, fmt.Errorf("config load ses: %w", err)
 	}
+	return cfg, nil
 }
 
-// GetAWSSESConfigNoCredentials get no credentials config.
+// GetSESConfigNoCredentials get no credentials config.
 // If AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are environment variables and are in the execution environment, Credentials is not required.
-func GetAWSSESConfigNoCredentials(l *logger.Logger, region, endpoint string) *aws.Config {
+func GetAWSSESConfigNoCredentials(l *logger.Logger, region, _ string) (aws.Config, error) { // nolint:unused
 	var httpClient *http.Client
 	if l != nil {
 		httpClient = &http.Client{
 			Transport: transport.NewTransportHTTPLogger(
-				l.WithField("service", "aws-ses"),
+				l.WithField(serviceFieldKey, awsSESService),
 				transport.HTTPLoggerTypeExternal,
 			),
 		}
 	}
-	return &aws.Config{
-		Region:     aws.String(region),
-		HTTPClient: httpClient,
+	cfg, err := config.LoadDefaultConfig(context.TODO(),
+		config.WithRegion(region),
+		config.WithHTTPClient(httpClient),
+	)
+	if err != nil {
+		return aws.Config{}, fmt.Errorf("config load ses no creds: %w", err)
 	}
+	return cfg, nil
 }
 
-// GetAWSSESConfigZap get config.
-func GetAWSSESConfigZap(l *logger.ZapLogger, id, secret, token, region, endpoint string) *aws.Config {
+// GetSESConfigZap get config.
+func GetAWSSESConfigZap(l *logger.ZapLogger, key, secret, sessionToken, region, _ string) (aws.Config, error) { // nolint:unused
 	var httpClient *http.Client
 	if l != nil {
 		httpClient = &http.Client{
 			Transport: transport.NewTransportHTTPZapLogger(
-				l.With(zap.String("service", "aws-ses")),
+				l.With(zap.String(serviceFieldKey, awsSESService)),
 				transport.HTTPLoggerTypeExternal,
 			),
 		}
 	}
-	return &aws.Config{
-		Credentials: credentials.NewStaticCredentials(
-			id,
-			secret,
-			token),
-		Region:     aws.String(region),
-		HTTPClient: httpClient,
+	cfg, err := config.LoadDefaultConfig(context.TODO(),
+		config.WithRegion(region),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(key, secret, sessionToken)),
+		config.WithHTTPClient(httpClient),
+	)
+	if err != nil {
+		return aws.Config{}, fmt.Errorf("config load ses zap: %w", err)
 	}
+	return cfg, nil
 }
 
 // GetAWSSESConfigNoCredentialsZap get no credentials config.
 // If AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are environment variables and are in the execution environment, Credentials is not required.
-func GetSESConfigNoCredentialsZap(l *logger.ZapLogger, region, endpoint string) *aws.Config {
+func GetAWSSESConfigNoCredentialsZap(l *logger.ZapLogger, region, _ string) (aws.Config, error) { // nolint:unused
 	var httpClient *http.Client
 	if l != nil {
 		httpClient = &http.Client{
 			Transport: transport.NewTransportHTTPZapLogger(
-				l.With(zap.String("service", "aws-ses")),
+				l.With(zap.String(serviceFieldKey, awsSESService)),
 				transport.HTTPLoggerTypeExternal,
 			),
 		}
 	}
-	return &aws.Config{
-		Region:     aws.String(region),
-		HTTPClient: httpClient,
+	cfg, err := config.LoadDefaultConfig(context.TODO(),
+		config.WithRegion(region),
+		config.WithHTTPClient(httpClient),
+	)
+	if err != nil {
+		return aws.Config{}, fmt.Errorf("config load ses no creds zap: %w", err)
 	}
+	return cfg, nil
 }

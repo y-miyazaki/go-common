@@ -6,16 +6,16 @@ import (
 	"time"
 
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"gorm.io/gorm/logger"
 )
 
 // ZapInterface Gorm Logger interface.
+// nolint:iface,revive,unused
 type ZapInterface interface {
-	LogMode(zapcore.Level) Interface
-	Info(context.Context, string, ...interface{})
-	Warn(context.Context, string, ...interface{})
-	Error(context.Context, string, ...interface{})
+	LogMode(logger.LogLevel) logger.Interface
+	Info(ctx context.Context, msg string, data ...any)
+	Warn(ctx context.Context, msg string, data ...any)
+	Error(ctx context.Context, msg string, data ...any)
 	Trace(ctx context.Context, begin time.Time, fc func() (sql string, rowsAffected int64), err error)
 }
 
@@ -62,27 +62,27 @@ func NewZapLoggerGorm(c *GormZapSetting) *GormZap {
 }
 
 // LogMode log mode(same logrus.level)
-func (l *GormZap) LogMode(level logger.LogLevel) logger.Interface {
+func (l *GormZap) LogMode(_ logger.LogLevel) logger.Interface { // nolint:unused
 	newlogger := l
 	return newlogger
 }
 
 // Info print the info level log.
-func (l *GormZap) Info(ctx context.Context, msg string, data ...interface{}) {
+func (l *GormZap) Info(_ context.Context, msg string, data ...any) { // nolint:unused
 	if l.gormConfig.LogLevel >= Info {
 		l.l.Sugar().Infof(msg, data...)
 	}
 }
 
 // Warn print the warn level log.
-func (l *GormZap) Warn(ctx context.Context, msg string, data ...interface{}) {
+func (l *GormZap) Warn(_ context.Context, msg string, data ...any) { // nolint:unused
 	if l.gormConfig.LogLevel >= Warn {
 		l.l.Sugar().Warnf(msg, data...)
 	}
 }
 
 // Error print the error level log.
-func (l *GormZap) Error(ctx context.Context, msg string, data ...interface{}) {
+func (l *GormZap) Error(_ context.Context, msg string, data ...any) { // nolint:unused
 	if l.gormConfig.LogLevel >= Error {
 		l.l.Sugar().Errorf(msg, data...)
 	}
@@ -90,7 +90,7 @@ func (l *GormZap) Error(ctx context.Context, msg string, data ...interface{}) {
 
 // Trace print the SQL log.
 func (l *GormZap) Trace(
-	ctx context.Context,
+	_ context.Context, // nolint:unused
 	begin time.Time,
 	fc func() (sql string, rowsAffected int64),
 	err error,
@@ -111,11 +111,13 @@ func (l *GormZap) Trace(
 	}
 
 	switch {
-	case err != nil && level >= Error && (!errors.Is(err, logger.ErrRecordNotFound) || !l.gormConfig.IgnoreRecordNotFoundError):
+	case err != nil && level >= Error && (!l.gormConfig.IgnoreRecordNotFoundError || !errors.Is(err, logger.ErrRecordNotFound)):
 		entry.Error("failed SQL Query")
 	case level >= Warn && duration > l.gormConfig.SlowThreshold && l.gormConfig.SlowThreshold != 0:
 		entry.Warnf("slow SQL Query > %v", l.gormConfig.SlowThreshold)
 	case level >= Info:
 		entry.Info("SQL Query")
+	default:
+		// No logging for silent level
 	}
 }

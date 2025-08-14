@@ -1,7 +1,9 @@
+// Package utils provides small utility functions used across the project.
 package utils
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 )
 
@@ -10,7 +12,7 @@ func GetBufferFromReadCloser(r io.ReadCloser) ([]byte, error) {
 	buf := new(bytes.Buffer)
 	_, err := buf.ReadFrom(r)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("read from reader: %w", err)
 	}
 	return buf.Bytes(), nil
 }

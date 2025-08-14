@@ -1,3 +1,4 @@
+// Package signal provides OS signal handling utilities.
 package signal
 
 import (
@@ -12,7 +13,7 @@ func DetectSignal(f func(sig os.Signal), sig ...os.Signal) {
 		s := make(chan os.Signal, 1)
 		signal.Notify(s, sig...)
 		defer signal.Stop(s)
-		sig := <-s
-		f(sig)
+		receivedSig := <-s
+		f(receivedSig)
 	}()
 }

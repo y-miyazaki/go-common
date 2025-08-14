@@ -1,3 +1,4 @@
+// Package main demonstrates MySQL database connection example.
 package main
 
 import (
@@ -14,6 +15,12 @@ import (
 )
 
 func main() {
+	const slowThresholdSeconds = 3
+	const defaultStringSize = 256
+	const connectionLifetimeMinutes = 5
+	const maxIdleConnections = 20
+	const maxOpenConnections = 100
+
 	// --------------------------------------------------------------
 	// logrus
 	// --------------------------------------------------------------
@@ -30,7 +37,7 @@ func main() {
 		Logger: loggerNew.Entry.Logger,
 		GormConfig: &logger.GormConfig{
 			// slow query time: 3 sec
-			SlowThreshold:             time.Second * 3,
+			SlowThreshold:             time.Second * slowThresholdSeconds,
 			IgnoreRecordNotFoundError: false,
 			LogLevel:                  logger.Info,
 		},
@@ -51,21 +58,21 @@ func main() {
 	mysqlConfig := &infrastructure.MySQLConfig{
 		Config: &mysql.Config{
 			DSN:                       db.GetMySQLDsn(mysqlUsername, mysqlPassword, mysqlServer, mysqlPort, mysqlDBname, "charset=utf8mb4&parseTime=True&loc=Local"),
-			DefaultStringSize:         256,   // default size for string fields
-			DisableDatetimePrecision:  true,  // disable datetime precision, which not supported before MySQL 5.6
-			DontSupportRenameIndex:    true,  // drop & create when rename index, rename index not supported before MySQL 5.7, MariaDB
-			DontSupportRenameColumn:   true,  // `change` when rename column, rename column not supported before MySQL 8, MariaDB
-			SkipInitializeWithVersion: false, // auto configure based on currently MySQL version
+			DefaultStringSize:         defaultStringSize, // default size for string fields
+			DisableDatetimePrecision:  true,              // disable datetime precision, which not supported before MySQL 5.6
+			DontSupportRenameIndex:    true,              // drop & create when rename index, rename index not supported before MySQL 5.7, MariaDB
+			DontSupportRenameColumn:   true,              // `change` when rename column, rename column not supported before MySQL 8, MariaDB
+			SkipInitializeWithVersion: false,             // auto configure based on currently MySQL version
 		},
 		DBConfig: infrastructure.DBConfig{
 			// ConnMaxLifetime sets max life time(sec)
-			ConnMaxLifetime: time.Minute * 5,
+			ConnMaxLifetime: time.Minute * connectionLifetimeMinutes,
 			// ConnMaxIdletime sets max idle time(sec)
-			ConnMaxIdletime: time.Minute * 5,
+			ConnMaxIdletime: time.Minute * connectionLifetimeMinutes,
 			// MaxIdleConns sets idle connection
-			MaxIdleConns: 20,
+			MaxIdleConns: maxIdleConnections,
 			// MaxOpenConns sets max connection
-			MaxOpenConns: 100,
+			MaxOpenConns: maxOpenConnections,
 		},
 	}
 	database := infrastructure.NewMySQL(mysqlConfig, gc)

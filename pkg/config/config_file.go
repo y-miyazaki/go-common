@@ -36,7 +36,9 @@ func NewConfigFile(setting *FileSetting) *Config {
 	}
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
-		fmt.Println("ConfigHandler file changed:", e.Name)
+		// use logger instead of fmt.Println
+		log := logrus.New()
+		log.Infof("ConfigHandler file changed: %s", e.Name)
 	})
 	// -------------------------------------------------------------
 	// set Logger

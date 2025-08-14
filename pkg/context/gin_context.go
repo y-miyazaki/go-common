@@ -1,3 +1,4 @@
+// Package context provides Gin context utility functions.
 package context
 
 import (
@@ -14,8 +15,8 @@ const (
 // GetGinContextError gets error.
 func GetGinContextError(c *gin.Context) (err, err2 error) {
 	if tmp, exists := c.Get(contextKeyError); exists {
-		if err, ok := tmp.(error); ok {
-			return err, nil
+		if ginErr, ok := tmp.(error); ok {
+			return ginErr, nil
 		}
 		return nil, errors.New("can't get error")
 	}
@@ -38,7 +39,7 @@ func SetGinContextError(c *gin.Context, err error) {
 	c.Set(contextKeyError, err)
 }
 
-// SetGinContextErrorMessage sets error message.
-func SetGinContextErrorMessage(c *gin.Context, message interface{}) {
+// SetGinContextErrorMessage sets the error message in Gin context.
+func SetGinContextErrorMessage(c *gin.Context, message any) {
 	c.Set(contextKeyErrorMessage, message)
 }

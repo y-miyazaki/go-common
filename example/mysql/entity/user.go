@@ -1,16 +1,14 @@
+// Package entity defines database entity models for MySQL examples.
 package entity
 
 // User table struct.
 type User struct {
-	// ID    int    `gorm:"column:id;primaryKey;type:bigint;not null;autoIncrement" mapstructure:"id"`
-	// Name  string `gorm:"column:name;type:varchar(255);not null" mapstructure:"name"`
-	// Email string `gorm:"column:email;type:varchar(255);not null" mapstructure:"email"`
-	ID    int
 	Name  string
 	Email string
+	ID    int
 }
 
 // TableName returns tablename.
-func (i *User) TableName() string {
+func (*User) TableName() string {
 	return "user"
 }

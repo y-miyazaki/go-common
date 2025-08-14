@@ -1,3 +1,4 @@
+// Package middleware provides HTTP middleware utilities for the Gin web framework.
 package middleware
 
 import (
@@ -12,12 +13,11 @@ import (
 )
 
 // GinHTTPLogger retrieves the request/response logs.
-func GinHTTPLogger(
-	l *logger.Logger,
-	traceIDHeader string,
-	clientIPHeader string,
+// It logs HTTP requests and responses using logrus logger with configurable headers.
+func GinHTTPLogger(l *logger.Logger, traceIDHeader, clientIPHeader string,
 ) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Record start time for duration calculation
 		start := time.Now()
 		c.Next()
 		duration := time.Since(start)
@@ -35,17 +35,18 @@ func GinHTTPLogger(
 			fields[traceIDHeader] = c.Request.Header.Get(traceIDHeader)
 		}
 		// get error
+		loggerWithContext := l
 		if err, err2 := context.GetGinContextError(c); err2 == nil {
-			l = l.WithError(err)
+			loggerWithContext = loggerWithContext.WithError(err)
 		}
 		// get error message
 		if messages, err := context.GetGinContextErrorMessage(c); err == nil {
-			l = l.WithField("messages", messages)
+			loggerWithContext = loggerWithContext.WithField("messages", messages)
 		}
 		if c.Writer.Status() >= http.StatusInternalServerError {
-			l.WithFields(fields).Error()
+			loggerWithContext.WithFields(fields).Error()
 		} else {
-			l.WithFields(fields).Info()
+			loggerWithContext.WithFields(fields).Info()
 		}
 	}
 }
@@ -53,14 +54,13 @@ func GinHTTPLogger(
 // GinHTTPZapLogger retrieves the request/response logs.
 func GinHTTPZapLogger(
 	l *logger.ZapLogger,
-	traceIDHeader string,
-	clientIPHeader string,
+	traceIDHeader, clientIPHeader string,
 ) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
 		c.Next()
 		duration := time.Since(start)
-		l = l.With(
+		loggerWithContext := l.With(
 			zap.String("host", c.Request.Host),
 			zap.String("duration", duration.String()),
 			zap.String("clientIP", clientIP(c, clientIPHeader)),
@@ -72,20 +72,20 @@ func GinHTTPZapLogger(
 		)
 
 		if traceIDHeader != "" {
-			l = l.With(zap.String(traceIDHeader, c.Request.Header.Get(traceIDHeader)))
+			loggerWithContext = loggerWithContext.With(zap.String(traceIDHeader, c.Request.Header.Get(traceIDHeader)))
 		}
 		// get error
 		if err, err2 := context.GetGinContextError(c); err2 == nil {
-			l = l.WithError(err)
+			loggerWithContext = loggerWithContext.WithError(err)
 		}
 		// get error message
 		if messages, err := context.GetGinContextErrorMessage(c); err == nil {
-			l = l.With(zap.String("messages", messages))
+			loggerWithContext = loggerWithContext.With(zap.String("messages", messages))
 		}
 		if c.Writer.Status() >= http.StatusInternalServerError {
-			l.Error("")
+			loggerWithContext.Error("")
 		} else {
-			l.Info("")
+			loggerWithContext.Info("")
 		}
 	}
 }

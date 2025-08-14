@@ -1,3 +1,4 @@
+// Package slack provides Slack integration utilities.
 package slack
 
 import "fmt"
