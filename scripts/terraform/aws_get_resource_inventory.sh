@@ -61,7 +61,6 @@ source "${SCRIPT_DIR}/../lib/all.sh"
 #######################################
 # Global variables and default values
 #######################################
-CATEGORIES=""
 VERBOSE=false
 export VERBOSE
 DRY_RUN=false

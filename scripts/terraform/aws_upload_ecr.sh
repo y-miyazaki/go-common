@@ -54,7 +54,6 @@ function show_usage {
     echo "  -t, --tag        Image tag (default: latest)"
     echo "  -f, --file       Dockerfile path (default: ./Dockerfile)"
     echo "  -c, --context    Build context path (default: .)"
-    echo "  -t, --tag        Image tag (default: latest)"
     echo ""
     echo "Examples:"
     echo "  $(basename "$0") my-app-repo"

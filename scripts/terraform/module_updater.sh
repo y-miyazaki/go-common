@@ -37,9 +37,6 @@ FAILED_MODULES=0
 declare -a UPDATED_MODULES_LIST=()
 declare -a FAILED_MODULES_LIST=()
 
-# Global variables using common library defaults
-DEFAULT_ENV="${ENV:-dev}"
-
 # Arrays for tracking module updates
 declare -A MODULE_FILES_MAP=()    # module_source -> list of files
 declare -A MODULE_VERSIONS_MAP=() # module_source -> current_version|latest_version
