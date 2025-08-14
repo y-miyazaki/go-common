@@ -10,7 +10,7 @@
 #######################################
 
 # Error handling: exit on error, unset variable, or failed pipeline
-set -euo pipefail # Error handling: exit on error, unset variable, or failed pipeline
+set -euo pipefail
 
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -398,7 +398,7 @@ function run_security_checks {
         fi
     done
 
-    if [[ "$secrets_found" == "true" ]]; then
+    if [[ "$secrets_found" == "true" ]]; then   # pragma: allowlist secret
         log "WARN" "Potential hardcoded secrets found. Please review and use environment variables instead."
         EXIT_CODE=1
         SECURITY_FAILED=1

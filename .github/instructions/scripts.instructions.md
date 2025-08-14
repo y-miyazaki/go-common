@@ -65,7 +65,7 @@ applyTo: "**/*.sh,scripts/**"
 #######################################
 
 # Error handling: exit on error, unset variable, or failed pipeline
-set -euo pipefail # Error handling: exit on error, unset variable, or failed pipeline
+set -euo pipefail
 
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
