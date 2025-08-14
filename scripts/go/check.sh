@@ -398,7 +398,7 @@ function run_security_checks {
         fi
     done
 
-    if [[ "$secrets_found" == "true" ]]; then   # pragma: allowlist secret
+    if [[ "$secrets_found" == "true" ]]; then   # pragma: allowlist secret   # pragma: allowlist secret
         log "WARN" "Potential hardcoded secrets found. Please review and use environment variables instead."
         EXIT_CODE=1
         SECURITY_FAILED=1
