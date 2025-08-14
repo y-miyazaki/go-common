@@ -1,5 +1,7 @@
 module github.com/y-miyazaki/go-common
 
+replace github.com/y-miyazaki/go-common => ./
+
 go 1.16
 
 require (

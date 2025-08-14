@@ -3,9 +3,8 @@ package main
 import (
 	"os"
 
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/sirupsen/logrus"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 	"github.com/y-miyazaki/go-common/pkg/logger"
@@ -32,20 +31,22 @@ func main() {
 	s3Secret := os.Getenv("S3_SECRET")
 	s3Token := os.Getenv("S3_TOKEN")
 
-	s3Config := infrastructure.GetAWSS3Config(l, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
-	sess := infrastructure.NewAWSS3Session(&session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-	})
+	s3Config, err := infrastructure.GetAWSV2S3Config(l, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
+	if err != nil {
+		panic(err)
+	}
 
 	// --------------------------------------------------------------
 	// example: S3
 	// --------------------------------------------------------------
-	awsS3Repository := repository.NewAWSS3Repository(s3.New(sess, s3Config), sess)
+	awsS3Repository := repository.NewAWSV2S3Repository(s3.NewFromConfig(s3Config, func(o *s3.Options) {
+		o.UsePathStyle = true
+	}))
 	text := "abc"
 	bucket := "test"
 
 	// Create Bucket
-	_, err := awsS3Repository.CreateBucket(bucket)
+	_, err = awsS3Repository.CreateBucket(bucket)
 	if err != nil {
 		l.WithError(err).Errorf("can't create s3 bucket")
 	}

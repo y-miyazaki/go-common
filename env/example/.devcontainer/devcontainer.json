@@ -1,0 +1,60 @@
+{
+  "dockerFile": "../env/common/Dockerfile",
+  "remoteUser": "vscode",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "extensions.verifySignature": false
+      },
+      "extensions": [
+        "davidanson.vscode-markdownlint",
+        "eamodio.gitlens",
+        "editorconfig.editorconfig",
+        "esbenp.prettier-vscode",
+        "github.vscode-github-actions",
+        "ibm.output-colorizer",
+        "qufiwefefwoyn.inline-sql-syntax",
+        "redhat.vscode-yaml",
+        "streetsidesoftware.code-spell-checker",
+        "usernamehw.errorlens",
+        "vscode-icons-team.vscode-icons",
+        "yzhang.markdown-all-in-one",
+        // for AI
+        "automatalabs.copilot-mcp",
+        "github.copilot",
+        // for Shell Script environment
+        "foxundermoon.shell-format",
+        "timonwong.shellcheck",
+        "mads-hartmann.bash-ide-vscode",
+        "rogalmic.bash-debug",
+        // for Go environment
+        "golang.go",
+        "windmilleng.vscode-go-autotest",
+        "timvaneker.serverless-snippets",
+        "bufbuild.vscode-buf"
+      ]
+    }
+  },
+
+  "runArgs": [
+    "-v",
+    "${env:HOME}/workspace/go-common:/workspace",
+    "-v",
+    "${env:HOME}/workspace/go-common/env/common/.bashrc:/home/vscode/.bashrc",
+    "-v",
+    "${env:HOME}/workspace/go-common/env/common/.gitconfig:/home/vscode/.gitconfig",
+    "-v",
+    "/var/run/docker.sock:/var/run/docker.sock"
+  ],
+  "postCreateCommand": "/bin/sh env/common/scripts/init.sh",
+  "workspaceMount": "",
+  "workspaceFolder": "/workspace",
+  "overrideCommand": false,
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "version": "latest",
+      "moby": true,
+      "dockerDashComposeVersion": "v2"
+    }
+  }
+}

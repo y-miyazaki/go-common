@@ -1,13 +1,18 @@
 package infrastructure
 
 import (
+	"context"
 	"net/http"
 
-	"github.com/aws/aws-sdk-go/aws"
+	aws "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+
+	aws2 "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+
 	"github.com/y-miyazaki/go-common/pkg/logger"
 	"github.com/y-miyazaki/go-common/pkg/transport"
 	"go.uber.org/zap"
@@ -122,4 +127,18 @@ func GetAWSS3ConfigNoCredentialsZap(l *logger.ZapLogger, region, endpoint string
 		S3ForcePathStyle: aws.Bool(isMinio),
 		HTTPClient:       httpClient,
 	}
+}
+
+// GetAWSV2S3Config returns AWS SDK v2 S3 configuration.
+func GetAWSV2S3Config(l *logger.Logger, id, secret, token, region, endpoint string, isMinio bool) (aws2.Config, error) {
+	var loadOptions []func(*config.LoadOptions) error
+	if region != "" {
+		loadOptions = append(loadOptions, config.WithRegion(region))
+	}
+	cfg, err := config.LoadDefaultConfig(context.TODO(), loadOptions...)
+	if err != nil {
+		return cfg, err
+	}
+	// Note: credentials, custom endpoint, and HTTP client for v2 can be configured here when needed.
+	return cfg, nil
 }

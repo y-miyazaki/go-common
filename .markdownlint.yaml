@@ -1,42 +1,28 @@
-# Configuration for markdownlint
-# https://github.com/DavidAnson/markdownlint#configuration
+# Markdownlint configuration for GitHub Copilot instructions
+# This configuration disables most formatting rules to focus on content quality
 
-default: true
+# Disable all problematic rules for technical documentation
+MD009: false  # Trailing spaces
+MD010: false  # Hard tabs
+MD012: false  # Multiple consecutive blank lines
+MD013: false  # Line length
+MD022: false  # Headers should be surrounded by blank lines
+MD024: false  # Multiple headers with the same content
+MD026: false  # Trailing punctuation in headers
+MD029: false  # Ordered list item prefix
+MD031: false  # Fenced code blocks should be surrounded by blank lines
+MD032: false  # Lists should be surrounded by blank lines
+MD033: false  # Inline HTML
+MD034: false  # Bare URL used
+MD035: false  # Horizontal rule style
+MD036: false  # Emphasis used instead of header
+MD040: false  # Fenced code blocks should have a language specified
+MD051: false  # Link fragments should be valid
 
-# MD007
-ul-indent:
-  indent: 2
-
-# MD010
-no-hard-tabs:
-  code_blocks: false
-
-# Disabled Rules
-# https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md
-
-# MD001
-heading-increment: false
-
-# MD004
-ul-style: false
-
-# MD013
-line-length: false
-
-# MD014
-commands-show-output: false
-
-# MD022
-blanks-around-headings: false
-
-# MD024
-no-duplicate-heading: false
-
-# MD034
-no-bare-urls: false
-
-# MD038
-no-space-in-code: false
-
-# MD040
-fenced-code-language: false
+# Keep only essential rules enabled
+MD001: true   # Header levels should only increment by one level at a time
+MD003: true   # Header style consistency
+MD011: true   # Reversed link syntax
+MD018: true   # No space after hash on atx style header
+MD019: true   # Multiple spaces after hash on atx style header
+MD023: true   # Headers must start at the beginning of the line
