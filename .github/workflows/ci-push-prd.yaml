@@ -8,20 +8,28 @@ on:
       - "master"
       - "hotfix/**"
     paths:
+      - ".github/workflows/ci-push-dev.yaml"
+      - ".github/workflows/reusable-ci-go-common.yaml"
       - "cmd/**"
       - "internal/**"
-      - ".github/workflows/ci-push-prd.yaml"
-      - ".github/workflows/reusable-ci-go-common.yaml"
+      - "go.mod"
+      - "go.sum"
+      - ".golangci.yaml"
+      - "trivy.yaml"
   pull_request:
     branches:
       - "main"
       - "master"
       - "hotfix/**"
     paths:
+      - ".github/workflows/ci-push-dev.yaml"
+      - ".github/workflows/reusable-ci-go-common.yaml"
       - "cmd/**"
       - "internal/**"
-      - ".github/workflows/ci-push-prd.yaml"
-      - ".github/workflows/reusable-ci-go-common.yaml"
+      - "go.mod"
+      - "go.sum"
+      - ".golangci.yaml"
+      - "trivy.yaml"
 
 jobs:
   go-ci:
