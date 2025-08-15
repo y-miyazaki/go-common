@@ -64,6 +64,12 @@ applyTo: "**/*.go"
 | Lambda 関数ファイル | snake_case          | main.go, event_handler.go               |
 | AWS リソース名      | kebab-case + prefix | go-lambda-${stage}-${function}          |
 
+## Go Standards
+
+以下の内容は golangci-lint,go vet で指摘される項目以外の内容を記載する。
+
+- Go ファイルの宣言順序を遵守: const -> var -> type (interface → struct) -> func (constructor → methods → helpers)
+
 ### Lambda Function Examples
 
 ```go
@@ -157,7 +163,7 @@ bash scripts/go/check.sh -v -f ./cmd/cloudwatch/cloudwatch_alarm_to_sns_to_slack
 
 - すべての検証に合格してからコードの修正を完了とする
 - Lambda 関数・パッケージはテストカバレッジ 80%以上を維持する
-  - ただし、テストカバレージが 80%を超えることが無理な場合もあるので、その点は一部許容する
+  - ただし、テストカバレッジが 80%を超えることが無理な場合もあるので、その点は一部許容する
 
 ### Manual Testing Requirements
 

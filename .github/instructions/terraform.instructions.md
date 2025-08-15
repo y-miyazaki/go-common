@@ -57,6 +57,8 @@ applyTo: "**/*.tf,**/*.tfvars,**/*.tfstate,**/*.tfbackend"
 
 ### Terraform Standards
 
+以下の内容は tflint,trivy で指摘される項目以外の内容を記載する。
+
 - module の variables.tf
   - 変数コメントは先頭に(Optional) or (Required)を明記
   - validation チェック
