@@ -7,7 +7,6 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
-	"github.com/aws/aws-secretsmanager-caching-go/secretcache"
 )
 
 // AWSSecretsManagerRepositoryInterface interface.
@@ -19,15 +18,13 @@ type AWSSecretsManagerRepositoryInterface interface {
 
 // AWSSecretsManagerRepository struct.
 type AWSSecretsManagerRepository struct {
-	c     *secretsmanager.Client
-	cache *secretcache.Cache
+	c *secretsmanager.Client
 }
 
-// NewAWSSecretsManagerRepository returns NewAWSSecretsManagerRepository instance.
-func NewAWSSecretsManagerRepository(c *secretsmanager.Client, cache *secretcache.Cache) *AWSSecretsManagerRepository {
+// NewAWSSecretsManagerRepository returns AWSSecretsManagerRepository instance.
+func NewAWSSecretsManagerRepository(c *secretsmanager.Client) *AWSSecretsManagerRepository {
 	return &AWSSecretsManagerRepository{
-		c:     c,
-		cache: cache,
+		c: c,
 	}
 }
 
@@ -50,13 +47,4 @@ func (r *AWSSecretsManagerRepository) GetSecretString(secretName string) (string
 		return "", fmt.Errorf("secretsmanager decode secret binary: %w", err)
 	}
 	return string(decodedBinarySecretBytes[:length]), nil
-}
-
-// GetCacheSecretString gets a cache secret string from secretsmanager.
-func (r *AWSSecretsManagerRepository) GetCacheSecretString(secretName string) (string, error) {
-	res, err := r.cache.GetSecretString(secretName)
-	if err != nil {
-		return "", fmt.Errorf("secretsmanager cache GetSecretString: %w", err)
-	}
-	return res, nil
 }
