@@ -47,7 +47,7 @@ function show_usage {
 }
 
 #######################################
-# Parse command line arguments (unified pattern)
+# Parse command line arguments
 #######################################
 function parse_arguments {
     while [[ $# -gt 0 ]]; do

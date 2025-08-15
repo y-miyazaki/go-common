@@ -150,7 +150,7 @@ function show_usage {
 }
 
 #######################################
-# Parse arguments
+# Parse command line arguments
 #######################################
 function parse_arguments {
     while [[ $# -gt 0 ]]; do

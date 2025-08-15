@@ -64,6 +64,9 @@ function custom_echo_section {
         echo_section "$1"
     fi
 }
+#######################################
+# Display usage information
+#######################################
 function show_usage {
     show_help_header "$(basename "$0")" "Comprehensive validation tool for all shell scripts in the workspace" "[options]"
     echo "Options:"
@@ -537,7 +540,7 @@ function generate_recommendations {
 }
 
 #######################################
-# Parse arguments
+# Parse command line arguments
 #######################################
 function parse_arguments {
     while [[ $# -gt 0 ]]; do

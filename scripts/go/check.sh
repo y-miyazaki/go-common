@@ -51,7 +51,7 @@ COVERAGE_PERCENT=""
 # Functions are now provided by common.sh library
 
 #######################################
-# Function to display help message
+# Display usage information
 #######################################
 function show_usage {
     echo "Usage: $(basename "$0") [options]"
@@ -438,7 +438,7 @@ function run_benchmark_tests {
 }
 
 #######################################
-# Parse arguments
+# Parse command line arguments
 #######################################
 function parse_arguments {
     while [[ $# -gt 0 ]]; do

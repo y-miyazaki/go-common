@@ -18,7 +18,7 @@ export SCRIPT_DIR
 source "${SCRIPT_DIR}/../lib/all.sh"
 
 #######################################
-# Display usage instructions
+# Display usage information
 #######################################
 function show_usage {
     show_help_header "$(basename "$0")" "Local testing script for Node.js Lambda modules" "[module_name]"
