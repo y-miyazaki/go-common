@@ -123,8 +123,12 @@ github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGX
 github.com/cncf/udpa/go v0.0.0-20200629203442-efcf912fb354/go.mod h1:WmhPx2Nbnhtbo57+VJT5O0JRkEi1Wbu0z5j0R8u5Hbk=
 github.com/cncf/udpa/go v0.0.0-20201120205902-5459f2c99403/go.mod h1:WmhPx2Nbnhtbo57+VJT5O0JRkEi1Wbu0z5j0R8u5Hbk=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
-github.com/danielkov/gin-helmet v0.0.0-20171108135313-1387e224435e h1:5jVSh2l/ho6ajWhSPNN84eHEdq3dp0T7+f6r3Tc6hsk=
-github.com/danielkov/gin-helmet v0.0.0-20171108135313-1387e224435e/go.mod h1:IJgIiGUARc4aOr4bOQ85klmjsShkEEfiRc6q/yBSfo8=
+github.com/danielkov/gin-helmet v1.0.2 h1:/3bNQhm22aP0V6ixQwDleXNc9GXkI1KSakf7Nw3tkUg=
+github.com/danielkov/gin-helmet v1.0.2/go.mod h1:8rUJOXPIffwECxWTPXJim3kjgim50gTD1B5qgqt5Qe0=
+github.com/danielkov/gin-helmet/core v1.0.0 h1:mDp3gSue/yj1F6TJThzMAEkRai0gzXuv6JOv8Zfcx7U=
+github.com/danielkov/gin-helmet/core v1.0.0/go.mod h1:C0CB9QSYvWeVRdY07jc/Bbd1fxCQnz2WK/TeGUGdn4o=
+github.com/danielkov/gin-helmet/ginhelmet v1.0.0 h1:a/EpoNW8rDeo22KjLuOp+IfgQkpzk1FnBYha61e648I=
+github.com/danielkov/gin-helmet/ginhelmet v1.0.0/go.mod h1:8XL5QOdmdGPL4mEA2LaOkxcMM3nWTtOIqiZaQin/FFk=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
