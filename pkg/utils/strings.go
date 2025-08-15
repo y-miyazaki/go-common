@@ -13,10 +13,10 @@ import (
 	"golang.org/x/exp/utf8string"
 )
 
+const maxByteMultiplier = 3
+
 // ErrUndefinedTypeToConvert is returned when ConvertToString receives an unsupported type.
 var ErrUndefinedTypeToConvert = errors.New("undefined type to convert")
-
-const maxByteMultiplier = 3
 
 // GetStringCount gets the number of characters in a person's view.
 func GetStringCount(str string) int {

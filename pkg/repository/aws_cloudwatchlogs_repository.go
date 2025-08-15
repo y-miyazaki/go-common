@@ -13,6 +13,15 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 )
 
+// const: no constants for this repository file
+
+// var: sentinel and package-level variables
+var (
+	// ErrLogStreamNotFound indicates that a requested log stream could not be found.
+	ErrLogStreamNotFound = errors.New("log stream not found")
+)
+
+// type: interfaces and structs
 // AWSCWLogsRepositoryInterface defines the contract for CloudWatch Logs operations.
 // nolint:iface,revive,unused
 type AWSCWLogsRepositoryInterface interface {
@@ -30,6 +39,8 @@ type AWSCWLogsRepositoryInterface interface {
 type AWSCWLogsRepository struct {
 	c *cloudwatchlogs.Client
 }
+
+// func: constructors, methods, helpers
 
 // NewAWSCWLogsRepository returns a new repository instance using the provided CloudWatch Logs client.
 func NewAWSCWLogsRepository(c *cloudwatchlogs.Client) *AWSCWLogsRepository {
@@ -141,9 +152,6 @@ func (r *AWSCWLogsRepository) FilterLogEvents(group string, startTime, endTime i
 	}
 	return out, nil
 }
-
-// ErrLogStreamNotFound indicates that a requested log stream could not be found.
-var ErrLogStreamNotFound = errors.New("log stream not found")
 
 // GetNextSequenceToken retrieves the next sequence token for a log stream.
 func (r *AWSCWLogsRepository) GetNextSequenceToken(group, stream string) (*string, error) {
