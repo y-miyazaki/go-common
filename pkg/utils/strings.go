@@ -1,6 +1,5 @@
-// Package utils provides string utility functions for character counting, slicing, and conversion.
-//
-//nolint:revive
+// utils is a meaningful package name for utility functions
+// nolint:revive
 package utils
 
 import (

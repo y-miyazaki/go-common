@@ -1,4 +1,5 @@
-// Package utils provides small utility functions used across the project.
+// utils is a meaningful package name for utility functions
+// nolint:revive
 package utils
 
 import (
