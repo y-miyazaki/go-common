@@ -16,7 +16,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.38.0
 	github.com/aws/aws-sdk-go-v2/service/sesv2 v1.51.0
 	github.com/danielkov/gin-helmet v0.0.0-20171108135313-1387e224435e
-	github.com/fsnotify/fsnotify v1.6.0
+	github.com/fsnotify/fsnotify v1.9.0
 	github.com/gin-contrib/cors v1.7.6
 	github.com/gin-gonic/gin v1.10.1
 	github.com/go-redis/redis/v8 v8.11.5
