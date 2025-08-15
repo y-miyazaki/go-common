@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	helmet "github.com/danielkov/gin-helmet"
+	"github.com/danielkov/gin-helmet/ginhelmet"
 	"github.com/gin-gonic/gin"
 	redis "github.com/go-redis/redis/v8"
 	"github.com/sirupsen/logrus"
@@ -175,7 +175,7 @@ func main() {
 			AllowCredentials: true,
 			MaxAge:           corsMaxAgeHours * time.Hour,
 		}))
-	router.Use(helmet.Default())
+	router.Use(ginhelmet.Default())
 	router.Use(middleware.GinHTTPLogger(log, "request-id", "test"))
 	router.GET("/healthcheck", h.HealthCheck)
 	router.GET("/hello", h.SayHello)
