@@ -1,15 +1,17 @@
+// Package main demonstrates a complete Gin web application with database connections,
+// Redis integration, S3 operations, and various HTTP handlers.
 package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
 	"syscall"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	helmet "github.com/danielkov/gin-helmet"
 	"github.com/gin-gonic/gin"
 	redis "github.com/go-redis/redis/v8"
@@ -43,11 +45,12 @@ func main() {
 	// --------------------------------------------------------------
 	// logger for gorm
 	// --------------------------------------------------------------
+	const slowThresholdSeconds = 3
 	loggerGorm := logger.NewLoggerGorm(&logger.GormSetting{
 		Logger: log.Entry.Logger,
 		GormConfig: &logger.GormConfig{
 			// slow query time: 3 sec
-			SlowThreshold:             time.Second * 3,
+			SlowThreshold:             time.Second * slowThresholdSeconds,
 			IgnoreRecordNotFoundError: false,
 			LogLevel:                  logger.Info,
 		},
@@ -64,24 +67,31 @@ func main() {
 	mysqlServer := os.Getenv("MYSQL_SERVER")
 	mysqlPort := os.Getenv("MYSQL_PORT")
 
+	const defaultStringSize = 256
+	const connectionLifetimeMinutes = 5
+	const maxIdleConnections = 20
+	const maxOpenConnections = 100
+	const corsMaxAgeHours = 12
+	const serverReadTimeoutSeconds = 5
+	const shutdownTimeoutSeconds = 5
 	mysqlConfig := &infrastructure.MySQLConfig{
 		Config: &mysql.Config{
 			DSN:                       db.GetMySQLDsn(mysqlUsername, mysqlPassword, mysqlServer, mysqlPort, mysqlDBname, "charset=utf8mb4&parseTime=True&loc=Local"),
-			DefaultStringSize:         256,   // default size for string fields
-			DisableDatetimePrecision:  true,  // disable datetime precision, which not supported before MySQL 5.6
-			DontSupportRenameIndex:    true,  // drop & create when rename index, rename index not supported before MySQL 5.7, MariaDB
-			DontSupportRenameColumn:   true,  // `change` when rename column, rename column not supported before MySQL 8, MariaDB
-			SkipInitializeWithVersion: false, // auto configure based on currently MySQL version
+			DefaultStringSize:         defaultStringSize, // default size for string fields
+			DisableDatetimePrecision:  true,              // disable datetime precision, which not supported before MySQL 5.6
+			DontSupportRenameIndex:    true,              // drop & create when rename index, rename index not supported before MySQL 5.7, MariaDB
+			DontSupportRenameColumn:   true,              // `change` when rename column, rename column not supported before MySQL 8, MariaDB
+			SkipInitializeWithVersion: false,             // auto configure based on currently MySQL version
 		},
 		DBConfig: infrastructure.DBConfig{
 			// ConnMaxLifetime sets max life time(sec)
-			ConnMaxLifetime: time.Minute * 5,
+			ConnMaxLifetime: time.Minute * connectionLifetimeMinutes,
 			// ConnMaxIdletime sets max idle time(sec)
-			ConnMaxIdletime: time.Minute * 5,
+			ConnMaxIdletime: time.Minute * connectionLifetimeMinutes,
 			// MaxIdleConns sets idle connection
-			MaxIdleConns: 20,
+			MaxIdleConns: maxIdleConnections,
 			// MaxOpenConns sets max connection
-			MaxOpenConns: 100,
+			MaxOpenConns: maxOpenConnections,
 		},
 	}
 	mysqlDB := infrastructure.NewMySQL(mysqlConfig, gc)
@@ -102,13 +112,13 @@ func main() {
 		},
 		DBConfig: infrastructure.DBConfig{
 			// ConnMaxLifetime sets max life time(sec)
-			ConnMaxLifetime: time.Minute * 5,
+			ConnMaxLifetime: time.Minute * connectionLifetimeMinutes,
 			// ConnMaxIdletime sets max idle time(sec)
-			ConnMaxIdletime: time.Minute * 5,
+			ConnMaxIdletime: time.Minute * connectionLifetimeMinutes,
 			// MaxIdleConns sets idle connection
-			MaxIdleConns: 20,
+			MaxIdleConns: maxIdleConnections,
 			// MaxOpenConns sets max connection
-			MaxOpenConns: 100,
+			MaxOpenConns: maxOpenConnections,
 		},
 	}
 	postgresDB := infrastructure.NewPostgres(postgresConfig, gc)
@@ -122,11 +132,11 @@ func main() {
 	s3Secret := os.Getenv("S3_SECRET")
 	s3Token := os.Getenv("S3_TOKEN")
 
-	s3Config := infrastructure.GetAWSS3Config(log, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
-	sess := infrastructure.NewAWSS3Session(&session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-	})
-	awsS3Repository := repository.NewAWSS3Repository(s3.New(sess, s3Config), sess)
+	s3Config, err := infrastructure.GetAWSS3Config(log, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
+	if err != nil {
+		panic(err)
+	}
+	awsS3Repository := repository.NewAWSS3Repository(s3.NewFromConfig(s3Config, func(o *s3.Options) { o.UsePathStyle = true }))
 
 	// --------------------------------------------------------------
 	// Redis
@@ -163,30 +173,30 @@ func main() {
 			AllowHeaders:     []string{"Origin"},
 			ExposeHeaders:    []string{"Content-Length"},
 			AllowCredentials: true,
-			MaxAge:           12 * time.Hour,
+			MaxAge:           corsMaxAgeHours * time.Hour,
 		}))
 	router.Use(helmet.Default())
 	router.Use(middleware.GinHTTPLogger(log, "request-id", "test"))
-	router.GET("/healthcheck", h.GetHealthcheck)
-	router.GET("/hello", h.GetHello)
-	router.GET("/error_1", h.GetError1)
-	router.GET("/error_2", h.GetError2)
-	router.GET("/mysql", h.GetMySQL)
-	router.GET("/postgres", h.GetPostgres)
-	router.GET("/s3", h.GetS3)
-	router.GET("/redis", h.GetRedis)
-	router.GET("/env", h.GetEnv)
+	router.GET("/healthcheck", h.HealthCheck)
+	router.GET("/hello", h.SayHello)
+	router.GET("/error_1", h.HandleError1)
+	router.GET("/error_2", h.HandleError2)
+	router.GET("/mysql", h.HandleMySQL)
+	router.GET("/postgres", h.HandlePostgres)
+	router.GET("/s3", h.HandleS3)
+	router.GET("/redis", h.HandleRedis)
+	router.GET("/env", h.HandleEnv)
 
 	server := &http.Server{
 		Addr:        ":8080",
 		Handler:     router,
-		ReadTimeout: 5 * time.Second,
+		ReadTimeout: serverReadTimeoutSeconds * time.Second,
 	}
 
 	// detect signal
 	signal.DetectSignal(func(sig os.Signal) {
 		log.Infof("signal detected: %v", sig)
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeoutSeconds*time.Second)
 		defer cancel()
 		log.Info("server shutdown...")
 		if err = server.Shutdown(ctx); err != nil {
@@ -195,7 +205,7 @@ func main() {
 	}, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGINT, os.Interrupt)
 
 	err = server.ListenAndServe()
-	if err != nil && err != http.ErrServerClosed {
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.WithField("err", err).Errorf("an error occurred in Server")
 	}
 }
@@ -209,7 +219,7 @@ func closeDB(log *logger.Logger, gormDB *gorm.DB) {
 		log.Errorf("can't close db")
 		return
 	}
-	if err := database.Close(); err != nil {
+	if closeErr := database.Close(); closeErr != nil {
 		log.Errorf("can't close db")
 	}
 }

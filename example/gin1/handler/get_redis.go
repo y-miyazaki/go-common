@@ -6,9 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetRedis handler
-func (h *HTTPHandler) GetRedis(c *gin.Context) {
-
+// HandleRedis demonstrates Redis operations including setting and getting key-value pairs.
+func (h *HTTPHandler) HandleRedis(c *gin.Context) {
 	// Set key
 	err := h.redisRepository.Set(c, "a", 1, 0)
 	if err != nil {

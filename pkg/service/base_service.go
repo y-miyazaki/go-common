@@ -1,3 +1,4 @@
+// Package service provides base service layer implementations.
 package service
 
 // BaseService struct.

@@ -1,4 +1,4 @@
-// Package *logger provides structured logging functionality using slog
+// Package logger provides structured logging functionality using slog.
 package logger
 
 import (
@@ -32,14 +32,14 @@ type SlogConfig struct {
 	Format string
 }
 
-// *logger implements the *logger interface
-type slogLogger struct {
+// SlogLogger implements the logger interface
+type SlogLogger struct {
 	log *slog.Logger
 }
 
-// New*logger creates a new *logger instance with the specified configuration.
+// NewSlogLogger creates a new SlogLogger instance with the specified configuration.
 // If cfg is nil, default configuration will be used.
-func NewSlogLogger(cfg *SlogConfig) *slogLogger {
+func NewSlogLogger(cfg *SlogConfig) *SlogLogger {
 	if cfg == nil {
 		panic("*logger config is required")
 	}
@@ -56,54 +56,54 @@ func NewSlogLogger(cfg *SlogConfig) *slogLogger {
 		handler = slog.NewTextHandler(cfg.Output, opts)
 	}
 
-	return &slogLogger{
+	return &SlogLogger{
 		log: slog.New(handler),
 	}
 }
 
 // Debug implements *logger.Debug
-func (l *slogLogger) Debug(msg string, args ...interface{}) {
+func (l *SlogLogger) Debug(msg string, args ...any) {
 	l.log.Debug(msg, args...)
 }
 
 // Info implements *logger.Info
-func (l *slogLogger) Info(msg string, args ...interface{}) {
+func (l *SlogLogger) Info(msg string, args ...any) {
 	l.log.Info(msg, args...)
 }
 
 // Warn implements *logger.Warn
-func (l *slogLogger) Warn(msg string, args ...interface{}) {
+func (l *SlogLogger) Warn(msg string, args ...any) {
 	l.log.Warn(msg, args...)
 }
 
 // Error implements *logger.Error
-func (l *slogLogger) Error(msg string, args ...interface{}) {
+func (l *SlogLogger) Error(msg string, args ...any) {
 	l.log.Error(msg, args...)
 }
 
 // WithContext implements *logger.WithContext
 // It creates a new *logger with trace ID from the context
-func (l *slogLogger) WithContext(ctx context.Context) *slogLogger {
-	return &slogLogger{
+func (l *SlogLogger) WithContext(ctx context.Context) *SlogLogger {
+	return &SlogLogger{
 		log: l.log.With("trace_id", getTraceID(ctx)),
 	}
 }
 
 // With implements *logger.With
 // It creates a new *logger with additional key-value pairs in the context
-func (l *slogLogger) With(args ...interface{}) *slogLogger {
-	return &slogLogger{
+func (l *SlogLogger) With(args ...any) *SlogLogger {
+	return &SlogLogger{
 		log: l.log.With(args...),
 	}
 }
 
 // WithError implements *logger.WithError
 // It creates a new *logger with error information added to the context
-func (l *slogLogger) WithError(err error) *slogLogger {
+func (l *SlogLogger) WithError(err error) *SlogLogger {
 	if err == nil {
 		return l
 	}
-	return &slogLogger{
+	return &SlogLogger{
 		log: l.log.With(
 			"error", err.Error(),
 			"stack", fmt.Sprintf("%+v", err),
@@ -113,7 +113,7 @@ func (l *slogLogger) WithError(err error) *slogLogger {
 
 // getTraceID retrieves trace ID from the given context.
 // Returns empty string if trace ID is not found.
-func getTraceID(ctx context.Context) string {
+func getTraceID(_ context.Context) string { // nolint:unused
 	// Implement trace ID retrieval logic
 	return ""
 }

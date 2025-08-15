@@ -3,13 +3,13 @@ package handler
 import (
 	"net/http"
 
-	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/gin-gonic/gin"
 	"github.com/y-miyazaki/go-common/pkg/utils"
 )
 
-// GetS3 handler
-func (h *HTTPHandler) GetS3(c *gin.Context) {
+// HandleS3 demonstrates AWS S3 operations including bucket creation, object management, and cleanup.
+func (h *HTTPHandler) HandleS3(c *gin.Context) {
 	text := "aaaaaaaab"
 	bucket := "test"
 
@@ -22,8 +22,8 @@ func (h *HTTPHandler) GetS3(c *gin.Context) {
 	// ListBuckets
 	listBuckets, err := h.awsS3Repository.ListBuckets()
 	if err == nil {
-		for _, b := range listBuckets.Buckets {
-			h.Logger.Infof("bucket = %s(%s)", aws.StringValue(b.Name), aws.TimeValue(b.CreationDate))
+		for i := range listBuckets.Buckets {
+			h.Logger.Infof("bucket = %s(%s)", aws.ToString(listBuckets.Buckets[i].Name), aws.ToTime(listBuckets.Buckets[i].CreationDate))
 		}
 	} else {
 		h.Logger.WithError(err).Errorf("can't list of s3 bucket")
@@ -56,8 +56,8 @@ func (h *HTTPHandler) GetS3(c *gin.Context) {
 	// ListObjectV2
 	listObjects, err := h.awsS3Repository.ListObjectsV2(bucket, "")
 	if err == nil {
-		for _, o := range listObjects.Contents {
-			h.Logger.Infof("Object key = %s", aws.StringValue(o.Key))
+		for i := range listObjects.Contents {
+			h.Logger.Infof("Object key = %s", aws.ToString(listObjects.Contents[i].Key))
 		}
 	} else {
 		h.Logger.WithError(err).Errorf("can't list of s3 object")

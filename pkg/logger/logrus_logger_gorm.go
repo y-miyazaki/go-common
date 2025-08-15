@@ -10,11 +10,12 @@ import (
 )
 
 // Interface Gorm Logger interface.
+// nolint:iface,revive,unused
 type Interface interface {
 	LogMode(logger.LogLevel) Interface
-	Info(context.Context, string, ...interface{})
-	Warn(context.Context, string, ...interface{})
-	Error(context.Context, string, ...interface{})
+	Info(ctx context.Context, msg string, data ...any)
+	Warn(ctx context.Context, msg string, data ...any)
+	Error(ctx context.Context, msg string, data ...any)
 	Trace(ctx context.Context, begin time.Time, fc func() (sql string, rowsAffected int64), err error)
 }
 
@@ -45,7 +46,7 @@ type GormConfig struct {
 
 // Gorm struct.
 type Gorm struct {
-	l          *logrus.Logger
+	l          *logrus.Logger // nolint:unused // logger instance kept for potential future use
 	e          *logrus.Entry
 	gormConfig *GormConfig
 }
@@ -79,27 +80,27 @@ func NewLoggerGorm(c *GormSetting) *Gorm {
 }
 
 // LogMode log mode(same logrus.level)
-func (l *Gorm) LogMode(level logger.LogLevel) logger.Interface {
+func (l *Gorm) LogMode(_ logger.LogLevel) logger.Interface { // nolint:unused
 	newlogger := l
 	return newlogger
 }
 
 // Info print the info level log.
-func (l *Gorm) Info(ctx context.Context, msg string, data ...interface{}) {
+func (l *Gorm) Info(ctx context.Context, msg string, data ...any) {
 	if l.gormConfig.LogLevel >= Info {
 		l.e.WithContext(ctx).Infof(msg, data...)
 	}
 }
 
 // Warn print the warn level log.
-func (l *Gorm) Warn(ctx context.Context, msg string, data ...interface{}) {
+func (l *Gorm) Warn(ctx context.Context, msg string, data ...any) {
 	if l.gormConfig.LogLevel >= Warn {
 		l.e.WithContext(ctx).Warnf(msg, data...)
 	}
 }
 
 // Error print the error level log.
-func (l *Gorm) Error(ctx context.Context, msg string, data ...interface{}) {
+func (l *Gorm) Error(ctx context.Context, msg string, data ...any) {
 	if l.gormConfig.LogLevel >= Error {
 		l.e.WithContext(ctx).Errorf(msg, data...)
 	}
@@ -128,11 +129,13 @@ func (l *Gorm) Trace(
 	}
 
 	switch {
-	case err != nil && level >= Error && (!errors.Is(err, logger.ErrRecordNotFound) || !l.gormConfig.IgnoreRecordNotFoundError):
+	case err != nil && level >= Error && (!l.gormConfig.IgnoreRecordNotFoundError || !errors.Is(err, logger.ErrRecordNotFound)):
 		entry.Error("failed SQL Query")
 	case level >= Warn && duration > l.gormConfig.SlowThreshold && l.gormConfig.SlowThreshold != 0:
 		entry.Warnf("slow SQL Query > %v", l.gormConfig.SlowThreshold)
 	case level >= Info:
 		entry.Info("SQL Query")
+	default:
+		// No logging for silent level
 	}
 }

@@ -89,8 +89,11 @@ func initDB(db *gorm.DB, dbConfig DBConfig) {
 	if err != nil {
 		panic(fmt.Sprintf("can't get db instance error. %v", err))
 	}
-	d.SetConnMaxIdleTime(dbConfig.ConnMaxIdletime * time.Second)
-	d.SetConnMaxLifetime(dbConfig.ConnMaxLifetime * time.Second)
+	// The DBConfig fields ConnMaxIdletime and ConnMaxLifetime are of type time.Duration.
+	// They should be used directly. Multiplying a time.Duration by time.Second is incorrect
+	// and leads to suspicious duration multiplication (reported by durationcheck).
+	d.SetConnMaxIdleTime(dbConfig.ConnMaxIdletime)
+	d.SetConnMaxLifetime(dbConfig.ConnMaxLifetime)
 	d.SetMaxIdleConns(dbConfig.MaxIdleConns)
 	d.SetMaxOpenConns(dbConfig.MaxOpenConns)
 }

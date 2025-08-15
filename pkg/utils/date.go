@@ -1,12 +1,15 @@
-package utils
+package utils // nolint:revive // utils is a meaningful package name for utility functions
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 const (
 	// DateFormatHyphenYearMonthDay : yyyy-mm-dd
-	DateFormatHyphenYearMonthDay = "2006-01-02"
+	DateFormatHyphenYearMonthDay = time.DateOnly
 	// DateFormatHyphenYearMonthDayHourMinuteSecond : yyyy-mm-dd hh:mm:ss
-	DateFormatHyphenYearMonthDayHourMinuteSecond = "2006-01-02 15:04:05"
+	DateFormatHyphenYearMonthDayHourMinuteSecond = time.DateTime
 	// DateFormatHyphenMonthDayYear : mm-dd-yyyy
 	DateFormatHyphenMonthDayYear = "01-02-2006"
 	// DateFormatHyphenMonthDayYearHourMinuteSecond : mm-dd-yyyy hh:mm:ss
@@ -40,7 +43,7 @@ const (
 	// DateFormatYear : yyyy
 	DateFormatYear = "2006"
 	// DateFormatHourMinuteSecond : hh:mm:ss
-	DateFormatHourMinuteSecond = "15:04:05"
+	DateFormatHourMinuteSecond = time.TimeOnly
 
 	dateConvertUTCToJSTOffset = 9 * 60 * 60
 )
@@ -52,7 +55,11 @@ func GetDateFormatString(t time.Time, format string) string {
 
 // GetDateTime gets time.
 func GetDateTime(str, format string) (time.Time, error) {
-	return time.Parse(format, str)
+	t, err := time.Parse(format, str)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("parse time: %w", err)
+	}
+	return t, nil
 }
 
 // ConvertUTCToJST converts UTC to JST

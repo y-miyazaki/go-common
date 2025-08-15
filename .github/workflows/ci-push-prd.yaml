@@ -1,0 +1,60 @@
+# CI workflow for base component in prd environment
+name: ci-push-prd
+
+on:
+  push:
+    branches:
+      - "main"
+      - "master"
+      - "hotfix/**"
+    paths:
+      - ".github/workflows/ci-push-dev.yaml"
+      - ".github/workflows/reusable-ci-go-common.yaml"
+      - "cmd/**"
+      - "internal/**"
+      - "go.mod"
+      - "go.sum"
+      - ".golangci.yaml"
+      - "trivy.yaml"
+  pull_request:
+    branches:
+      - "main"
+      - "master"
+      - "hotfix/**"
+    paths:
+      - ".github/workflows/ci-push-dev.yaml"
+      - ".github/workflows/reusable-ci-go-common.yaml"
+      - "cmd/**"
+      - "internal/**"
+      - "go.mod"
+      - "go.sum"
+      - ".golangci.yaml"
+      - "trivy.yaml"
+
+jobs:
+  go-ci:
+    uses: ./.github/workflows/reusable-ci-go-common.yaml
+    with:
+      environment: "prd"
+      component: "go-common"
+      go_path: "."
+
+  # ------------------------------------------------------------------
+  # Example: Build and push Docker image to Amazon ECR using reusable workflow
+  # Uncomment the following job to enable ECR image build & push after CI.
+  #
+  # ecr-push:
+  #   needs: go-ci
+  #   uses: ./.github/workflows/reusable-go-ecr.yaml
+  #   with:
+  #     environment: "prd"
+  #     component: "go-common"
+  #     go_path: "."                       # used as default Docker build context
+  #     ecr_repository: "your-repo-name"    # required
+  #     # ecr_registry: "123456789012.dkr.ecr.ap-northeast-1.amazonaws.com"  # optional; defaults to ECR login output
+  #     # docker_context: "."               # optional; defaults to go_path
+  #     # dockerfile: "Dockerfile"          # optional
+  #     # image_tag: "prd-${{ github.sha }}" # optional; defaults to short SHA
+  #   secrets:
+  #     AWS_IAM_ROLE_ARN: ${{ secrets.AWS_IAM_ROLE_ARN }}
+  #     AWS_REGION: ${{ secrets.AWS_REGION }}

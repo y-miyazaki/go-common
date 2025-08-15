@@ -1,125 +1,126 @@
+// Package infrastructure provides AWS S3 integration helpers using AWS SDK v2.
 package infrastructure
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/y-miyazaki/go-common/pkg/logger"
 	"github.com/y-miyazaki/go-common/pkg/transport"
 	"go.uber.org/zap"
 )
 
-// NewAWSS3Session returns Session.
-func NewAWSS3Session(o *session.Options) *session.Session {
-	return session.Must(session.NewSessionWithOptions(*o))
+const (
+	serviceFieldKey = "service"
+	awsS3Service    = "aws-s3"
+	awsSESService   = "aws-ses"
+)
+
+// NewAWSS3 returns S3 client using AWS SDK v2.
+func NewAWSS3(c *aws.Config, optFns ...func(*s3.Options)) *s3.Client { // nolint:gocritic
+	return s3.NewFromConfig(*c, optFns...)
 }
 
-// NewAWSS3 returns S3.
-func NewAWSS3(o *session.Options, c *aws.Config) *s3.S3 {
-	s := session.Must(session.NewSessionWithOptions(*o))
-	return s3.New(s, c)
+// NewAWSS3Downloader returns S3 Downloader using AWS SDK v2.
+func NewAWSS3Downloader(c manager.DownloadAPIClient, options ...func(*manager.Downloader)) *manager.Downloader {
+	return manager.NewDownloader(c, options...)
 }
 
-// NewAWSS3Downloader returns Downloader.
-func NewAWSS3Downloader(s *session.Session) *s3manager.Downloader {
-	return s3manager.NewDownloader(s)
+// NewAWSS3Uploader returns S3 Uploader using AWS SDK v2.
+func NewAWSS3Uploader(c manager.UploadAPIClient, options ...func(*manager.Uploader)) *manager.Uploader {
+	return manager.NewUploader(c, options...)
 }
 
-// NewAWSS3Uploader returns Uploader.
-func NewAWSS3Uploader(s *session.Session) *s3manager.Uploader {
-	return s3manager.NewUploader(s)
-}
-
-// GetAWSS3Config get config.
-func GetAWSS3Config(l *logger.Logger, id, secret, token, region, endpoint string, isMinio bool) *aws.Config {
+// GetAWSS3Config get S3 config using AWS SDK v2.
+func GetAWSS3Config(l *logger.Logger, key, secret, sessionToken, region, endpoint string, _ bool) (aws.Config, error) { // nolint:unused
 	var httpClient *http.Client
 	if l != nil {
 		httpClient = &http.Client{
 			Transport: transport.NewTransportHTTPLogger(
-				l.WithField("service", "aws-s3"),
+				l.WithField(serviceFieldKey, awsS3Service),
 				transport.HTTPLoggerTypeExternal,
 			),
 		}
 	}
-	return &aws.Config{
-		Credentials: credentials.NewStaticCredentials(
-			id,
-			secret,
-			token),
-		Region:           aws.String(region),
-		Endpoint:         aws.String(endpoint),
-		DisableSSL:       aws.Bool(isMinio),
-		S3ForcePathStyle: aws.Bool(isMinio),
-		HTTPClient:       httpClient,
+	cfg, err := config.LoadDefaultConfig(context.TODO(),
+		config.WithRegion(region),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(key, secret, sessionToken)),
+		config.WithHTTPClient(httpClient),
+	)
+	if err != nil {
+		return aws.Config{}, fmt.Errorf("config load: %w", err)
 	}
+	return cfg, nil
 }
 
 // GetAWSS3ConfigNoCredentials get no credentials config.
 // If AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are environment variables and are in the execution environment, Credentials is not required.
-func GetAWSS3ConfigNoCredentials(l *logger.Logger, region, endpoint string, isMinio bool) *aws.Config {
+func GetAWSS3ConfigNoCredentials(l *logger.Logger, region, endpoint string, _ bool) (aws.Config, error) { // nolint:unused
 	var httpClient *http.Client
 	if l != nil {
 		httpClient = &http.Client{
 			Transport: transport.NewTransportHTTPLogger(
-				l.WithField("service", "aws-s3"),
+				l.WithField(serviceFieldKey, awsS3Service),
 				transport.HTTPLoggerTypeExternal,
 			),
 		}
 	}
-	return &aws.Config{
-		Region:           aws.String(region),
-		Endpoint:         aws.String(endpoint),
-		DisableSSL:       aws.Bool(isMinio),
-		S3ForcePathStyle: aws.Bool(isMinio),
-		HTTPClient:       httpClient,
+	cfg, err := config.LoadDefaultConfig(context.TODO(),
+		config.WithRegion(region),
+		config.WithHTTPClient(httpClient),
+	)
+	if err != nil {
+		return aws.Config{}, fmt.Errorf("config load no credentials: %w", err)
 	}
+	return cfg, nil
 }
 
 // GetAWSS3ConfigZap get config.
-func GetAWSS3ConfigZap(l *logger.ZapLogger, id, secret, token, region, endpoint string, isMinio bool) *aws.Config {
+func GetAWSS3ConfigZap(l *logger.ZapLogger, key, secret, sessionToken, region, endpoint string, _ bool) (aws.Config, error) { // nolint:unused
 	var httpClient *http.Client
 	if l != nil {
 		httpClient = &http.Client{
 			Transport: transport.NewTransportHTTPZapLogger(
-				l.With(zap.String("service", "aws-s3")),
+				l.With(zap.String(serviceFieldKey, awsS3Service)),
 				transport.HTTPLoggerTypeExternal,
 			),
 		}
 	}
-	return &aws.Config{
-		Credentials: credentials.NewStaticCredentials(
-			id,
-			secret,
-			token),
-		Region:           aws.String(region),
-		Endpoint:         aws.String(endpoint),
-		DisableSSL:       aws.Bool(isMinio),
-		S3ForcePathStyle: aws.Bool(isMinio),
-		HTTPClient:       httpClient,
+	cfg, err := config.LoadDefaultConfig(context.TODO(),
+		config.WithRegion(region),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(key, secret, sessionToken)),
+		config.WithHTTPClient(httpClient),
+	)
+	if err != nil {
+		return aws.Config{}, fmt.Errorf("config load zap: %w", err)
 	}
+	return cfg, nil
 }
 
 // GetAWSS3ConfigNoCredentialsZap get no credentials config.
 // If AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY are environment variables and are in the execution environment, Credentials is not required.
-func GetAWSS3ConfigNoCredentialsZap(l *logger.ZapLogger, region, endpoint string, isMinio bool) *aws.Config {
+func GetAWSS3ConfigNoCredentialsZap(l *logger.ZapLogger, region, endpoint string, _ bool) (aws.Config, error) { // nolint:unused
 	var httpClient *http.Client
 	if l != nil {
 		httpClient = &http.Client{
 			Transport: transport.NewTransportHTTPZapLogger(
-				l.With(zap.String("service", "aws-s3")),
+				l.With(zap.String(serviceFieldKey, awsS3Service)),
 				transport.HTTPLoggerTypeExternal,
 			),
 		}
 	}
-	return &aws.Config{
-		Region:           aws.String(region),
-		Endpoint:         aws.String(endpoint),
-		DisableSSL:       aws.Bool(isMinio),
-		S3ForcePathStyle: aws.Bool(isMinio),
-		HTTPClient:       httpClient,
+	cfg, err := config.LoadDefaultConfig(context.TODO(),
+		config.WithRegion(region),
+		config.WithHTTPClient(httpClient),
+	)
+	if err != nil {
+		return aws.Config{}, fmt.Errorf("config load no creds zap: %w", err)
 	}
+	return cfg, nil
 }

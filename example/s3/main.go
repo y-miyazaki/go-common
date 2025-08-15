@@ -1,11 +1,11 @@
+// Package main demonstrates AWS S3 operations using AWS SDK v2.
 package main
 
 import (
 	"os"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/sirupsen/logrus"
 	"github.com/y-miyazaki/go-common/pkg/infrastructure"
 	"github.com/y-miyazaki/go-common/pkg/logger"
@@ -32,20 +32,22 @@ func main() {
 	s3Secret := os.Getenv("S3_SECRET")
 	s3Token := os.Getenv("S3_TOKEN")
 
-	s3Config := infrastructure.GetAWSS3Config(l, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
-	sess := infrastructure.NewAWSS3Session(&session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-	})
+	s3Config, err := infrastructure.GetAWSS3Config(l, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
+	if err != nil {
+		panic(err)
+	}
 
 	// --------------------------------------------------------------
 	// example: S3
 	// --------------------------------------------------------------
-	awsS3Repository := repository.NewAWSS3Repository(s3.New(sess, s3Config), sess)
+	awsS3Repository := repository.NewAWSS3Repository(s3.NewFromConfig(s3Config, func(o *s3.Options) {
+		o.UsePathStyle = true
+	}))
 	text := "abc"
 	bucket := "test"
 
 	// Create Bucket
-	_, err := awsS3Repository.CreateBucket(bucket)
+	_, err = awsS3Repository.CreateBucket(bucket)
 	if err != nil {
 		l.WithError(err).Errorf("can't create s3 bucket")
 	}
@@ -53,8 +55,9 @@ func main() {
 	// ListBuckets
 	listBuckets, err := awsS3Repository.ListBuckets()
 	if err == nil {
-		for _, b := range listBuckets.Buckets {
-			l.Infof("bucket = %s(%s)", aws.StringValue(b.Name), aws.TimeValue(b.CreationDate))
+		for i := range listBuckets.Buckets {
+			b := &listBuckets.Buckets[i]
+			l.Infof("bucket = %s(%s)", aws.ToString(b.Name), aws.ToTime(b.CreationDate))
 		}
 	} else {
 		l.WithError(err).Errorf("can't list of s3 bucket")
@@ -87,8 +90,8 @@ func main() {
 	// ListObjectV2
 	listObjects, err := awsS3Repository.ListObjectsV2(bucket, "")
 	if err == nil {
-		for _, o := range listObjects.Contents {
-			l.Infof("Object key = %s", aws.StringValue(o.Key))
+		for i := range listObjects.Contents {
+			l.Infof("Object key = %s", aws.ToString(listObjects.Contents[i].Key))
 		}
 	} else {
 		l.WithError(err).Errorf("can't list of s3 object")

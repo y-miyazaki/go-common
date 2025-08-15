@@ -1,3 +1,4 @@
+// Package middleware provides HTTP middleware components for Gin web framework.
 package middleware
 
 import (
@@ -13,23 +14,17 @@ const (
 	decimal int = 10
 )
 
-type converter func(string) string
+type converter func(string) string // nolint:unused // type definition for potential future use
 
 // GinCorsConfig sets configurations.
 type GinCorsConfig struct {
-	AllowAllOrigins bool
-	// for Access-Control-Allow-Origin
-	AllowOrigins []string
-	// for Access-Control-Allow-Methods
-	AllowMethods []string
-	// for Access-Control-Allow-Headers
-	AllowHeaders []string
-	// for Access-Control-Allow-Credentials
+	AllowOrigins     []string
+	AllowMethods     []string
+	AllowHeaders     []string
+	ExposeHeaders    []string
+	MaxAge           time.Duration
+	AllowAllOrigins  bool
 	AllowCredentials bool
-	// for Access-Control-Expose-Headers
-	ExposeHeaders []string
-	// for Access-Control-Max-Age
-	MaxAge time.Duration
 }
 
 // GinCors sets Access-Control-XXXXX header.
@@ -53,7 +48,7 @@ func GinCors(
 		}
 
 		// Preflight headers
-		if c.Request.Method == "OPTIONS" {
+		if c.Request.Method == http.MethodOptions {
 			// Access-Control-Allow-Methods
 			if len(cs.AllowMethods) > 0 {
 				allowMethods := convert(normalize(cs.AllowMethods), strings.ToUpper)
@@ -92,7 +87,7 @@ func GinCors(
 		}
 
 		// Check OPTIONS
-		if c.Request.Method == "OPTIONS" {
+		if c.Request.Method == http.MethodOptions {
 			if cs.validateMethodOptions() {
 				c.AbortWithStatus(http.StatusNoContent)
 			}
@@ -103,11 +98,12 @@ func GinCors(
 
 // DefaultConfig returns a generic default configuration mapped to localhost.
 func DefaultConfig() *GinCorsConfig {
+	const defaultMaxAgeSecondsStandard = 86400
 	return &GinCorsConfig{
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type"},
 		AllowCredentials: true,
-		MaxAge:           86400,
+		MaxAge:           defaultMaxAgeSecondsStandard,
 	}
 }
 

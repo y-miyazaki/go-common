@@ -1,3 +1,4 @@
+// Package db provides database utility functions for connection string generation.
 package db
 
 import (
@@ -9,10 +10,11 @@ import (
 // about DSN document.
 // https://github.com/go-sql-driver/mysql#dsn-data-source-name
 func GetMySQLDsn(username, password, server, port, db, parameter string) string {
+	finalParameter := parameter
 	if !strings.HasPrefix(parameter, "?") {
-		parameter = "?" + parameter
+		finalParameter = "?" + parameter
 	}
-	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s%s", username, password, server, port, db, parameter)
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s%s", username, password, server, port, db, finalParameter)
 }
 
 // GetPostgresDsn creates a Postgres DSN string.

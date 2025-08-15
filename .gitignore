@@ -1,9 +1,65 @@
+# root
 .DS_Store
-coverage
-.vscode
+/.devcontainer/devcontainer.json
+.vscode/**
+!.vscode/cspell.json
+!.vscode/cspell-project.txt
+!.vscode/mcp-example.json
+!.vscode/settings-example.json
+tmp
+
+# env
+.env
 env/*
-main
+!env/common/
+!env/example/
+env/common/.aws
+env/common/.ssh
+env/common/.gitconfig
+
+# terraform
+builds
+# terraform modules
+**/.terraform/*
+**/.terraform.d/*
+# Lock files - exclude from modules, but keep in root configurations
+modules/**/.terraform.lock.hcl
+# .tfstate files
+*.tfstate
+*.tfstate.*
+# tfvars files
+*.tfvars
+# !terraform.example.tfvars
+# !terraform.dev.tfvars
+# !terraform.qa.tfvars
+# !terraform.stg.tfvars
+# !terraform.prd.tfvars
+# !terraform.root.tfvars
+# !terraform.audit.tfvars
+*.tfbackend
+# !terraform.example.tfbackend
+# !terraform.dev.tfbackend
+# !terraform.qa.tfbackend
+# !terraform.stg.tfbackend
+# !terraform.prd.tfbackend
+# !terraform.root.tfbackend
+# !terraform.audit.tfbackend
+
+# go
+vendor
+bin
+.serverless
+coverage
+cover.out
+
+# node
+node_modules
+outputs
+!lambda/outputs
+
+# mcp
+.serena
+
+# other
 db/migrations
 db/dbconfig.yaml
-.devcontainer
-.devcontainer/**

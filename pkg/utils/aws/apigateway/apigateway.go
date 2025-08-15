@@ -1,3 +1,4 @@
+// Package apigateway provides utilities for AWS API Gateway operations.
 package apigateway
 
 // GetSecureHeaders gets secure headers.
