@@ -18,9 +18,9 @@ var (
 	ErrLogStreamNotFound = errors.New("log stream not found")
 )
 
-// AWSCWLogsRepositoryInterface defines the contract for CloudWatch Logs operations.
+// AWSCloudWatchLogsRepositoryInterface defines the contract for CloudWatch Logs operations.
 // nolint:iface,revive,unused
-type AWSCWLogsRepositoryInterface interface {
+type AWSCloudWatchLogsRepositoryInterface interface {
 	CreateLogGroup(group string) (*cloudwatchlogs.CreateLogGroupOutput, error)
 	CreateLogStream(group, stream string) (*cloudwatchlogs.CreateLogStreamOutput, error)
 	PutRetentionPolicy(group string, logRetentionInDays int32) (*cloudwatchlogs.PutRetentionPolicyOutput, error)
@@ -31,18 +31,18 @@ type AWSCWLogsRepositoryInterface interface {
 	GetNextSequenceToken(group, stream string) (*string, error)
 }
 
-// AWSCWLogsRepository implements AWSCWLogsRepositoryInterface backed by AWS SDK v2 client.
-type AWSCWLogsRepository struct {
+// AWSCloudWatchLogsRepository implements AWSCloudWatchLogsRepositoryInterface backed by AWS SDK v2 client.
+type AWSCloudWatchLogsRepository struct {
 	c *cloudwatchlogs.Client
 }
 
-// NewAWSCWLogsRepository returns a new repository instance using the provided CloudWatch Logs client.
-func NewAWSCWLogsRepository(c *cloudwatchlogs.Client) *AWSCWLogsRepository {
-	return &AWSCWLogsRepository{c: c}
+// NewAWSCloudWatchLogsRepository returns a new repository instance using the provided CloudWatch Logs client.
+func NewAWSCloudWatchLogsRepository(c *cloudwatchlogs.Client) *AWSCloudWatchLogsRepository {
+	return &AWSCloudWatchLogsRepository{c: c}
 }
 
 // CreateLogGroup creates a new CloudWatch Logs log group.
-func (r *AWSCWLogsRepository) CreateLogGroup(group string) (*cloudwatchlogs.CreateLogGroupOutput, error) {
+func (r *AWSCloudWatchLogsRepository) CreateLogGroup(group string) (*cloudwatchlogs.CreateLogGroupOutput, error) {
 	out, err := r.c.CreateLogGroup(context.TODO(), &cloudwatchlogs.CreateLogGroupInput{
 		LogGroupName: aws.String(group),
 	})
@@ -53,7 +53,7 @@ func (r *AWSCWLogsRepository) CreateLogGroup(group string) (*cloudwatchlogs.Crea
 }
 
 // CreateLogStream creates a new log stream within the specified log group.
-func (r *AWSCWLogsRepository) CreateLogStream(group, stream string) (*cloudwatchlogs.CreateLogStreamOutput, error) {
+func (r *AWSCloudWatchLogsRepository) CreateLogStream(group, stream string) (*cloudwatchlogs.CreateLogStreamOutput, error) {
 	out, err := r.c.CreateLogStream(context.TODO(), &cloudwatchlogs.CreateLogStreamInput{
 		LogGroupName:  aws.String(group),
 		LogStreamName: aws.String(stream),
@@ -65,7 +65,7 @@ func (r *AWSCWLogsRepository) CreateLogStream(group, stream string) (*cloudwatch
 }
 
 // PutRetentionPolicy sets the retention policy for a log group.
-func (r *AWSCWLogsRepository) PutRetentionPolicy(group string, logRetentionInDays int32) (*cloudwatchlogs.PutRetentionPolicyOutput, error) {
+func (r *AWSCloudWatchLogsRepository) PutRetentionPolicy(group string, logRetentionInDays int32) (*cloudwatchlogs.PutRetentionPolicyOutput, error) {
 	out, err := r.c.PutRetentionPolicy(context.TODO(), &cloudwatchlogs.PutRetentionPolicyInput{
 		LogGroupName:    aws.String(group),
 		RetentionInDays: aws.Int32(logRetentionInDays),
@@ -77,7 +77,7 @@ func (r *AWSCWLogsRepository) PutRetentionPolicy(group string, logRetentionInDay
 }
 
 // DescribeLogGroups returns log groups optionally filtered by a name prefix.
-func (r *AWSCWLogsRepository) DescribeLogGroups(prefix string) (*cloudwatchlogs.DescribeLogGroupsOutput, error) {
+func (r *AWSCloudWatchLogsRepository) DescribeLogGroups(prefix string) (*cloudwatchlogs.DescribeLogGroupsOutput, error) {
 	in := &cloudwatchlogs.DescribeLogGroupsInput{}
 	if prefix != "" {
 		in.LogGroupNamePrefix = aws.String(prefix)
@@ -90,7 +90,7 @@ func (r *AWSCWLogsRepository) DescribeLogGroups(prefix string) (*cloudwatchlogs.
 }
 
 // DescribeLogStreams returns log streams in a group optionally filtered by a name prefix.
-func (r *AWSCWLogsRepository) DescribeLogStreams(group, prefix string) (*cloudwatchlogs.DescribeLogStreamsOutput, error) {
+func (r *AWSCloudWatchLogsRepository) DescribeLogStreams(group, prefix string) (*cloudwatchlogs.DescribeLogStreamsOutput, error) {
 	in := &cloudwatchlogs.DescribeLogStreamsInput{LogGroupName: aws.String(group)}
 	if prefix != "" {
 		in.LogStreamNamePrefix = aws.String(prefix)
@@ -104,7 +104,7 @@ func (r *AWSCWLogsRepository) DescribeLogStreams(group, prefix string) (*cloudwa
 
 // PutLogEvents uploads log events to the specified log stream.
 // The sequenceToken should be provided for subsequent calls after the first PutLogEvents.
-func (r *AWSCWLogsRepository) PutLogEvents(group, stream string, events []types.InputLogEvent, sequenceToken *string) (*cloudwatchlogs.PutLogEventsOutput, error) {
+func (r *AWSCloudWatchLogsRepository) PutLogEvents(group, stream string, events []types.InputLogEvent, sequenceToken *string) (*cloudwatchlogs.PutLogEventsOutput, error) {
 	in := &cloudwatchlogs.PutLogEventsInput{
 		LogGroupName:  aws.String(group),
 		LogStreamName: aws.String(stream),
@@ -121,7 +121,7 @@ func (r *AWSCWLogsRepository) PutLogEvents(group, stream string, events []types.
 }
 
 // FilterLogEvents searches log events in a log group with optional time range and filter pattern.
-func (r *AWSCWLogsRepository) FilterLogEvents(group string, startTime, endTime int64, filterPattern string, nextToken *string, limit int32) (*cloudwatchlogs.FilterLogEventsOutput, error) {
+func (r *AWSCloudWatchLogsRepository) FilterLogEvents(group string, startTime, endTime int64, filterPattern string, nextToken *string, limit int32) (*cloudwatchlogs.FilterLogEventsOutput, error) {
 	in := &cloudwatchlogs.FilterLogEventsInput{
 		LogGroupName: aws.String(group),
 	}
@@ -148,7 +148,7 @@ func (r *AWSCWLogsRepository) FilterLogEvents(group string, startTime, endTime i
 }
 
 // GetNextSequenceToken retrieves the next sequence token for a log stream.
-func (r *AWSCWLogsRepository) GetNextSequenceToken(group, stream string) (*string, error) {
+func (r *AWSCloudWatchLogsRepository) GetNextSequenceToken(group, stream string) (*string, error) {
 	streams, err := r.DescribeLogStreams(group, stream)
 	if err != nil {
 		return nil, fmt.Errorf("cloudwatchlogs DescribeLogStreams: %w", err)
