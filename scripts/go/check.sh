@@ -398,7 +398,7 @@ function run_security_checks {
         fi
     done
 
-    if [[ "$secrets_found" == "true" ]]; then   # pragma: allowlist secret   # pragma: allowlist secret
+    if [[ "$secrets_found" == "true" ]]; then   # pragma: allowlist secret
         log "WARN" "Potential hardcoded secrets found. Please review and use environment variables instead."
         EXIT_CODE=1
         SECURITY_FAILED=1
@@ -420,7 +420,7 @@ function run_benchmark_tests {
 
     # Check if there are any benchmark tests
     local has_benchmarks
-    has_benchmarks=$(find . -name "*_test.go" -not -path "./vendor/*" -not -path "./.*" -exec grep -l "func Benchmark" {} + 2>/dev/null | head -1)
+    has_benchmarks=$(find . -name "*_test.go" -not -path "./vendor/*" -not -path "./.*" -exec grep -l "func Benchmark" {} + 2>/dev/null | head -1 || true)
 
     if [[ -n "$has_benchmarks" ]]; then
         log "INFO" "Running benchmark tests..."

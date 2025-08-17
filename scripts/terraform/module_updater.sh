@@ -37,7 +37,7 @@ FAILED_MODULES=0
 declare -a UPDATED_MODULES_LIST=()
 declare -a FAILED_MODULES_LIST=()
 
-# Arrays for tracking module updates
+# Associative arrays for module tracking
 declare -A MODULE_FILES_MAP=()    # module_source -> list of files
 declare -A MODULE_VERSIONS_MAP=() # module_source -> current_version|latest_version
 declare -A PROJECT_DIRS_MAP=()    # project_dir -> 1 (for tracking unique project directories)

@@ -4,13 +4,14 @@ package main
 import (
 	"os"
 
+	"go-common/pkg/infrastructure"
+	"go-common/pkg/logger"
+	"go-common/pkg/repository"
+	"go-common/pkg/utils"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/sirupsen/logrus"
-	"github.com/y-miyazaki/go-common/pkg/infrastructure"
-	"github.com/y-miyazaki/go-common/pkg/logger"
-	"github.com/y-miyazaki/go-common/pkg/repository"
-	"github.com/y-miyazaki/go-common/pkg/utils"
 )
 
 func main() {
@@ -32,7 +33,7 @@ func main() {
 	s3Secret := os.Getenv("S3_SECRET")
 	s3Token := os.Getenv("S3_TOKEN")
 
-	s3Config, err := infrastructure.GetAWSS3Config(l, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
+	s3Config, err := infrastructure.GetAWSConfig(l, infrastructure.AWSServiceS3, s3ID, s3Secret, s3Token, s3Region, s3Endpoint)
 	if err != nil {
 		panic(err)
 	}

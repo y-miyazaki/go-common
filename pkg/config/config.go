@@ -6,10 +6,11 @@ import (
 	"os"
 	"strings"
 
+	"go-common/pkg/infrastructure"
+	"go-common/pkg/logger"
+
 	"github.com/sirupsen/logrus"
 	"github.com/slack-go/slack"
-	"github.com/y-miyazaki/go-common/pkg/infrastructure"
-	"github.com/y-miyazaki/go-common/pkg/logger"
 )
 
 // Config sets base configurations.
@@ -28,28 +29,68 @@ type Setting struct {
 
 // NewConfig sets base configurations.
 func NewConfig(setting *Setting) *Config {
-	config := &Config{}
+	config := &Config{
+		Logger:      nil,
+		SlackClient: nil,
+	}
 
 	// -------------------------------------------------------------
 	// set Logger
 	// -------------------------------------------------------------
-	l := &logrus.Logger{}
+	l := &logrus.Logger{
+		Out:          os.Stdout,
+		Hooks:        make(logrus.LevelHooks),
+		Formatter:    nil,
+		ReportCaller: false,
+		Level:        logrus.InfoLevel,
+		ExitFunc:     os.Exit,
+		BufferPool:   nil,
+	}
+
 	// formatter
 	formatter := strings.ToLower(setting.LoggerFormatter)
-	if formatter == "json" {
-		l.Formatter = &logrus.JSONFormatter{}
-	} else if formatter == "text" {
-		l.Formatter = &logrus.TextFormatter{}
-	} else {
+	switch formatter {
+	case "json":
+		l.Formatter = &logrus.JSONFormatter{
+			TimestampFormat:   "",
+			DisableTimestamp:  false,
+			DisableHTMLEscape: false,
+			DataKey:           "",
+			FieldMap:          nil,
+			CallerPrettyfier:  nil,
+			PrettyPrint:       false,
+		}
+	case "text":
+		l.Formatter = &logrus.TextFormatter{
+			ForceColors:               false,
+			DisableColors:             false,
+			ForceQuote:                false,
+			DisableQuote:              false,
+			EnvironmentOverrideColors: false,
+			DisableTimestamp:          false,
+			FullTimestamp:             false,
+			TimestampFormat:           "",
+			DisableSorting:            false,
+			SortingFunc:               nil,
+			DisableLevelTruncation:    false,
+			PadLevelText:              false,
+			QuoteEmptyFields:          false,
+			FieldMap:                  nil,
+			CallerPrettyfier:          nil,
+		}
+	default:
 		panic("Only json and text can be selected for formatter.")
 	}
+
 	// out
 	out := strings.ToLower(setting.LoggerOut)
-	if out == "stdout" {
+	switch out {
+	case "stdout":
 		l.Out = os.Stdout
-	} else {
+	default:
 		panic("Only stdout can be selected for out.")
 	}
+
 	// level
 	level, err := logrus.ParseLevel(setting.LoggerLevel)
 	if err != nil {

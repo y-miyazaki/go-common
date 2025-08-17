@@ -17,6 +17,7 @@
     "chmod",
     "cloudwatchlogs",
     "cobertura",
+    "cognitoidentityprovider",
     "configmap",
     "configmaps",
     "connectionlog",

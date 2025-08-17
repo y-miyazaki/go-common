@@ -1,9 +1,10 @@
 package handler
 
 import (
-	"github.com/y-miyazaki/go-common/pkg/handler"
-	"github.com/y-miyazaki/go-common/pkg/logger"
-	"github.com/y-miyazaki/go-common/pkg/repository"
+	"go-common/pkg/handler"
+	"go-common/pkg/logger"
+	"go-common/pkg/repository"
+
 	"gorm.io/gorm"
 )
 

@@ -45,8 +45,9 @@ func NewSlogLogger(cfg *SlogConfig) *SlogLogger {
 	}
 
 	opts := &slog.HandlerOptions{
-		Level:     cfg.Level,
-		AddSource: cfg.AddSource,
+		Level:       cfg.Level,
+		AddSource:   cfg.AddSource,
+		ReplaceAttr: nil, // Not used, defaults to nil
 	}
 
 	var handler slog.Handler

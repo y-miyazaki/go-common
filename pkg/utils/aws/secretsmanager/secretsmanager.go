@@ -23,6 +23,7 @@ func GetSecretString(secretName, region string) (string, error) {
 		SecretId: aws.String(secretName),
 		// VersionStage defaults to AWSCURRENT if unspecified
 		VersionStage: aws.String("AWSCURRENT"),
+		VersionId:    nil, // Not specified, defaults to nil
 	}
 	result, err := svc.GetSecretValue(context.Background(), input)
 	if err != nil {

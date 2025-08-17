@@ -11,18 +11,19 @@ import (
 	"syscall"
 	"time"
 
+	"go-common/example/gin1/handler"
+	"go-common/pkg/infrastructure"
+	"go-common/pkg/logger"
+	"go-common/pkg/middleware"
+	"go-common/pkg/repository"
+	"go-common/pkg/signal"
+	"go-common/pkg/utils/db"
+
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/danielkov/gin-helmet/ginhelmet"
 	"github.com/gin-gonic/gin"
 	redis "github.com/go-redis/redis/v8"
 	"github.com/sirupsen/logrus"
-	"github.com/y-miyazaki/go-common/example/gin1/handler"
-	"github.com/y-miyazaki/go-common/pkg/infrastructure"
-	"github.com/y-miyazaki/go-common/pkg/logger"
-	"github.com/y-miyazaki/go-common/pkg/middleware"
-	"github.com/y-miyazaki/go-common/pkg/repository"
-	"github.com/y-miyazaki/go-common/pkg/signal"
-	"github.com/y-miyazaki/go-common/pkg/utils/db"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -132,7 +133,7 @@ func main() {
 	s3Secret := os.Getenv("S3_SECRET")
 	s3Token := os.Getenv("S3_TOKEN")
 
-	s3Config, err := infrastructure.GetAWSS3Config(log, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
+	s3Config, err := infrastructure.GetAWSConfig(log, infrastructure.AWSServiceS3, s3ID, s3Secret, s3Token, s3Region, s3Endpoint)
 	if err != nil {
 		panic(err)
 	}
