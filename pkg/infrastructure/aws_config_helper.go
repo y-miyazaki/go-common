@@ -85,7 +85,6 @@ func createHTTPClientWithLogger(logger any) *http.Client {
 }
 
 // createAWSConfig creates an AWS configuration with the given parameters
-// nolint: hugeParam
 func createAWSConfig(params *AWSConfigParams, httpClient *http.Client) (aws.Config, error) {
 	var configOptions []func(*config.LoadOptions) error
 
