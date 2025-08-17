@@ -21,7 +21,10 @@ type FileSetting struct {
 
 // NewConfigFile to read config
 func NewConfigFile(setting *FileSetting) *Config {
-	config := &Config{}
+	config := &Config{
+		Logger:      nil,
+		SlackClient: nil,
+	}
 	// -------------------------------------------------------------
 	// get config
 	// -------------------------------------------------------------
@@ -43,16 +46,51 @@ func NewConfigFile(setting *FileSetting) *Config {
 	// -------------------------------------------------------------
 	// set Logger
 	// -------------------------------------------------------------
-	l := &logrus.Logger{}
+	l := &logrus.Logger{
+		Out:          os.Stdout,
+		Hooks:        make(logrus.LevelHooks),
+		Formatter:    nil,
+		ReportCaller: false,
+		Level:        logrus.InfoLevel,
+		ExitFunc:     os.Exit,
+		BufferPool:   nil,
+	}
+
 	// formatter
 	formatter := strings.ToLower(viper.GetString("logger.formatter"))
-	if formatter == "json" {
-		l.Formatter = &logrus.JSONFormatter{}
-	} else if formatter == "text" {
-		l.Formatter = &logrus.TextFormatter{}
-	} else {
+	switch formatter {
+	case "json":
+		l.Formatter = &logrus.JSONFormatter{
+			TimestampFormat:   "",
+			DisableTimestamp:  false,
+			DisableHTMLEscape: false,
+			DataKey:           "",
+			FieldMap:          nil,
+			CallerPrettyfier:  nil,
+			PrettyPrint:       false,
+		}
+	case "text":
+		l.Formatter = &logrus.TextFormatter{
+			ForceColors:               false,
+			DisableColors:             false,
+			ForceQuote:                false,
+			DisableQuote:              false,
+			EnvironmentOverrideColors: false,
+			DisableTimestamp:          false,
+			FullTimestamp:             false,
+			TimestampFormat:           "",
+			DisableSorting:            false,
+			SortingFunc:               nil,
+			DisableLevelTruncation:    false,
+			PadLevelText:              false,
+			QuoteEmptyFields:          false,
+			FieldMap:                  nil,
+			CallerPrettyfier:          nil,
+		}
+	default:
 		panic("Only json and text can be selected for formatter.")
 	}
+
 	// out
 	out := strings.ToLower(viper.GetString("logger.out"))
 	if out == "stdout" {
