@@ -8,20 +8,6 @@ applyTo: "**"
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
 
-<!-- omit in toc -->
-
-## Table of Contents
-
-- [Copilot fixed code Guidelines](#copilot-fixed-code-guidelines)
-- [General Principles](#general-principles)
-- [Documentation and Comments](#documentation-and-comments)
-- [Error Handling](#error-handling)
-- [Testing and Validation](#testing-and-validation)
-- [Security Guidelines](#security-guidelines)
-- [Development Workflow](#development-workflow)
-- [Language-specific Rules](#language-specific-rules)
-- [Reference Resources](#reference-resources)
-
 ## Copilot fixed code Guidelines
 
 - コード修正後は必ずコマンド動作検証を行う
@@ -40,6 +26,7 @@ applyTo: "**"
   - dry-run オプションは使用しない
   - && で全てワンライナー対応
   - 複数結果確認は || でワンライナー対応
+  - コマンド実行時に set は利用しないこと。ターミナルが終了するため
 - コマンド動作実行
   - 成果物ファイル名はデフォルトから変更しないこと。そのため output オプションは指定しない
   - 成果物ファイルは毎回名前変更しないこと。比較が必要な場合のみ許可
@@ -94,3 +81,21 @@ applyTo: "**"
 - マージ前に最低 1 回レビューを受ける
 - マージ前にベースブランチと同期する
 - 必要に応じてドキュメント・使用例も更新する
+
+## MCP Tools
+
+- 本プロジェクトでは Model Context Protocol (MCP) 対応ツールを活用する。
+- 目的: コードベース解析、ドキュメント検索、AWS 操作支援、変更の一貫性向上。
+
+利用する MCP サーバ（固定）:
+
+- Serena: コードベース解析・安全な編集支援（検索、参照関係、シンボル単位の挿入/置換、ディレクトリ/シンボル概要）。特に Go の作業で既定利用。
+- Terraform MCP: Terraform コードの検索・構造把握・シンボル/正規表現ベース編集を支援。
+- AWS Knowledge: AWS 公式ドキュメント検索・参照（docs.aws.amazon.com のコンテンツ取得、関連ページ推奨）。
+- AWS Assistant: AWS CLI コマンド提案・実行。
+
+Operating Rules (high-level):
+
+- Go の作業では Serena を既定で使用する。
+- Terraform の作業では Terraform MCP を使用する。
+- 大規模置換やリファクタは MCP のシンボル/正規表現ベース操作を優先する。

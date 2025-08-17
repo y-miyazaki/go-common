@@ -8,29 +8,6 @@ applyTo: "**/*.go"
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
 
----
-
-<!-- omit in toc -->
-
-## Table of Contents
-
-- [GitHub Copilot Instructions for Go Lambda Applications](#github-copilot-instructions-for-go-lambda-applications)
-  - [Project Overview](#project-overview)
-  - [Coding Standards](#coding-standards)
-    - [Production and Test Code Separation](#production-and-test-code-separation)
-  - [Naming Conventions](#naming-conventions)
-    - [Lambda Function Examples](#lambda-function-examples)
-    - [Package Structure Examples](#package-structure-examples)
-    - [Error Handling Examples](#error-handling-examples)
-    - [Testing Examples](#testing-examples)
-  - [Testing and Validation](#testing-and-validation)
-    - [Code Modification Guidelines](#code-modification-guidelines)
-    - [Manual Testing Requirements](#manual-testing-requirements)
-  - [Security Guidelines](#security-guidelines)
-    - [Go Security Best Practices](#go-security-best-practices)
-    - [AWS Lambda Infrastructure Security](#aws-lambda-infrastructure-security)
-  - [Reference Resources](#reference-resources)
-
 ## Project Overview
 
 このリポジトリは AWS Lambda 上で動作する Go アプリケーションを含む。
@@ -194,3 +171,8 @@ bash scripts/go/check.sh -v -f ./cmd/cloudwatch/cloudwatch_alarm_to_sns_to_slack
 - VPC 設定はネットワーク分離を考慮する
 - CloudWatch ログは適切なレベルで有効化する
 - Lambda 監視用 CloudWatch アラームを設定する
+
+## MCP Tools
+
+- Go の作業では Serena を既定で使用する（コードベース解析・参照関係・シンボル単位の安全な編集）。
+- MCP の目的・利用サーバ一覧・運用ルールの正本は `.github/instructions/general.instructions.md` の「MCP Tools」を参照すること。
