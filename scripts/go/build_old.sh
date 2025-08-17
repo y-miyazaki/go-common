@@ -99,7 +99,6 @@ function prepare_build_environment {
     # Download and update dependencies
     log "INFO" "Updating Go modules..."
     go mod download || error_exit "Failed to download Go modules"
-    go mod tidy || error_exit "Failed to tidy Go modules"
 
     # Clean output directories
     log "INFO" "Cleaning output directories..."
