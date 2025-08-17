@@ -12,7 +12,7 @@ import (
 // ZapInterface Gorm Logger interface.
 // nolint:iface,revive,unused
 type ZapInterface interface {
-	LogMode(logger.LogLevel) logger.Interface
+	LogMode(level logger.LogLevel) logger.Interface
 	Info(ctx context.Context, msg string, data ...any)
 	Warn(ctx context.Context, msg string, data ...any)
 	Error(ctx context.Context, msg string, data ...any)
@@ -26,7 +26,8 @@ type LogLevelZap int
 type GormZapConfig struct {
 	// If the time specified by SlowThreshold is exceeded, it is displayed in the log as a SlowQuery.
 	SlowThreshold time.Duration
-	// If true is specified for IgnoreRecordNotFoundError, no log is output at the error level even if the record does not exist as a search result.
+	// If true is specified for IgnoreRecordNotFoundError, no log is output at the error level even if the record
+	// does not exist as a search result.
 	// If false, logs are output at the error level when a record does not exist as a search result.
 	IgnoreRecordNotFoundError bool
 	// LogLevel outputs logs above the specified level.
@@ -111,7 +112,8 @@ func (l *GormZap) Trace(
 	}
 
 	switch {
-	case err != nil && level >= Error && (!l.gormConfig.IgnoreRecordNotFoundError || !errors.Is(err, logger.ErrRecordNotFound)):
+	case err != nil && level >= Error && (!l.gormConfig.IgnoreRecordNotFoundError ||
+		!errors.Is(err, logger.ErrRecordNotFound)):
 		entry.Error("failed SQL Query")
 	case level >= Warn && duration > l.gormConfig.SlowThreshold && l.gormConfig.SlowThreshold != 0:
 		entry.Warnf("slow SQL Query > %v", l.gormConfig.SlowThreshold)
