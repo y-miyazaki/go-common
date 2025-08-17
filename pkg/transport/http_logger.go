@@ -6,8 +6,9 @@ import (
 	"net/http"
 	"time"
 
+	"go-common/pkg/logger"
+
 	"github.com/sirupsen/logrus"
-	"github.com/y-miyazaki/go-common/pkg/logger"
 	"go.uber.org/zap"
 )
 

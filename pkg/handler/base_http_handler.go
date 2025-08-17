@@ -7,9 +7,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"go-common/pkg/context"
+	"go-common/pkg/logger"
+
 	"github.com/gin-gonic/gin"
-	"github.com/y-miyazaki/go-common/pkg/context"
-	"github.com/y-miyazaki/go-common/pkg/logger"
 )
 
 // BaseHTTPHandler base handler struct.

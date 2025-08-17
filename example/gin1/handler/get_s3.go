@@ -3,9 +3,10 @@ package handler
 import (
 	"net/http"
 
+	"go-common/pkg/utils"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/gin-gonic/gin"
-	"github.com/y-miyazaki/go-common/pkg/utils"
 )
 
 // HandleS3 demonstrates AWS S3 operations including bucket creation, object management, and cleanup.

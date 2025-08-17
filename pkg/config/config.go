@@ -6,10 +6,11 @@ import (
 	"os"
 	"strings"
 
+	"go-common/pkg/infrastructure"
+	"go-common/pkg/logger"
+
 	"github.com/sirupsen/logrus"
 	"github.com/slack-go/slack"
-	"github.com/y-miyazaki/go-common/pkg/infrastructure"
-	"github.com/y-miyazaki/go-common/pkg/logger"
 )
 
 // Config sets base configurations.

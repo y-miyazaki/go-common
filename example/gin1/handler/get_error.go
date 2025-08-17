@@ -1,9 +1,10 @@
 package handler
 
 import (
+	"go-common/pkg/dto"
+
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-	"github.com/y-miyazaki/go-common/pkg/dto"
 )
 
 // HandleError1 responds with an internal server error for testing purposes.

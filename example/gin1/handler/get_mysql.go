@@ -3,8 +3,9 @@ package handler
 import (
 	"net/http"
 
+	"go-common/example/gin1/entity"
+
 	"github.com/gin-gonic/gin"
-	"github.com/y-miyazaki/go-common/example/gin1/entity"
 )
 
 // HandleMySQL demonstrates MySQL database operations including table creation,
