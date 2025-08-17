@@ -420,7 +420,7 @@ function run_benchmark_tests {
 
     # Check if there are any benchmark tests
     local has_benchmarks
-    has_benchmarks=$(find . -name "*_test.go" -not -path "./vendor/*" -not -path "./.*" -exec grep -l "func Benchmark" {} + 2>/dev/null | head -1)
+    has_benchmarks=$(find . -name "*_test.go" -not -path "./vendor/*" -not -path "./.*" -exec grep -l "func Benchmark" {} + 2>/dev/null | head -1 || true)
 
     if [[ -n "$has_benchmarks" ]]; then
         log "INFO" "Running benchmark tests..."
