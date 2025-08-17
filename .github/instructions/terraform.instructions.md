@@ -8,27 +8,6 @@ applyTo: "**/*.tf,**/*.tfvars,**/*.tfstate,**/*.tfbackend"
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
 
-<!-- omit in toc -->
-
-## Table of Contents
-
-- [Project Overview](#project-overview)
-- [Coding Standards](#coding-standards)
-- [Naming Conventions](#naming-conventions)
-  - [Terraform Standards](#terraform-standards)
-- [Documentation and Comments](#documentation-and-comments)
-- [Error Handling](#error-handling)
-- [Testing and Validation](#testing-and-validation)
-  - [Code Modification Guidelines](#code-modification-guidelines)
-  - [Validation Requirements](#validation-requirements)
-- [Security Guidelines](#security-guidelines)
-  - [Terraform Security Best Practices](#terraform-security-best-practices)
-  - [AWS Environment Security](#aws-environment-security)
-
-## MCP Server
-
-- レビュー時は、terraform MCP サーバを利用する
-
 ## Project Overview
 
 このリポジトリは AWS のセキュリティ・監視インフラを管理する Terraform コードを含みます。
@@ -108,3 +87,11 @@ applyTo: "**/*.tf,**/*.tfvars,**/*.tfstate,**/*.tfbackend"
 - trivy/AWS Inspector 等で定期的に脆弱性スキャンを行う
 - ネットワークアクセスは必要最小限に制限する
 - データ保存・転送時は暗号化を有効化する
+
+## MCP Tools
+
+- 本ドキュメントの MCP に関する詳細は `.github/instructions/general.instructions.md` の「MCP Tools」を正本として参照すること。
+- Terraform 作業での補助的な利用方針:
+  - Terraform MCP: Terraform コードの検索・構造把握・シンボル/正規表現ベースの安全な編集に使用（.tf/.tfvars 等）。
+  - AWS Knowledge: 公式ドキュメントの検索・参照に使用。
+  - AWS Assistant: 必要に応じて AWS CLI の提案・実行に使用（明示的なリージョン指定・最小スコープ運用）。

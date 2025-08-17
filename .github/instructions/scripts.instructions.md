@@ -8,24 +8,6 @@ applyTo: "**/*.sh,scripts/**"
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
 
-<!-- omit in toc -->
-
-## Table of Contents
-
-- [Project Overview](#project-overview)
-- [Coding Standards](#coding-standards)
-- [Naming Conventions](#naming-conventions)
-  - [Shell Script Standards](#shell-script-standards)
-- [Documentation and Comments](#documentation-and-comments)
-  - [Help Function Standards](#help-function-standards)
-- [Error Handling](#error-handling)
-- [Testing and Validation](#testing-and-validation)
-  - [Code Modification Guidelines](#code-modification-guidelines)
-  - [Validation Requirements](#validation-requirements)
-- [Security Guidelines](#security-guidelines)
-  - [Shell Script Security Best Practices](#shell-script-security-best-practices)
-  - [AWS Environment Security](#aws-environment-security)
-
 ## Project Overview
 
 このリポジトリは自動化・インフラ管理用のシェルスクリプトを含みます。スクリプトは以下のように構成されています：
@@ -232,3 +214,10 @@ bash /workspace/scripts/validate_all_scripts.sh -v -f
 - すべての操作はログ記録する
 - ネットワークアクセスは必要最小限に制限する
 - データ保存・転送時は暗号化を有効化する
+
+## MCP Tools
+
+- 本ドキュメントの MCP に関する詳細は `.github/instructions/general.instructions.md` の「MCP Tools」を正本として参照すること。
+- Script 作業での補助的な利用方針:
+  - AWS Knowledge: 公式ドキュメントの検索・参照に使用。
+  - AWS Assistant: 必要に応じて AWS CLI の提案・実行に使用（明示的なリージョン指定・最小スコープ運用）。
