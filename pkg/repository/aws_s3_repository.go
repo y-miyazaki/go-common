@@ -58,6 +58,16 @@ func NewAWSS3Repository(client *s3.Client) *AWSS3Repository {
 	}
 }
 
+// NewAWSS3RepositoryWithOther returns AWSS3Repository instance backed by AWS SDK v2 client.
+func NewAWSS3RepositoryWithOther(client *s3.Client, uploader *manager.Uploader, downloader *manager.Downloader, presigned *s3.PresignClient) *AWSS3Repository {
+	return &AWSS3Repository{
+		c:          client,
+		uploader:   uploader,
+		downloader: downloader,
+		presigned:  presigned,
+	}
+}
+
 // GetObject retrieves objects from Amazon S3.
 // https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html
 func (r *AWSS3Repository) GetObject(bucket, key string) (*s3.GetObjectOutput, error) {

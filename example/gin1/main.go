@@ -133,7 +133,7 @@ func main() {
 	s3Secret := os.Getenv("S3_SECRET")
 	s3Token := os.Getenv("S3_TOKEN")
 
-	s3Config, err := infrastructure.GetAWSS3Config(log, s3ID, s3Secret, s3Token, s3Region, s3Endpoint, true)
+	s3Config, err := infrastructure.GetAWSConfig(log, infrastructure.AWSServiceS3, s3ID, s3Secret, s3Token, s3Region, s3Endpoint)
 	if err != nil {
 		panic(err)
 	}

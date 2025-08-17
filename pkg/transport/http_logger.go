@@ -43,6 +43,13 @@ type HTTPZapLogger struct {
 	Type   HTTPLoggerType
 }
 
+// HTTPSlogLogger struct.
+type HTTPSlogLogger struct {
+	http.RoundTripper
+	logger *logger.SlogLogger
+	Type   HTTPLoggerType
+}
+
 // NewTransportHTTPLogger get http.RoundTripper.
 func NewTransportHTTPLogger(
 	l *logger.Logger,
@@ -61,6 +68,18 @@ func NewTransportHTTPZapLogger(
 	transportType HTTPLoggerType,
 ) http.RoundTripper {
 	return &HTTPZapLogger{
+		http.DefaultTransport,
+		l,
+		transportType,
+	}
+}
+
+// NewTransportHTTPSlogLogger get http.RoundTripper.
+func NewTransportHTTPSlogLogger(
+	l *logger.SlogLogger,
+	transportType HTTPLoggerType,
+) http.RoundTripper {
+	return &HTTPSlogLogger{
 		http.DefaultTransport,
 		l,
 		transportType,
@@ -114,6 +133,37 @@ func (t HTTPZapLogger) RoundTrip(req *http.Request) (*http.Response, error) {
 		log.WithError(err).Error("")
 	} else {
 		log.Info("")
+	}
+	if err != nil {
+		return nil, fmt.Errorf("round trip: %w", err)
+	}
+	return response, nil
+}
+
+// RoundTrip logs transparently.
+func (t HTTPSlogLogger) RoundTrip(req *http.Request) (*http.Response, error) {
+	timeBefore := time.Now()
+	response, err := t.RoundTripper.RoundTrip(req)
+	timeAfter := time.Now()
+
+	logArgs := []any{
+		"url", req.URL.String(),
+		"method", req.Method,
+		"protocol", req.Proto,
+		"duration", timeAfter.Sub(timeBefore).String(),
+		"transportType", t.Type,
+	}
+	if response != nil {
+		logArgs = append(logArgs, "status", response.StatusCode)
+	}
+
+	if err != nil || (response != nil && response.StatusCode/HTTPStatusCodeDivisor >= HTTPClientErrorThreshold) {
+		if err != nil {
+			logArgs = append(logArgs, "error", err.Error())
+		}
+		t.logger.Error("HTTP request failed", logArgs...)
+	} else {
+		t.logger.Info("HTTP request completed", logArgs...)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("round trip: %w", err)

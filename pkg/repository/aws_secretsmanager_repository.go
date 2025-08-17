@@ -13,7 +13,6 @@ import (
 // nolint:iface,revive,unused
 type AWSSecretsManagerRepositoryInterface interface {
 	GetSecretString(secretName string) (string, error)
-	GetCacheSecretString(secretName string) (string, error)
 }
 
 // AWSSecretsManagerRepository struct.
