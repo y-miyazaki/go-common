@@ -4,10 +4,10 @@ package main
 import (
 	"os"
 
-	"go-common/pkg/infrastructure"
-	"go-common/pkg/logger"
-	"go-common/pkg/repository"
-	"go-common/pkg/utils"
+	"github.com/y-miyazaki/go-common/pkg/infrastructure"
+	"github.com/y-miyazaki/go-common/pkg/logger"
+	"github.com/y-miyazaki/go-common/pkg/repository"
+	"github.com/y-miyazaki/go-common/pkg/utils"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"

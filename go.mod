@@ -1,8 +1,4 @@
-module go-common
-
-replace go-common => ./
-
-replace github.com/y-miyazaki/go-common => ./
+module github.com/y-miyazaki/go-common
 
 go 1.24.0
 

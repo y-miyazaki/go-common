@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"go-common/pkg/dto"
+	"github.com/y-miyazaki/go-common/pkg/dto"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"

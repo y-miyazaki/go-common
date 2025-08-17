@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
-	loggerPkg "go-common/pkg/logger"
-	"go-common/pkg/transport"
+	loggerPkg "github.com/y-miyazaki/go-common/pkg/logger"
+	"github.com/y-miyazaki/go-common/pkg/transport"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"

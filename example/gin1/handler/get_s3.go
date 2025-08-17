@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"go-common/pkg/utils"
+	"github.com/y-miyazaki/go-common/pkg/utils"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/gin-gonic/gin"

@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"go-common/pkg/infrastructure"
-	"go-common/pkg/logger"
+	"github.com/y-miyazaki/go-common/pkg/infrastructure"
+	"github.com/y-miyazaki/go-common/pkg/logger"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/sirupsen/logrus"
