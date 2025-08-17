@@ -5,10 +5,10 @@ import (
 	"os"
 	"time"
 
-	"go-common/example/postgres/entity"
-	"go-common/pkg/infrastructure"
-	"go-common/pkg/logger"
-	"go-common/pkg/utils/db"
+	"github.com/y-miyazaki/go-common/example/postgres/entity"
+	"github.com/y-miyazaki/go-common/pkg/infrastructure"
+	"github.com/y-miyazaki/go-common/pkg/logger"
+	"github.com/y-miyazaki/go-common/pkg/utils/db"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
