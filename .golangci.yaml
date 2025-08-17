@@ -4,7 +4,7 @@
 # https://golangci-lint.run/usage/configuration/
 # -------------------------------------------------------------
 # Defines the configuration version.
-# The only possible value is "2".
+# For v2 version of golangci-lint, use version: 2
 version: "2"
 
 # Options for analysis running.
