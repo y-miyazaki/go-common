@@ -38,6 +38,7 @@ jobs:
       environment: "dev"
       component: "go-common"
       go_path: "."
+      license_check: true
 
   # ------------------------------------------------------------------
   # Example: Build and push Docker image to Amazon ECR using reusable workflow

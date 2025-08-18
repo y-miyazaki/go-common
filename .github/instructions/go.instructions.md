@@ -117,13 +117,13 @@ func main() {
 
 ```bash
 # 特定ディレクトリのみ（推奨: 対象ディレクトリ）
-bash scripts/go/check.sh -v -f ./cmd/cloudwatch/cloudwatch_alarm_to_sns_to_slack/
+bash scripts/go/check.sh -f ./cmd/cloudwatch/cloudwatch_alarm_to_sns_to_slack/
 
 # プロジェクト全体
 bash scripts/go/check.sh
 
 # 自動修正付き
-bash scripts/go/check.sh -v -f ./cmd/cloudwatch/cloudwatch_alarm_to_sns_to_slack/
+bash scripts/go/check.sh -f ./cmd/cloudwatch/cloudwatch_alarm_to_sns_to_slack/
 ```
 
 - チェックスクリプトは以下を実施するため、個別で以下のコマンドを実行しない

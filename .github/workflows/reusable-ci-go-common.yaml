@@ -17,6 +17,11 @@ on:
         description: "Path (relative) to the Go project root (directory containing go.mod)"
         required: true
         type: string
+      license_check:
+        description: "Run license check"
+        required: false
+        type: boolean
+        default: false
 
 env:
   ENV: ${{ inputs.environment }}
@@ -105,8 +110,8 @@ jobs:
           path: ${{ env.GO_PROJECT_PATH }}/security
 
       # https://github.com/aquasecurity/trivy-action/tree/0.29.0/?tab=readme-ov-file#inputs
-      - name: Trivy Vulnerability Scan (Go modules)
-        uses: aquasecurity/trivy-action@0.29.0
+      - name: Trivy Vulnerability Scan
+        uses: aquasecurity/trivy-action@0.32.0
         with:
           exit-code: 1
           format: table
@@ -114,6 +119,16 @@ jobs:
           scan-type: "config"
           trivy-config: trivy.yaml
           severity: HIGH,CRITICAL
+
+      - name: Trivy License Scan
+        if: ${{ inputs.license_check }}
+        uses: aquasecurity/trivy-action@0.32.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          exit-code: 1
+          format: table
+          scanners: license
 
       - name: Generate SBOM (CycloneDX)
         working-directory: ${{ env.GO_PROJECT_PATH }}
