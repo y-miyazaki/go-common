@@ -10,11 +10,12 @@ import (
 
 // Logger struct.
 type Logger struct {
-	Entry *logrus.Entry
+	Entry  *logrus.Entry
+	Config *LoggerConfig
 }
 
 // NewLogger returns an instance of logger
-func NewLogger(logger *logrus.Logger) *Logger {
+func NewLogger(logger *logrus.Logger, cfg ...*LoggerConfig) *Logger {
 	var l = logrus.New()
 
 	// Log as JSON instead of the default ASCII formatter.
@@ -24,8 +25,15 @@ func NewLogger(logger *logrus.Logger) *Logger {
 	l.SetOutput(logger.Out)
 	// Only log the warning severity or above.
 	l.SetLevel(logger.Level)
+
+	var config *LoggerConfig
+	if len(cfg) > 0 {
+		config = cfg[0]
+	}
+
 	return &Logger{
-		Entry: l.WithFields(logrus.Fields{}),
+		Entry:  l.WithFields(logrus.Fields{}),
+		Config: config,
 	}
 }
 
@@ -36,17 +44,28 @@ func (l *Logger) GetEntry() *logrus.Entry {
 
 // WithField attaches a field to the logger.
 func (l *Logger) WithField(key string, value any) *Logger {
+	cfg := defaultConfig(l.Config)
+	if !cfg.AllowSensitive && isSensitiveKey(key) {
+		return &Logger{
+			Entry:  l.Entry.WithField(key, "[REDACTED]"),
+			Config: l.Config,
+		}
+	}
 	return &Logger{
-		Entry: l.Entry.WithField(key, value),
+		Entry:  l.Entry.WithField(key, value),
+		Config: l.Config,
 	}
 }
 
 // WithFields calls WithField function of logger entry.
 func (l *Logger) WithFields(fields logrus.Fields) *Logger {
 	return &Logger{
-		Entry: l.Entry.WithFields(fields),
+		Entry:  l.Entry.WithFields(SanitizeFields(fields, l.Config)),
+		Config: l.Config,
 	}
 }
+
+// ... existing code ...
 
 // WithError calls WithError function of logger entry.
 func (l *Logger) WithError(err error) *Logger {
