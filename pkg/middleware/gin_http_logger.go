@@ -15,7 +15,6 @@ import (
 
 // GinHTTPLogger retrieves the request/response logs.
 // It logs HTTP requests and responses using logrus logger with configurable headers.
-// nolint:unused
 func GinHTTPLogger(l *logger.Logger, traceIDHeader, clientIPHeader string,
 ) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -33,9 +32,9 @@ func GinHTTPLogger(l *logger.Logger, traceIDHeader, clientIPHeader string,
 			"referer":   c.Request.Referer(),
 			"userAgent": c.Request.UserAgent(),
 		}
-		// if traceIDHeader != "" {
-		// 	fields[traceIDHeader] = c.Request.Header.Get(traceIDHeader)
-		// }
+		if traceIDHeader != "" {
+			fields[traceIDHeader] = c.Request.Header.Get(traceIDHeader)
+		}
 		// get error
 		loggerWithContext := l
 		if err, err2 := context.GetGinContextError(c); err2 == nil {
