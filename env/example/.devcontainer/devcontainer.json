@@ -12,6 +12,7 @@
         "editorconfig.editorconfig",
         "esbenp.prettier-vscode",
         "github.vscode-github-actions",
+        "github.vscode-pull-request-github",
         "ibm.output-colorizer",
         "qufiwefefwoyn.inline-sql-syntax",
         "redhat.vscode-yaml",

@@ -38,6 +38,9 @@ jobs:
       environment: "prd"
       component: "go-common"
       go_path: "."
+    permissions:
+      contents: read
+      pull-requests: write
 
   # ------------------------------------------------------------------
   # Example: Build and push Docker image to Amazon ECR using reusable workflow

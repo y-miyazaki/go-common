@@ -56,7 +56,7 @@ run:
 linters:
     # Default set of linters.
   # The value can be:
-  # - `standard`: https://golangci-lint.run/usage/linters/#enabled-by-default
+  # - `standard`: https://golangci-lint.run/docs/linters/configuration/#enabled-by-default
   # - `all`: enables all linters by default.
   # - `none`: disables all linters by default.
   # - `fast`: enables only linters considered as "fast" (`golangci-lint help linters --json | jq '[ .[] | select(.fast==true) ] | map(.name)'`).
@@ -170,7 +170,7 @@ linters:
     - zerologlint # Detects the wrong usage of zerolog that a user forgets to dispatch with Send or Msg.
 
   settings:
-    asasalint: # https://golangci-lint.run/usage/linters/#asasalint
+    asasalint: # https://golangci-lint.run/docs/linters/configuration/#asasalint
       # To specify a set of function names to exclude.
       # The values are merged with the builtin exclusions.
       # The builtin exclusions can be disabled by setting `use-builtin-exclusions` to `false`.
@@ -183,7 +183,7 @@ linters:
       # Default: true
       use-builtin-exclusions: false
 
-    bidichk: # https://golangci-lint.run/usage/linters/#bidichk
+    bidichk: # https://golangci-lint.run/docs/linters/configuration/#bidichk
       # The following configurations check for all mentioned invisible Unicode runes.
       # All runes are enabled by default.
       left-to-right-embedding: false
@@ -201,7 +201,7 @@ linters:
       # Default: false
       check-alias: true
 
-    cyclop: # https://golangci-lint.run/usage/linters/#cyclop
+    cyclop: # https://golangci-lint.run/docs/linters/configuration/#cyclop
       # The maximal code complexity to report.
       # Default: 10
       max-complexity: 50
@@ -210,7 +210,7 @@ linters:
       # Default: 0.0
       package-average: 0.0
 
-    decorder: # https://golangci-lint.run/usage/linters/#decorder
+    decorder: # https://golangci-lint.run/docs/linters/configuration/#decorder
       # Required order of `type`, `const`, `var` and `func` declarations inside a file.
       # Default: types before constants before variables before functions.
       dec-order:
@@ -240,7 +240,7 @@ linters:
       # Default: false (var statements are not ignored)
       disable-var-dec-num-check: false
 
-    depguard: # https://golangci-lint.run/usage/linters/#depguard
+    depguard: # https://golangci-lint.run/docs/linters/configuration/#depguard
       # Rules to apply.
       #
       # Variables:
@@ -286,17 +286,17 @@ linters:
             - pkg: "github.com/pkg/errors"
               desc: Should be replaced by standard lib errors package
 
-    dogsled: # https://golangci-lint.run/usage/linters/#dogsled
+    dogsled: # https://golangci-lint.run/docs/linters/configuration/#dogsled
       # Checks assignments with too many blank identifiers.
       # Default: 2
       max-blank-identifiers: 2
 
-    dupl: # https://golangci-lint.run/usage/linters/#dupl
+    dupl: # https://golangci-lint.run/docs/linters/configuration/#dupl
       # Tokens count to trigger issue.
       # Default: 150
       threshold: 100
 
-    dupword: # https://golangci-lint.run/usage/linters/#dupword
+    dupword: # https://golangci-lint.run/docs/linters/configuration/#dupword
       # Keywords for detecting duplicate words.
       # If this list is not empty, only the words defined in this list will be detected.
       # Default: []
@@ -309,7 +309,7 @@ linters:
       ignore:
         - "0C0C"
 
-    errcheck: # https://golangci-lint.run/usage/linters/#errcheck
+    errcheck: # https://golangci-lint.run/docs/linters/configuration/#errcheck
       # Report about not checking of errors in type assertions: `a := b.(MyStruct)`.
       # Such cases aren't reported by default.
       # Default: false
@@ -334,7 +334,7 @@ linters:
       # see https://github.com/kisielk/errcheck#excluding-functions for details
       #     exclude: /path/to/file.txt
 
-    errchkjson: # https://golangci-lint.run/usage/linters/#errchkjson
+    errchkjson: # https://golangci-lint.run/docs/linters/configuration/#errchkjson
       # With check-error-free-encoding set to true, errchkjson does warn about errors
       # from json encoding functions that are safe to be ignored,
       # because they are not possible to happen.
@@ -354,7 +354,7 @@ linters:
       # Default: false
       report-no-exported: false
 
-    errorlint: # https://golangci-lint.run/usage/linters/#errorlint
+    errorlint: # https://golangci-lint.run/docs/linters/configuration/#errorlint
       # Check whether fmt.Errorf uses the %w verb for formatting errors.
       # See the https://github.com/polyfloyd/go-errorlint for caveats.
       # Default: true
@@ -379,7 +379,7 @@ linters:
         - err: "example.com/pkg.ErrMagic"
           fun: "example.com/pkg.Magic"
 
-    exhaustive: # https://golangci-lint.run/usage/linters/#exhaustive
+    exhaustive: # https://golangci-lint.run/docs/linters/configuration/#exhaustive
       # Program elements to check for exhaustiveness.
       # Default: [ switch ]
       check:
@@ -410,7 +410,7 @@ linters:
       # Default: false
       default-case-required: true
 
-    exhaustruct: # https://golangci-lint.run/usage/linters/#exhaustruct
+    exhaustruct: # https://golangci-lint.run/docs/linters/configuration/#exhaustruct
       # List of regular expressions to match struct packages and their names.
       # Regular expressions must match complete canonical struct package/name/structname.
       # If this list is empty, all structs are tested.
@@ -424,7 +424,7 @@ linters:
       exclude:
         - '.+/cobra\.Command$'
 
-    forbidigo: # https://golangci-lint.run/usage/linters/#forbidigo
+    forbidigo: # https://golangci-lint.run/docs/linters/configuration/#forbidigo
       # Forbid the following identifiers (list of regexp).
       # Default: ["^(fmt\\.Print(|f|ln)|print|println)$"]
       forbid:
@@ -454,7 +454,7 @@ linters:
       # Default: false
       analyze-types: true
 
-    funlen: # https://golangci-lint.run/usage/linters/#funlen
+    funlen: # https://golangci-lint.run/docs/linters/configuration/#funlen
       # Checks the number of lines in a function.
       # If lower than 0, disable the check.
       # Default: 60
@@ -467,7 +467,7 @@ linters:
       # Default false
       ignore-comments: true
 
-    ginkgolinter: # https://golangci-lint.run/usage/linters/#ginkgolinter
+    ginkgolinter: # https://golangci-lint.run/docs/linters/configuration/#ginkgolinter
       # Suppress the wrong length assertion warning.
       # Default: false
       suppress-len-assertion: true
@@ -507,7 +507,7 @@ linters:
       # Default: false
       force-succeed: true
 
-    gochecksumtype: # https://golangci-lint.run/usage/linters/#gochecksumtype
+    gochecksumtype: # https://golangci-lint.run/docs/linters/configuration/#gochecksumtype
       # Presence of `default` case in switch statements satisfies exhaustiveness, if all members are not listed.
       # Default: true
       default-signifies-exhaustive: false
@@ -515,12 +515,12 @@ linters:
       # Default: false
       include-shared-interfaces: true
 
-    gocognit: # https://golangci-lint.run/usage/linters/#gocognit
+    gocognit: # https://golangci-lint.run/docs/linters/configuration/#gocognit
       # Minimal code complexity to report.
       # Default: 30 (but we recommend 10-20)
       min-complexity: 20
 
-    goconst: # https://golangci-lint.run/usage/linters/#goconst
+    goconst: # https://golangci-lint.run/docs/linters/configuration/#goconst
       # Minimal length of string constant.
       # Default: 3
       min-len: 2
@@ -553,7 +553,7 @@ linters:
       # Default: false
       eval-const-expressions: true
 
-    gocritic: # https://golangci-lint.run/usage/linters/#gocritic
+    gocritic: # https://golangci-lint.run/docs/linters/configuration/#gocritic
       enabled-tags:
         - diagnostic
         - experimental
@@ -663,12 +663,12 @@ linters:
           # Default: false
           checkExported: true
 
-    gocyclo: # https://golangci-lint.run/usage/linters/#gocyclo
+    gocyclo: # https://golangci-lint.run/docs/linters/configuration/#gocyclo
       # Minimal code complexity to report.
       # Default: 30 (but we recommend 10-20)
       min-complexity: 50
 
-    godot: # https://golangci-lint.run/usage/linters/#godot
+    godot: # https://golangci-lint.run/docs/linters/configuration/#godot
       # Comments to be checked: `declarations`, `toplevel`, or `all`.
       # Default: declarations
       scope: toplevel
@@ -685,7 +685,7 @@ linters:
       # Default: false
       capital: true
 
-    godox: # https://golangci-lint.run/usage/linters/#godox
+    godox: # https://golangci-lint.run/docs/linters/configuration/#godox
       # Report any comments starting with keywords, this is useful for TODO or FIXME comments that
       # might be left in the code accidentally and should be resolved before merging.
       # Default: ["TODO", "BUG", "FIXME"]
@@ -694,13 +694,13 @@ linters:
         - OPTIMIZE # marks code that should be optimized before merging
         - HACK # marks hack-around that should be removed before merging
 
-    goheader: # https://golangci-lint.run/usage/linters/#goheader
+    goheader: # https://golangci-lint.run/docs/linters/configuration/#goheader
       # As alternative of directive 'template', you may put the path to file with the template source.
       # Useful if you need to load the template from a specific file.
       # Default: ""
       template-path: /path/to/my/template.tmpl
 
-    gomoddirectives: # https://golangci-lint.run/usage/linters/#gomoddirectives
+    gomoddirectives: # https://golangci-lint.run/docs/linters/configuration/#gomoddirectives
       # Allow local `replace` directives.
       # Default: false
       replace-local: true
@@ -730,7 +730,7 @@ linters:
       # Default: '' (no match)
       go-version-pattern: '\d\.\d+(\.0)?'
 
-    gomodguard: # https://golangci-lint.run/usage/linters/#gomodguard
+    gomodguard: # https://golangci-lint.run/docs/linters/configuration/#gomodguard
       allowed:
         # List of allowed modules.
         # Default: []
@@ -764,7 +764,7 @@ linters:
         # Default: false
         local-replace-directives: false
 
-    gosec: # https://golangci-lint.run/usage/linters/#gosec
+    gosec: # https://golangci-lint.run/docs/linters/configuration/#gosec
       # To select a subset of rules to run.
       # Available rules: https://github.com/securego/gosec#available-rules
       # Default: [] - means include all rules
@@ -811,46 +811,46 @@ linters:
       # To specify a set of rules to explicitly exclude.
       # Available rules: https://github.com/securego/gosec#available-rules
       # Default: []
-      excludes:
-        - G101 # Look for hard coded credentials
-        - G102 # Bind to all interfaces
-        - G103 # Audit the use of unsafe block
-        - G104 # Audit errors not checked
-        - G106 # Audit the use of ssh.InsecureIgnoreHostKey
-        - G107 # Url provided to HTTP request as taint input
-        - G108 # Profiling endpoint automatically exposed on /debug/pprof
-        - G109 # Potential Integer overflow made by strconv.Atoi result conversion to int16/32
-        - G110 # Potential DoS vulnerability via decompression bomb
-        - G111 # Potential directory traversal
-        - G112 # Potential slowloris attack
-        - G114 # Use of net/http serve function that has no support for setting timeouts
-        - G115 # Potential integer overflow when converting between integer types
-        - G201 # SQL query construction using format string
-        - G202 # SQL query construction using string concatenation
-        - G203 # Use of unescaped data in HTML templates
-        - G204 # Audit use of command execution
-        - G301 # Poor file permissions used when creating a directory
-        - G302 # Poor file permissions used with chmod
-        - G303 # Creating tempfile using a predictable path
-        - G304 # File path provided as taint input
-        - G305 # File traversal when extracting zip/tar archive
-        - G306 # Poor file permissions used when writing to a new file
-        - G307 # Poor file permissions used when creating a file with os.Create
-        - G401 # Detect the usage of MD5 or SHA1
-        - G402 # Look for bad TLS connection settings
-        - G403 # Ensure minimum RSA key length of 2048 bits
-        - G404 # Insecure random number source (rand)
-        - G405 # Detect the usage of DES or RC4
-        - G406 # Detect the usage of MD4 or RIPEMD160
-        - G501 # Import blocklist: crypto/md5
-        - G502 # Import blocklist: crypto/des
-        - G503 # Import blocklist: crypto/rc4
-        - G504 # Import blocklist: net/http/cgi
-        - G505 # Import blocklist: crypto/sha1
-        - G506 # Import blocklist: golang.org/x/crypto/md4
-        - G507 # Import blocklist: golang.org/x/crypto/ripemd160
-        - G601 # Implicit memory aliasing of items from a range statement
-        - G602 # Slice access out of bounds
+      # excludes:
+      #   - G101 # Look for hard coded credentials
+      #   - G102 # Bind to all interfaces
+      #   - G103 # Audit the use of unsafe block
+      #   - G104 # Audit errors not checked
+      #   - G106 # Audit the use of ssh.InsecureIgnoreHostKey
+      #   - G107 # Url provided to HTTP request as taint input
+      #   - G108 # Profiling endpoint automatically exposed on /debug/pprof
+      #   - G109 # Potential Integer overflow made by strconv.Atoi result conversion to int16/32
+      #   - G110 # Potential DoS vulnerability via decompression bomb
+      #   - G111 # Potential directory traversal
+      #   - G112 # Potential slowloris attack
+      #   - G114 # Use of net/http serve function that has no support for setting timeouts
+      #   - G115 # Potential integer overflow when converting between integer types
+      #   - G201 # SQL query construction using format string
+      #   - G202 # SQL query construction using string concatenation
+      #   - G203 # Use of unescaped data in HTML templates
+      #   - G204 # Audit use of command execution
+      #   - G301 # Poor file permissions used when creating a directory
+      #   - G302 # Poor file permissions used with chmod
+      #   - G303 # Creating tempfile using a predictable path
+      #   - G304 # File path provided as taint input
+      #   - G305 # File traversal when extracting zip/tar archive
+      #   - G306 # Poor file permissions used when writing to a new file
+      #   - G307 # Poor file permissions used when creating a file with os.Create
+      #   - G401 # Detect the usage of MD5 or SHA1
+      #   - G402 # Look for bad TLS connection settings
+      #   - G403 # Ensure minimum RSA key length of 2048 bits
+      #   - G404 # Insecure random number source (rand)
+      #   - G405 # Detect the usage of DES or RC4
+      #   - G406 # Detect the usage of MD4 or RIPEMD160
+      #   - G501 # Import blocklist: crypto/md5
+      #   - G502 # Import blocklist: crypto/des
+      #   - G503 # Import blocklist: crypto/rc4
+      #   - G504 # Import blocklist: net/http/cgi
+      #   - G505 # Import blocklist: crypto/sha1
+      #   - G506 # Import blocklist: golang.org/x/crypto/md4
+      #   - G507 # Import blocklist: golang.org/x/crypto/ripemd160
+      #   - G601 # Implicit memory aliasing of items from a range statement
+      #   - G602 # Slice access out of bounds
       # Filter out the issues with a lower severity than the given value.
       # Valid options are: low, medium, high.
       # Default: low
@@ -938,7 +938,7 @@ linters:
         # Default: "0600"
         G306: "0600"
 
-    gosmopolitan: # https://golangci-lint.run/usage/linters/#gosmopolitan
+    gosmopolitan: # https://golangci-lint.run/docs/linters/configuration/#gosmopolitan
       # Allow and ignore `time.Local` usages.
       #
       # Default: false
@@ -965,7 +965,7 @@ linters:
         - Hiragana
         - Katakana
 
-    govet: # https://golangci-lint.run/usage/linters/#govet
+    govet: # https://golangci-lint.run/docs/linters/configuration/#govet
       # Enable all analyzers.
       # Default: false
       enable-all: true
@@ -1008,7 +1008,7 @@ linters:
           stringmethods:
             - MyMethod
 
-    grouper: # https://golangci-lint.run/usage/linters/#grouper
+    grouper: # https://golangci-lint.run/docs/linters/configuration/#grouper
       # Require the use of a single global 'const' declaration only.
       # Default: false
       const-require-single-const: true
@@ -1034,7 +1034,7 @@ linters:
       # Default: false
       var-require-grouping: true
 
-    iface: # https://golangci-lint.run/usage/linters/#iface
+    iface: # https://golangci-lint.run/docs/linters/configuration/#iface
       # List of analyzers.
       # Default: ["identical"]
       enable:
@@ -1048,7 +1048,7 @@ linters:
           exclude:
             - github.com/example/log
 
-    importas: # https://golangci-lint.run/usage/linters/#importas
+    importas: # https://golangci-lint.run/docs/linters/configuration/#importas
       # Do not allow unaliased imports of aliased packages.
       # Default: false
       no-unaliased: true
@@ -1075,17 +1075,17 @@ linters:
         - pkg: errors
           alias: ""
 
-    inamedparam: # https://golangci-lint.run/usage/linters/#inamedparam
+    inamedparam: # https://golangci-lint.run/docs/linters/configuration/#inamedparam
       # Skips check for interface methods with only a single parameter.
       # Default: false
       skip-single-param: true
 
-    interfacebloat: # https://golangci-lint.run/usage/linters/#interfacebloat
+    interfacebloat: # https://golangci-lint.run/docs/linters/configuration/#interfacebloat
       # The maximum number of methods allowed for an interface.
       # Default: 10
       max: 10
 
-    ireturn: # https://golangci-lint.run/usage/linters/#ireturn
+    ireturn: # https://golangci-lint.run/docs/linters/configuration/#ireturn
       # List of interfaces to allow.
       # Lists of the keywords and regular expressions matched to interface or package names can be used.
       # `allow` and `reject` settings cannot be used at the same time.
@@ -1117,7 +1117,7 @@ linters:
       reject:
         - github.com\/user\/package\/v4\.Type
 
-    lll: # https://golangci-lint.run/usage/linters/#lll
+    lll: # https://golangci-lint.run/docs/linters/configuration/#lll
       # Max line length, lines longer will be reported.
       # '\t' is counted as 1 character by default, and can be changed with the tab-width option.
       # Default: 120.
@@ -1126,7 +1126,7 @@ linters:
       # Default: 1
       tab-width: 1
 
-    loggercheck: # https://golangci-lint.run/usage/linters/#loggercheck
+    loggercheck: # https://golangci-lint.run/docs/linters/configuration/#loggercheck
       # Allow check for the github.com/go-kit/log library.
       # Default: true
       kitlog: false
@@ -1156,13 +1156,13 @@ linters:
         - (github.com/go-logr/logr.Logger).Error # "Methods"
         - (*go.uber.org/zap.SugaredLogger).With # Also "Methods", but with a pointer receiver
 
-    maintidx: # https://golangci-lint.run/usage/linters/#maintidx
+    maintidx: # https://golangci-lint.run/docs/linters/configuration/#maintidx
       # Show functions with maintainability index lower than N.
       # A high index indicates better maintainability (it's kind of the opposite of complexity).
       # Default: 20
       under: 100
 
-    misspell: # https://golangci-lint.run/usage/linters/#misspell
+    misspell: # https://golangci-lint.run/docs/linters/configuration/#misspell
       # Correct spellings using locale preferences for US or UK.
       # Setting locale to US will correct the British spelling of 'colour' to 'color'.
       # Default is to use a neutral variety of English.
@@ -1187,7 +1187,7 @@ linters:
       # Default: ""
       mode: restricted
 
-    mnd: # https://golangci-lint.run/usage/linters/#mnd
+    mnd: # https://golangci-lint.run/docs/linters/configuration/#mnd
       # List of enabled checks, see https://github.com/tommy-muehle/go-mnd/#checks for description.
       # Default: ["argument", "case", "condition", "operation", "return", "assign"]
       checks:
@@ -1218,7 +1218,7 @@ linters:
         - '^math\.'
         - '^http\.StatusText$'
 
-    musttag: # https://golangci-lint.run/usage/linters/#musttag
+    musttag: # https://golangci-lint.run/docs/linters/configuration/#musttag
       # A set of custom functions to check in addition to the builtin ones.
       # Default: json, xml, gopkg.in/yaml.v3, BurntSushi/toml, mitchellh/mapstructure, jmoiron/sqlx
       functions:
@@ -1229,17 +1229,17 @@ linters:
           # The position of the argument to check.
           arg-pos: 2
 
-    nakedret: # https://golangci-lint.run/usage/linters/#nakedret
+    nakedret: # https://golangci-lint.run/docs/linters/configuration/#nakedret
       # Make an issue if func has more lines of code than this setting, and it has naked returns.
       # Default: 30
       max-func-lines: 31
 
-    nestif: # https://golangci-lint.run/usage/linters/#nestif
+    nestif: # https://golangci-lint.run/docs/linters/configuration/#nestif
       # Minimal complexity of if statements to report.
       # Default: 5
       min-complexity: 5
 
-    nilnil: # https://golangci-lint.run/usage/linters/#nilnil
+    nilnil: # https://golangci-lint.run/docs/linters/configuration/#nilnil
       # In addition, detect opposite situation (simultaneous return of non-nil error and valid value).
       # Default: false
       detect-opposite: true
@@ -1254,13 +1254,13 @@ linters:
         - uintptr
         - unsafeptr
 
-    nlreturn: # https://golangci-lint.run/usage/linters/#nlreturn
+    nlreturn: # https://golangci-lint.run/docs/linters/configuration/#nlreturn
       # Size of the block (including return statement that is still "OK")
       # so no return split required.
       # Default: 1
       block-size: 2
 
-    nolintlint: # https://golangci-lint.run/usage/linters/#nolintlint
+    nolintlint: # https://golangci-lint.run/docs/linters/configuration/#nolintlint
       # Disable to ensure that all nolint directives actually have an effect.
       # Default: false
       allow-unused: true
@@ -1274,12 +1274,12 @@ linters:
       # Default: false
       require-specific: true
 
-    nonamedreturns: # https://golangci-lint.run/usage/linters/#nonamedreturns
+    nonamedreturns: # https://golangci-lint.run/docs/linters/configuration/#nonamedreturns
       # Report named error if it is assigned inside defer.
       # Default: false
       report-error-in-defer: true
 
-    paralleltest: # https://golangci-lint.run/usage/linters/#paralleltest
+    paralleltest: # https://golangci-lint.run/docs/linters/configuration/#paralleltest
       # Ignore missing calls to `t.Parallel()` and only report incorrect uses of it.
       # Default: false
       ignore-missing: true
@@ -1288,7 +1288,7 @@ linters:
       # Default: false
       ignore-missing-subtests: true
 
-    perfsprint: # https://golangci-lint.run/usage/linters/#perfsprint
+    perfsprint: # https://golangci-lint.run/docs/linters/configuration/#perfsprint
       # Optimizes even if it requires an int or uint type cast.
       # Default: true
       int-conversion: false
@@ -1305,7 +1305,7 @@ linters:
       # Default: true
       strconcat: false
 
-    prealloc: # https://golangci-lint.run/usage/linters/#prealloc
+    prealloc: # https://golangci-lint.run/docs/linters/configuration/#prealloc
       # IMPORTANT: we don't recommend using this linter before doing performance profiling.
       # For most programs usage of prealloc will be a premature optimization.
 
@@ -1319,7 +1319,7 @@ linters:
       # Default: false
       for-loops: true
 
-    predeclared: # https://golangci-lint.run/usage/linters/#predeclared
+    predeclared: # https://golangci-lint.run/docs/linters/configuration/#predeclared
       # List of predeclared identifiers to not report on.
       # Default: []
       ignore:
@@ -1329,7 +1329,7 @@ linters:
       # Default: false
       qualified-name: true
 
-    promlinter: # https://golangci-lint.run/usage/linters/#promlinter
+    promlinter: # https://golangci-lint.run/docs/linters/configuration/#promlinter
       # Promlinter cannot infer all metrics name in static analysis.
       # Enable strict mode will also include the errors caused by failing to parse the args.
       # Default: false
@@ -1354,7 +1354,7 @@ linters:
         # UnitAbbreviations detects abbreviated units in the metric name.
         - UnitAbbreviations
 
-    protogetter: # https://golangci-lint.run/usage/linters/#protogetter
+    protogetter: # https://golangci-lint.run/docs/linters/configuration/#protogetter
       # Skip files generated by specified generators from the checking.
       # Checks only the file's initial comment, which must follow the format: "// Code generated by <generator-name>".
       # Files generated by protoc-gen-go, protoc-gen-go-grpc, and protoc-gen-grpc-gateway are always excluded automatically.
@@ -1373,14 +1373,14 @@ linters:
       # Default: false
       replace-first-arg-in-append: true
 
-    reassign: # https://golangci-lint.run/usage/linters/#reassign
+    reassign: # https://golangci-lint.run/docs/linters/configuration/#reassign
       # Patterns for global variable names that are checked for reassignment.
       # See https://github.com/curioswitch/go-reassign#usage
       # Default: ["EOF", "Err.*"]
       patterns:
         - ".*"
 
-    recvcheck: # https://golangci-lint.run/usage/linters/#recvcheck
+    recvcheck: # https://golangci-lint.run/docs/linters/configuration/#recvcheck
       # Disables the built-in method exclusions:
       # - `MarshalText`
       # - `MarshalJSON`
@@ -1397,7 +1397,7 @@ linters:
       exclusions:
         - "*.Value"
 
-    revive: # https://golangci-lint.run/usage/linters/#revive
+    revive: # https://golangci-lint.run/docs/linters/configuration/#revive
       # Maximum number of open files at the same time.
       # See https://github.com/mgechev/revive#command-line-flags
       # Defaults to unlimited.
@@ -1941,13 +1941,13 @@ linters:
           disabled: false
           exclude: [""]
 
-    rowserrcheck: # https://golangci-lint.run/usage/linters/#rowserrcheck
+    rowserrcheck: # https://golangci-lint.run/docs/linters/configuration/#rowserrcheck
       # database/sql is always checked
       # Default: []
       packages:
         - github.com/jmoiron/sqlx
 
-    sloglint: # https://golangci-lint.run/usage/linters/#sloglint
+    sloglint: # https://golangci-lint.run/docs/linters/configuration/#sloglint
       # Enforce not mixing key-value pairs and attributes.
       # https://github.com/go-simpler/sloglint?tab=readme-ov-file#no-mixed-arguments
       # Default: true
@@ -2003,7 +2003,7 @@ linters:
       # Default: false
       args-on-sep-lines: true
 
-    spancheck: # https://golangci-lint.run/usage/linters/#spancheck
+    spancheck: # https://golangci-lint.run/docs/linters/configuration/#spancheck
       # Checks to enable.
       # Options include:
       # - `end`: check that `span.End()` is called
@@ -2028,7 +2028,7 @@ linters:
       extra-start-span-signatures:
         - "github.com/user/repo/telemetry/trace.Start:opentelemetry"
 
-    staticcheck: # https://golangci-lint.run/usage/linters/#staticcheck
+    staticcheck: # https://golangci-lint.run/docs/linters/configuration/#staticcheck
       # SAxxxx checks in https://staticcheck.dev/docs/configuration/options/#checks
       # Example (to disable some checks): [ "all", "-SA1000", "-SA1001"]
       # Default: ["*"]
@@ -2319,7 +2319,7 @@ linters:
         # https://staticcheck.dev/docs/checks/#SA9009
         - SA9009
 
-    tagalign: # https://golangci-lint.run/usage/linters/#tagalign
+    tagalign: # https://golangci-lint.run/docs/linters/configuration/#tagalign
       # Align and sort can be used together or separately.
       #
       # Whether enable align. If true, the struct tags will be aligned.
@@ -2358,7 +2358,7 @@ linters:
       # Default: false
       strict: true
 
-    tagliatelle: # https://golangci-lint.run/usage/linters/#tagliatelle
+    tagliatelle: # https://golangci-lint.run/docs/linters/configuration/#tagliatelle
       # Checks the struct tag name case.
       case:
         # Defines the association between tag name and case.
@@ -2450,7 +2450,7 @@ linters:
             # Default: false
             ignore: true
 
-    testifylint: # https://golangci-lint.run/usage/linters/#testifylint
+    testifylint: # https://golangci-lint.run/docs/linters/configuration/#testifylint
       # # Enable all checkers (https://github.com/Antonboom/testifylint#checkers).
       # # Default: false
       # enable-all: true
@@ -2548,7 +2548,7 @@ linters:
         # Default: remove
         mode: require
 
-    testpackage: # https://golangci-lint.run/usage/linters/#testpackage
+    testpackage: # https://golangci-lint.run/docs/linters/configuration/#testpackage
       # Regexp pattern to skip files.
       # Default: "(export|internal)_test\\.go"
       skip-regexp: (export|internal)_test\.go
@@ -2560,7 +2560,7 @@ linters:
 
     # comment out for following error.
     # [error] level=error msg="[linter] thelper: at least one option must be enabled"
-    # thelper: # https://golangci-lint.run/usage/linters/#thelper
+    # thelper: # https://golangci-lint.run/docs/linters/configuration/#thelper
     #   test:
     #     # Check *testing.T is first param (or after context.Context) of helper function.
     #     # Default: true
@@ -2602,7 +2602,7 @@ linters:
     #     # Default: true
     #     begin: false
 
-    usestdlibvars: # https://golangci-lint.run/usage/linters/#usestdlibvars
+    usestdlibvars: # https://golangci-lint.run/docs/linters/configuration/#usestdlibvars
       # Suggest the use of http.MethodXX.
       # Default: true
       http-method: true
@@ -2634,7 +2634,7 @@ linters:
       # Default: false
       constant-kind: true
 
-    usetesting: # https://golangci-lint.run/usage/linters/#usetesting
+    usetesting: # https://golangci-lint.run/docs/linters/configuration/#usetesting
       # Enable/disable `os.CreateTemp("", ...)` detections.
       # Default: true
       os-create-temp: false
@@ -2660,7 +2660,7 @@ linters:
       # Default: true
       context-todo: false
 
-    unconvert: # https://golangci-lint.run/usage/linters/#unconvert
+    unconvert: # https://golangci-lint.run/docs/linters/configuration/#unconvert
       # Remove conversions that force intermediate rounding.
       # Default: false
       fast-math: true
@@ -2668,7 +2668,7 @@ linters:
       # Default: false
       safe: true
 
-    unparam: # https://golangci-lint.run/usage/linters/#unparam
+    unparam: # https://golangci-lint.run/docs/linters/configuration/#unparam
       # Inspect exported functions.
       #
       # Set to true if no external program/library imports your code.
@@ -2679,7 +2679,7 @@ linters:
       # Default: false
       check-exported: false
 
-    unused: # https://golangci-lint.run/usage/linters/#unused
+    unused: # https://golangci-lint.run/docs/linters/configuration/#unused
       # Mark all struct fields that have been written to as used.
       # Default: true
       field-writes-are-uses: false
@@ -2699,7 +2699,7 @@ linters:
       # Default: true
       generated-is-used: false
 
-    varnamelen: # https://golangci-lint.run/usage/linters/#varnamelen
+    varnamelen: # https://golangci-lint.run/docs/linters/configuration/#varnamelen
       # The longest distance, in source lines, that is being considered a "small scope".
       # Variables used in at most this many lines will be ignored.
       # Default: 5
@@ -2747,7 +2747,7 @@ linters:
         - T any
         - m map[string]int
 
-    whitespace: # https://golangci-lint.run/usage/linters/#whitespace
+    whitespace: # https://golangci-lint.run/docs/linters/configuration/#whitespace
       # Enforces newlines (or comments) after every multi-line if statement.
       # Default: false
       multi-if: true
@@ -2755,7 +2755,7 @@ linters:
       # Default: false
       multi-func: true
 
-    wrapcheck: # https://golangci-lint.run/usage/linters/#wrapcheck
+    wrapcheck: # https://golangci-lint.run/docs/linters/configuration/#wrapcheck
       # An array of strings specifying additional substrings of signatures to ignore.
       # Unlike 'ignore-sigs', this option extends the default set (or the set specified in 'ignore-sigs') without replacing it entirely.
       # This allows you to add specific signatures to the ignore list
@@ -2795,7 +2795,7 @@ linters:
       # Default: false
       report-internal-errors: true
 
-    wsl: # https://golangci-lint.run/usage/linters/#wsl
+    wsl: # https://golangci-lint.run/docs/linters/configuration/#wsl
       # Do strict checking when assigning from append (x = append(x, y)).
       # If this is set to true - the append call must append either a variable
       # assigned, called or used on the line above.

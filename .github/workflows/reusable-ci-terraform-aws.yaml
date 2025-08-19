@@ -32,7 +32,7 @@ env:
   ENV: ${{ inputs.environment }}
   COMPONENT: ${{ inputs.component }}
   TERRAFORM_PATH: ${{ inputs.terraform_path }}
-  TERRAFORM_VERSION: "1.11.4"
+  TERRAFORM_VERSION: "1.12.2"
   TFLINT_VERSION: "v0.44.1"
   TFCMT_VERSION: "4.5.1"
 
@@ -125,13 +125,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate Trivy Vulnerability Report
-        uses: aquasecurity/trivy-action@0.29.0
+      # https://github.com/aquasecurity/trivy-action/tree/0.32.0/?tab=readme-ov-file#inputs
+      - name: Trivy Vulnerability Scan
+        uses: aquasecurity/trivy-action@0.32.0
         with:
           exit-code: 1
           format: table
           scan-ref: .
-          scan-type: "config"
+          scan-type: "fs"
+          scanners: license,misconfig,secret,vuln
           trivy-config: trivy.yaml
           severity: HIGH,CRITICAL
 

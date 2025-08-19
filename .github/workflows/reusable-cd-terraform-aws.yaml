@@ -27,7 +27,7 @@ env:
   ENV: ${{ inputs.environment }}
   COMPONENT: ${{ inputs.component }}
   TERRAFORM_PATH: ${{ inputs.terraform_path }}
-  TERRAFORM_VERSION: "1.11.4"
+  TERRAFORM_VERSION: "1.12.2"
 
 jobs:
   init:

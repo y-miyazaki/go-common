@@ -11,6 +11,7 @@ ARG WORKDIR=/workspace
 # version(base)
 ARG NODE_VERSION=24
 ARG GITLEAKS_VERSION=8.18.0
+ARG TRIVY_VERSION=0.65.0
 ARG GH_VERSION=2.73.0
 # version(go)
 ARG GOLANGCI_LINT_VERSION=v2.3.1
@@ -19,6 +20,7 @@ ARG GOLANGCI_LINT_VERSION=v2.3.1
 # ARG ARCH_BASE=amd64
 # ARG ARCH_BASE2=x86_64
 # ARG ARCH_GITLEAKS=x64
+# ARG ARCH_TRIVY=64bit
 # ARG ARCH_AWS_CLI=x86_64
 # ARG ARCH_SESSION_MANAGER_PLUGIN=64bit
 # ARG ARCH_KO=x86_64
@@ -27,6 +29,7 @@ ARG GOLANGCI_LINT_VERSION=v2.3.1
 ARG ARCH_BASE=arm64
 ARG ARCH_BASE2=aarch_64
 ARG ARCH_GITLEAKS=arm64
+ARG ARCH_TRIVY=ARM64
 ARG ARCH_AWS_CLI=aarch64
 ARG ARCH_SESSION_MANAGER_PLUGIN=arm64
 ARG ARCH_KO=arm64
@@ -76,6 +79,10 @@ RUN curl -sLO https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS
     chmod +x ./gitleaks_${GITLEAKS_VERSION}_linux_${ARCH_GITLEAKS}/gitleaks && \
     mv ./gitleaks_${GITLEAKS_VERSION}_linux_${ARCH_GITLEAKS}/gitleaks /usr/local/bin/gitleaks && \
     rm -rf gitleaks_${GITLEAKS_VERSION}_linux_${ARCH_GITLEAKS}.tar.gz ./gitleaks_${GITLEAKS_VERSION}_linux_${ARCH_GITLEAKS}
+
+# Install trivy
+RUN wget https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-${ARCH_TRIVY}.deb && \
+    dpkg -i trivy_${TRIVY_VERSION}_Linux-${ARCH_TRIVY}.deb
 
 # Install gh
 RUN wget https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_${ARCH_BASE}.tar.gz && \
