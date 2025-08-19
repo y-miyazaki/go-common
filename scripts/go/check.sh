@@ -527,8 +527,9 @@ function main {
         fi
         if [[ "$LINT_FAILED" == "1" ]]; then
             echo -n "❌ golangci-lint" >&2
-            if [[ "$LINT_ISSUES_COUNT" -gt 0 ]]; then
-                echo " ($LINT_ISSUES_COUNT issues)" >&2
+            # Use safe arithmetic comparison with default 0 to avoid bash syntax errors
+            if (( ${LINT_ISSUES_COUNT:-0} > 0 )); then
+                echo " (${LINT_ISSUES_COUNT} issues)" >&2
             else
                 echo "" >&2
             fi
@@ -537,8 +538,9 @@ function main {
         fi
         if [[ "$TEST_FAILED" == "1" ]]; then
             echo -n "❌ go test" >&2
-            if [[ "$TEST_FAIL_COUNT" -gt 0 ]]; then
-                echo " ($TEST_FAIL_COUNT failed)" >&2
+            # Use safe arithmetic comparison with default 0
+            if (( ${TEST_FAIL_COUNT:-0} > 0 )); then
+                echo " (${TEST_FAIL_COUNT} failed)" >&2
             else
                 echo "" >&2
             fi
