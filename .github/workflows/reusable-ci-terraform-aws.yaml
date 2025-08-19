@@ -32,7 +32,7 @@ env:
   ENV: ${{ inputs.environment }}
   COMPONENT: ${{ inputs.component }}
   TERRAFORM_PATH: ${{ inputs.terraform_path }}
-  TERRAFORM_VERSION: "1.11.4"
+  TERRAFORM_VERSION: "1.12.2"
   TFLINT_VERSION: "v0.44.1"
   TFCMT_VERSION: "4.5.1"
 
@@ -132,8 +132,8 @@ jobs:
           exit-code: 1
           format: table
           scan-ref: .
-          scan-type: "config"
-          scanners: vuln,secret,license
+          scan-type: "fs"
+          scanners: license,misconfig,secret,vuln
           trivy-config: trivy.yaml
           severity: HIGH,CRITICAL
 

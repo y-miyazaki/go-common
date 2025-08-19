@@ -111,8 +111,8 @@ jobs:
           exit-code: 1
           format: table
           scan-ref: .
-          scan-type: "config"
-          scanners: vuln,secret,license
+          scan-type: "fs"
+          scanners: license,misconfig,secret,vuln
           trivy-config: trivy.yaml
           severity: HIGH,CRITICAL
 
