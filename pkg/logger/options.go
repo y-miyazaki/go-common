@@ -28,7 +28,7 @@ func isSensitiveKey(key string) bool {
 	sensitiveSubstrings := []string{
 		"password", "passwd", "pwd", "secret", "token", "access_token",
 		"api_key", "apikey", "credential", "credentials", "auth", "private_key",
-		"secret_key", "session_token",
+		"secret_key", "session_token", "clientip", "client_ip", "authorization", "set-cookie", "cookie", "x-forwarded-for",
 	}
 	for _, s := range sensitiveSubstrings {
 		if strings.Contains(k, s) {
