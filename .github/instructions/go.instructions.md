@@ -174,5 +174,9 @@ bash scripts/go/check.sh -f ./cmd/cloudwatch/cloudwatch_alarm_to_sns_to_slack/
 
 ## MCP Tools
 
-- Go の作業では Serena を既定で使用する（コードベース解析・参照関係・シンボル単位の安全な編集）。
-- MCP の目的・利用サーバ一覧・運用ルールの正本は `.github/instructions/general.instructions.md` の「MCP Tools」を参照すること。
+- MCP の詳細仕様・サーバ一覧は `.github/instructions/general.instructions.md` の「MCP Tools」を参照。
+- Go 作業での補助的な利用方針:
+  - awslabs.aws-api-mcp-server: AWS CLI コマンド提案・実行。
+  - aws-knowledge-mcp-server: AWS 公式ドキュメント検索・参照（docs.aws.amazon.com のコンテンツ取得、関連ページ推奨）。
+  - context7: コンテキスト情報の管理・操作を支援。
+  - serena: コードベース解析・安全な編集支援（検索、参照関係、シンボル単位の挿入/置換、ディレクトリ/シンボル概要）。特に Go の作業で既定利用。

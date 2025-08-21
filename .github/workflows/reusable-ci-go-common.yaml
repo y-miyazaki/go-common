@@ -36,7 +36,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -57,7 +57,7 @@ jobs:
           path: |
             ${{ steps.go-cache-paths.outputs.gomodcache }}
             ${{ steps.go-cache-paths.outputs.gocache }}
-          key: go-cache-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ env.GO_VERSION }}-${{ hashFiles(format('{0}/go.sum', env.GO_PROJECT_PATH)) }}
+          key: go-cache-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ env.GO_VERSION }}-${{ hashFiles(format('{0}/go.mod', env.GO_PROJECT_PATH), format('{0}/go.sum', env.GO_PROJECT_PATH)) }}
           restore-keys: |
             go-cache-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ env.GO_VERSION }}-
             go-cache-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-

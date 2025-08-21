@@ -92,6 +92,7 @@ applyTo: "**/*.tf,**/*.tfvars,**/*.tfstate,**/*.tfbackend"
 
 - 本ドキュメントの MCP に関する詳細は `.github/instructions/general.instructions.md` の「MCP Tools」を正本として参照すること。
 - Terraform 作業での補助的な利用方針:
-  - Terraform MCP: Terraform コードの検索・構造把握・シンボル/正規表現ベースの安全な編集に使用（.tf/.tfvars 等）。
-  - AWS Knowledge: 公式ドキュメントの検索・参照に使用。
-  - AWS Assistant: 必要に応じて AWS CLI の提案・実行に使用（明示的なリージョン指定・最小スコープ運用）。
+  - awslabs.aws-api-mcp-server: 必要に応じて AWS CLI の提案・実行に使用（明示的なリージョン指定・最小スコープ運用）。
+  - aws-knowledge-mcp-server: 公式ドキュメントの検索・参照に使用。
+  - context7: コンテキスト情報の管理・操作を支援。
+  - terraform: Terraform コードの検索・構造把握・シンボル/正規表現ベースの安全な編集に使用（.tf/.tfvars 等）。

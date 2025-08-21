@@ -135,7 +135,8 @@ applyTo: "**/*.go"
 ## MCP Tools
 
 - MCP の詳細仕様・サーバ一覧は `.github/instructions/general.instructions.md` の「MCP Tools」を参照。
-- ドキュメント執筆時の補助的な利用:
-  - Terraform MCP: Terraform ドキュメント作成時にコード断片やパラメータ参照の正確性担保に使用。
-  - AWS Knowledge: 公式ドキュメントの根拠を提示。
-  - AWS Assistant: 必要に応じて AWS CLI 例示（実行はレビュー済みの安全な範囲に限定）。
+- Document 作業時の補助的な利用:
+  - awslabs.aws-api-mcp-server: 必要に応じて AWS CLI の提案・実行に使用（明示的なリージョン指定・最小スコープ運用）。
+  - aws-knowledge-mcp-server: 公式ドキュメントの検索・参照に使用。
+  - context7: コンテキスト情報の管理・操作を支援。
+  - terraform: Terraform ドキュメント作成時にコード断片やパラメータ参照の正確性担保に使用。

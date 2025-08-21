@@ -47,7 +47,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -56,7 +56,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
@@ -80,7 +80,7 @@ jobs:
           path: |
             ${{ env.TERRAFORM_PATH }}/.terraform
             ${{ env.TERRAFORM_PATH }}/.terraform.lock.hcl
-          key: terraform-init-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles('${{ env.TERRAFORM_PATH }}/terraform.${{ env.ENV }}.tfbackend', '${{ env.TERRAFORM_PATH }}/.terraform.lock.hcl', '${{ env.TERRAFORM_PATH }}/**/*.tf', 'modules/**/*.tf' ) }}
+          key: terraform-init-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/terraform.{1}.tfbackend', env.TERRAFORM_PATH, env.ENV), format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH), format('{0}/**/*.tf', env.TERRAFORM_PATH), 'modules/**/*.tf') }}
 
       - name: Exec Terraform init
         id: init
@@ -98,7 +98,7 @@ jobs:
           path: |
             ${{ env.TERRAFORM_PATH }}/.terraform
             ${{ env.TERRAFORM_PATH }}/.terraform.lock.hcl
-          key: terraform-init-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles('${{ env.TERRAFORM_PATH }}/terraform.${{ env.ENV }}.tfbackend', '${{ env.TERRAFORM_PATH }}/.terraform.lock.hcl', '${{ env.TERRAFORM_PATH }}/**/*.tf', 'modules/**/*.tf' ) }}
+          key: terraform-init-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/terraform.{1}.tfbackend', env.TERRAFORM_PATH, env.ENV), format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH), format('{0}/**/*.tf', env.TERRAFORM_PATH), 'modules/**/*.tf') }}
 
   lint:
     if: ${{ github.actor != 'dependabot[bot]' }}
@@ -108,10 +108,10 @@ jobs:
       name: ${{ inputs.environment }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v3
+        uses: terraform-linters/setup-tflint@v5
         with:
           tflint_version: ${{ env.TFLINT_VERSION }}
 
@@ -160,7 +160,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -169,7 +169,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
@@ -199,7 +199,7 @@ jobs:
           path: |
             ${{ env.TERRAFORM_PATH }}/.terraform
             ${{ env.TERRAFORM_PATH }}/.terraform.lock.hcl
-          key: terraform-init-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles('${{ env.TERRAFORM_PATH }}/terraform.${{ env.ENV }}.tfbackend', '${{ env.TERRAFORM_PATH }}/.terraform.lock.hcl', '${{ env.TERRAFORM_PATH }}/**/*.tf', 'modules/**/*.tf' ) }}
+          key: terraform-init-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/terraform.{1}.tfbackend', env.TERRAFORM_PATH, env.ENV), format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH), format('{0}/**/*.tf', env.TERRAFORM_PATH), 'modules/**/*.tf') }}
 
       - name: Exec Terraform init - if cache miss
         run: |

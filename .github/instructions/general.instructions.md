@@ -89,13 +89,6 @@ applyTo: "**"
 
 利用する MCP サーバ（固定）:
 
-- Serena: コードベース解析・安全な編集支援（検索、参照関係、シンボル単位の挿入/置換、ディレクトリ/シンボル概要）。特に Go の作業で既定利用。
-- Terraform MCP: Terraform コードの検索・構造把握・シンボル/正規表現ベース編集を支援。
-- AWS Knowledge: AWS 公式ドキュメント検索・参照（docs.aws.amazon.com のコンテンツ取得、関連ページ推奨）。
-- AWS Assistant: AWS CLI コマンド提案・実行。
-
-Operating Rules (high-level):
-
-- Go の作業では Serena を既定で使用する。
-- Terraform の作業では Terraform MCP を使用する。
-- 大規模置換やリファクタは MCP のシンボル/正規表現ベース操作を優先する。
+- awslabs.aws-api-mcp-server: AWS CLI コマンド提案・実行。
+- aws-knowledge-mcp-server: AWS 公式ドキュメント検索・参照（docs.aws.amazon.com のコンテンツ取得、関連ページ推奨）。
+- context7: コンテキスト情報の管理・操作を支援。
