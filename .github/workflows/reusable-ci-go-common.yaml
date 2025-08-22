@@ -27,7 +27,6 @@ env:
 
 jobs:
   test_and_lint:
-    if: ${{ github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     # environment:
     #   name: ${{ inputs.environment }}
@@ -129,7 +128,7 @@ jobs:
           path: ${{ env.GO_PROJECT_PATH }}/sbom-${{ env.COMPONENT }}-${{ env.ENV }}.json
 
       - name: GolangCI-Lint via reviewdog (PR inline comments)
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
         uses: reviewdog/action-golangci-lint@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -167,7 +166,7 @@ jobs:
           fi
 
       - name: Post PR failure comment
-        if: failure() && github.event_name == 'pull_request'
+        if: failure() && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
         uses: actions/github-script@v7
         with:
           script: |
