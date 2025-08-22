@@ -152,19 +152,22 @@ function prepare_build_environment {
 # Find Lambda functions to build
 #######################################
 function find_lambda_functions {
+    # Keep visual separators using echo_section (print to stdout for clarity)
     echo_section "Finding Lambda functions"
 
     local files
     files=$(find "$DIR" -type f -name 'main.go')
     local file_count
-    file_count=$(echo "$files" | wc -l)
+    # Count only non-empty lines to avoid counting empty output
+    file_count=$(printf "%s\n" "$files" | sed '/^$/d' | wc -l)
 
     if [[ $file_count -eq 0 ]]; then
         error_exit "No main.go files found in $DIR"
     fi
 
     log "INFO" "Found $file_count Lambda functions to build"
-    echo "$files"
+    # Print file paths only
+    printf "%s\n" "$files"
 }
 
 #######################################
@@ -194,8 +197,8 @@ function build_function {
     log "INFO" "  Moving binary for $function..."
     mkdir -p bin/"${BINDIR}"/"${function}"
     mv bootstrap bin/"${BINDIR}"/"${function}"/ || error_exit "Failed to move binary for $function"
-
-    echo "$function built successfully"
+    # Informational message should go to stderr so stdout remains clean for capturing the final count
+    echo "$function built successfully" >&2
 }
 
 #######################################
@@ -218,17 +221,17 @@ function build_lambda_functions {
         # Use GNU parallel if available and parallel build is enabled
         export -f build_function log error_exit echo_section
         export BINDIR ARCH VERBOSE
-        echo "$files" | parallel build_function {} || error_exit "Failed in parallel build"
+        # Redirect informational output to stderr; keep stdout reserved for the final count
+        echo "$files" | parallel build_function {} 1>/dev/null || error_exit "Failed in parallel build"
         count=$file_count
     else
         # Sequential build
         for file in $files; do
-            build_function "$file"
+            # Ensure per-function informational output goes to stderr
+            build_function "$file" 1>/dev/null
             count=$((count + 1))
         done
     fi
-
-    echo "$count"
 }
 
 #######################################
@@ -250,13 +253,13 @@ function main {
     # Prepare build environment
     prepare_build_environment
 
-    # Find Lambda functions
+    # Find Lambda functions (filter out header/separator lines starting with '#')
     local files
-    files=$(find_lambda_functions)
+    files=$(find_lambda_functions | sed '/^#/d')
 
     # Build all Lambda functions
     local count
-    count=$(build_lambda_functions "$files")
+    build_lambda_functions "$files"
 
     # Calculate elapsed time
     local end_time elapsed minutes seconds
@@ -265,7 +268,7 @@ function main {
     minutes=$((elapsed / 60))
     seconds=$((elapsed % 60))
 
-    echo_section "Build completed successfully! Built $count Lambda functions in ${minutes}m ${seconds}s."
+    echo_section "Build completed successfully! Built Lambda functions in ${minutes}m ${seconds}s."
     log "INFO" "All Lambda functions built successfully"
 }
 
