@@ -43,9 +43,9 @@
     "-v",
     "${env:HOME}/workspace/go-common/env/common/.bashrc:/home/vscode/.bashrc",
     "-v",
-    "${env:HOME}/workspace/go-common/env/common/.gitconfig:/home/vscode/.gitconfig",
+    "${env:HOME}/workspace/go-common/env/common/tmp/.gitconfig:/home/vscode/.gitconfig",
     "-v",
-    "${env:HOME}/workspace/go-common/env/common/gh:/home/vscode/.config/gh",
+    "${env:HOME}/workspace/go-common/env/common/tmp/gh:/home/vscode/.config/gh",
     "-v",
     "/var/run/docker.sock:/var/run/docker.sock"
   ],

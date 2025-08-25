@@ -10,12 +10,7 @@ tmp
 
 # env
 .env
-env/*
-!env/common/
-!env/example/
-env/common/.aws
-env/common/.ssh
-env/common/.gitconfig
+env/common/tmp/**
 
 # terraform
 builds
