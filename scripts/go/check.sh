@@ -42,6 +42,7 @@ TEST_FAILED=0
 RACE_FAILED=0
 COVERAGE_FAILED=0
 SECURITY_FAILED=0
+GO_BUILD_FAILED=0
 
 # Counters for issues
 LINT_ISSUES_COUNT=0
@@ -209,6 +210,27 @@ function run_go_vet {
         log "ERROR" "go vet found issues"
         EXIT_CODE=1
         GO_VET_FAILED=1
+    fi
+}
+
+#######################################
+# Function to run go build
+#######################################
+function run_go_build {
+    echo_section "Running go build"
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log "INFO" "DRY-RUN: Would run 'go build $TARGET_PATTERN'"
+        return 0
+    fi
+
+    # Attempt to build all packages matching the target pattern
+    if go build $TARGET_PATTERN; then
+        log "INFO" "go build succeeded"
+    else
+        log "ERROR" "go build failed"
+        EXIT_CODE=1
+        GO_BUILD_FAILED=1
     fi
 }
 
@@ -501,6 +523,7 @@ function main {
     run_go_mod_tidy
     run_go_fmt
     run_go_vet
+    run_go_build
     run_golangci_lint
     run_tests
     run_race_tests
@@ -523,7 +546,9 @@ function main {
         if [[ "$GO_VET_FAILED" == "1" ]]; then
             echo "❌ go vet" >&2
         else
-            echo "✅ go vet" >&2
+        echo "✅ go vet" >&2
+        # Report go build status next to keep result order consistent with run_* calls
+        [[ "$GO_BUILD_FAILED" == "1" ]] && echo "❌ go build" >&2 || echo "✅ go build" >&2
         fi
         if [[ "$LINT_FAILED" == "1" ]]; then
             echo -n "❌ golangci-lint" >&2
@@ -561,7 +586,7 @@ function main {
                 echo "✅ go test -cover" >&2
             fi
         fi
-        [[ "$SECURITY_FAILED" == "1" ]] && echo "❌ security checks (govulncheck or secrets)" >&2 || echo "✅ security checks (govulncheck or secrets)" >&2
+    [[ "$SECURITY_FAILED" == "1" ]] && echo "❌ security checks (govulncheck or secrets)" >&2 || echo "✅ security checks (govulncheck or secrets)" >&2
         log "ERROR" "❌ Some validations failed"
     fi
 

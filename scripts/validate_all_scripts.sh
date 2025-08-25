@@ -21,7 +21,9 @@ WORKSPACE_ROOT="$(dirname "$SCRIPT_DIR")"
 # Global variable for script search paths
 SEARCH_PATHS=("$WORKSPACE_ROOT/scripts" "$WORKSPACE_ROOT/env")
 
-# Load unified library system
+# Load all-in-one library
+# shellcheck source=../lib/all.sh
+# shellcheck disable=SC1091
 source "${SCRIPT_DIR}/lib/all.sh"
 
 # Counters for statistics

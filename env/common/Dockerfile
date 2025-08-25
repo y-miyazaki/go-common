@@ -37,6 +37,7 @@ ARG ARCH_KO=arm64
 #--------------------------------------------------------------
 # ENV
 #--------------------------------------------------------------
+ENV GH_CONFIG_DIR=/home/vscode/.config/gh
 ENV CGO_ENABLED=0
 ENV GOOS=linux
 # x86_64
