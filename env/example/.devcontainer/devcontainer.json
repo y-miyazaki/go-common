@@ -45,6 +45,8 @@
     "-v",
     "${env:HOME}/workspace/go-common/env/common/.gitconfig:/home/vscode/.gitconfig",
     "-v",
+    "${env:HOME}/workspace/go-common/env/common/gh:/home/vscode/.config/gh",
+    "-v",
     "/var/run/docker.sock:/var/run/docker.sock"
   ],
   "postCreateCommand": "/bin/sh env/common/scripts/init.sh",
