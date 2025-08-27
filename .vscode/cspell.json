@@ -193,8 +193,6 @@
     ".golangci.yaml",
     ".vscode"
   ],
-  "ignoreRegExpList": [
-    "[０-９Ａ-Ｚａ-ｚぁ-んァ-ヶ亜-熙纊-黑]+"
-  ],
+  "ignoreRegExpList": ["[０-９Ａ-Ｚａ-ｚぁ-んァ-ヶ亜-熙纊-黑]+"],
   "enabled": true
 }
