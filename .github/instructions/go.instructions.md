@@ -4,42 +4,44 @@ applyTo: "**/*.go"
 
 <!-- omit in toc -->
 
-# GitHub Copilot Instructions for Go Lambda Applications
+# GitHub Copilot Instructions for Go
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
 
 ## Project Overview
 
-このリポジトリは AWS Lambda 上で動作する Go アプリケーションを含む。
+このリポジトリは Go で構築された共通ライブラリとサンプルアプリケーションを含む。
 
-| ディレクトリ/ファイル | 役割・説明                       |
-| --------------------- | -------------------------------- |
-| cmd/                  | Lambda 関数メイン処理            |
-| internal/             | 内部パッケージ・ビジネスロジック |
-| pkg/                  | 外部公開可能なライブラリコード   |
+| ディレクトリ/ファイル | 役割・説明                               |
+| --------------------- | ---------------------------------------- |
+| example/              | サンプルアプリケーション（Gin、S3 等）   |
+| pkg/                  | 共通ライブラリ・ユーティリティ           |
+| cmd/                  | 実行可能なコマンドツール（存在する場合） |
+| internal/             | 内部パッケージ（存在する場合）           |
+
+## Coding Standards
 
 ## Coding Standards
 
 ### Production and Test Code Separation
 
-- テスト専用の依存注入関数・ラッパー・テスト用ロジックは本番 Go コード(main.go 等)に追加しない
-- テスト性が必要な場合はインターフェース設計や構造体埋め込みを使い、テスト専用コードは \*\_test.go ファイルにのみ記述する
-- 本番コードは AWS Lambda 標準構造・バリデーション・エラー処理・ドキュメント・可読性・保守性に集中する
+- テスト専用の依存注入関数・ラッパー・テスト用ロジックは本番コードに追加しない
+- テスト性が必要な場合はインターフェース設計や構造体埋め込みを使い、テスト専用コードは `*_test.go` ファイルにのみ記述する
+- 本番コードは可読性・保守性・エラー処理・ドキュメントに集中する
 - テストヘルパー・モック・テスト専用ロジックはすべてテストファイルに分離する
 
 ## Naming Conventions
 
-| コンポーネント      | 規則                | 例                                      |
-| ------------------- | ------------------- | --------------------------------------- |
-| パッケージ名        | 小文字              | infrastructure, repository, service     |
-| 関数名(公開)        | PascalCase          | NewLambdaConfig, ProcessEvent, GetUser  |
-| 関数名(内部)        | camelCase           | validateInput, processCloudWatchEvent   |
-| 変数名              | camelCase           | lambdaConfig, eventSource, userID       |
-| 定数名              | PascalCase          | DefaultTimeout, MaxRetryCount           |
-| インターフェース名  | PascalCase + er     | UserRepository, EventProcessor, Logger  |
-| 構造体名            | PascalCase          | LambdaConfig, CloudWatchEvent, SlackMsg |
-| Lambda 関数ファイル | snake_case          | main.go, event_handler.go               |
-| AWS リソース名      | kebab-case + prefix | go-lambda-${stage}-${function}          |
+| コンポーネント     | 規則            | 例                                     |
+| ------------------ | --------------- | -------------------------------------- |
+| パッケージ名       | 小文字          | infrastructure, repository, service    |
+| 関数名(公開)       | PascalCase      | NewConfig, ProcessEvent, GetUser       |
+| 関数名(内部)       | camelCase       | validateInput, processEvent            |
+| 変数名             | camelCase       | config, eventSource, userID            |
+| 定数名             | PascalCase      | DefaultTimeout, MaxRetryCount          |
+| インターフェース名 | PascalCase + er | UserRepository, EventProcessor, Logger |
+| 構造体名           | PascalCase      | Config, Event, User                    |
+| ファイル名         | snake_case      | main.go, event_handler.go              |
 
 ## Go Standards
 
@@ -113,70 +115,62 @@ func main() {
 
 ### Code Modification Guidelines
 
-コード修正時は scripts/go/check.sh で一括検証する
+コード修正時は `/workspace/scripts/go/check.sh` で一括検証する
 
 ```bash
 # 特定ディレクトリのみ（推奨: 対象ディレクトリ）
-bash scripts/go/check.sh -f ./cmd/cloudwatch/cloudwatch_alarm_to_sns_to_slack/
+bash /workspace/scripts/go/check.sh -f ./example/gin1/
 
 # プロジェクト全体
-bash scripts/go/check.sh
+bash /workspace/scripts/go/check.sh
 
 # 自動修正付き
-bash scripts/go/check.sh -f ./cmd/cloudwatch/cloudwatch_alarm_to_sns_to_slack/
+bash /workspace/scripts/go/check.sh -f ./example/gin1/
 ```
 
-- チェックスクリプトは以下を実施するため、個別で以下のコマンドを実行しない
+検証内容：
 
-  - go mod tidy（依存管理・不要パッケージ削除）
-  - go fmt（自動整形）
-  - go vet（静的解析・エラー検出）
-  - golangci-lint（58 以上のリンターによる品質チェック）
-  - go test -v（詳細な単体テスト）
-  - go test -race（レースコンディション検出、CGO_ENABLED=1 時）
-  - go test -cover（カバレッジ分析、80%以上必須）
-  - govulncheck・ハードコード秘密検出（セキュリティチェック）
-  - ベンチマークテスト（詳細モード時）
+- `go mod tidy`（依存管理・不要パッケージ削除）
+- `go fmt`（自動整形）
+- `go vet`（静的解析・エラー検出）
+- `golangci-lint`（複数リンターによる品質チェック）
+- `go test -v`（詳細な単体テスト）
+- `go test -race`（レースコンディション検出、CGO_ENABLED=1 時）
+- `go test -cover`（カバレッジ分析、80%以上推奨）
+- `govulncheck`・ハードコード秘密検出（セキュリティチェック）
+- ベンチマークテスト（詳細モード時）
+
+### Validation Requirements
 
 - すべての検証に合格してからコードの修正を完了とする
-- Lambda 関数・パッケージはテストカバレッジ 80%以上を維持する
-  - ただし、テストカバレッジが 80%を超えることが無理な場合もあるので、その点は一部許容する
+- テストカバレッジは可能な限り高く維持する（目標 80%以上）
+- テスト失敗は必ず修正してからコミットする
 
 ### Manual Testing Requirements
 
-- 本番コードは必ず \*\_test.go ファイルで単体テストを実施する
-- アサーション・モックは testify を利用する
+- 本番コードは必ず `*_test.go` ファイルで単体テストを実施する
+- アサーション・モックは `testify` を利用する
 - テストヘルパー・モックは本番コードに追加しない
 - テスト性はインターフェース設計で担保し、テスト専用フックは本番コードに追加しない
-- CI/CD で全テスト・カバレッジ・レースチェックを実施する
-- テスト失敗は必ず修正してからマージする
-- テスト戦略・カバレッジは README 等に記載する
 
 ## Security Guidelines
 
-### Go Security Best Practices
+**詳細な security guidelines は `.github/instructions/general.instructions.md` を参照。**
 
-- 機密情報は AWS Secrets Manager や Parameter Store を利用する
-- ソースコードに秘密情報をハードコーディングしない
-- 設定は環境変数で管理する
+### Go Specific Security Best Practices
+
 - エラーメッセージに機密情報を含めない
-- go mod tidy で不要な依存を削除する
-- context でタイムアウト・キャンセルを管理する
-- 共有データは適切に同期し、go test -race で検証する
-
-### AWS Lambda Infrastructure Security
-
-- Lambda 実行ロールは最小権限で設計する
-- Lambda 環境変数で設定を管理する
-- VPC 設定はネットワーク分離を考慮する
-- CloudWatch ログは適切なレベルで有効化する
-- Lambda 監視用 CloudWatch アラームを設定する
+- `go mod tidy` で不要な依存を削除する
+- `context` でタイムアウト・キャンセルを管理する
+- 共有データは適切に同期し、`go test -race` で検証する
+- 外部入力は必ずバリデーションする
 
 ## MCP Tools
 
-- MCP の詳細仕様・サーバ一覧は `.github/instructions/general.instructions.md` の「MCP Tools」を参照。
-- Go 作業での補助的な利用方針:
-  - awslabs.aws-api-mcp-server: AWS CLI コマンド提案・実行。
-  - aws-knowledge-mcp-server: AWS 公式ドキュメント検索・参照（docs.aws.amazon.com のコンテンツ取得、関連ページ推奨）。
-  - context7: コンテキスト情報の管理・操作を支援。
-  - serena: コードベース解析・安全な編集支援（検索、参照関係、シンボル単位の挿入/置換、ディレクトリ/シンボル概要）。特に Go の作業で既定利用。
+**詳細な MCP Tools の設定は `.github/instructions/general.instructions.md` を参照。**
+
+Go 開発での主な活用：
+
+- `serena`: コードベース解析・安全な編集支援。プロジェクト初期化時には `/mcp__serena__initial_instructions` を実行
+- `awslabs.aws-api-mcp-server`: AWS CLI コマンド提案・実行
+- `context7`: コンテキスト情報の管理・操作支援

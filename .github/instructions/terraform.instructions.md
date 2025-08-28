@@ -58,41 +58,43 @@ applyTo: "**/*.tf,**/*.tfvars,**/*.tfstate,**/*.tfbackend"
 
 ### Code Modification Guidelines
 
-- コード修正時は必ず以下を実施する
-  - ENV=dev; terraform init -reconfigure -backend-config=terraform.${ENV}.tfbackend
-  - ENV=dev; terraform fmt --recursive && terraform validate && tflint -f compact --var-file=terraform.${ENV}.tfvars && trivy fs . --format table --config /workspace/trivy.yaml --secret-config /workspace/trivy-secret.yaml
-  - ENV=dev; terraform plan -lock=false -var-file=terraform.${ENV}.tfvars
-- テスト結果は明示し、失敗時は修正案を提示する
+コード修正時は以下を順次実行する：
+
+```bash
+# 環境変数設定（例：dev環境）
+ENV=dev
+
+# 初期化・検証・プラン
+terraform init -reconfigure -backend-config=terraform.${ENV}.tfbackend
+terraform fmt --recursive && terraform validate
+tflint -f compact --var-file=terraform.${ENV}.tfvars
+trivy fs . --format table --config /workspace/trivy.yaml --secret-config /workspace/trivy-secret.yaml
+terraform plan -lock=false -var-file=terraform.${ENV}.tfvars
+```
 
 ### Validation Requirements
 
-- すべての検証に合格してからコード提出する
-- 実行可能な Terraform コードは plan 実行で検証する
+- すべての検証（fmt, validate, tflint, trivy, plan）に合格してからコード提出する
 - セキュリティスキャン結果を確認し、問題があれば修正する
 
 ## Security Guidelines
 
-### Terraform Security Best Practices
+**詳細な security guidelines は `.github/instructions/general.instructions.md` を参照。**
 
-- 秘密情報はハードコーディングせず、AWS Secrets Manager 等を利用する
+### Terraform Specific Security
+
 - IAM ポリシーは最小権限で設計する
 - S3 等はデフォルトで暗号化を有効化する
 - API Gateway 等は WAF・レート制限を設定する
 - モジュール・依存関係は最新バージョンを使用する
 - リソースベースポリシー・VPC セキュリティグループを適切に設定する
 
-### AWS Environment Security
-
-- CloudTrail 等の監査ログを有効化する
-- trivy/AWS Inspector 等で定期的に脆弱性スキャンを行う
-- ネットワークアクセスは必要最小限に制限する
-- データ保存・転送時は暗号化を有効化する
-
 ## MCP Tools
 
-- 本ドキュメントの MCP に関する詳細は `.github/instructions/general.instructions.md` の「MCP Tools」を正本として参照すること。
-- Terraform 作業での補助的な利用方針:
-  - awslabs.aws-api-mcp-server: 必要に応じて AWS CLI の提案・実行に使用（明示的なリージョン指定・最小スコープ運用）。
-  - aws-knowledge-mcp-server: 公式ドキュメントの検索・参照に使用。
-  - context7: コンテキスト情報の管理・操作を支援。
-  - terraform: Terraform コードの検索・構造把握・シンボル/正規表現ベースの安全な編集に使用（.tf/.tfvars 等）。
+**詳細な MCP Tools の設定は `.github/instructions/general.instructions.md` を参照。**
+
+Terraform 作業での主な活用：
+
+- `awslabs.aws-api-mcp-server`: AWS CLI の提案・実行（明示的なリージョン指定・最小スコープ運用）
+- `aws-knowledge-mcp-server`: 公式ドキュメントの検索・参照
+- `context7`: コンテキスト情報の管理・操作支援

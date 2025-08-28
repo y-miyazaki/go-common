@@ -125,18 +125,21 @@ applyTo: "**/*.go"
 5. **言語統一**: 本文を日本語に翻訳（TOC・Reference Resources は英語維持）
 6. **検証**: grep_search や read_file で構造と内容を確認
 
-## Security Best Practices
+## Security Guidelines
 
-- 機密情報はドキュメントに記載しない
+**詳細な security guidelines は `.github/instructions/general.instructions.md` を参照。**
+
+### Markdown Specific Security
+
 - 外部リンクは信頼できる HTTPS のみ使用する
 - コード例はセキュリティベストプラクティス（環境変数利用・秘密情報ハードコーディング禁止）を守る
 - 機能の権限・アクセス制御は必ず記載する
 
 ## MCP Tools
 
-- MCP の詳細仕様・サーバ一覧は `.github/instructions/general.instructions.md` の「MCP Tools」を参照。
-- Document 作業時の補助的な利用:
-  - awslabs.aws-api-mcp-server: 必要に応じて AWS CLI の提案・実行に使用（明示的なリージョン指定・最小スコープ運用）。
-  - aws-knowledge-mcp-server: 公式ドキュメントの検索・参照に使用。
-  - context7: コンテキスト情報の管理・操作を支援。
-  - terraform: Terraform ドキュメント作成時にコード断片やパラメータ参照の正確性担保に使用。
+**詳細な MCP Tools の設定は `.github/instructions/general.instructions.md` を参照。**
+
+ドキュメント作業での主な活用：
+
+- `aws-knowledge-mcp-server`: 公式ドキュメントの検索・参照
+- `context7`: コンテキスト情報の管理・操作支援

@@ -104,7 +104,6 @@
     "internal-terms": false // Disable the `internal-terms` dictionary
   },
   "cSpell.showAutocompleteDirectiveSuggestions": true,
-
   // ------------------------------------------------------------
   // files assotiations
   // ------------------------------------------------------------
@@ -168,9 +167,8 @@
   "go.enableCodeLens": {
     "runtest": true
   },
-  "go.formatTool": "gofmt",
-  "go.formatFlags": ["-w"],
   // "go.formatTool": "goimports", // It will be ignored if you use a language server.
+  // "go.formatFlags": ["-w"], // It will be ignored if you use a language server.
   "go.generateTestsFlags": [],
   // "go.gocodeAutoBuild": false, // It will be ignored if you use a language server.
   // "go.gocodeFlags": ["-builtin", "-ignore-case", "-unimported-packages"], // It will be ignored if you use a language server.
@@ -316,7 +314,6 @@
     "**/*.fish": true
   },
   "shellcheck.customArgs": ["-x"],
-  "shellcheck.ignoreFileSchemes": ["git", "gitfs"],
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format",
     "editor.formatOnSave": true,

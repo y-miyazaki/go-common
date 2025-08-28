@@ -170,55 +170,44 @@ fi
 
 ### Code Modification Guidelines
 
-コード修正時は /workspace/scripts/validate_all_scripts.sh -v -f で一括検証すること。
+コード修正時は以下コマンドで一括検証する：
 
 ```bash
+# 全スクリプトの検証（推奨）
 bash /workspace/scripts/validate_all_scripts.sh -v -f
 ```
 
-- チェックスクリプトは以下を実施するため、個別で以下のコマンドを実行しない
-  - 再帰的なスクリプト検出
-  - Shebang
-  - 実行権限
-  - bash 構文
-  - shellcheck
-  - 関数/複雑度分析
-- すべてのスクリプトが All validations passed となる
-- 警告・エラーが出た場合は shellcheck/bash の推奨に従い修正する
-- -v オプションで詳細表示
-- 警告・エラーが残る場合は shellcheck/bash の推奨に従い修正する
+検証内容：
+
+- 再帰的なスクリプト検出
+- Shebang チェック
+- 実行権限チェック
+- bash 構文チェック
+- shellcheck 静的解析
+- 関数/複雑度分析
 
 ### Validation Requirements
 
-- コード修正後は上記統合検証スクリプトを必ず実行する
+- すべてのスクリプトが "All validations passed" となることを確認する
+- 警告・エラーが出た場合は shellcheck/bash の推奨に従い修正する
 - 実行可能スクリプトはサンプル実行または dry-run で検証する
-- テスト結果は明示し、失敗時は修正案を提示する
 
 ## Security Guidelines
 
-### Shell Script Security Best Practices
+**詳細な security guidelines は `.github/instructions/general.instructions.md` を参照。**
 
-- 秘密情報は AWS Secrets Manager や Parameter Store を利用する
-- スクリプトのファイル権限を適切に設定する
+### Shell Script Specific Security
+
 - 入力値は必ずバリデーションし、コマンドインジェクションを防ぐ
 - 一時ファイルは安全に管理する
 - エラーは安全に処理し、情報漏洩を防ぐ
-- 機密操作はログに記録するが、機密データ自体は記録しない
-- 必要最小限の権限でスクリプトを実行する
 - 外部データは必ず検証・サニタイズする
-
-### AWS Environment Security
-
-- スクリプト実行は最小限の IAM 権限で行う
-- 一時認証情報やインスタンスプロファイルを活用する
-- すべての操作はログ記録する
-- ネットワークアクセスは必要最小限に制限する
-- データ保存・転送時は暗号化を有効化する
 
 ## MCP Tools
 
-- 本ドキュメントの MCP に関する詳細は `.github/instructions/general.instructions.md` の「MCP Tools」を正本として参照すること。
-- Script 作業での補助的な利用方針:
-  - awslabs.aws-api-mcp-server: 必要に応じて AWS CLI の提案・実行に使用（明示的なリージョン指定・最小スコープ運用）。
-  - aws-knowledge-mcp-server: 公式ドキュメントの検索・参照に使用。
-  - context7: コンテキスト情報の管理・操作を支援。
+**詳細な MCP Tools の設定は `.github/instructions/general.instructions.md` を参照。**
+
+スクリプト作業での主な活用：
+
+- `awslabs.aws-api-mcp-server`: AWS CLI の提案・実行（明示的なリージョン指定・最小スコープ運用）
+- `context7`: コンテキスト情報の管理・操作支援
