@@ -127,7 +127,7 @@ jobs:
 
       # https://github.com/aquasecurity/trivy-action/tree/0.32.0/?tab=readme-ov-file#inputs
       - name: Trivy Vulnerability Scan
-        uses: aquasecurity/trivy-action@0.32.0
+        uses: aquasecurity/trivy-action@0.33.1
         with:
           exit-code: 1
           format: table
