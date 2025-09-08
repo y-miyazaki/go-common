@@ -5,12 +5,12 @@ name: reusable-cd-terraform-aws
 on:
   workflow_call:
     inputs:
-      environment:
-        description: "Target environment (dev, qa, stg, prd, audit, root)"
-        required: true
-        type: string
       component:
         description: "Terraform component (base, monitor, management)"
+        required: true
+        type: string
+      environment:
+        description: "Target environment (dev, qa, stg, prd, audit, root)"
         required: true
         type: string
       terraform_path:

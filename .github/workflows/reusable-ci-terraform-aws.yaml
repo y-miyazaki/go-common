@@ -5,16 +5,8 @@ name: reusable-ci-terraform-aws
 on:
   workflow_call:
     inputs:
-      environment:
-        description: "Target environment (dev, qa, stg, prd, audit, root)"
-        required: true
-        type: string
       component:
         description: "Terraform component (base, monitor, management)"
-        required: true
-        type: string
-      terraform_path:
-        description: "Path to terraform configuration"
         required: true
         type: string
       deploy:
@@ -22,6 +14,14 @@ on:
         required: false
         type: boolean
         default: false
+      environment:
+        description: "Target environment (dev, qa, stg, prd, audit, root)"
+        required: true
+        type: string
+      terraform_path:
+        description: "Path to terraform configuration"
+        required: true
+        type: string
     secrets:
       AWS_IAM_ROLE_ARN:
         required: true
@@ -125,7 +125,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # https://github.com/aquasecurity/trivy-action/tree/0.32.0/?tab=readme-ov-file#inputs
+      # https://github.com/aquasecurity/trivy-action/tree/0.33.1/?tab=readme-ov-file#inputs
       - name: Trivy Vulnerability Scan
         uses: aquasecurity/trivy-action@0.33.1
         with:
@@ -134,19 +134,24 @@ jobs:
           scan-ref: .
           scan-type: "fs"
           scanners: license,misconfig,secret,vuln
-          trivy-config: trivy.yaml
           severity: HIGH,CRITICAL
+          trivy-config: trivy.yaml
 
-      - name: Generate SBOM (CycloneDX)
-        run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-          trivy fs --format cyclonedx --output sbom-${{ env.COMPONENT }}-${{ env.ENV }}.json .
+      # https://github.com/aquasecurity/trivy-action/tree/0.33.1/?tab=readme-ov-file#inputs
+      - name: Trivy Generate SBOM (CycloneDX)
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          exit-code: 0
+          format: cyclonedx
+          output: ${{ env.TERRAFORM_PATH }}/sbom-${{ env.COMPONENT }}-${{ env.ENV }}.json
+          scan-ref: .
+          scan-type: "fs"
 
       - name: Upload SBOM Artifact
         uses: actions/upload-artifact@v4
         with:
           name: sbom-${{ env.COMPONENT }}-${{ env.ENV }}
-          path: sbom-${{ env.COMPONENT }}-${{ env.ENV }}.json
+          path: ${{ env.TERRAFORM_PATH }}/sbom-${{ env.COMPONENT }}-${{ env.ENV }}.json
 
   plan:
     if: ${{ github.actor != 'dependabot[bot]' }}

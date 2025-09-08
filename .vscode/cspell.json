@@ -149,6 +149,7 @@
     "structs",
     "stylecheck",
     "testpackage",
+    "textlint",
     "tfbackend",
     "tfenv",
     "tflint",

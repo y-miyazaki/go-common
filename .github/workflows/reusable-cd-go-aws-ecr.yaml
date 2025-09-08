@@ -4,17 +4,18 @@ name: reusable-cd-go-aws-ecr
 on:
   workflow_call:
     inputs:
-      environment:
-        description: "Target environment (dev, qa, stg, prd, etc.)"
-        required: true
-        type: string
       component:
         description: "Logical component name (e.g. base)"
         required: true
         type: string
-      go_path:
-        description: "Path (relative) to the Go project root (directory containing go.mod). Used as default Docker context."
-        required: true
+      dockerfile:
+        description: "Dockerfile path"
+        required: false
+        type: string
+        default: "Dockerfile"
+      docker_context:
+        description: "Docker build context path"
+        required: false
         type: string
       ecr_registry:
         description: "Target ECR registry URL (e.g. 123456789012.dkr.ecr.ap-northeast-1.amazonaws.com). If empty, uses login output."
@@ -24,15 +25,14 @@ on:
         description: "Target ECR repository name"
         required: true
         type: string
-      docker_context:
-        description: "Docker build context path"
-        required: false
+      environment:
+        description: "Target environment (dev, qa, stg, prd, etc.)"
+        required: true
         type: string
-      dockerfile:
-        description: "Dockerfile path"
-        required: false
+      go_path:
+        description: "Path (relative) to the Go project root (directory containing go.mod). Used as default Docker context."
+        required: true
         type: string
-        default: "Dockerfile"
       image_tag:
         description: "Image tag to push"
         required: false
