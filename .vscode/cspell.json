@@ -11,6 +11,7 @@
     "autoscaler",
     "awscc",
     "awslabs",
+    "awsp",
     "awss3",
     "backoff",
     "bodyclose",
@@ -150,6 +151,7 @@
     "stylecheck",
     "testpackage",
     "textlint",
+    "textlintrc",
     "tfbackend",
     "tfenv",
     "tflint",
@@ -176,7 +178,8 @@
     "wrapcheck",
     "xerrors",
     "xoxb",
-    "ymiyazakixyz"
+    "ymiyazakixyz",
+    "yourname"
   ],
   "ignorePaths": [
     "**/package-lock.json",

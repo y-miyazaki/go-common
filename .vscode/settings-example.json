@@ -244,7 +244,8 @@
     "!modules/**/README.md",
     "!**/.terraform",
     "!.github/instructions/*.md",
-    "!.github/prompt/*.md"
+    "!.github/prompt/*.md",
+    "!CODEOWNERS"
   ],
   // ------------------------------------------------------------
   // for Terraform

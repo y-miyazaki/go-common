@@ -17,11 +17,6 @@ on:
         description: "Path (relative) to the Go project root (directory containing go.mod)"
         required: true
         type: string
-      trivy_root_scan:
-        description: "Whether to perform Trivy repository root filesystem scan"
-        required: false
-        type: boolean
-        default: true
 
 env:
   ENV: ${{ inputs.environment }}

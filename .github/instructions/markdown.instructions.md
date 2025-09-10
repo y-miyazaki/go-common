@@ -8,7 +8,7 @@ applyTo: "**/*.md"
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
 
-## Overview
+## Project Overview
 
 git clone https://github.com/owner/repo.git
 
@@ -78,11 +78,45 @@ git clone https://github.com/owner/repo.git
 
 ## Markdown Templates
 
-#### README.md Template
+### README.md Template
 
-...existing code...
+```
+<!-- omit in toc -->
+# some title
+<!-- omit in toc -->
+## Table of Contents
 
-#### Technical Documentation Template
+## Project Overview
+
+### Directory Structure
+
+| Directory/File | Description                          |
+| -------------- | ------------------------------------ |
+| `dir1/`        | Description of dir1                  |
+
+## Installation
+
+## Local Development Environment
+
+### Required
+
+### Setting
+
+### Create Local Development Environment
+
+## Commands
+
+## Troubleshooting
+
+### Common Issues
+
+### Getting Help
+
+## Note
+
+```
+
+### Technical Documentation Template
 
 ...existing code...
 

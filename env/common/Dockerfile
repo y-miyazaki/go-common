@@ -92,7 +92,7 @@ RUN wget https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VER
     rm -rf gh_${GH_VERSION}_linux_${ARCH_BASE}.tar.gz gh_${GH_VERSION}_linux_${ARCH_BASE}
 
 # Install npm packages
-RUN npm install -g markdownlint-cli markdown-link-check cspell textlint textlint-rule-preset-ja-technical-writing
+RUN npm install -g markdownlint-cli markdown-link-check cspell textlint textlint-rule-preset-ja-technical-writing textlint-rule-no-dead-link
 
 #--------------------------------------------------------------
 # Install for MCP Server
