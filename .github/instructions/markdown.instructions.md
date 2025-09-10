@@ -78,7 +78,7 @@ git clone https://github.com/owner/repo.git
 - 複雑なドキュメントには使用例を記載する
 - 箇条書き
   - ハイフン（-）を使用
-  - タイトルの後は改行を入れその後に説明を記載
+  - タイトルの後スペースを 2 つ入れた後に改行を入れた後に、説明を記載
 
 ## Markdown Templates
 
