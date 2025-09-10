@@ -22,6 +22,7 @@ This repository provides common libraries and example applications for Go langua
 - [Troubleshooting](#troubleshooting)
   - [Common Issues](#common-issues)
   - [Getting Help](#getting-help)
+- [License](#license)
 - [Note](#note)
 
 ## Project Overview
@@ -167,16 +168,27 @@ dlv debug ./example/gin1
 
 ### Common Issues
 
-- **Git push returns 403 error**: Check if GitHub CLI authentication is set correctly. Use `gh auth status` to verify status, and re-run `gh auth login` if necessary.
-- **devcontainer startup failure**: Check execution permissions of `env/common/scripts/init.sh` and verify `/bin/sh` compatibility issues. Run with `bash` if needed.
-- **Dependency errors**: Run `go mod tidy` and ensure Go version is 1.24 or higher.
-- **Lint errors**: Check output of `golangci-lint run` and fix pointed locations. Refer to configuration file `.golangci.yml`.
+- **Git push returns 403 error**
+  Check if GitHub CLI authentication is set correctly. Use `gh auth status` to verify status, and re-run `gh auth login` if necessary.
+- **devcontainer startup failure**
+  Check execution permissions of `env/common/scripts/init.sh` and verify `/bin/sh` compatibility issues. Run with `bash` if needed.
+- **Dependency errors**
+  Run `go mod tidy` and ensure Go version is 1.24 or higher.
+- **Lint errors**
+  Check output of `golangci-lint run` and fix pointed locations. Refer to configuration file `.golangci.yml`.
 
 ### Getting Help
 
-- **Documentation**: Refer to this README and documentation in each directory.
-- **Issues**: Report issues via GitHub Issues.
-- **Contribution**: Refer to CONTRIBUTING.md and create pull requests.
+- **Documentation**
+  Refer to this README and documentation in each directory.
+- **Issues**
+  Report issues via GitHub Issues.
+- **Contribution**
+  Refer to CONTRIBUTING.md and create pull requests.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Note
 

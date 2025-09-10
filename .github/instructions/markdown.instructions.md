@@ -53,7 +53,6 @@ git clone https://github.com/owner/repo.git
 
 - Table of Contents: 英語で維持
 - Reference Resources: 英語で維持
-- 本文コンテンツ: 日本語で記載（Reference Resources 除く）
 
 4. **テンプレート参照**: copilot-instructions-scripts.md を統一標準のテンプレートとして使用
 
@@ -66,6 +65,8 @@ git clone https://github.com/owner/repo.git
   - Script Options（Go 固有）
 - すべて英語名で統一
 
+6. リスト要素
+
 ## Markdown Standards
 
 - 見出し階層・画像 alt テキストを正しく使う
@@ -75,6 +76,9 @@ git clone https://github.com/owner/repo.git
 - 長い URL は参照型リンクを使う
 - 重要事項は引用・アドモンションで記載する
 - 複雑なドキュメントには使用例を記載する
+- 箇条書き
+  - ハイフン（-）を使用
+  - タイトルの後は改行を入れその後に説明を記載
 
 ## Markdown Templates
 
