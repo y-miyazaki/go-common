@@ -1,3 +1,5 @@
+// Package repository provides data access layer implementations for various services
+// including Redis, AWS services, and other infrastructure components.
 package repository
 
 import (
@@ -8,34 +10,63 @@ import (
 	redis "github.com/go-redis/redis/v8"
 )
 
-// RedisRepositoryInterface interface.
-// nolint:iface,revive,unused
-type RedisRepositoryInterface interface {
-	Append(c context.Context, key, value string) error
-	BitCount(c context.Context, key string, bitCount *redis.BitCount) (int64, error)
-	Decr(c context.Context, key string) error
-	DecrBy(c context.Context, key string, value int64) error
-	Get(c context.Context, key string) (string, error)
-	GetBit(c context.Context, key string, offset int64) (int64, error)
-	GetRange(c context.Context, key string, start, end int64) (string, error)
-	GetSet(c context.Context, key string, value interface{}) (string, error)
-	Incr(c context.Context, key string) error
-	IncrBy(c context.Context, key string, value int64) error
-	IncrByfloat(c context.Context, key string, value float64) error
-	MGet(c context.Context, keys ...string) ([]interface{}, error)
-	MSet(c context.Context, values ...interface{}) (string, error)
-	MSetNX(c context.Context, values ...interface{}) (bool, error)
-	Set(c context.Context, key string, value interface{}, expiration time.Duration) error
-	SetBit(c context.Context, key string, offset int64, value int) error
-	SetEX(c context.Context, key string, value interface{}, expiration time.Duration) error
-	SetNX(c context.Context, key string, value interface{}, expiration time.Duration) error
-	SetRange(c context.Context, key string, offset int64, value string) (int64, error)
-	StrLen(c context.Context, key string) (int64, error)
+// RedisClientInterface defines the interface for Redis client operations
+type RedisClientInterface interface {
+	// Append Redis `APPEND key value` command.
+	Append(_ context.Context, _ string, _ string) *redis.IntCmd
+	// BitCount Redis `BITCOUNT key` command.
+	BitCount(_ context.Context, _ string, _ *redis.BitCount) *redis.IntCmd
+	// Decr Redis `DECR key` command.
+	Decr(_ context.Context, _ string) *redis.IntCmd
+	// DecrBy Redis `DECRBY key value` command.
+	DecrBy(_ context.Context, _ string, _ int64) *redis.IntCmd
+	// Del Redis `DEL key [key ...]` command.
+	Del(_ context.Context, _ ...string) *redis.IntCmd
+	// Exists Redis `EXISTS key [key ...]` command.
+	Exists(_ context.Context, _ ...string) *redis.IntCmd
+	// Get Redis `GET key` command.
+	Get(_ context.Context, _ string) *redis.StringCmd
+	// GetBit Redis `GETBIT key start end` command.
+	GetBit(_ context.Context, _ string, _ int64) *redis.IntCmd
+	// GetRange Redis `GETRANGE key start end` command.
+	GetRange(_ context.Context, _ string, _ int64, _ int64) *redis.StringCmd
+	// GetSet Redis `GETSET key` command.
+	GetSet(_ context.Context, _ string, _ any) *redis.StringCmd
+	// Incr Redis `INCR key` command.
+	Incr(_ context.Context, _ string) *redis.IntCmd
+	// IncrBy Redis `INCRBY key value` command.
+	IncrBy(_ context.Context, _ string, _ int64) *redis.IntCmd
+	// IncrByFloat Redis `INCRBYFLOAT key value` command.
+	IncrByFloat(_ context.Context, _ string, _ float64) *redis.FloatCmd
+	// MGet Redis `MGET keys...` command.
+	MGet(_ context.Context, _ ...string) *redis.SliceCmd
+	// MSet Redis `MSET key value key2 value2...` command.
+	MSet(_ context.Context, _ ...any) *redis.StatusCmd
+	// MSetNX Redis `MSETNX key value key2 value2...` command.
+	MSetNX(_ context.Context, _ ...any) *redis.BoolCmd
+	// Ping Redis `PING` command.
+	Ping(_ context.Context) *redis.StatusCmd
+	// Set Redis `SET key value [expiration]` command.
+	Set(_ context.Context, _ string, _ any, _ time.Duration) *redis.StatusCmd
+	// SetBit Redis `SETBIT key value offset value` command.
+	SetBit(_ context.Context, _ string, _ int64, _ int) *redis.IntCmd
+	// SetEX Redis `SETEX key value expiration` command.
+	SetEX(_ context.Context, _ string, _ any, _ time.Duration) *redis.StatusCmd
+	// SetNX Redis `SETNX key value [expiration]` command.
+	SetNX(_ context.Context, _ string, _ any, _ time.Duration) *redis.BoolCmd
+	// SetRange Redis `SETRANGE key start end` command.
+	SetRange(_ context.Context, _ string, _ int64, _ string) *redis.IntCmd
+	// TTL Redis `TTL key` command.
+	TTL(_ context.Context, _ string) *redis.DurationCmd
+	// Expire Redis `EXPIRE key seconds` command.
+	Expire(_ context.Context, _ string, _ time.Duration) *redis.BoolCmd
+	// StrLen Redis `STRLEN key` command.
+	StrLen(_ context.Context, _ string) *redis.IntCmd
 }
 
 // RedisRepository struct.
 type RedisRepository struct {
-	redis *redis.Client
+	redis RedisClientInterface
 }
 
 // NewRedisRepository returns RedisRepository instance.
@@ -45,12 +76,20 @@ func NewRedisRepository(r *redis.Client) *RedisRepository {
 	}
 }
 
-// Append Redis `APPEND key value` command.
-func (r *RedisRepository) Append(c context.Context, key, value string) error {
-	if err := r.redis.Append(c, key, value).Err(); err != nil {
-		return fmt.Errorf("redis Append: %w", err)
+// NewRedisRepositoryWithInterface creates RedisRepository with interface for testing
+func NewRedisRepositoryWithInterface(r RedisClientInterface) *RedisRepository {
+	return &RedisRepository{
+		redis: r,
 	}
-	return nil
+}
+
+// Append Redis `APPEND key value` command.
+func (r *RedisRepository) Append(c context.Context, key, value string) (int64, error) {
+	res, err := r.redis.Append(c, key, value).Result()
+	if err != nil {
+		return 0, fmt.Errorf("redis Append: %w", err)
+	}
+	return res, nil
 }
 
 // BitCount Redis `BITCOUNT key` command.
@@ -76,6 +115,24 @@ func (r *RedisRepository) DecrBy(c context.Context, key string, value int64) err
 		return fmt.Errorf("redis DecrBy: %w", err)
 	}
 	return nil
+}
+
+// Del Redis `DEL key [key ...]` command.
+func (r *RedisRepository) Del(c context.Context, keys ...string) (int64, error) {
+	res, err := r.redis.Del(c, keys...).Result()
+	if err != nil {
+		return 0, fmt.Errorf("redis Del: %w", err)
+	}
+	return res, nil
+}
+
+// Exists Redis `EXISTS key [key ...]` command.
+func (r *RedisRepository) Exists(c context.Context, keys ...string) (int64, error) {
+	res, err := r.redis.Exists(c, keys...).Result()
+	if err != nil {
+		return 0, fmt.Errorf("redis Exists: %w", err)
+	}
+	return res, nil
 }
 
 // Get Redis `GET key` command.
@@ -107,7 +164,7 @@ func (r *RedisRepository) GetRange(c context.Context, key string, start, end int
 
 // GetSet Redis `GETSET key` command.
 // nolint:revive // keep interface{} for Go 1.16 compatibility
-func (r *RedisRepository) GetSet(c context.Context, key string, value interface{}) (string, error) {
+func (r *RedisRepository) GetSet(c context.Context, key string, value any) (string, error) {
 	res, err := r.redis.GetSet(c, key, value).Result()
 	if err != nil {
 		return "", fmt.Errorf("redis GetSet: %w", err)
@@ -116,11 +173,12 @@ func (r *RedisRepository) GetSet(c context.Context, key string, value interface{
 }
 
 // Incr Redis `INCR key` command.
-func (r *RedisRepository) Incr(c context.Context, key string) error {
-	if err := r.redis.Incr(c, key).Err(); err != nil {
-		return fmt.Errorf("redis Incr: %w", err)
+func (r *RedisRepository) Incr(c context.Context, key string) (int64, error) {
+	res, err := r.redis.Incr(c, key).Result()
+	if err != nil {
+		return 0, fmt.Errorf("redis Incr: %w", err)
 	}
-	return nil
+	return res, nil
 }
 
 // IncrBy Redis `INCRBY key value` command.
@@ -141,7 +199,7 @@ func (r *RedisRepository) IncrByfloat(c context.Context, key string, value float
 
 // MGet Redis `MGET keys...` command.
 // nolint:revive // keep interface{} for Go 1.16 compatibility
-func (r *RedisRepository) MGet(c context.Context, keys ...string) ([]interface{}, error) {
+func (r *RedisRepository) MGet(c context.Context, keys ...string) ([]any, error) {
 	res, err := r.redis.MGet(c, keys...).Result()
 	if err != nil {
 		return nil, fmt.Errorf("redis MGet: %w", err)
@@ -151,7 +209,7 @@ func (r *RedisRepository) MGet(c context.Context, keys ...string) ([]interface{}
 
 // MSet Redis `MSET key value key2 value2...` command.
 // nolint:revive // keep interface{} for Go 1.16 compatibility
-func (r *RedisRepository) MSet(c context.Context, values ...interface{}) (string, error) {
+func (r *RedisRepository) MSet(c context.Context, values ...any) (string, error) {
 	res, err := r.redis.MSet(c, values...).Result()
 	if err != nil {
 		return "", fmt.Errorf("redis MSet: %w", err)
@@ -161,7 +219,7 @@ func (r *RedisRepository) MSet(c context.Context, values ...interface{}) (string
 
 // MSetNX Redis `MSETNX key value key2 value2...` command.
 // nolint:revive // keep interface{} for Go 1.16 compatibility
-func (r *RedisRepository) MSetNX(c context.Context, values ...interface{}) (bool, error) {
+func (r *RedisRepository) MSetNX(c context.Context, values ...any) (bool, error) {
 	res, err := r.redis.MSetNX(c, values...).Result()
 	if err != nil {
 		return false, fmt.Errorf("redis MSetNX: %w", err)
@@ -169,9 +227,17 @@ func (r *RedisRepository) MSetNX(c context.Context, values ...interface{}) (bool
 	return res, nil
 }
 
+// Ping Redis `PING` command.
+func (r *RedisRepository) Ping(c context.Context) error {
+	if err := r.redis.Ping(c).Err(); err != nil {
+		return fmt.Errorf("redis Ping: %w", err)
+	}
+	return nil
+}
+
 // Set Redis `SET key value [expiration]` command.
 // nolint:revive // keep interface{} for Go 1.16 compatibility
-func (r *RedisRepository) Set(c context.Context, key string, value interface{}, expiration time.Duration) error {
+func (r *RedisRepository) Set(c context.Context, key string, value any, expiration time.Duration) error {
 	if err := r.redis.Set(c, key, value, expiration).Err(); err != nil {
 		return fmt.Errorf("redis Set: %w", err)
 	}
@@ -188,7 +254,7 @@ func (r *RedisRepository) SetBit(c context.Context, key string, offset int64, va
 
 // SetEX Redis `SETEX key value expiration` command.
 // nolint:revive // keep interface{} for Go 1.16 compatibility
-func (r *RedisRepository) SetEX(c context.Context, key string, value interface{}, expiration time.Duration) error {
+func (r *RedisRepository) SetEX(c context.Context, key string, value any, expiration time.Duration) error {
 	if err := r.redis.SetEX(c, key, value, expiration).Err(); err != nil {
 		return fmt.Errorf("redis SetEX: %w", err)
 	}
@@ -197,7 +263,7 @@ func (r *RedisRepository) SetEX(c context.Context, key string, value interface{}
 
 // SetNX Redis `SETNX key value [expiration]` command.
 // nolint:revive // keep interface{} for Go 1.16 compatibility
-func (r *RedisRepository) SetNX(c context.Context, key string, value interface{}, expiration time.Duration) error {
+func (r *RedisRepository) SetNX(c context.Context, key string, value any, expiration time.Duration) error {
 	if err := r.redis.SetNX(c, key, value, expiration).Err(); err != nil {
 		return fmt.Errorf("redis SetNX: %w", err)
 	}
@@ -209,6 +275,24 @@ func (r *RedisRepository) SetRange(c context.Context, key string, offset int64, 
 	res, err := r.redis.SetRange(c, key, offset, value).Result()
 	if err != nil {
 		return 0, fmt.Errorf("redis SetRange: %w", err)
+	}
+	return res, nil
+}
+
+// TTL Redis `TTL key` command.
+func (r *RedisRepository) TTL(c context.Context, key string) (time.Duration, error) {
+	res, err := r.redis.TTL(c, key).Result()
+	if err != nil {
+		return 0, fmt.Errorf("redis TTL: %w", err)
+	}
+	return res, nil
+}
+
+// Expire Redis `EXPIRE key seconds` command.
+func (r *RedisRepository) Expire(c context.Context, key string, expiration time.Duration) (bool, error) {
+	res, err := r.redis.Expire(c, key, expiration).Result()
+	if err != nil {
+		return false, fmt.Errorf("redis Expire: %w", err)
 	}
 	return res, nil
 }

@@ -49,14 +49,9 @@ git clone https://github.com/owner/repo.git
 
 2. **第３項目（###）以下**: 各言語・フレームワークの特性に応じて調整可能
 
-3. **保持要素**:
+3. **テンプレート参照**: copilot-instructions-scripts.md を統一標準のテンプレートとして使用
 
-- Table of Contents: 英語で維持
-- Reference Resources: 英語で維持
-
-4. **テンプレート参照**: copilot-instructions-scripts.md を統一標準のテンプレートとして使用
-
-5. **第３項目（###）レベルの統一**:
+4. **第３項目（###）レベルの統一**:
 
 - Testing and Validation 章の統一構造:
   - Code Modification Guidelines（共通）
@@ -64,8 +59,6 @@ git clone https://github.com/owner/repo.git
   - Manual Testing Requirements（Go 固有）
   - Script Options（Go 固有）
 - すべて英語名で統一
-
-6. リスト要素
 
 ## Markdown Standards
 
@@ -78,7 +71,7 @@ git clone https://github.com/owner/repo.git
 - 複雑なドキュメントには使用例を記載する
 - 箇条書き
   - ハイフン（-）を使用
-  - タイトルの後スペースを 2 つ入れた後に改行を入れた後に、説明を記載
+  - タイトルの後はスペースを 2 つと改行を入れ、その後に説明を記載
 
 ## Markdown Templates
 

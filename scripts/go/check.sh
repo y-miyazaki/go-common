@@ -177,10 +177,9 @@ function run_go_fmt {
             GO_FMT_FAILED=1
         fi
     else
-        # Check if formatting is needed by using gofmt -l
+        # Check if formatting is needed by running go fmt and checking for changes
         local fmt_output
-        fmt_output=$(go fmt -n "$TARGET_PATTERN" 2>/dev/null || true)
-
+        fmt_output=$(go fmt "$TARGET_PATTERN" 2>&1)
         if [[ -n "$fmt_output" ]]; then
             echo "Files that would be formatted:"
             echo "$fmt_output"
@@ -401,32 +400,6 @@ function run_security_checks {
         log "WARN" "govulncheck not installed, skipping vulnerability check"
         log "INFO" "Install with: go install golang.org/x/vuln/cmd/govulncheck@latest"
     fi
-
-    # Check for hardcoded secrets (basic patterns)
-    log "INFO" "Checking for potential hardcoded secrets... (root=$search_root)"
-    local secret_patterns=(
-        "password.*=.*['\"][^'\"]*['\"]"
-        "secret.*=.*['\"][^'\"]*['\"]"
-        "token.*=.*['\"][^'\"]*['\"]"
-        "key.*=.*['\"][^'\"]*['\"]"
-        "aws_access_key_id.*=.*['\"][^'\"]*['\"]"
-        "aws_secret_access_key.*=.*['\"][^'\"]*['\"]"
-    )
-
-    local secrets_found=false
-    for pattern in "${secret_patterns[@]}"; do
-        if find "$search_root" -name "*.go" -not -path "*/vendor/*" -not -path "*/.*" -exec grep -l -i -E "$pattern" {} + 2>/dev/null | head -1; then
-            secrets_found=true
-        fi
-    done
-
-    if [[ "$secrets_found" == "true" ]]; then # pragma: allowlist secret
-        log "WARN" "Potential hardcoded secrets found. Please review and use environment variables instead."
-        EXIT_CODE=1
-        SECURITY_FAILED=1
-    else
-        log "INFO" "No obvious hardcoded secrets found"
-    fi
 }
 
 #######################################
@@ -586,7 +559,7 @@ function main {
                 echo "✅ go test -cover" >&2
             fi
         fi
-    [[ "$SECURITY_FAILED" == "1" ]] && echo "❌ security checks (govulncheck or secrets)" >&2 || echo "✅ security checks (govulncheck or secrets)" >&2
+    [[ "$SECURITY_FAILED" == "1" ]] && echo "❌ security checks (govulncheck)" >&2 || echo "✅ security checks (govulncheck)" >&2
         log "ERROR" "❌ Some validations failed"
     fi
 

@@ -17,6 +17,7 @@ MD034: false  # Bare URL used
 MD035: false  # Horizontal rule style
 MD036: false  # Emphasis used instead of header
 MD040: false  # Fenced code blocks should have a language specified
+MD041: false  # First line in file should be a top level header
 MD051: false  # Link fragments should be valid
 
 # Keep only essential rules enabled

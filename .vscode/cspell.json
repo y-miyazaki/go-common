@@ -127,7 +127,6 @@
     "nolintlint",
     "pidfile",
     "pipefail",
-    "postgres",
     "prealloc",
     "printf",
     "redrive",

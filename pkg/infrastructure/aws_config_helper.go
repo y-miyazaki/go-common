@@ -139,7 +139,7 @@ func GetAWSConfig(logger any, service AWSService, key, secret, sessionToken, reg
 	// nolint: wrapcheck
 	return GetAWSConfigWithLogger(logger, &AWSConfigParams{
 		Key:          key,
-		Secret:       secret, // pragma: allowlist secret
+		Secret:       secret, // pragma: allowlist-secret
 		SessionToken: sessionToken,
 		Region:       region,
 		Endpoint:     endpoint,

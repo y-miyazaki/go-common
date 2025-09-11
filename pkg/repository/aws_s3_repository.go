@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -22,34 +23,57 @@ const (
 	maxBufferSize int = 512
 )
 
-// AWSS3RepositoryInterface interface for AWS SDK v2 S3 repository.
-// nolint:iface,revive,unused
-type AWSS3RepositoryInterface interface {
-	GetObject(bucket, key string) (*s3.GetObjectOutput, error)
-	PutObjectFile(bucket, key, filePath string) (*s3.PutObjectOutput, error)
-	PutObjectText(bucket, key string, text *string) (*s3.PutObjectOutput, error)
-	DeleteObject(bucket, key string) (*s3.DeleteObjectOutput, error)
-	DeleteObjects(bucket string, keys []string) (*s3.DeleteObjectsOutput, error)
-	ListObjectsV2(bucket, prefix string) (*s3.ListObjectsV2Output, error)
-	ListBuckets() (*s3.ListBucketsOutput, error)
-	CreateBucket(bucket string) (*s3.CreateBucketOutput, error)
-	DeleteBucket(bucket string) (*s3.DeleteBucketOutput, error)
-	GetPresignedURL(bucket, key string, expire time.Duration) (*v4.PresignedHTTPRequest, error)
-	Upload(bucket, key, filePath string) (*manager.UploadOutput, error)
-	Download(bucket, key, filePath string) error
-	normalizePath(p string) string
+// AWSS3ClientInterface interface for mocking S3 client
+type AWSS3ClientInterface interface {
+	// GetObject retrieves an object from S3
+	GetObject(_ context.Context, _ *s3.GetObjectInput, _ ...func(*s3.Options)) (*s3.GetObjectOutput, error)
+	// PutObject uploads an object to S3
+	PutObject(_ context.Context, _ *s3.PutObjectInput, _ ...func(*s3.Options)) (*s3.PutObjectOutput, error)
+	// DeleteObject deletes an object from S3
+	DeleteObject(_ context.Context, _ *s3.DeleteObjectInput, _ ...func(*s3.Options)) (*s3.DeleteObjectOutput, error)
+	// DeleteObjects deletes multiple objects from S3
+	DeleteObjects(_ context.Context, _ *s3.DeleteObjectsInput, _ ...func(*s3.Options)) (*s3.DeleteObjectsOutput, error)
+	// ListObjectsV2 lists objects in an S3 bucket
+	ListObjectsV2(_ context.Context, _ *s3.ListObjectsV2Input, _ ...func(*s3.Options)) (*s3.ListObjectsV2Output, error)
+	// ListBuckets lists all S3 buckets
+	ListBuckets(_ context.Context, _ *s3.ListBucketsInput, _ ...func(*s3.Options)) (*s3.ListBucketsOutput, error)
+	// CreateBucket creates a new S3 bucket
+	CreateBucket(_ context.Context, _ *s3.CreateBucketInput, _ ...func(*s3.Options)) (*s3.CreateBucketOutput, error)
+	// DeleteBucket deletes an S3 bucket
+	DeleteBucket(_ context.Context, _ *s3.DeleteBucketInput, _ ...func(*s3.Options)) (*s3.DeleteBucketOutput, error)
+}
+
+// AWSS3PresignClientInterface interface for mocking S3 presign client
+type AWSS3PresignClientInterface interface {
+	// PresignGetObject generates a presigned URL for getting an S3 object
+	PresignGetObject(_ context.Context, _ *s3.GetObjectInput, _ ...func(*s3.PresignOptions)) (*v4.PresignedHTTPRequest, error)
+}
+
+// AWSS3UploaderClientInterface interface for mocking S3 uploader
+type AWSS3UploaderClientInterface interface {
+	// Upload uploads an object to S3 using the manager uploader
+	Upload(_ context.Context, _ *s3.PutObjectInput, _ ...func(*manager.Uploader)) (*manager.UploadOutput, error)
+}
+
+// AWSS3DownloaderClientInterface interface for mocking S3 downloader
+type AWSS3DownloaderClientInterface interface {
+	// Download downloads an object from S3 using the manager downloader
+	Download(_ context.Context, _ io.WriterAt, _ *s3.GetObjectInput, _ ...func(*manager.Downloader)) (int64, error)
 }
 
 // AWSS3Repository struct implements AWSS3RepositoryInterface using AWS SDK v2.
 type AWSS3Repository struct {
-	c          *s3.Client
-	uploader   *manager.Uploader
-	downloader *manager.Downloader
-	presigned  *s3.PresignClient
+	c          AWSS3ClientInterface
+	uploader   AWSS3UploaderClientInterface
+	downloader AWSS3DownloaderClientInterface
+	presigned  AWSS3PresignClientInterface
 }
 
 // NewAWSS3Repository returns AWSS3Repository instance backed by AWS SDK v2 client.
 func NewAWSS3Repository(client *s3.Client) *AWSS3Repository {
+	if client == nil {
+		return &AWSS3Repository{}
+	}
 	return &AWSS3Repository{
 		c:          client,
 		uploader:   manager.NewUploader(client),
@@ -60,6 +84,16 @@ func NewAWSS3Repository(client *s3.Client) *AWSS3Repository {
 
 // NewAWSS3RepositoryWithOther returns AWSS3Repository instance backed by AWS SDK v2 client.
 func NewAWSS3RepositoryWithOther(client *s3.Client, uploader *manager.Uploader, downloader *manager.Downloader, presigned *s3.PresignClient) *AWSS3Repository {
+	return &AWSS3Repository{
+		c:          client,
+		uploader:   uploader,
+		downloader: downloader,
+		presigned:  presigned,
+	}
+}
+
+// NewAWSS3RepositoryWithInterface returns AWSS3Repository instance backed by interfaces for testing.
+func NewAWSS3RepositoryWithInterface(client AWSS3ClientInterface, uploader AWSS3UploaderClientInterface, downloader AWSS3DownloaderClientInterface, presigned AWSS3PresignClientInterface) *AWSS3Repository {
 	return &AWSS3Repository{
 		c:          client,
 		uploader:   uploader,

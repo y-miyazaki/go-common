@@ -6,17 +6,15 @@ import (
 	"github.com/slack-go/slack"
 )
 
-// SlackRepositoryInterface interface
-// nolint:iface,revive,unused
-type SlackRepositoryInterface interface {
-	PostMessage(options ...slack.MsgOption) error
-	PostMessageText(text string) error
-	PostMessageAttachment(attachment *slack.Attachment) error
+// SlackClientInterface defines the interface for Slack client operations
+type SlackClientInterface interface {
+	// PostMessage sends a message to a channel
+	PostMessage(_ string, _ ...slack.MsgOption) (string, string, error)
 }
 
 // SlackRepository struct.
 type SlackRepository struct {
-	client    *slack.Client
+	client    SlackClientInterface
 	channelID string
 }
 
@@ -28,7 +26,15 @@ func NewSlackRepository(client *slack.Client, channelID string) *SlackRepository
 	}
 }
 
-// PostMessageAttachment sends a message to a channel.
+// NewSlackRepositoryWithInterface returns SlackRepository instance with interface (for testing).
+func NewSlackRepositoryWithInterface(client SlackClientInterface, channelID string) *SlackRepository {
+	return &SlackRepository{
+		client:    client,
+		channelID: channelID,
+	}
+}
+
+// PostMessage sends a message to a channel.
 // Message is escaped by default according to https://api.slack.com/docs/formatting
 // Use http://davestevens.github.io/slack-message-builder/ to help crafting your message.
 func (r *SlackRepository) PostMessage(options ...slack.MsgOption) error {

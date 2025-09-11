@@ -61,3 +61,50 @@ func TestNewLogger(t *testing.T) {
 	ctx = context.WithValue(ctx, "contextKey", "contextValue")
 	log.WithContext(ctx).WithContextValue("contextKey").Infof("WithContextValue")
 }
+
+func TestLogger_PanicFunctions(t *testing.T) {
+	// Create a logger with a buffer to capture output
+	logger := &logrus.Logger{}
+	logger.Formatter = &logrus.TextFormatter{}
+	logger.Level = logrus.PanicLevel // Set to PanicLevel to ensure panic functions are called
+
+	// Test Panicf - should panic
+	assert.Panics(t, func() {
+		log := NewLogger(logger)
+		log.Panicf("Test panicf: %s", "message")
+	})
+
+	// Test Panic - should panic
+	assert.Panics(t, func() {
+		log := NewLogger(logger)
+		log.Panic("Test panic")
+	})
+
+	// Test Panicln - should panic
+	assert.Panics(t, func() {
+		log := NewLogger(logger)
+		log.Panicln("Test panicln")
+	})
+}
+
+func TestLogger_FatalFunctions(t *testing.T) {
+	// Note: Fatal functions call os.Exit, which terminates the program
+	// In a real test environment, you might want to mock os.Exit or use a different approach
+	// For now, we'll test that the functions exist and can be called (though they will exit)
+
+	// We can't easily test Fatal functions in unit tests because they call os.Exit
+	// One approach is to test that the logger is properly configured
+	logger := &logrus.Logger{}
+	logger.Formatter = &logrus.TextFormatter{}
+	logger.Level = logrus.FatalLevel
+
+	log := NewLogger(logger)
+
+	// Test that the logger has the expected level
+	assert.Equal(t, logrus.FatalLevel, log.Entry.Logger.Level)
+
+	// Fatal functions would normally exit, so we don't call them in tests
+	// log.Fatalf("Test fatalf: %s", "message")
+	// log.Fatal("Test fatal")
+	// log.Fatalln("Test fatalln")
+}
