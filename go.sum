@@ -28,8 +28,8 @@ github.com/DATA-DOG/go-sqlmock v1.5.2 h1:OcvFkGmslmlZibjAjaHm3L//6LiuBgolP7Oputl
 github.com/DATA-DOG/go-sqlmock v1.5.2/go.mod h1:88MAG/4G7SMwSE3CeA0ZKzrT5CiOU3OJ+JlNzwDqpNU=
 github.com/aws/aws-sdk-go-v2 v1.39.0 h1:xm5WV/2L4emMRmMjHFykqiA4M/ra0DJVSWUkDyBjbg4=
 github.com/aws/aws-sdk-go-v2 v1.39.0/go.mod h1:sDioUELIUO9Znk23YVmIk86/9DOpkbyyVb1i/gUNFXY=
-github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.0 h1:6GMWV6CNpA/6fbFHnoAjrv4+LGfyTqZz2LtCHnspgDg=
-github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.0/go.mod h1:/mXlTIVG9jbxkqDnr5UQNQxW1HRYxeGklkM9vAFeabg=
+github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.1 h1:i8p8P4diljCr60PpJp6qZXNlgX4m2yQFpYk+9ZT+J4E=
+github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.1/go.mod h1:ddqbooRZYNoJ2dsTwOty16rM+/Aqmk/GOXrK8cg7V00=
 github.com/aws/aws-sdk-go-v2/config v1.31.8 h1:kQjtOLlTU4m4A64TsRcqwNChhGCwaPBt+zCQt/oWsHU=
 github.com/aws/aws-sdk-go-v2/config v1.31.8/go.mod h1:QPpc7IgljrKwH0+E6/KolCgr4WPLerURiU592AYzfSY=
 github.com/aws/aws-sdk-go-v2/credentials v1.18.12 h1:zmc9e1q90wMn8wQbjryy8IwA6Q4XlaL9Bx2zIqdNNbk=
@@ -46,8 +46,8 @@ github.com/aws/aws-sdk-go-v2/internal/ini v1.8.3 h1:bIqFDwgGXXN1Kpp99pDOdKMTTb5d
 github.com/aws/aws-sdk-go-v2/internal/ini v1.8.3/go.mod h1:H5O/EsxDWyU+LP/V8i5sm8cxoZgc2fdNR9bxlOFrQTo=
 github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.7 h1:BszAktdUo2xlzmYHjWMq70DqJ7cROM8iBd3f6hrpuMQ=
 github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.7/go.mod h1:XJ1yHki/P7ZPuG4fd3f0Pg/dSGA2cTQBCLw82MH2H48=
-github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.56.0 h1:GiSL2mJ/gSJR4p2HHRrydkM/LVtP82gssI3CKeGCFAk=
-github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.56.0/go.mod h1:0jzhov8WzD4VylEv83E+RkqA8W6k7DX37XyrwMavyvQ=
+github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.57.4 h1:3iaxLk54jdxyeYAW0t07bjF0Y+T456dLFxhd5BVeD50=
+github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.57.4/go.mod h1:ptJgRWK9opQK1foOTBKUg3PokkKA0/xcTXWIxwliaIY=
 github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.57.5 h1:FOD3qP3yqkNE7WN8PjX9Y+9fPgJdvOqLXnA4DZlXuiY=
 github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.57.5/go.mod h1:M535tDOpoNJrgl2FV6nUxWq8asER7mY+xoTiTPcgLJ8=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.1 h1:oegbebPEMA/1Jny7kvwejowCaHz1FWZAQ94WXFNCyTM=
