@@ -18,7 +18,7 @@ repos:
     hooks:
       - id: detect-secrets
         # args: ['--baseline', '.secrets.baseline']
-        # Exclude gitleaks config and any terraform.*.tfvars files in any directory
+        # Exclude go test file and gitleaks config and any terraform.*.tfvars files in any directory
         exclude: '(.*_test.go|.gitleaks.toml|(?:^|/)(?:.*/)?terraform\.[^.]+\.tfvars$)'
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.24.2
