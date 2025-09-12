@@ -522,13 +522,11 @@ function main {
         echo_section "Result (completed in ${elapsed} seconds)"
         echo "Result:" >&2
         [[ "$GO_FMT_FAILED" == "1" ]] && echo "❌ go fmt" >&2 || echo "✅ go fmt" >&2
-        if [[ "$GO_VET_FAILED" == "1" ]]; then
-            echo "❌ go vet" >&2
-        else
-        echo "✅ go vet" >&2
+        # Report go vet status
+        [[ "$GO_VET_FAILED" == "1" ]] && echo "❌ go vet" >&2 || echo "✅ go vet" >&2
+
         # Report go build status next to keep result order consistent with run_* calls
         [[ "$GO_BUILD_FAILED" == "1" ]] && echo "❌ go build" >&2 || echo "✅ go build" >&2
-        fi
         if [[ "$LINT_FAILED" == "1" ]]; then
             echo -n "❌ golangci-lint" >&2
             # Use safe arithmetic comparison with default 0 to avoid bash syntax errors
