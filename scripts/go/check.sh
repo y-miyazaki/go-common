@@ -177,11 +177,11 @@ function run_go_fmt {
             GO_FMT_FAILED=1
         fi
     else
-        # Check if formatting is needed by running go fmt and checking for changes
+        # Check if formatting is needed by using gofmt -l (list files that need formatting)
         local fmt_output
-        fmt_output=$(go fmt "$TARGET_PATTERN" 2>&1)
+        fmt_output=$(gofmt -l $(find . -name "*.go" -path "$TARGET_PATTERN" 2>/dev/null) 2>/dev/null)
         if [[ -n "$fmt_output" ]]; then
-            echo "Files that would be formatted:"
+            echo "Files that need formatting:"
             echo "$fmt_output"
             log "WARN" "Some files need formatting. Use -f flag to auto-fix"
             EXIT_CODE=1
