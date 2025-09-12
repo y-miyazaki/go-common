@@ -3,6 +3,9 @@
 # NOTE: This Lint setting is an example. Customize it for your project.
 # https://golangci-lint.run/usage/configuration/
 # -------------------------------------------------------------
+# Defines the configuration version.
+# For v2 version of golangci-lint, use version: 2
+version: "2"
 
 # Options for analysis running.
 run:
