@@ -14,14 +14,14 @@ type SlackClientInterface interface {
 
 // SlackRepository struct.
 type SlackRepository struct {
-	client    SlackClientInterface
+	Client    SlackClientInterface
 	channelID string
 }
 
 // NewSlackRepository returns SlackRepository instance.
 func NewSlackRepository(client *slack.Client, channelID string) *SlackRepository {
 	return &SlackRepository{
-		client:    client,
+		Client:    client,
 		channelID: channelID,
 	}
 }
@@ -29,7 +29,7 @@ func NewSlackRepository(client *slack.Client, channelID string) *SlackRepository
 // NewSlackRepositoryWithInterface returns SlackRepository instance with interface (for testing).
 func NewSlackRepositoryWithInterface(client SlackClientInterface, channelID string) *SlackRepository {
 	return &SlackRepository{
-		client:    client,
+		Client:    client,
 		channelID: channelID,
 	}
 }
@@ -38,7 +38,7 @@ func NewSlackRepositoryWithInterface(client SlackClientInterface, channelID stri
 // Message is escaped by default according to https://api.slack.com/docs/formatting
 // Use http://davestevens.github.io/slack-message-builder/ to help crafting your message.
 func (r *SlackRepository) PostMessage(options ...slack.MsgOption) error {
-	_, _, err := r.client.PostMessage(r.channelID, options...)
+	_, _, err := r.Client.PostMessage(r.channelID, options...)
 	if err != nil {
 		return fmt.Errorf("slack PostMessage: %w", err)
 	}
@@ -51,7 +51,7 @@ func (r *SlackRepository) PostMessage(options ...slack.MsgOption) error {
 func (r *SlackRepository) PostMessageText(text string) error {
 	// text
 	msgOptText := slack.MsgOptionText(text, true)
-	_, _, err := r.client.PostMessage(r.channelID, msgOptText)
+	_, _, err := r.Client.PostMessage(r.channelID, msgOptText)
 	if err != nil {
 		return fmt.Errorf("slack PostMessageText: %w", err)
 	}
@@ -66,7 +66,7 @@ func (r *SlackRepository) PostMessageAttachment(attachment *slack.Attachment) er
 	msgOptText := slack.MsgOptionText("", true)
 	// attachment
 	msgOptAttachments := slack.MsgOptionAttachments(*attachment)
-	_, _, err := r.client.PostMessage(r.channelID, msgOptAttachments, msgOptText)
+	_, _, err := r.Client.PostMessage(r.channelID, msgOptAttachments, msgOptText)
 	if err != nil {
 		return fmt.Errorf("slack PostMessageAttachment: %w", err)
 	}

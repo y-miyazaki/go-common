@@ -1,5 +1,4 @@
 // Package handler provides HTTP request handlers for the Gin web framework.
-// pragma: allowlist-secret
 package handler
 
 import (
