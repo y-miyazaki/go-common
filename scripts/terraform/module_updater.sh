@@ -859,10 +859,10 @@ function validate_terraform_with_plan_comparison {
         else
             log "INFO" "Use -v option to see detailed plan content differences"
         fi
-    # Clean up transient plan files in working dir (artifact copies kept)
-    rm -f .terraform_baseline.plan .terraform_baseline.log .terraform_baseline.txt || true
-    rm -f .terraform_current.plan .terraform_current.log .terraform_current.txt || true
-    rm -f .terraform_init.log .terraform_validate.log || true
+        # Clean up transient plan files in working dir (artifact copies kept)
+        rm -f .terraform_baseline.plan .terraform_baseline.log .terraform_baseline.txt || true
+        rm -f .terraform_current.plan .terraform_current.log .terraform_current.txt || true
+        rm -f .terraform_init.log .terraform_validate.log || true
         return 1
     fi
 }

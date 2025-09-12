@@ -563,7 +563,7 @@ function main {
                 echo "✅ go test -cover" >&2
             fi
         fi
-    [[ "$SECURITY_FAILED" == "1" ]] && echo "❌ security checks (govulncheck)" >&2 || echo "✅ security checks (govulncheck)" >&2
+        [[ "$SECURITY_FAILED" == "1" ]] && echo "❌ security checks (govulncheck)" >&2 || echo "✅ security checks (govulncheck)" >&2
         log "ERROR" "❌ Some validations failed"
     fi
 
