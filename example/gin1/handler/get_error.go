@@ -1,17 +1,25 @@
 package handler
 
 import (
+	"errors"
+
 	"github.com/y-miyazaki/go-common/pkg/dto"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
+)
+
+var (
+	// ErrTest1 is an error for testing purposes
+	ErrTest1 = errors.New("error test1")
+	// ErrTest2 is an error for testing purposes
+	ErrTest2 = errors.New("error test2")
 )
 
 // HandleError1 responds with an internal server error for testing purposes.
 func (h *HTTPHandler) HandleError1(c *gin.Context) {
 	h.ResponseStatusInternalServerError(c, map[string]string{
 		"test": "testmessage",
-	}, errors.New("error test1"))
+	}, ErrTest1)
 }
 
 // HandleError2 responds with an internal server error using structured response.
@@ -20,5 +28,5 @@ func (h *HTTPHandler) HandleError2(c *gin.Context) {
 		Message: map[string]string{
 			"test": "testmessage",
 		},
-	}, errors.New("error test2"))
+	}, ErrTest2)
 }

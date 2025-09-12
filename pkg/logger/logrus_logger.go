@@ -2,9 +2,7 @@ package logger
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -72,13 +70,9 @@ func (l *Logger) WithError(err error) *Logger {
 	if err == nil {
 		return l
 	}
-	if e, ok := err.(interface{ StackTrace() errors.StackTrace }); ok {
-		return &Logger{
-			Entry: l.Entry.WithField("stacktrace", fmt.Sprintf("%+v", e.StackTrace())).WithError(err),
-		}
-	}
 	return &Logger{
-		Entry: l.Entry.WithError(err),
+		Entry:  l.Entry.WithError(err),
+		Config: l.Config,
 	}
 }
 

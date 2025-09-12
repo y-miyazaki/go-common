@@ -38,10 +38,25 @@ func main() {
 	// level
 	level, err := logrus.ParseLevel("info")
 	if err != nil {
-		panic(fmt.Sprintf("level can't set %v", level))
+		panic(fmt.Sprintf("failed to parse log level 'info': %v", err))
 	}
 	l.Level = level
 	log := logger.NewLogger(l)
+
+	// --------------------------------------------------------------
+	// Validate required environment variables
+	// --------------------------------------------------------------
+	requiredEnvVars := []string{
+		"MYSQL_DBNAME", "MYSQL_USERNAME", "MYSQL_PASSWORD", "MYSQL_SERVER", "MYSQL_PORT",
+		"POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_HOST", "POSTGRES_PORT", "POSTGRES_DBNAME",
+		"S3_REGION", "S3_ID", "S3_SECRET",
+		"REDIS_ADDR",
+	}
+	for _, envVar := range requiredEnvVars {
+		if value := os.Getenv(envVar); value == "" {
+			log.Fatalf("required environment variable %s is not set", envVar)
+		}
+	}
 
 	// --------------------------------------------------------------
 	// logger for gorm
@@ -217,11 +232,11 @@ func closeDB(log *logger.Logger, gormDB *gorm.DB) {
 	}
 	database, err := gormDB.DB()
 	if err != nil {
-		log.Errorf("can't close db")
+		log.WithError(err).Error("failed to get database connection for closing")
 		return
 	}
 	if closeErr := database.Close(); closeErr != nil {
-		log.Errorf("can't close db")
+		log.WithError(closeErr).Error("failed to close database connection")
 	}
 }
 
@@ -230,6 +245,6 @@ func closeRedis(log *logger.Logger, r *redis.Client) {
 		return
 	}
 	if err := r.Close(); err != nil {
-		log.Errorf("can't close redis")
+		log.WithError(err).Error("failed to close Redis connection")
 	}
 }
