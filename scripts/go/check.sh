@@ -180,7 +180,7 @@ function run_go_fmt {
         # Check formatting using gofmt -l to list files that are not formatted
         local fmt_output
         # Safely build argument list from go list output to avoid word splitting
-        mapfile -t go_dirs < <(go list -f '{{.Dir}}' $TARGET_PATTERN 2>/dev/null || true)
+        mapfile -t go_dirs < <(go list -f '{{.Dir}}' "$TARGET_PATTERN" 2>/dev/null || true)
         if [[ ${#go_dirs[@]} -eq 0 ]]; then
             fmt_output=""
         else
@@ -225,7 +225,7 @@ function run_go_build {
     echo_section "Running go build"
 
     if [[ "$DRY_RUN" == "true" ]]; then
-        log "INFO" "DRY-RUN: Would run 'go build $TARGET_PATTERN'"
+        log "INFO" "DRY-RUN: Would run 'go build \"$TARGET_PATTERN\"'"
         return 0
     fi
 
