@@ -158,8 +158,12 @@ function find_lambda_functions {
     local files
     files=$(find "$DIR" -type f -name 'main.go')
     local file_count
-    # Count only non-empty lines to avoid counting empty output
-    file_count=$(printf "%s\n" "$files" | grep -c .)
+    # Count non-empty lines directly - more efficient than sed/wc
+    if [[ -n "$files" ]]; then
+        file_count=$(printf "%s\n" "$files" | grep -c .)
+    else
+        file_count=0
+    fi
 
     if [[ $file_count -eq 0 ]]; then
         error_exit "No main.go files found in $DIR"

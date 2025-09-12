@@ -270,7 +270,15 @@ function run_golangci_lint {
         EXIT_CODE=1
         LINT_FAILED=1
         # Count issues
-        LINT_ISSUES_COUNT=$(grep -cE '^\S+\.go:' /tmp/golint_output.txt || echo 0)
+        if [[ -f /tmp/golint_output.txt ]]; then
+            LINT_ISSUES_COUNT=$(grep -cE '^\S+\.go:' /tmp/golint_output.txt 2>/dev/null || echo 0)
+        else
+            LINT_ISSUES_COUNT=0
+        fi
+        # Ensure it's a valid number
+        if ! [[ "$LINT_ISSUES_COUNT" =~ ^[0-9]+$ ]]; then
+            LINT_ISSUES_COUNT=0
+        fi
     fi
     rm -f /tmp/golint_output.txt
 }
@@ -530,7 +538,8 @@ function main {
         if [[ "$LINT_FAILED" == "1" ]]; then
             echo -n "❌ golangci-lint" >&2
             # Use safe arithmetic comparison with default 0 to avoid bash syntax errors
-            if ((${LINT_ISSUES_COUNT:-0} > 0)); then
+            local issue_count="${LINT_ISSUES_COUNT:-0}"
+            if [[ "$issue_count" != "0" && "$issue_count" -gt 0 ]]; then
                 echo " (${LINT_ISSUES_COUNT} issues)" >&2
             else
                 echo "" >&2
@@ -563,7 +572,7 @@ function main {
                 echo "✅ go test -cover" >&2
             fi
         fi
-    [[ "$SECURITY_FAILED" == "1" ]] && echo "❌ security checks (govulncheck)" >&2 || echo "✅ security checks (govulncheck)" >&2
+        [[ "$SECURITY_FAILED" == "1" ]] && echo "❌ security checks (govulncheck)" >&2 || echo "✅ security checks (govulncheck)" >&2
         log "ERROR" "❌ Some validations failed"
     fi
 

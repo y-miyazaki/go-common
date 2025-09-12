@@ -34,7 +34,7 @@ if command -v git >/dev/null 2>&1; then
             git -C "$repo_root" config --local --unset-all credential.helper 2>/dev/null || true
             git -C "$repo_root" config --local credential.helper ''
             git -C "$repo_root" config --local --add credential.helper '!gh auth git-credential'
-            [ -n "${GIT_USER_NAME:-}" ]  && git -C "$repo_root" config --local user.name  "$GIT_USER_NAME"
+            [ -n "${GIT_USER_NAME:-}" ] && git -C "$repo_root" config --local user.name "$GIT_USER_NAME"
             [ -n "${GIT_USER_EMAIL:-}" ] && git -C "$repo_root" config --local user.email "$GIT_USER_EMAIL"
         fi
     fi
