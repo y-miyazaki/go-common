@@ -147,7 +147,7 @@ func TestMainConfiguration(t *testing.T) {
 		"S3_REGION":   "us-east-1",
 		"S3_ENDPOINT": "http://localhost:9000",
 		"S3_ID":       "test-id",
-		"S3_SECRET":   "test-secret",
+		"S3_SECRET":   "test-secret", // pragma: allowlist-secret
 		"S3_TOKEN":    "",
 	}
 
