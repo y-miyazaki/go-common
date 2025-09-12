@@ -224,7 +224,7 @@ function run_go_build {
     fi
 
     # Attempt to build all packages matching the target pattern
-    if go build $TARGET_PATTERN; then
+    if go build "$TARGET_PATTERN"; then
         log "INFO" "go build succeeded"
     else
         log "ERROR" "go build failed"
