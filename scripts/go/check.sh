@@ -177,9 +177,9 @@ function run_go_fmt {
             GO_FMT_FAILED=1
         fi
     else
-        # Check if formatting is needed by running go fmt and checking for changes
+        # Check if formatting is needed by using gofmt -l to list files that need formatting
         local fmt_output
-        fmt_output=$(go fmt "$TARGET_PATTERN" 2>&1)
+        fmt_output=$(gofmt -l . 2>/dev/null | head -10 || true)
         if [[ -n "$fmt_output" ]]; then
             echo "Files that would be formatted:"
             echo "$fmt_output"
