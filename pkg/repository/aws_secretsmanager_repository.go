@@ -18,19 +18,19 @@ type AWSSecretsManagerClientInterface interface {
 
 // AWSSecretsManagerRepository struct.
 type AWSSecretsManagerRepository struct {
-	c AWSSecretsManagerClientInterface
+	Client AWSSecretsManagerClientInterface
 }
 
 // NewAWSSecretsManagerRepository returns AWSSecretsManagerRepository instance.
 func NewAWSSecretsManagerRepository(c *secretsmanager.Client) *AWSSecretsManagerRepository {
 	return &AWSSecretsManagerRepository{
-		c: c,
+		Client: c,
 	}
 }
 
 // GetSecretString gets a secret string from secretsmanager.
 func (r *AWSSecretsManagerRepository) GetSecretString(ctx context.Context, secretName string) (string, error) {
-	result, err := r.c.GetSecretValue(ctx, &secretsmanager.GetSecretValueInput{
+	result, err := r.Client.GetSecretValue(ctx, &secretsmanager.GetSecretValueInput{
 		SecretId: aws.String(secretName),
 		// VersionStage defaults to AWSCURRENT if unspecified
 		VersionStage: aws.String("AWSCURRENT"),

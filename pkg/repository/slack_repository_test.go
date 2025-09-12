@@ -142,7 +142,7 @@ func TestNewSlackRepository(t *testing.T) {
 	channelID := "test_channel"
 	repo := NewSlackRepository(mockClient, channelID)
 	assert.NotNil(t, repo)
-	assert.Equal(t, mockClient, repo.client)
+	assert.Equal(t, mockClient, repo.Client)
 	assert.Equal(t, channelID, repo.channelID)
 }
 

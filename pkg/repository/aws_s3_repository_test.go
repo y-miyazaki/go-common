@@ -131,7 +131,7 @@ func TestNewAWSS3RepositoryWithInterface(t *testing.T) {
 
 	repo := NewAWSS3RepositoryWithInterface(mockClient, mockUploader, mockDownloader, mockPresigned)
 	assert.NotNil(t, repo)
-	assert.Equal(t, mockClient, repo.c)
+	assert.Equal(t, mockClient, repo.Client)
 	assert.Equal(t, mockUploader, repo.uploader)
 	assert.Equal(t, mockDownloader, repo.downloader)
 	assert.Equal(t, mockPresigned, repo.presigned)
@@ -342,7 +342,7 @@ func TestNewAWSS3Repository(t *testing.T) {
 	// Test with nil client
 	repo := NewAWSS3Repository(nil)
 	assert.NotNil(t, repo)
-	assert.Nil(t, repo.c)
+	assert.Nil(t, repo.Client)
 	assert.Nil(t, repo.uploader)
 	assert.Nil(t, repo.downloader)
 	assert.Nil(t, repo.presigned)

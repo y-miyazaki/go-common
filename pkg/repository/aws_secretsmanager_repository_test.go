@@ -29,12 +29,12 @@ func TestNewAWSSecretsManagerRepository(t *testing.T) {
 	mockClient := &secretsmanager.Client{}
 	repo := NewAWSSecretsManagerRepository(mockClient)
 	assert.NotNil(t, repo)
-	assert.Equal(t, mockClient, repo.c)
+	assert.Equal(t, mockClient, repo.Client)
 }
 
 func TestAWSSecretsManagerRepository_GetSecretString_SecretString(t *testing.T) {
 	mockClient := new(MockSecretsManagerClient)
-	repo := &AWSSecretsManagerRepository{c: mockClient}
+	repo := &AWSSecretsManagerRepository{Client: mockClient}
 
 	secretName := "test-secret"
 	expectedSecret := "secret-value"
@@ -54,7 +54,7 @@ func TestAWSSecretsManagerRepository_GetSecretString_SecretString(t *testing.T) 
 
 func TestAWSSecretsManagerRepository_GetSecretString_SecretBinary(t *testing.T) {
 	mockClient := new(MockSecretsManagerClient)
-	repo := &AWSSecretsManagerRepository{c: mockClient}
+	repo := &AWSSecretsManagerRepository{Client: mockClient}
 
 	secretName := "test-secret-binary"
 	secretValue := "binary-secret-value"
@@ -76,7 +76,7 @@ func TestAWSSecretsManagerRepository_GetSecretString_SecretBinary(t *testing.T) 
 
 func TestAWSSecretsManagerRepository_GetSecretString_Error(t *testing.T) {
 	mockClient := new(MockSecretsManagerClient)
-	repo := &AWSSecretsManagerRepository{c: mockClient}
+	repo := &AWSSecretsManagerRepository{Client: mockClient}
 
 	secretName := "test-secret-error"
 	expectedError := errors.New("secretsmanager error")

@@ -38,22 +38,22 @@ type AWSCloudWatchLogsClientInterface interface {
 
 // AWSCloudWatchLogsRepository implements AWSCloudWatchLogsRepositoryInterface backed by AWS SDK v2 client.
 type AWSCloudWatchLogsRepository struct {
-	c AWSCloudWatchLogsClientInterface
+	Client AWSCloudWatchLogsClientInterface
 }
 
 // NewAWSCloudWatchLogsRepository returns a new repository instance using the provided CloudWatch Logs client.
 func NewAWSCloudWatchLogsRepository(c *cloudwatchlogs.Client) *AWSCloudWatchLogsRepository {
-	return &AWSCloudWatchLogsRepository{c: c}
+	return &AWSCloudWatchLogsRepository{Client: c}
 }
 
 // NewAWSCloudWatchLogsRepositoryWithInterface returns a new repository instance using the provided client interface (for testing).
 func NewAWSCloudWatchLogsRepositoryWithInterface(c AWSCloudWatchLogsClientInterface) *AWSCloudWatchLogsRepository {
-	return &AWSCloudWatchLogsRepository{c: c}
+	return &AWSCloudWatchLogsRepository{Client: c}
 }
 
 // CreateLogGroup creates a new CloudWatch Logs log group.
 func (r *AWSCloudWatchLogsRepository) CreateLogGroup(ctx context.Context, group string) (*cloudwatchlogs.CreateLogGroupOutput, error) {
-	out, err := r.c.CreateLogGroup(ctx, &cloudwatchlogs.CreateLogGroupInput{
+	out, err := r.Client.CreateLogGroup(ctx, &cloudwatchlogs.CreateLogGroupInput{
 		LogGroupName: aws.String(group),
 	})
 	if err != nil {
@@ -64,7 +64,7 @@ func (r *AWSCloudWatchLogsRepository) CreateLogGroup(ctx context.Context, group 
 
 // CreateLogStream creates a new log stream within the specified log group.
 func (r *AWSCloudWatchLogsRepository) CreateLogStream(ctx context.Context, group, stream string) (*cloudwatchlogs.CreateLogStreamOutput, error) {
-	out, err := r.c.CreateLogStream(ctx, &cloudwatchlogs.CreateLogStreamInput{
+	out, err := r.Client.CreateLogStream(ctx, &cloudwatchlogs.CreateLogStreamInput{
 		LogGroupName:  aws.String(group),
 		LogStreamName: aws.String(stream),
 	})
@@ -76,7 +76,7 @@ func (r *AWSCloudWatchLogsRepository) CreateLogStream(ctx context.Context, group
 
 // PutRetentionPolicy sets the retention policy for a log group.
 func (r *AWSCloudWatchLogsRepository) PutRetentionPolicy(ctx context.Context, group string, logRetentionInDays int32) (*cloudwatchlogs.PutRetentionPolicyOutput, error) {
-	out, err := r.c.PutRetentionPolicy(ctx, &cloudwatchlogs.PutRetentionPolicyInput{
+	out, err := r.Client.PutRetentionPolicy(ctx, &cloudwatchlogs.PutRetentionPolicyInput{
 		LogGroupName:    aws.String(group),
 		RetentionInDays: aws.Int32(logRetentionInDays),
 	})
@@ -92,7 +92,7 @@ func (r *AWSCloudWatchLogsRepository) DescribeLogGroups(ctx context.Context, pre
 	if prefix != "" {
 		in.LogGroupNamePrefix = aws.String(prefix)
 	}
-	out, err := r.c.DescribeLogGroups(ctx, in)
+	out, err := r.Client.DescribeLogGroups(ctx, in)
 	if err != nil {
 		return nil, fmt.Errorf("cloudwatchlogs DescribeLogGroups: %w", err)
 	}
@@ -105,7 +105,7 @@ func (r *AWSCloudWatchLogsRepository) DescribeLogStreams(ctx context.Context, gr
 	if prefix != "" {
 		in.LogStreamNamePrefix = aws.String(prefix)
 	}
-	out, err := r.c.DescribeLogStreams(ctx, in)
+	out, err := r.Client.DescribeLogStreams(ctx, in)
 	if err != nil {
 		return nil, fmt.Errorf("cloudwatchlogs DescribeLogStreams: %w", err)
 	}
@@ -123,7 +123,7 @@ func (r *AWSCloudWatchLogsRepository) PutLogEvents(ctx context.Context, group, s
 	if sequenceToken != nil {
 		in.SequenceToken = sequenceToken
 	}
-	out, err := r.c.PutLogEvents(ctx, in)
+	out, err := r.Client.PutLogEvents(ctx, in)
 	if err != nil {
 		return nil, fmt.Errorf("cloudwatchlogs PutLogEvents: %w", err)
 	}
@@ -150,7 +150,7 @@ func (r *AWSCloudWatchLogsRepository) FilterLogEvents(ctx context.Context, group
 	if limit > 0 {
 		in.Limit = aws.Int32(limit)
 	}
-	out, err := r.c.FilterLogEvents(ctx, in)
+	out, err := r.Client.FilterLogEvents(ctx, in)
 	if err != nil {
 		return nil, fmt.Errorf("cloudwatchlogs FilterLogEvents: %w", err)
 	}

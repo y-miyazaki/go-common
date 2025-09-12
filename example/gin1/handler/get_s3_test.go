@@ -15,6 +15,7 @@ func TestHTTPHandler_HandleS3(t *testing.T) {
 
 	// This test would require setting up mock AWS S3 repository
 	// For now, we skip it to avoid complex mocking setup
+	// TODO: Implement mock S3 repository for testing
 }
 
 func TestHTTPHandler_HandleS3_POST(t *testing.T) {
@@ -39,4 +40,16 @@ func TestHTTPHandler_HandleS3_POST(t *testing.T) {
 
 	// Assert the response - should be 404 Not Found for unmatched route
 	assert.Equal(t, http.StatusNotFound, w.Code)
+}
+
+func TestHTTPHandler_HandleS3_ErrorUpload(t *testing.T) {
+	// Mock S3 upload error
+	// Since we can't easily mock AWS S3 client, we'll skip this test for now
+	t.Skip("Skipping error test due to AWS S3 mocking complexity")
+}
+
+func TestHTTPHandler_HandleS3_ErrorDownload(t *testing.T) {
+	// Mock S3 download error
+	// Since we can't easily mock AWS S3 client, we'll skip this test for now
+	t.Skip("Skipping error test due to AWS S3 mocking complexity")
 }

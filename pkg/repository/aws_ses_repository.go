@@ -19,14 +19,14 @@ type AWSSESClientInterface interface {
 
 // AWSSESRepository struct.
 type AWSSESRepository struct {
-	c                    AWSSESClientInterface
+	Client               AWSSESClientInterface
 	configurationSetName *string
 }
 
 // NewAWSSESRepository returns AWSSESRepository instance.
 func NewAWSSESRepository(c *sesv2.Client, configurationSetName *string) *AWSSESRepository {
 	return &AWSSESRepository{
-		c:                    c,
+		Client:               c,
 		configurationSetName: configurationSetName,
 	}
 }
@@ -34,14 +34,14 @@ func NewAWSSESRepository(c *sesv2.Client, configurationSetName *string) *AWSSESR
 // NewAWSSESRepositoryWithInterface returns AWSSESRepository instance with interface (for testing).
 func NewAWSSESRepositoryWithInterface(c AWSSESClientInterface, configurationSetName *string) *AWSSESRepository {
 	return &AWSSESRepository{
-		c:                    c,
+		Client:               c,
 		configurationSetName: configurationSetName,
 	}
 }
 
 // SendTextEmail sends text email.
 func (r *AWSSESRepository) SendTextEmail(ctx context.Context, from string, to, replyTo []string, subject, content string) (*sesv2.SendEmailOutput, error) {
-	res, err := r.c.SendEmail(ctx, &sesv2.SendEmailInput{
+	res, err := r.Client.SendEmail(ctx, &sesv2.SendEmailInput{
 		ConfigurationSetName: r.configurationSetName,
 		FromEmailAddress:     aws.String(from),
 		Destination: &types.Destination{
@@ -71,7 +71,7 @@ func (r *AWSSESRepository) SendTextEmail(ctx context.Context, from string, to, r
 
 // SendHTMLEmail sends HTML email.
 func (r *AWSSESRepository) SendHTMLEmail(ctx context.Context, from string, to, replyTo []string, subject, content string) (*sesv2.SendEmailOutput, error) {
-	res, err := r.c.SendEmail(ctx, &sesv2.SendEmailInput{
+	res, err := r.Client.SendEmail(ctx, &sesv2.SendEmailInput{
 		ConfigurationSetName: r.configurationSetName,
 		FromEmailAddress:     aws.String(from),
 		Destination: &types.Destination{
@@ -101,7 +101,7 @@ func (r *AWSSESRepository) SendHTMLEmail(ctx context.Context, from string, to, r
 
 // SendEmail sends email.
 func (r *AWSSESRepository) SendEmail(ctx context.Context, from string, to, replyTo []string, subject, contentText, contentHTML string) (*sesv2.SendEmailOutput, error) {
-	res, err := r.c.SendEmail(ctx, &sesv2.SendEmailInput{
+	res, err := r.Client.SendEmail(ctx, &sesv2.SendEmailInput{
 		ConfigurationSetName: r.configurationSetName,
 		FromEmailAddress:     aws.String(from),
 		Destination: &types.Destination{
@@ -137,7 +137,7 @@ func (r *AWSSESRepository) SendEmail(ctx context.Context, from string, to, reply
 // Note: One or more Destination objects. All of the recipients in a Destination receive the same version of the email.
 // You can specify up to 50 Destination objects within a Destinations array.
 func (r *AWSSESRepository) SendBulkEmail(ctx context.Context, from string, replyTo []string, defaultTemplateData string, bulkEmailEntries []types.BulkEmailEntry) (*sesv2.SendBulkEmailOutput, error) {
-	res, err := r.c.SendBulkEmail(ctx, &sesv2.SendBulkEmailInput{
+	res, err := r.Client.SendBulkEmail(ctx, &sesv2.SendBulkEmailInput{
 		FromEmailAddress: aws.String(from),
 		ReplyToAddresses: replyTo,
 		DefaultContent: &types.BulkEmailContent{

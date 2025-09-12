@@ -624,7 +624,7 @@ func TestNewRedisRepository(t *testing.T) {
 	mockClient := &redis.Client{}
 	repo := NewRedisRepository(mockClient)
 	assert.NotNil(t, repo)
-	assert.Equal(t, mockClient, repo.redis)
+	assert.Equal(t, mockClient, repo.Client)
 }
 
 func TestRedisRepository_Get(t *testing.T) {

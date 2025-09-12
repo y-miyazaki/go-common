@@ -36,21 +36,21 @@ func (m *MockSESClient) SendBulkEmail(ctx context.Context, input *sesv2.SendBulk
 
 // AWSSESRepositoryWithMock for testing with mock client
 type AWSSESRepositoryWithMock struct {
-	c                    AWSSESClientInterface
+	Client               AWSSESClientInterface
 	configurationSetName *string
 }
 
 // NewAWSSESRepositoryWithMock creates repository with mock client for testing
 func NewAWSSESRepositoryWithMock(mockClient AWSSESClientInterface, configurationSetName *string) *AWSSESRepositoryWithMock {
 	return &AWSSESRepositoryWithMock{
-		c:                    mockClient,
+		Client:               mockClient,
 		configurationSetName: configurationSetName,
 	}
 }
 
 // SendTextEmail sends text email.
 func (r *AWSSESRepositoryWithMock) SendTextEmail(ctx context.Context, from string, to, replyTo []string, subject, content string) (*sesv2.SendEmailOutput, error) {
-	res, err := r.c.SendEmail(ctx, &sesv2.SendEmailInput{
+	res, err := r.Client.SendEmail(ctx, &sesv2.SendEmailInput{
 		ConfigurationSetName: r.configurationSetName,
 		FromEmailAddress:     aws.String(from),
 		Destination: &types.Destination{
@@ -80,7 +80,7 @@ func (r *AWSSESRepositoryWithMock) SendTextEmail(ctx context.Context, from strin
 
 // SendHTMLEmail sends HTML email.
 func (r *AWSSESRepositoryWithMock) SendHTMLEmail(ctx context.Context, from string, to, replyTo []string, subject, content string) (*sesv2.SendEmailOutput, error) {
-	res, err := r.c.SendEmail(ctx, &sesv2.SendEmailInput{
+	res, err := r.Client.SendEmail(ctx, &sesv2.SendEmailInput{
 		ConfigurationSetName: r.configurationSetName,
 		FromEmailAddress:     aws.String(from),
 		Destination: &types.Destination{
@@ -110,7 +110,7 @@ func (r *AWSSESRepositoryWithMock) SendHTMLEmail(ctx context.Context, from strin
 
 // SendEmail sends email with both text and HTML content.
 func (r *AWSSESRepositoryWithMock) SendEmail(ctx context.Context, from string, to, replyTo []string, subject, contentText, contentHTML string) (*sesv2.SendEmailOutput, error) {
-	res, err := r.c.SendEmail(ctx, &sesv2.SendEmailInput{
+	res, err := r.Client.SendEmail(ctx, &sesv2.SendEmailInput{
 		ConfigurationSetName: r.configurationSetName,
 		FromEmailAddress:     aws.String(from),
 		Destination: &types.Destination{
@@ -144,7 +144,7 @@ func (r *AWSSESRepositoryWithMock) SendEmail(ctx context.Context, from string, t
 
 // SendBulkEmail sends bulk email.
 func (r *AWSSESRepositoryWithMock) SendBulkEmail(ctx context.Context, from string, replyTo []string, defaultTemplateData string, bulkEmailEntries []types.BulkEmailEntry) (*sesv2.SendBulkEmailOutput, error) {
-	res, err := r.c.SendBulkEmail(ctx, &sesv2.SendBulkEmailInput{
+	res, err := r.Client.SendBulkEmail(ctx, &sesv2.SendBulkEmailInput{
 		ConfigurationSetName: r.configurationSetName,
 		FromEmailAddress:     aws.String(from),
 		ReplyToAddresses:     replyTo,
@@ -166,7 +166,7 @@ func TestNewAWSSESRepository(t *testing.T) {
 	configurationSetName := "test_config"
 	repo := NewAWSSESRepository(mockClient, &configurationSetName)
 	assert.NotNil(t, repo)
-	assert.Equal(t, mockClient, repo.c)
+	assert.Equal(t, mockClient, repo.Client)
 	assert.Equal(t, &configurationSetName, repo.configurationSetName)
 }
 

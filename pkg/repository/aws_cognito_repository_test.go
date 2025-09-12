@@ -125,7 +125,7 @@ func (m *MockCognitoClient) RevokeToken(ctx context.Context, input *cognitoident
 
 // AWSCognitoRepositoryWithMock for testing with mock client
 type AWSCognitoRepositoryWithMock struct {
-	c                    AWSCognitoIdentityProviderClientInterface
+	Client               AWSCognitoIdentityProviderClientInterface
 	userPoolID           string
 	userPoolClientID     string
 	userPoolClientSecret string
@@ -134,7 +134,7 @@ type AWSCognitoRepositoryWithMock struct {
 // NewAWSCognitoRepositoryWithMock creates repository with mock client for testing
 func NewAWSCognitoRepositoryWithMock(mockClient AWSCognitoIdentityProviderClientInterface, userPoolID, userPoolClientID, userPoolClientSecret string) *AWSCognitoRepositoryWithMock {
 	return &AWSCognitoRepositoryWithMock{
-		c:                    mockClient,
+		Client:               mockClient,
 		userPoolID:           userPoolID,
 		userPoolClientID:     userPoolClientID,
 		userPoolClientSecret: userPoolClientSecret,
@@ -143,7 +143,7 @@ func NewAWSCognitoRepositoryWithMock(mockClient AWSCognitoIdentityProviderClient
 
 // GetUser gets a user information from Cognito.
 func (r *AWSCognitoRepositoryWithMock) GetUser(ctx context.Context, username string) (*cognitoidentityprovider.AdminGetUserOutput, error) {
-	res, err := r.c.AdminGetUser(ctx, &cognitoidentityprovider.AdminGetUserInput{
+	res, err := r.Client.AdminGetUser(ctx, &cognitoidentityprovider.AdminGetUserInput{
 		UserPoolId: aws.String(r.userPoolID),
 		Username:   aws.String(username),
 	})
@@ -155,7 +155,7 @@ func (r *AWSCognitoRepositoryWithMock) GetUser(ctx context.Context, username str
 
 // CreateUser creates a new user for Cognito user pool.
 func (r *AWSCognitoRepositoryWithMock) CreateUser(ctx context.Context, username, password string) error {
-	_, err := r.c.AdminCreateUser(ctx, &cognitoidentityprovider.AdminCreateUserInput{
+	_, err := r.Client.AdminCreateUser(ctx, &cognitoidentityprovider.AdminCreateUserInput{
 		UserPoolId: aws.String(r.userPoolID),
 		Username:   aws.String(username),
 	})
@@ -163,7 +163,7 @@ func (r *AWSCognitoRepositoryWithMock) CreateUser(ctx context.Context, username,
 		return fmt.Errorf("cognito AdminCreateUser: %w", err)
 	}
 
-	_, err = r.c.AdminSetUserPassword(ctx, &cognitoidentityprovider.AdminSetUserPasswordInput{
+	_, err = r.Client.AdminSetUserPassword(ctx, &cognitoidentityprovider.AdminSetUserPasswordInput{
 		UserPoolId: aws.String(r.userPoolID),
 		Username:   aws.String(username),
 		Password:   aws.String(password),
@@ -177,7 +177,7 @@ func (r *AWSCognitoRepositoryWithMock) CreateUser(ctx context.Context, username,
 
 // DeleteUser deletes a user from Cognito user pool.
 func (r *AWSCognitoRepositoryWithMock) DeleteUser(ctx context.Context, username string) error {
-	_, err := r.c.AdminDeleteUser(ctx, &cognitoidentityprovider.AdminDeleteUserInput{
+	_, err := r.Client.AdminDeleteUser(ctx, &cognitoidentityprovider.AdminDeleteUserInput{
 		UserPoolId: aws.String(r.userPoolID),
 		Username:   aws.String(username),
 	})
@@ -205,7 +205,7 @@ func (r *AWSCognitoRepositoryWithMock) Login(ctx context.Context, username, pass
 		authInput.AuthParameters["SECRET_HASH"] = secretHash // pragma: allowlist-secret
 	}
 
-	res, err := r.c.AdminInitiateAuth(ctx, authInput)
+	res, err := r.Client.AdminInitiateAuth(ctx, authInput)
 	if err != nil {
 		return AWSCognitoToken{}, fmt.Errorf("cognito AdminInitiateAuth: %w", err)
 	}
@@ -227,7 +227,7 @@ func (r *AWSCognitoRepositoryWithMock) calculateSecretHash(username string) stri
 
 // ChangePassword changes the password for a user.
 func (r *AWSCognitoRepositoryWithMock) ChangePassword(ctx context.Context, authorizationHeader, previousPassword, proposedPassword string) error {
-	_, err := r.c.ChangePassword(ctx, &cognitoidentityprovider.ChangePasswordInput{
+	_, err := r.Client.ChangePassword(ctx, &cognitoidentityprovider.ChangePasswordInput{
 		AccessToken:      aws.String(authorizationHeader),
 		PreviousPassword: aws.String(previousPassword),
 		ProposedPassword: aws.String(proposedPassword),
@@ -240,7 +240,7 @@ func (r *AWSCognitoRepositoryWithMock) ChangePassword(ctx context.Context, autho
 
 // ResetUserPassword initiates password reset for a user.
 func (r *AWSCognitoRepositoryWithMock) ResetUserPassword(ctx context.Context, username string) error {
-	_, err := r.c.ForgotPassword(ctx, &cognitoidentityprovider.ForgotPasswordInput{
+	_, err := r.Client.ForgotPassword(ctx, &cognitoidentityprovider.ForgotPasswordInput{
 		ClientId: aws.String(r.userPoolClientID),
 		Username: aws.String(username),
 	})
@@ -252,7 +252,7 @@ func (r *AWSCognitoRepositoryWithMock) ResetUserPassword(ctx context.Context, us
 
 // ConfirmForgotPassword confirms password reset with confirmation code.
 func (r *AWSCognitoRepositoryWithMock) ConfirmForgotPassword(ctx context.Context, username, password, confirmationCode string) error {
-	_, err := r.c.ConfirmForgotPassword(ctx, &cognitoidentityprovider.ConfirmForgotPasswordInput{
+	_, err := r.Client.ConfirmForgotPassword(ctx, &cognitoidentityprovider.ConfirmForgotPasswordInput{
 		ClientId:         aws.String(r.userPoolClientID),
 		Username:         aws.String(username),
 		Password:         aws.String(password),
@@ -266,7 +266,7 @@ func (r *AWSCognitoRepositoryWithMock) ConfirmForgotPassword(ctx context.Context
 
 // Logout signs out a user globally.
 func (r *AWSCognitoRepositoryWithMock) Logout(ctx context.Context, refreshToken string) error {
-	_, err := r.c.GlobalSignOut(ctx, &cognitoidentityprovider.GlobalSignOutInput{
+	_, err := r.Client.GlobalSignOut(ctx, &cognitoidentityprovider.GlobalSignOutInput{
 		AccessToken: aws.String("mock-access-token"), // In real implementation, this should be extracted from refresh token
 	})
 	if err != nil {
@@ -287,7 +287,7 @@ func (r *AWSCognitoRepositoryWithMock) RefreshToken(ctx context.Context, refresh
 		},
 	}
 
-	res, err := r.c.AdminInitiateAuth(ctx, authInput)
+	res, err := r.Client.AdminInitiateAuth(ctx, authInput)
 	if err != nil {
 		return AWSCognitoToken{}, fmt.Errorf("cognito AdminInitiateAuth(refresh): %w", err)
 	}
@@ -302,7 +302,7 @@ func (r *AWSCognitoRepositoryWithMock) RefreshToken(ctx context.Context, refresh
 
 // SetUserPassword sets the password of the user.
 func (r *AWSCognitoRepositoryWithMock) SetUserPassword(ctx context.Context, username, password string, permanent bool) error {
-	_, err := r.c.AdminSetUserPassword(ctx, &cognitoidentityprovider.AdminSetUserPasswordInput{
+	_, err := r.Client.AdminSetUserPassword(ctx, &cognitoidentityprovider.AdminSetUserPasswordInput{
 		UserPoolId: aws.String(r.userPoolID),
 		Username:   aws.String(username),
 		Password:   aws.String(password),
@@ -322,7 +322,7 @@ func TestNewAWSCognitoRepository(t *testing.T) {
 
 	repo := NewAWSCognitoRepository(mockClient, userPoolID, userPoolClientID, userPoolClientSecret)
 	assert.NotNil(t, repo)
-	assert.Equal(t, mockClient, repo.c)
+	assert.Equal(t, mockClient, repo.Client)
 	assert.Equal(t, userPoolID, repo.userPoolID)
 	assert.Equal(t, userPoolClientID, repo.userPoolClientID)
 	assert.Equal(t, userPoolClientSecret, repo.userPoolClientSecret)

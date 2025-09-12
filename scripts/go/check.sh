@@ -177,11 +177,17 @@ function run_go_fmt {
             GO_FMT_FAILED=1
         fi
     else
-        # Check if formatting is needed by running go fmt and checking for changes
+        # Check formatting using gofmt -l to list files that are not formatted
         local fmt_output
-        fmt_output=$(go fmt "$TARGET_PATTERN" 2>&1)
+        # Safely build argument list from go list output to avoid word splitting
+        mapfile -t go_dirs < <(go list -f '{{.Dir}}' $TARGET_PATTERN 2>/dev/null || true)
+        if [[ ${#go_dirs[@]} -eq 0 ]]; then
+            fmt_output=""
+        else
+            fmt_output=$(gofmt -l "${go_dirs[@]}" 2>&1 || true)
+        fi
         if [[ -n "$fmt_output" ]]; then
-            echo "Files that would be formatted:"
+            echo "Files that need formatting (gofmt -l):"
             echo "$fmt_output"
             log "WARN" "Some files need formatting. Use -f flag to auto-fix"
             EXIT_CODE=1

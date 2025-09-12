@@ -78,7 +78,7 @@ func TestNewAWSCloudWatchLogsRepository(t *testing.T) {
 	mockClient := &MockCloudWatchLogsClient{}
 	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
 	assert.NotNil(t, repo)
-	assert.Equal(t, mockClient, repo.c)
+	assert.Equal(t, mockClient, repo.Client)
 }
 
 func TestAWSCloudWatchLogsRepository_CreateLogGroup(t *testing.T) {

@@ -57,7 +57,7 @@ type AWSCognitoIdentityProviderClientInterface interface {
 
 // AWSCognitoRepository struct.
 type AWSCognitoRepository struct {
-	c                    AWSCognitoIdentityProviderClientInterface
+	Client               AWSCognitoIdentityProviderClientInterface
 	userPoolID           string
 	userPoolClientID     string
 	userPoolClientSecret string
@@ -74,7 +74,7 @@ type AWSCognitoToken struct {
 // NewAWSCognitoRepository returns AWSCognitoRepository instance.
 func NewAWSCognitoRepository(c *cognitoidentityprovider.Client, userPoolID, userPoolClientID, userPoolClientSecret string) *AWSCognitoRepository {
 	return &AWSCognitoRepository{
-		c:                    c,
+		Client:               c,
 		userPoolID:           userPoolID,
 		userPoolClientID:     userPoolClientID,
 		userPoolClientSecret: userPoolClientSecret, // pragma: allowlist-secret
@@ -84,7 +84,7 @@ func NewAWSCognitoRepository(c *cognitoidentityprovider.Client, userPoolID, user
 // NewAWSCognitoRepositoryWithInterface returns AWSCognitoRepository instance with interface (for testing).
 func NewAWSCognitoRepositoryWithInterface(c AWSCognitoIdentityProviderClientInterface, userPoolID, userPoolClientID, userPoolClientSecret string) *AWSCognitoRepository {
 	return &AWSCognitoRepository{
-		c:                    c,
+		Client:               c,
 		userPoolID:           userPoolID,
 		userPoolClientID:     userPoolClientID,
 		userPoolClientSecret: userPoolClientSecret, // pragma: allowlist-secret
@@ -93,7 +93,7 @@ func NewAWSCognitoRepositoryWithInterface(c AWSCognitoIdentityProviderClientInte
 
 // GetUser gets a user information from Cognito.
 func (r *AWSCognitoRepository) GetUser(ctx context.Context, username string) (*cognitoidentityprovider.AdminGetUserOutput, error) {
-	res, err := r.c.AdminGetUser(ctx, &cognitoidentityprovider.AdminGetUserInput{
+	res, err := r.Client.AdminGetUser(ctx, &cognitoidentityprovider.AdminGetUserInput{
 		UserPoolId: aws.String(r.userPoolID),
 		Username:   aws.String(username),
 	})
@@ -105,7 +105,7 @@ func (r *AWSCognitoRepository) GetUser(ctx context.Context, username string) (*c
 
 // CreateUser creates a new user for Cognito user pool.
 func (r *AWSCognitoRepository) CreateUser(ctx context.Context, username, password string) error {
-	_, err := r.c.AdminCreateUser(ctx, &cognitoidentityprovider.AdminCreateUserInput{
+	_, err := r.Client.AdminCreateUser(ctx, &cognitoidentityprovider.AdminCreateUserInput{
 		UserPoolId: aws.String(r.userPoolID),
 		Username:   aws.String(username),
 	})
@@ -113,7 +113,7 @@ func (r *AWSCognitoRepository) CreateUser(ctx context.Context, username, passwor
 		return fmt.Errorf("cognito AdminCreateUser: %w", err)
 	}
 
-	_, err = r.c.AdminSetUserPassword(ctx, &cognitoidentityprovider.AdminSetUserPasswordInput{
+	_, err = r.Client.AdminSetUserPassword(ctx, &cognitoidentityprovider.AdminSetUserPasswordInput{
 		UserPoolId: aws.String(r.userPoolID),
 		Username:   aws.String(username),
 		Password:   aws.String(password),
@@ -127,7 +127,7 @@ func (r *AWSCognitoRepository) CreateUser(ctx context.Context, username, passwor
 
 // DeleteUser deletes a user from Cognito user pool.
 func (r *AWSCognitoRepository) DeleteUser(ctx context.Context, username string) error {
-	_, err := r.c.AdminDeleteUser(ctx, &cognitoidentityprovider.AdminDeleteUserInput{
+	_, err := r.Client.AdminDeleteUser(ctx, &cognitoidentityprovider.AdminDeleteUserInput{
 		UserPoolId: aws.String(r.userPoolID),
 		Username:   aws.String(username),
 	})
@@ -139,7 +139,7 @@ func (r *AWSCognitoRepository) DeleteUser(ctx context.Context, username string) 
 
 // Login logs to Cognito.
 func (r *AWSCognitoRepository) Login(ctx context.Context, username, password string) (AWSCognitoToken, error) {
-	res, err := r.c.AdminInitiateAuth(ctx, &cognitoidentityprovider.AdminInitiateAuthInput{
+	res, err := r.Client.AdminInitiateAuth(ctx, &cognitoidentityprovider.AdminInitiateAuthInput{
 		AuthFlow:   types.AuthFlowTypeAdminUserPasswordAuth,
 		ClientId:   aws.String(r.userPoolClientID),
 		UserPoolId: aws.String(r.userPoolID),
@@ -162,7 +162,7 @@ func (r *AWSCognitoRepository) Login(ctx context.Context, username, password str
 
 // Logout logs out of Cognito.
 func (r *AWSCognitoRepository) Logout(ctx context.Context, refreshToken string) error {
-	_, err := r.c.RevokeToken(ctx, &cognitoidentityprovider.RevokeTokenInput{
+	_, err := r.Client.RevokeToken(ctx, &cognitoidentityprovider.RevokeTokenInput{
 		ClientId:     aws.String(r.userPoolClientID),
 		Token:        aws.String(refreshToken),
 		ClientSecret: aws.String(r.userPoolClientSecret),
@@ -174,7 +174,7 @@ func (r *AWSCognitoRepository) Logout(ctx context.Context, refreshToken string) 
 }
 
 func (r *AWSCognitoRepository) RefreshToken(ctx context.Context, refreshToken, username string) (AWSCognitoToken, error) {
-	res, err := r.c.AdminInitiateAuth(ctx, &cognitoidentityprovider.AdminInitiateAuthInput{
+	res, err := r.Client.AdminInitiateAuth(ctx, &cognitoidentityprovider.AdminInitiateAuthInput{
 		AuthFlow:   types.AuthFlowTypeRefreshTokenAuth,
 		ClientId:   aws.String(r.userPoolClientID),
 		UserPoolId: aws.String(r.userPoolID),
@@ -195,7 +195,7 @@ func (r *AWSCognitoRepository) RefreshToken(ctx context.Context, refreshToken, u
 
 // SetUserPassword sets the password of the user.
 func (r *AWSCognitoRepository) SetUserPassword(ctx context.Context, username, password string, permanent bool) error {
-	_, err := r.c.AdminSetUserPassword(ctx, &cognitoidentityprovider.AdminSetUserPasswordInput{
+	_, err := r.Client.AdminSetUserPassword(ctx, &cognitoidentityprovider.AdminSetUserPasswordInput{
 		UserPoolId: aws.String(r.userPoolID),
 		Username:   aws.String(username),
 		Password:   aws.String(password),
@@ -215,7 +215,7 @@ func (r *AWSCognitoRepository) ChangePassword(ctx context.Context, authorization
 		return fmt.Errorf("cognito getAccessToken: %w", err)
 	}
 
-	_, err = r.c.ChangePassword(ctx, &cognitoidentityprovider.ChangePasswordInput{
+	_, err = r.Client.ChangePassword(ctx, &cognitoidentityprovider.ChangePasswordInput{
 		PreviousPassword: aws.String(previousPassword),
 		ProposedPassword: aws.String(proposedPassword),
 		AccessToken:      aws.String(accessToken),
@@ -228,7 +228,7 @@ func (r *AWSCognitoRepository) ChangePassword(ctx context.Context, authorization
 
 // ResetUserPassword resets the specified user's password in a user pool as an administrator. Works on any user.
 func (r *AWSCognitoRepository) ResetUserPassword(ctx context.Context, username string) error {
-	_, err := r.c.AdminResetUserPassword(ctx, &cognitoidentityprovider.AdminResetUserPasswordInput{
+	_, err := r.Client.AdminResetUserPassword(ctx, &cognitoidentityprovider.AdminResetUserPasswordInput{
 		UserPoolId: aws.String(r.userPoolID),
 		Username:   aws.String(username),
 	})
@@ -240,7 +240,7 @@ func (r *AWSCognitoRepository) ResetUserPassword(ctx context.Context, username s
 
 // ConfirmForgotPassword allows a user to enter a confirmation code to reset a forgotten password.
 func (r *AWSCognitoRepository) ConfirmForgotPassword(ctx context.Context, username, password, confirmationCode string) error {
-	_, err := r.c.ConfirmForgotPassword(ctx, &cognitoidentityprovider.ConfirmForgotPasswordInput{
+	_, err := r.Client.ConfirmForgotPassword(ctx, &cognitoidentityprovider.ConfirmForgotPasswordInput{
 		ClientId:         aws.String(r.userPoolClientID),
 		Username:         aws.String(username),
 		Password:         aws.String(password),
