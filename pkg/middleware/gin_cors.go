@@ -14,7 +14,7 @@ const (
 	decimal int = 10
 )
 
-type converter func(string) string // nolint:unused // type definition for potential future use
+type converter func(string) string // nolint:unused // used in convert function
 
 // GinCorsConfig sets configurations.
 type GinCorsConfig struct {

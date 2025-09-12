@@ -2,8 +2,9 @@
 package context
 
 import (
+	"errors"
+
 	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
 )
 
 // for gin.Context Key
@@ -12,13 +13,20 @@ const (
 	contextKeyErrorMessage string = "errormessage"
 )
 
+var (
+	// ErrCannotGetError indicates that the error value in context cannot be retrieved
+	ErrCannotGetError = errors.New("can't get error")
+	// ErrCannotGetMessage indicates that the message value in context cannot be retrieved
+	ErrCannotGetMessage = errors.New("can't get message")
+)
+
 // GetGinContextError gets error.
 func GetGinContextError(c *gin.Context) (err, err2 error) {
 	if tmp, exists := c.Get(contextKeyError); exists {
 		if ginErr, ok := tmp.(error); ok {
 			return ginErr, nil
 		}
-		return nil, errors.New("can't get error")
+		return nil, ErrCannotGetError
 	}
 	return nil, nil
 }
@@ -29,7 +37,7 @@ func GetGinContextErrorMessage(c *gin.Context) (string, error) {
 		if message, ok := tmp.(string); ok {
 			return message, nil
 		}
-		return "", errors.New("can't get message")
+		return "", ErrCannotGetMessage
 	}
 	return "", nil
 }
