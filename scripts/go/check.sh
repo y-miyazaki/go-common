@@ -180,7 +180,7 @@ function run_go_fmt {
         # Check formatting using gofmt -l to list files that are not formatted
         local fmt_output
         # Safely build argument list from go list output to avoid word splitting
-        mapfile -t go_dirs < <(go list -f '{{.Dir}}' $TARGET_PATTERN 2>/dev/null || true)
+        mapfile -t go_dirs < <(go list -f '{{.Dir}}' "$TARGET_PATTERN" 2>/dev/null || true)
         if [[ ${#go_dirs[@]} -eq 0 ]]; then
             fmt_output=""
         else
