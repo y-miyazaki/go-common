@@ -58,3 +58,4 @@ outputs
 # other
 db/migrations
 db/dbconfig.yaml
+s3
