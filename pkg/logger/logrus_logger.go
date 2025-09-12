@@ -74,11 +74,13 @@ func (l *Logger) WithError(err error) *Logger {
 	}
 	if e, ok := err.(interface{ StackTrace() errors.StackTrace }); ok {
 		return &Logger{
-			Entry: l.Entry.WithField("stacktrace", fmt.Sprintf("%+v", e.StackTrace())).WithError(err),
+			Entry:  l.Entry.WithField("stacktrace", fmt.Sprintf("%+v", e.StackTrace())).WithError(err),
+			Config: l.Config,
 		}
 	}
 	return &Logger{
-		Entry: l.Entry.WithError(err),
+		Entry:  l.Entry.WithError(err),
+		Config: l.Config,
 	}
 }
 
