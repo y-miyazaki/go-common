@@ -1,8 +1,7 @@
-// pragma: allowlist-secret
 // NOTE: This file may contain references to configuration secrets (client secret, passwords) that are
 // provided via environment or secret manager at runtime. The occurrences are documented with inline
-// allowlist comments. To avoid false positives from static secret scanners during validation, mark
-// the file as intentional for secret references.
+// allowlist comments. To avoid false positives from static secret scanners during validation, each
+// occurrence is individually marked with inline allowlist comments.
 
 // Package repository provides AWS SDK v2 based repository implementations.
 package repository
