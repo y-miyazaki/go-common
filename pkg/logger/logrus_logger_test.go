@@ -2,11 +2,11 @@ package logger
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,10 +18,10 @@ func TestNewLogger(t *testing.T) {
 	logger.Out = os.Stdout
 	logger.Level, _ = logrus.ParseLevel("Info")
 	log := NewLogger(logger)
-	e1 := errors.WithStack(errors.New("test1"))
+	e1 := errors.New("test1")
 	e2 := errors.New("test2")
-	e3 := fmt.Errorf("test3 %s", e1)
-	e4 := errors.WithStack(e1)
+	e3 := fmt.Errorf("test3 %w", e1)
+	e4 := e1
 
 	log.WithError(e1).Error("test1")
 	log.WithError(e2).Error("test2")
