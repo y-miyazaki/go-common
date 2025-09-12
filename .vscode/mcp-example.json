@@ -2,10 +2,7 @@
   // https://github.com/modelcontextprotocol/servers
   // https://code.visualstudio.com/mcp
   "servers": {
-    "github": {
-      "type": "http",
-      "url": "https://api.githubcopilot.com/mcp/"
-    },
+    // https://github.com/awslabs/mcp/
     "awslabs.aws-api-mcp-server": {
       "command": "uvx",
       "args": ["awslabs.aws-api-mcp-server@latest"],
@@ -13,6 +10,7 @@
         "AWS_REGION": "us-east-1"
       }
     },
+    // https://github.com/awslabs/mcp/
     "aws-knowledge-mcp-server": {
       "command": "uvx",
       "args": [
@@ -21,6 +19,14 @@
         "streamablehttp",
         "https://knowledge-mcp.global.api.aws"
       ]
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
     },
     // https://github.com/hashicorp/terraform-mcp-server
     "terraform": {
@@ -36,6 +42,17 @@
         "hashicorp/terraform-mcp-server"
       ]
     },
+    // https://github.com/awslabs/mcp/tree/main/src/terraform-mcp-server
+    "awslabs.terraform-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.terraform-mcp-server@latest"],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "disabled": false,
+      "autoApprove": []
+    },
+    // https://github.com/oraios/serena
     "serena": {
       "command": "uvx",
       "args": [

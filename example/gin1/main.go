@@ -149,7 +149,7 @@ func main() {
 	o := &redis.Options{
 		Addr:     redisAddr,
 		Username: redisUsername,
-		Password: redisPassword, // pragma: allowlist secret
+		Password: redisPassword,
 	}
 	r := infrastructure.NewRedis(o)
 	redisRepository := repository.NewRedisRepository(r)

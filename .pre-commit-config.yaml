@@ -2,17 +2,43 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
         exclude: README.*.md
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-added-large-files
+        args: ["--maxkb=10240"]
       - id: detect-aws-credentials
         args: [--allow-missing-credentials]
       - id: detect-private-key
-  # for go
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        # args: ['--baseline', '.secrets.baseline']
+        # Exclude go test file and gitleaks config and any terraform.*.tfvars files in any directory
+        exclude: '(.*_test.go|.gitleaks.toml|(?:^|/)(?:.*/)?terraform\.[^.]+\.tfvars$)'
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.2
+    hooks:
+      - id: gitleaks
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.100.0 # https://github.com/antonbabenko/pre-commit-terraform/releases
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_tflint
+        args:
+          - --args=-f=compact
+          - --args=--chdir=/workspace/modules
+          - --args=--module
+          - --args=--no-color
+      - id: terraform_trivy
+        args:
+          - --args=--format=table
+          - --args=--skip-dirs="**/.terraform"
+          - --args=--config="/workspace/trivy.yaml"
   - repo: local
     hooks:
       - id: golangci-lint
@@ -23,14 +49,3 @@ repos:
         language: golang
         exclude: ^.*_test.go$
         pass_filenames: false
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.1.0
-    hooks:
-      - id:
-          detect-secrets
-          # args: ['--baseline', '.secrets.baseline']
-          # exclude: package.lock.json
-  - repo: https://github.com/zricethezav/gitleaks
-    rev: v7.6.0
-    hooks:
-      - id: gitleaks

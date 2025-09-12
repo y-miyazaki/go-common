@@ -65,9 +65,34 @@
     // "editorLink.activeForeground": "#5555ce"
   },
   // ------------------------------------------------------------
+  // GitHub Copilot
+  // ------------------------------------------------------------
+  "chat.tools.terminal.autoApprove": {
+    "/.*/": true,
+    "rm": false
+  },
+  "chat.agent.enabled": true,
+  "chat.mcp.autostart": "onlyNew",
+  "chat.mcp.enabled": true,
+  "chat.mcp.discovery.enabled": true,
+  "editor.inlineSuggest.enabled": true,
+  "github.copilot.chat.agent.autoFix": true,
+  "github.copilot.chat.localeOverride": "ja",
+  "github.copilot.chat.newWorkspace.useContext7": true,
+  "github.copilot.enable": {
+    "*": true,
+    "go": true,
+    "javascript": true,
+    "markdown": true,
+    "plaintext": true,
+    "python": true,
+    "typescriptreact": true
+  },
+  // ------------------------------------------------------------
   // cspell
   // ------------------------------------------------------------
-  "cSpell.showAutocompleteSuggestions": true,
+  "cSpell.autoFormatConfigFile": true,
+  "cSpell.caseSensitive": false,
   "cSpell.customDictionaries": {
     "project-words": {
       "name": "project-words",
@@ -78,6 +103,7 @@
     "custom": true, // Enable the `custom` dictionary
     "internal-terms": false // Disable the `internal-terms` dictionary
   },
+  "cSpell.showAutocompleteDirectiveSuggestions": true,
   // ------------------------------------------------------------
   // files assotiations
   // ------------------------------------------------------------
@@ -91,9 +117,6 @@
   "go.alternateTools": {
     "go-langserver": "gopls"
   },
-  // "go.buildFlags": "", // It will be ignored if you use a language server.
-  // "go.buildOnSave": "workspace", // It will be ignored if you use a language server.
-  // "go.buildTags": "", // It will be ignored if you use a language server.
   "go.coverMode": "default",
   "go.coverOnSave": true,
   "go.coverOnSingleTest": true,
@@ -144,8 +167,8 @@
   "go.enableCodeLens": {
     "runtest": true
   },
-  "go.formatFlags": ["-w"],
   // "go.formatTool": "goimports", // It will be ignored if you use a language server.
+  // "go.formatFlags": ["-w"], // It will be ignored if you use a language server.
   "go.generateTestsFlags": [],
   // "go.gocodeAutoBuild": false, // It will be ignored if you use a language server.
   // "go.gocodeFlags": ["-builtin", "-ignore-case", "-unimported-packages"], // It will be ignored if you use a language server.
@@ -160,7 +183,7 @@
   "go.languageServerFlags": [],
   "go.lintFlags": [
     "-c",
-    "${workspaceFolder}/.golangci.yaml",
+    "/workspace/.golangci.yaml",
     "-v",
     "--max-same-issues",
     "0",
@@ -180,9 +203,6 @@
     "options": "",
     "promptForTags": false
   },
-  // "go.testEnvFile": null,
-  // "go.testEnvVars": {},
-  // "go.testFlags": ["-v"], // It will be ignored if you use a language server.
   "go.testOnSave": true,
   "go.testTags": null,
   "go.testTimeout": "30s",
@@ -195,7 +215,6 @@
   "go.trace.server": "off",
   "go.useLanguageServer": true,
   "go.vetFlags": [],
-  // "go.vetOnSave":"package", // It will be ignored if you use a language server.
   "gopls": {
     "usePlaceholders": true,
     "completeUnimported": true
@@ -225,7 +244,8 @@
     "!modules/**/README.md",
     "!**/.terraform",
     "!.github/instructions/*.md",
-    "!.github/prompt/*.md"
+    "!.github/prompt/*.md",
+    "!CODEOWNERS"
   ],
   // ------------------------------------------------------------
   // for Terraform
@@ -295,7 +315,6 @@
     "**/*.fish": true
   },
   "shellcheck.customArgs": ["-x"],
-  "shellcheck.ignoreFileSchemes": ["git", "gitfs"],
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format",
     "editor.formatOnSave": true,

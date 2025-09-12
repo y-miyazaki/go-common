@@ -27,7 +27,7 @@ func TestIsSensitiveKey(t *testing.T) {
 
 func TestSanitizeFields_RedactsAndPreserves(t *testing.T) {
 	fields := logrus.Fields{
-		"password": "hunter2", // pragma: allowlist secret
+		"password": "hunter2", // pragma: allowlist-secret
 		"user":     "alice",
 	}
 	got := SanitizeFields(fields, nil)
@@ -40,10 +40,10 @@ func TestSanitizeFields_RedactsAndPreserves(t *testing.T) {
 }
 
 func TestSanitizeFields_AllowSensitiveTrue(t *testing.T) {
-	fields := logrus.Fields{"api_key": "abcd1234"} // pragma: allowlist secret
+	fields := logrus.Fields{"api_key": "abcd1234"} // pragma: allowlist-secret
 	cfg := &LoggerConfig{AllowSensitive: true}
 	got := SanitizeFields(fields, cfg)
-	if got["api_key"] != "abcd1234" { // pragma: allowlist secret
+	if got["api_key"] != "abcd1234" { // pragma: allowlist-secret
 		t.Fatalf("expected api_key to be preserved when AllowSensitive=true, got %v", got["api_key"])
 	}
 }

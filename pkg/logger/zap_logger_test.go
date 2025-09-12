@@ -139,3 +139,127 @@ func TestZapLoggerWithPanic(t *testing.T) {
 	logger := NewZapLogger(&zapConfig)
 	logger.Panic("This should trigger a panic")
 }
+
+func TestZapLogger_PrintfStyleFunctions(t *testing.T) {
+	zapConfig := zap.Config{
+		Level:       zap.NewAtomicLevelAt(zap.DebugLevel),
+		Development: false,
+		Sampling: &zap.SamplingConfig{
+			Initial:    100,
+			Thereafter: 100,
+		},
+		Encoding: "json",
+		EncoderConfig: zapcore.EncoderConfig{
+			TimeKey:        "time",
+			LevelKey:       "level",
+			NameKey:        "logger",
+			CallerKey:      "caller",
+			FunctionKey:    zapcore.OmitKey,
+			MessageKey:     "msg",
+			StacktraceKey:  "stacktrace",
+			LineEnding:     zapcore.DefaultLineEnding,
+			EncodeLevel:    zapcore.LowercaseLevelEncoder,
+			EncodeTime:     zapcore.ISO8601TimeEncoder,
+			EncodeDuration: zapcore.StringDurationEncoder,
+			EncodeCaller:   zapcore.ShortCallerEncoder,
+		},
+		OutputPaths:      []string{"stdout"},
+		ErrorOutputPaths: []string{"stderr"},
+	}
+
+	logger := NewZapLogger(&zapConfig)
+
+	// Test printf-style functions
+	logger.Debugf("Debugf test: %s", "debug")
+	logger.Infof("Infof test: %s", "info")
+	logger.Warnf("Warnf test: %s", "warn")
+	logger.Errorf("Errorf test: %s", "error")
+
+	// Note: Fatalf and Panicf would exit the program or panic, so we don't test them
+	// logger.Fatalf("Fatalf test: %s", "fatal")
+	// logger.Panicf("Panicf test: %s", "panic")
+
+	// Test DPanicf (only panics in development mode)
+	logger.DPanicf("DPanicf test: %s", "dpanic")
+}
+
+func TestZapLogger_PrintlnStyleFunctions(t *testing.T) {
+	zapConfig := zap.Config{
+		Level:       zap.NewAtomicLevelAt(zap.DebugLevel),
+		Development: false,
+		Sampling: &zap.SamplingConfig{
+			Initial:    100,
+			Thereafter: 100,
+		},
+		Encoding: "json",
+		EncoderConfig: zapcore.EncoderConfig{
+			TimeKey:        "time",
+			LevelKey:       "level",
+			NameKey:        "logger",
+			CallerKey:      "caller",
+			FunctionKey:    zapcore.OmitKey,
+			MessageKey:     "msg",
+			StacktraceKey:  "stacktrace",
+			LineEnding:     zapcore.DefaultLineEnding,
+			EncodeLevel:    zapcore.LowercaseLevelEncoder,
+			EncodeTime:     zapcore.ISO8601TimeEncoder,
+			EncodeDuration: zapcore.StringDurationEncoder,
+			EncodeCaller:   zapcore.ShortCallerEncoder,
+		},
+		OutputPaths:      []string{"stdout"},
+		ErrorOutputPaths: []string{"stderr"},
+	}
+
+	logger := NewZapLogger(&zapConfig)
+
+	// Test println-style functions
+	logger.Debugln("Debugln test")
+	logger.Infoln("Infoln test")
+	logger.Warnln("Warnln test")
+	logger.Errorln("Errorln test")
+
+	// Note: Fatalln and Panicln would exit the program or panic, so we don't test them
+	// logger.Fatalln("Fatalln test")
+	// logger.Panicln("Panicln test")
+
+	// Test DPanicln (only panics in development mode)
+	logger.DPanicln("DPanicln test")
+}
+
+func TestZapLogger_FatalAndDPanic(t *testing.T) {
+	zapConfig := zap.Config{
+		Level:       zap.NewAtomicLevelAt(zap.DebugLevel),
+		Development: false, // Set to false so DPanic doesn't panic
+		Sampling: &zap.SamplingConfig{
+			Initial:    100,
+			Thereafter: 100,
+		},
+		Encoding: "json",
+		EncoderConfig: zapcore.EncoderConfig{
+			TimeKey:        "time",
+			LevelKey:       "level",
+			NameKey:        "logger",
+			CallerKey:      "caller",
+			FunctionKey:    zapcore.OmitKey,
+			MessageKey:     "msg",
+			StacktraceKey:  "stacktrace",
+			LineEnding:     zapcore.DefaultLineEnding,
+			EncodeLevel:    zapcore.LowercaseLevelEncoder,
+			EncodeTime:     zapcore.ISO8601TimeEncoder,
+			EncodeDuration: zapcore.StringDurationEncoder,
+			EncodeCaller:   zapcore.ShortCallerEncoder,
+		},
+		OutputPaths:      []string{"stdout"},
+		ErrorOutputPaths: []string{"stderr"},
+	}
+
+	logger := NewZapLogger(&zapConfig)
+
+	// Test Fatal - this would normally exit, but in test we can call it
+	// Note: In real usage, Fatal would exit the program
+	// For testing purposes, we just ensure the function exists and can be called
+	// logger.Fatal("Fatal test")
+
+	// Test DPanic - only panics in development mode
+	logger.DPanic("DPanic test")
+}

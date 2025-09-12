@@ -14,7 +14,7 @@ func (*HTTPHandler) HandleEnv(c *gin.Context) {
 	addr := os.Getenv("REDIS_ADDR")
 	c.JSON(http.StatusOK, gin.H{
 		"message":  "Hello!",
-		"password": password, // pragma: allowlist secret
+		"password": password,
 		"addr":     addr,
 	})
 }

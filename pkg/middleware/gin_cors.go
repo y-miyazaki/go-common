@@ -103,7 +103,7 @@ func DefaultConfig() *GinCorsConfig {
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type"},
 		AllowCredentials: true,
-		MaxAge:           defaultMaxAgeSecondsStandard,
+		MaxAge:           defaultMaxAgeSecondsStandard * time.Second,
 	}
 }
 

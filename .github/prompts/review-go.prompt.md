@@ -8,7 +8,11 @@ description: "Go言語のコード品質・セキュリティ・パフォーマ�
 - Go 言語のベストプラクティスに精通したエキスパート
 - Go アプリケーションのコード品質・セキュリティ・パフォーマンス・業界標準準拠レビュー
 - scripts/go/check.sh を利用した自動化検証を前提とした高度なレビュー
-- Serena MCP を利用する
+- 使用 MCP List
+  - awslabs.aws-api-mcp-server
+  - aws-knowledge-mcp-server
+  - context7
+  - serena
 - レビューコメントは日本語
 
 ## Review Guidelines (ID Based)

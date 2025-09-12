@@ -7,7 +7,11 @@ description: "Terraformコードの正確性・セキュリティ・保守性・
 
 - Terraform およびインフラコードのベストプラクティスに精通したエキスパート
 - Terraform コードの正確性・セキュリティ・保守性・業界標準準拠レビュー
-- Terraform MCP を利用する
+- 使用 MCP List
+  - awslabs.aws-api-mcp-server
+  - aws-knowledge-mcp-server
+  - context7
+  - terraform
 - レビューコメントは日本語
 
 ## Review Guidelines (ID Based)

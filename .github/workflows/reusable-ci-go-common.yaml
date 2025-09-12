@@ -5,12 +5,12 @@ name: reusable-ci-go-common
 on:
   workflow_call:
     inputs:
-      environment:
-        description: "Target environment (dev, qa, stg, prd, etc.)"
-        required: true
-        type: string
       component:
         description: "Logical component name (e.g. base)"
+        required: true
+        type: string
+      environment:
+        description: "Target environment (dev, qa, stg, prd, etc.)"
         required: true
         type: string
       go_path:
@@ -27,7 +27,6 @@ env:
 
 jobs:
   test_and_lint:
-    if: ${{ github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     # environment:
     #   name: ${{ inputs.environment }}
@@ -36,10 +35,10 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: ${{ env.GO_VERSION }}
           cache: false
@@ -57,7 +56,7 @@ jobs:
           path: |
             ${{ steps.go-cache-paths.outputs.gomodcache }}
             ${{ steps.go-cache-paths.outputs.gocache }}
-          key: go-cache-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ env.GO_VERSION }}-${{ hashFiles(format('{0}/go.sum', env.GO_PROJECT_PATH)) }}
+          key: go-cache-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ env.GO_VERSION }}-${{ hashFiles(format('{0}/go.mod', env.GO_PROJECT_PATH), format('{0}/go.sum', env.GO_PROJECT_PATH)) }}
           restore-keys: |
             go-cache-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ env.GO_VERSION }}-
             go-cache-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-
@@ -104,23 +103,27 @@ jobs:
           name: govulncheck-${{ env.COMPONENT }}-${{ env.ENV }}
           path: ${{ env.GO_PROJECT_PATH }}/security
 
-      # https://github.com/aquasecurity/trivy-action/tree/0.32.0/?tab=readme-ov-file#inputs
+      # https://github.com/aquasecurity/trivy-action/tree/0.33.1/?tab=readme-ov-file#inputs
       - name: Trivy Vulnerability Scan
-        uses: aquasecurity/trivy-action@0.32.0
+        uses: aquasecurity/trivy-action@0.33.1
         with:
           exit-code: 1
           format: table
           scan-ref: .
           scan-type: "fs"
           scanners: license,misconfig,secret,vuln
-          trivy-config: trivy.yaml
           severity: HIGH,CRITICAL
+          trivy-config: trivy.yaml
 
-      - name: Generate SBOM (CycloneDX)
-        working-directory: ${{ env.GO_PROJECT_PATH }}
-        run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-          trivy fs --format cyclonedx --output sbom-${{ env.COMPONENT }}-${{ env.ENV }}.json .
+      # https://github.com/aquasecurity/trivy-action/tree/0.33.1/?tab=readme-ov-file#inputs
+      - name: Trivy Generate SBOM (CycloneDX)
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          exit-code: 0
+          format: cyclonedx
+          output: ${{ env.GO_PROJECT_PATH }}/sbom-${{ env.COMPONENT }}-${{ env.ENV }}.json
+          scan-ref: .
+          scan-type: "fs"
 
       - name: Upload SBOM Artifact
         uses: actions/upload-artifact@v4
@@ -129,7 +132,7 @@ jobs:
           path: ${{ env.GO_PROJECT_PATH }}/sbom-${{ env.COMPONENT }}-${{ env.ENV }}.json
 
       - name: GolangCI-Lint via reviewdog (PR inline comments)
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
         uses: reviewdog/action-golangci-lint@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -167,8 +170,8 @@ jobs:
           fi
 
       - name: Post PR failure comment
-        if: failure() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        if: failure() && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
+        uses: actions/github-script@v8
         with:
           script: |
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;

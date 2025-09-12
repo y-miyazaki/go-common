@@ -277,7 +277,7 @@ function generate_generic_resources {
 
                         if [[ -n "$resource_name_value" && "$resource_name_value" != "null" ]]; then
                             resource_names+=("$resource_name_value")
-                            ((resource_count++))
+                            resource_count=$((resource_count + 1))
                         fi
                     fi
                 done < <(echo "$resources" | jq -c '.[]? // empty')
@@ -295,7 +295,7 @@ EOF
                     local counter=1
                     for res_name in "${resource_names[@]}"; do
                         echo "        - ${resource_name^}_${safe_region}_${counter}" >>"$TEMP_YAML_FILE"
-                        ((counter++))
+                        counter=$((counter + 1))
                     done
 
                     # Generate resource definitions
@@ -311,7 +311,7 @@ EOF
       Type: $type_field
       Title: $clean_name
 EOF
-                        ((counter++))
+                        counter=$((counter + 1))
                     done
                 fi
             done
@@ -510,7 +510,7 @@ function generate_vpc_hierarchical_resources {
 
                         if [[ -n "$vpc_id" && "$vpc_id" != "null" ]]; then
                             vpc_data+=("$vpc_info")
-                            ((vpc_count++))
+                            vpc_count=$((vpc_count + 1))
                         fi
                     fi
                 done < <(echo "$vpcs" | jq -c '.Vpcs[]? // empty')
@@ -530,7 +530,7 @@ EOF
                     local vpc_counter=1
                     for vpc_info in "${vpc_data[@]}"; do
                         echo "        - VPCHierarchical_${safe_region}_${vpc_counter}" >>"$TEMP_YAML_FILE"
-                        ((vpc_counter++))
+                        vpc_counter=$((vpc_counter + 1))
                     done
 
                     # Generate hierarchical VPC definitions with children
@@ -561,7 +561,7 @@ EOF
 
                                 if [[ -n "$subnet_id" && "$subnet_id" != "null" ]]; then
                                     subnet_children+=("Subnet_${safe_region}_${vpc_counter}_${subnet_counter}")
-                                    ((subnet_counter++))
+                                    subnet_counter=$((subnet_counter + 1))
                                 fi
                             fi
                         done < <(echo "$subnets" | jq -c '.Subnets[]? // empty')
@@ -620,7 +620,7 @@ EOF
 
                                             if [[ -n "$instance_id" && "$instance_id" != "null" ]]; then
                                                 ec2_children+=("EC2Hierarchical_${safe_region}_${vpc_counter}_${subnet_counter}_${ec2_counter}")
-                                                ((ec2_counter++))
+                                                ec2_counter=$((ec2_counter + 1))
                                             fi
                                         fi
                                     done < <(echo "$ec2_instances" | jq -c '.[]? // empty')
@@ -646,7 +646,7 @@ EOF
                                             # Check if Lambda is in current VPC
                                             if [[ "$lambda_vpc_id" == "$vpc_id" ]]; then
                                                 lambda_children+=("LambdaVPC_${safe_region}_${vpc_counter}_${lambda_counter}:$function_name")
-                                                ((lambda_counter++))
+                                                lambda_counter=$((lambda_counter + 1))
                                             fi
                                         fi
                                     done < <(echo "$lambda_functions" | jq -r '.Functions[]? | @base64')
@@ -659,7 +659,7 @@ EOF
                                     local lambda_child_counter=1
                                     for lambda_child in "${lambda_children[@]}"; do
                                         all_children+=("LambdaVPC_${safe_region}_${vpc_counter}_${subnet_counter}_${lambda_child_counter}")
-                                        ((lambda_child_counter++))
+                                        lambda_child_counter=$((lambda_child_counter + 1))
                                     done
 
                                     # Generate subnet definition
@@ -701,7 +701,7 @@ EOF
       Type: AWS::EC2::Instance
       Title: $instance_name
 EOF
-                                                ((ec2_counter++))
+                                                ec2_counter=$((ec2_counter + 1))
                                             fi
                                         fi
                                     done < <(echo "$ec2_instances" | jq -c '.[]? // empty')
@@ -716,15 +716,15 @@ EOF
       Type: AWS::Lambda::Function
       Title: $lambda_name (VPC)
 EOF
-                                        ((lambda_child_counter++))
+                                        lambda_child_counter=$((lambda_child_counter + 1))
                                     done
 
-                                    ((subnet_counter++))
+                                    subnet_counter=$((subnet_counter + 1))
                                 fi
                             fi
                         done < <(echo "$subnets" | jq -c '.Subnets[]? // empty')
 
-                        ((vpc_counter++))
+                        vpc_counter=$((vpc_counter + 1))
                     done
                 fi
             done
@@ -820,7 +820,7 @@ EOF
             local counter=1
             for func_name in "${nonvpc_functions[@]}"; do
                 echo "        - LambdaNonVPC_${safe_region}_${counter}" >>"$TEMP_YAML_FILE"
-                ((counter++))
+                counter=$((counter + 1))
             done
 
             # Generate resource definitions
@@ -832,7 +832,7 @@ EOF
       Type: AWS::Lambda::Function
       Title: $func_name (Non-VPC)
 EOF
-                ((counter++))
+                counter=$((counter + 1))
             done
         fi
     done
@@ -890,7 +890,7 @@ EOF
             local counter=1
             for bucket_name in "${region_buckets[@]}"; do
                 echo "        - S3_${safe_region}_${counter}" >>"$TEMP_YAML_FILE"
-                ((counter++))
+                counter=$((counter + 1))
             done
 
             # Generate resource definitions
@@ -902,7 +902,7 @@ EOF
       Type: AWS::S3::Bucket
       Title: $bucket_name
 EOF
-                ((counter++))
+                counter=$((counter + 1))
             done
         fi
     done

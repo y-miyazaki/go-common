@@ -314,7 +314,7 @@ function validate_files_in_directory {
 
     for file in "${files[@]}"; do
         if ! "$validation_function" "$file"; then
-            ((failed_count++))
+            failed_count=$((failed_count + 1))
             log "ERROR" "Validation failed: $file"
         fi
     done

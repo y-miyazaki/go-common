@@ -42,6 +42,7 @@ TEST_FAILED=0
 RACE_FAILED=0
 COVERAGE_FAILED=0
 SECURITY_FAILED=0
+GO_BUILD_FAILED=0
 
 # Counters for issues
 LINT_ISSUES_COUNT=0
@@ -176,12 +177,17 @@ function run_go_fmt {
             GO_FMT_FAILED=1
         fi
     else
-        # Check if formatting is needed by using gofmt -l
+        # Check formatting using gofmt -l to list files that are not formatted
         local fmt_output
-        fmt_output=$(go fmt -n "$TARGET_PATTERN" 2>/dev/null || true)
-
+        # Safely build argument list from go list output to avoid word splitting
+        mapfile -t go_dirs < <(go list -f '{{.Dir}}' "$TARGET_PATTERN" 2>/dev/null || true)
+        if [[ ${#go_dirs[@]} -eq 0 ]]; then
+            fmt_output=""
+        else
+            fmt_output=$(gofmt -l "${go_dirs[@]}" 2>&1 || true)
+        fi
         if [[ -n "$fmt_output" ]]; then
-            echo "Files that would be formatted:"
+            echo "Files that need formatting (gofmt -l):"
             echo "$fmt_output"
             log "WARN" "Some files need formatting. Use -f flag to auto-fix"
             EXIT_CODE=1
@@ -209,6 +215,27 @@ function run_go_vet {
         log "ERROR" "go vet found issues"
         EXIT_CODE=1
         GO_VET_FAILED=1
+    fi
+}
+
+#######################################
+# Function to run go build
+#######################################
+function run_go_build {
+    echo_section "Running go build"
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log "INFO" "DRY-RUN: Would run 'go build \"$TARGET_PATTERN\"'"
+        return 0
+    fi
+
+    # Attempt to build all packages matching the target pattern
+    if go build "$TARGET_PATTERN"; then
+        log "INFO" "go build succeeded"
+    else
+        log "ERROR" "go build failed"
+        EXIT_CODE=1
+        GO_BUILD_FAILED=1
     fi
 }
 
@@ -243,7 +270,15 @@ function run_golangci_lint {
         EXIT_CODE=1
         LINT_FAILED=1
         # Count issues
-        LINT_ISSUES_COUNT=$(grep -cE '^\S+\.go:' /tmp/golint_output.txt || echo 0)
+        if [[ -f /tmp/golint_output.txt ]]; then
+            LINT_ISSUES_COUNT=$(grep -cE '^\S+\.go:' /tmp/golint_output.txt 2>/dev/null || echo 0)
+        else
+            LINT_ISSUES_COUNT=0
+        fi
+        # Ensure it's a valid number
+        if ! [[ "$LINT_ISSUES_COUNT" =~ ^[0-9]+$ ]]; then
+            LINT_ISSUES_COUNT=0
+        fi
     fi
     rm -f /tmp/golint_output.txt
 }
@@ -379,32 +414,6 @@ function run_security_checks {
         log "WARN" "govulncheck not installed, skipping vulnerability check"
         log "INFO" "Install with: go install golang.org/x/vuln/cmd/govulncheck@latest"
     fi
-
-    # Check for hardcoded secrets (basic patterns)
-    log "INFO" "Checking for potential hardcoded secrets... (root=$search_root)"
-    local secret_patterns=(
-        "password.*=.*['\"][^'\"]*['\"]"
-        "secret.*=.*['\"][^'\"]*['\"]"
-        "token.*=.*['\"][^'\"]*['\"]"
-        "key.*=.*['\"][^'\"]*['\"]"
-        "aws_access_key_id.*=.*['\"][^'\"]*['\"]"
-        "aws_secret_access_key.*=.*['\"][^'\"]*['\"]"
-    )
-
-    local secrets_found=false
-    for pattern in "${secret_patterns[@]}"; do
-        if find "$search_root" -name "*.go" -not -path "*/vendor/*" -not -path "*/.*" -exec grep -l -i -E "$pattern" {} + 2>/dev/null | head -1; then
-            secrets_found=true
-        fi
-    done
-
-    if [[ "$secrets_found" == "true" ]]; then   # pragma: allowlist secret
-        log "WARN" "Potential hardcoded secrets found. Please review and use environment variables instead."
-        EXIT_CODE=1
-        SECURITY_FAILED=1
-    else
-        log "INFO" "No obvious hardcoded secrets found"
-    fi
 }
 
 #######################################
@@ -501,6 +510,7 @@ function main {
     run_go_mod_tidy
     run_go_fmt
     run_go_vet
+    run_go_build
     run_golangci_lint
     run_tests
     run_race_tests
@@ -520,15 +530,16 @@ function main {
         echo_section "Result (completed in ${elapsed} seconds)"
         echo "Result:" >&2
         [[ "$GO_FMT_FAILED" == "1" ]] && echo "❌ go fmt" >&2 || echo "✅ go fmt" >&2
-        if [[ "$GO_VET_FAILED" == "1" ]]; then
-            echo "❌ go vet" >&2
-        else
-            echo "✅ go vet" >&2
-        fi
+        # Report go vet status
+        [[ "$GO_VET_FAILED" == "1" ]] && echo "❌ go vet" >&2 || echo "✅ go vet" >&2
+
+        # Report go build status next to keep result order consistent with run_* calls
+        [[ "$GO_BUILD_FAILED" == "1" ]] && echo "❌ go build" >&2 || echo "✅ go build" >&2
         if [[ "$LINT_FAILED" == "1" ]]; then
             echo -n "❌ golangci-lint" >&2
             # Use safe arithmetic comparison with default 0 to avoid bash syntax errors
-            if (( ${LINT_ISSUES_COUNT:-0} > 0 )); then
+            local issue_count="${LINT_ISSUES_COUNT:-0}"
+            if [[ "$issue_count" != "0" && "$issue_count" -gt 0 ]]; then
                 echo " (${LINT_ISSUES_COUNT} issues)" >&2
             else
                 echo "" >&2
@@ -539,7 +550,7 @@ function main {
         if [[ "$TEST_FAILED" == "1" ]]; then
             echo -n "❌ go test" >&2
             # Use safe arithmetic comparison with default 0
-            if (( ${TEST_FAIL_COUNT:-0} > 0 )); then
+            if ((${TEST_FAIL_COUNT:-0} > 0)); then
                 echo " (${TEST_FAIL_COUNT} failed)" >&2
             else
                 echo "" >&2
@@ -561,7 +572,7 @@ function main {
                 echo "✅ go test -cover" >&2
             fi
         fi
-        [[ "$SECURITY_FAILED" == "1" ]] && echo "❌ security checks (govulncheck or secrets)" >&2 || echo "✅ security checks (govulncheck or secrets)" >&2
+        [[ "$SECURITY_FAILED" == "1" ]] && echo "❌ security checks (govulncheck)" >&2 || echo "✅ security checks (govulncheck)" >&2
         log "ERROR" "❌ Some validations failed"
     fi
 

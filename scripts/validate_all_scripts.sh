@@ -21,7 +21,9 @@ WORKSPACE_ROOT="$(dirname "$SCRIPT_DIR")"
 # Global variable for script search paths
 SEARCH_PATHS=("$WORKSPACE_ROOT/scripts" "$WORKSPACE_ROOT/env")
 
-# Load unified library system
+# Load all-in-one library
+# shellcheck source=../lib/all.sh
+# shellcheck disable=SC1091
 source "${SCRIPT_DIR}/lib/all.sh"
 
 # Counters for statistics
@@ -52,7 +54,7 @@ function custom_log {
 
     # Increment warning counter for WARN level
     if [[ "$level" == "WARN" ]]; then
-        ((WARNINGS_COUNT++))
+        WARNINGS_COUNT=$((WARNINGS_COUNT + 1))
     fi
 }
 
@@ -396,14 +398,14 @@ function validate_script {
     relative_path="${script#$WORKSPACE_ROOT/}"
     local validation_passed=true
 
-    ((TOTAL_SCRIPTS++))
+    TOTAL_SCRIPTS=$((TOTAL_SCRIPTS + 1))
 
     custom_log "INFO" "Validating script: $relative_path"
 
     # Skip if it's a directory (should not happen after filtering, but safety check)
     if [[ -d "$script" ]]; then
         custom_log "DEBUG" "Skipping directory: $script_name"
-        ((TOTAL_SCRIPTS--)) # Don't count directories
+        TOTAL_SCRIPTS=$((TOTAL_SCRIPTS - 1)) # Don't count directories
         return 0
     fi
 
@@ -411,7 +413,7 @@ function validate_script {
     if [[ ! -f "$script" ]] || [[ ! -r "$script" ]]; then
         custom_log "ERROR" "❌ Script not accessible: $script_name"
         FAILED_SCRIPTS_LIST+=("$relative_path (not accessible)")
-        ((FAILED_SCRIPTS++))
+        FAILED_SCRIPTS=$((FAILED_SCRIPTS + 1))
         return 1
     fi
 
@@ -450,11 +452,11 @@ function validate_script {
     if [[ "$validation_passed" == "true" ]]; then
         custom_log "INFO" "✅ All validations passed: $script_name"
         PASSED_SCRIPTS_LIST+=("$relative_path")
-        ((PASSED_SCRIPTS++))
+        PASSED_SCRIPTS=$((PASSED_SCRIPTS + 1))
     else
         custom_log "ERROR" "❌ Validation failed: $script_name"
         FAILED_SCRIPTS_LIST+=("$relative_path")
-        ((FAILED_SCRIPTS++))
+        FAILED_SCRIPTS=$((FAILED_SCRIPTS + 1))
     fi
 
     # Track warnings separately

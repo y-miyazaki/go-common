@@ -8,7 +8,7 @@ applyTo: "**/*.md"
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
 
-## Overview
+## Project Overview
 
 git clone https://github.com/owner/repo.git
 
@@ -49,15 +49,9 @@ git clone https://github.com/owner/repo.git
 
 2. **第３項目（###）以下**: 各言語・フレームワークの特性に応じて調整可能
 
-3. **保持要素**:
+3. **テンプレート参照**: copilot-instructions-scripts.md を統一標準のテンプレートとして使用
 
-- Table of Contents: 英語で維持
-- Reference Resources: 英語で維持
-- 本文コンテンツ: 日本語で記載（Reference Resources 除く）
-
-4. **テンプレート参照**: copilot-instructions-scripts.md を統一標準のテンプレートとして使用
-
-5. **第３項目（###）レベルの統一**:
+4. **第３項目（###）レベルの統一**:
 
 - Testing and Validation 章の統一構造:
   - Code Modification Guidelines（共通）
@@ -75,14 +69,51 @@ git clone https://github.com/owner/repo.git
 - 長い URL は参照型リンクを使う
 - 重要事項は引用・アドモンションで記載する
 - 複雑なドキュメントには使用例を記載する
+- 箇条書き
+  - ハイフン（-）を使用
+  - タイトルの後はスペースを 2 つと改行を入れ、その後に説明を記載
 
 ## Markdown Templates
 
-#### README.md Template
+### README.md Template
 
-...existing code...
+```
+<!-- omit in toc -->
+# some title
+<!-- omit in toc -->
+## Table of Contents
 
-#### Technical Documentation Template
+## Project Overview
+
+### Directory Structure
+
+| Directory/File | Description                          |
+| -------------- | ------------------------------------ |
+| `dir1/`        | Description of dir1                  |
+
+## Installation
+
+## Local Development Environment
+
+### Required
+
+### Setting
+
+### Create Local Development Environment
+
+## Commands
+
+## Troubleshooting
+
+### Common Issues
+
+### Getting Help
+
+## Note
+
+```
+
+### Technical Documentation Template
 
 ...existing code...
 
@@ -125,17 +156,21 @@ applyTo: "**/*.go"
 5. **言語統一**: 本文を日本語に翻訳（TOC・Reference Resources は英語維持）
 6. **検証**: grep_search や read_file で構造と内容を確認
 
-## Security Best Practices
+## Security Guidelines
 
-- 機密情報はドキュメントに記載しない
+**詳細な security guidelines は `.github/instructions/general.instructions.md` を参照。**
+
+### Markdown Specific Security
+
 - 外部リンクは信頼できる HTTPS のみ使用する
 - コード例はセキュリティベストプラクティス（環境変数利用・秘密情報ハードコーディング禁止）を守る
 - 機能の権限・アクセス制御は必ず記載する
 
 ## MCP Tools
 
-- MCP の詳細仕様・サーバ一覧は `.github/instructions/general.instructions.md` の「MCP Tools」を参照。
-- ドキュメント執筆時の補助的な利用:
-  - Terraform MCP: Terraform ドキュメント作成時にコード断片やパラメータ参照の正確性担保に使用。
-  - AWS Knowledge: 公式ドキュメントの根拠を提示。
-  - AWS Assistant: 必要に応じて AWS CLI 例示（実行はレビュー済みの安全な範囲に限定）。
+**詳細な MCP Tools の設定は `.github/instructions/general.instructions.md` を参照。**
+
+ドキュメント作業での主な活用：
+
+- `aws-knowledge-mcp-server`: 公式ドキュメントの検索・参照
+- `context7`: コンテキスト情報の管理・操作支援
