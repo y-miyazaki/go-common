@@ -1,4 +1,3 @@
-// pragma: allowlist-secret
 // Package main demonstrates AWS S3 operations using AWS SDK v2.
 package main
 
