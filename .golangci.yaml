@@ -67,7 +67,7 @@ linters:
     # - asciicheck # Simple linter to check that your code does not contain non-ASCII identifiers
     # - bidichk # Checks for dangerous unicode character sequences.
     - bodyclose # checks whether HTTP response body is closed successfully
-    - canonicalheader # Canonicalheader checks whether net/http.Header uses canonical header.
+    # - canonicalheader # Canonicalheader checks whether net/http.Header uses canonical header. (not supported in this version)
     - containedctx # Containedctx is a linter that detects struct contained context.Context field.
     # - contextcheck # Check whether the function uses a non-inherited context.
     # - copyloopvar # Copyloopvar is a linter detects places where loop variables are copied.
@@ -78,7 +78,7 @@ linters:
     # - dupl # Tool for code clone detection
     # - dupword # Checks for duplicate words in the source code.
     - durationcheck # Check for two durations multiplied together.
-    - err113 # Go linter to check the errors handling expressions.
+    - goerr113 # Go linter to check the errors handling expressions.
     - errcheck # Errcheck is a program for checking for unchecked errors in go programs. These unchecked errors can be critical bugs in some cases
     - errchkjson # Checks types passed to the json encoding functions. Reports unsupported types and reports occurrences where the check for the returned error can be omitted.
     - errname # Checks that sentinel errors are prefixed with the Err and error types are suffixed with the Error.
@@ -88,7 +88,7 @@ linters:
     - exhaustruct # Checks if all structure fields are initialized.
     # - exportloopref # The linter 'exportloopref' is deprecated (since v1.60.2)
     # - exptostd # no supported now.
-    - fatcontext # Detects nested contexts in loops and function literals.
+    # - fatcontext # Detects nested contexts in loops and function literals. (not supported in this version)
     - forbidigo # Forbids identifiers.
     - forcetypeassert # Finds forced type assertions.
     # - funlen # Tool for detection of long functions
@@ -111,7 +111,7 @@ linters:
     # - gosmopolitan # Report certain i18n/l10n anti-patterns in your Go codebase.
     - govet # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string
     # - grouper # Analyze expression groups.
-    - iface # Detect the incorrect use of interfaces, helping developers avoid interface pollution.
+    # - iface # Detect the incorrect use of interfaces, helping developers avoid interface pollution. (not supported in this version)
     # - importas # Enforces consistent import aliases.
     - inamedparam # Reports interfaces with unnamed method parameters.
     - ineffassign # Detects when assignments to existing variables are not used
@@ -124,7 +124,7 @@ linters:
     - makezero # Finds slice declarations with non-zero initial length.
     - mirror # Reports wrong mirror patterns of bytes/strings usage.
     # - misspell # Finds commonly misspelled English words in comments
-    - mnd # An analyzer to detect magic numbers.
+    - gomnd # An analyzer to detect magic numbers.
     - musttag # Enforce field tags in (un)marshaled structs.
     # - nakedret # Finds naked returns in functions greater than a specified function length
     # - nestif # Reports deeply nested if statements
@@ -143,7 +143,7 @@ linters:
     # - promlinter # Check Prometheus metrics naming via promlint.
     - protogetter # Reports direct reads from proto message fields when getters should be used.
     - reassign # Checks that package variables are not reassigned.
-    - recvcheck # Checks for receiver type consistency.
+    # - recvcheck # Checks for receiver type consistency. (not supported in this version)
     - revive # Fast, configurable, extensible, flexible, and beautiful linter for Go. Drop-in replacement of golint. Revive provides a framework for development of custom rules, and lets you define a strict preset for enhancing your development & code review processes.
     # - rowserrcheck # checks whether Err of rows is checked successfully
     # - sloglint # Ensure consistent code style when using log/slog.
@@ -1034,15 +1034,15 @@ linters:
       # Default: false
       var-require-grouping: true
 
-    iface: # https://golangci-lint.run/docs/linters/configuration/#iface
-      # List of analyzers.
-      # Default: ["identical"]
-      enable:
-        - identical # Identifies interfaces in the same package that have identical method sets.
-        - unused # Identifies interfaces that are not used anywhere in the same package where the interface is defined.
-        - opaque # Identifies functions that return interfaces, but the actual returned value is always a single concrete implementation.
-      settings:
-        unused:
+    # iface: # https://golangci-lint.run/docs/linters/configuration/#iface (not supported in this version)
+    #   # List of analyzers.
+    #   # Default: ["identical"]
+    #   enable:
+    #     - identical # Identifies interfaces in the same package that have identical method sets.
+    #     - unused # Identifies interfaces that are not used anywhere in the same package where the interface is defined.
+    #     - opaque # Identifies functions that return interfaces, but the actual returned value is always a single concrete implementation.
+    #   settings:
+    #     unused:
           # List of packages path to exclude from the check.
           # Default: []
           exclude:
@@ -1187,7 +1187,7 @@ linters:
       # Default: ""
       mode: restricted
 
-    mnd: # https://golangci-lint.run/docs/linters/configuration/#mnd
+    gomnd: # https://golangci-lint.run/docs/linters/configuration/#gomnd
       # List of enabled checks, see https://github.com/tommy-muehle/go-mnd/#checks for description.
       # Default: ["argument", "case", "condition", "operation", "return", "assign"]
       checks:
@@ -1380,22 +1380,22 @@ linters:
       patterns:
         - ".*"
 
-    recvcheck: # https://golangci-lint.run/docs/linters/configuration/#recvcheck
-      # Disables the built-in method exclusions:
-      # - `MarshalText`
-      # - `MarshalJSON`
-      # - `MarshalYAML`
-      # - `MarshalXML`
-      # - `MarshalBinary`
-      # - `GobEncode`
-      # Default: false
-      disable-builtin: true
-      # User-defined method exclusions.
-      # The format is `struct_name.method_name` (ex: `Foo.MethodName`).
-      # A wildcard `*` can use as a struct name (ex: `*.MethodName`).
-      # Default: []
-      exclusions:
-        - "*.Value"
+    # recvcheck: # https://golangci-lint.run/docs/linters/configuration/#recvcheck (not supported in this version)
+    #   # Disables the built-in method exclusions:
+    #   # - `MarshalText`
+    #   # - `MarshalJSON`
+    #   # - `MarshalYAML`
+    #   # - `MarshalXML`
+    #   # - `MarshalBinary`
+    #   # - `GobEncode`
+    #   # Default: false
+    #   disable-builtin: true
+    #   # User-defined method exclusions.
+    #   # The format is `struct_name.method_name` (ex: `Foo.MethodName`).
+    #   # A wildcard `*` can use as a struct name (ex: `*.MethodName`).
+    #   # Default: []
+    #   exclusions:
+    #     - "*.Value"
 
     revive: # https://golangci-lint.run/docs/linters/configuration/#revive
       # Maximum number of open files at the same time.

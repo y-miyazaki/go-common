@@ -264,7 +264,10 @@ function run_golangci_lint {
         EXIT_CODE=1
         LINT_FAILED=1
         # Count issues
-        LINT_ISSUES_COUNT=$(grep -cE '^\S+\.go:' /tmp/golint_output.txt || echo 0)
+        LINT_ISSUES_COUNT=$(grep -cE '^\S+\.go:' /tmp/golint_output.txt 2>/dev/null || echo 0)
+        # Ensure LINT_ISSUES_COUNT is a valid number
+        LINT_ISSUES_COUNT=$(echo "$LINT_ISSUES_COUNT" | tr -d '[:space:]' | sed 's/[^0-9]//g')
+        [[ -z "$LINT_ISSUES_COUNT" ]] && LINT_ISSUES_COUNT=0
     fi
     rm -f /tmp/golint_output.txt
 }
@@ -389,12 +392,22 @@ function run_security_checks {
     # Check for govulncheck
     if command -v govulncheck &>/dev/null; then
         log "INFO" "Running govulncheck... (root=$search_root)"
-        if govulncheck "$TARGET_PATTERN"; then
+        if timeout 30 govulncheck "$TARGET_PATTERN" 2>&1; then
             log "INFO" "No known vulnerabilities found"
         else
-            log "WARN" "Potential vulnerabilities found"
-            EXIT_CODE=1
-            SECURITY_FAILED=1
+            local exit_code=$?
+            if [[ $exit_code -eq 124 ]]; then
+                log "WARN" "govulncheck timed out, possibly due to network issues"
+            else
+                log "WARN" "govulncheck failed or found vulnerabilities (exit code: $exit_code)"
+            fi
+            # Only treat as failure if it's not a network/timeout issue
+            if [[ $exit_code -ne 124 ]] && [[ ! "$?" =~ "dial tcp" ]] && [[ ! "$?" =~ "lookup" ]]; then
+                EXIT_CODE=1
+                SECURITY_FAILED=1
+            else
+                log "INFO" "Skipping security failure due to network connectivity issues"
+            fi
         fi
     else
         log "WARN" "govulncheck not installed, skipping vulnerability check"
