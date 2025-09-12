@@ -54,7 +54,7 @@ function custom_log {
 
     # Increment warning counter for WARN level
     if [[ "$level" == "WARN" ]]; then
-        ((WARNINGS_COUNT++))
+        WARNINGS_COUNT=$((WARNINGS_COUNT + 1))
     fi
 }
 
@@ -398,7 +398,7 @@ function validate_script {
     relative_path="${script#$WORKSPACE_ROOT/}"
     local validation_passed=true
 
-    ((TOTAL_SCRIPTS++))
+    TOTAL_SCRIPTS=$((TOTAL_SCRIPTS + 1))
 
     custom_log "INFO" "Validating script: $relative_path"
 
@@ -413,7 +413,7 @@ function validate_script {
     if [[ ! -f "$script" ]] || [[ ! -r "$script" ]]; then
         custom_log "ERROR" "❌ Script not accessible: $script_name"
         FAILED_SCRIPTS_LIST+=("$relative_path (not accessible)")
-        ((FAILED_SCRIPTS++))
+        FAILED_SCRIPTS=$((FAILED_SCRIPTS + 1))
         return 1
     fi
 
@@ -452,11 +452,11 @@ function validate_script {
     if [[ "$validation_passed" == "true" ]]; then
         custom_log "INFO" "✅ All validations passed: $script_name"
         PASSED_SCRIPTS_LIST+=("$relative_path")
-        ((PASSED_SCRIPTS++))
+        PASSED_SCRIPTS=$((PASSED_SCRIPTS + 1))
     else
         custom_log "ERROR" "❌ Validation failed: $script_name"
         FAILED_SCRIPTS_LIST+=("$relative_path")
-        ((FAILED_SCRIPTS++))
+        FAILED_SCRIPTS=$((FAILED_SCRIPTS + 1))
     fi
 
     # Track warnings separately
