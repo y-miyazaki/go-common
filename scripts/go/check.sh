@@ -225,7 +225,7 @@ function run_go_build {
     echo_section "Running go build"
 
     if [[ "$DRY_RUN" == "true" ]]; then
-        log "INFO" "DRY-RUN: Would run 'go build $TARGET_PATTERN'"
+        log "INFO" "DRY-RUN: Would run 'go build \"$TARGET_PATTERN\"'"
         return 0
     fi
 

@@ -46,6 +46,10 @@ declare -A LATEST_VERSION_CACHE=() # module_source -> latest_version cache
 # Track current file for better error context on unexpected errors
 CURRENT_FILE_BEING_SCANNED=""
 
+# Common patterns to avoid duplication
+readonly MODULE_PATTERN_GREP='^[[:space:]]*module[[:space:]]\+"[^"]\+"[[:space:]]*{'
+readonly MODULE_PATTERN_AWK='/^[[:space:]]*module[[:space:]]+"[^"]+"[[:space:]]*{/'
+
 # Provide context on unexpected errors (ignored inside conditionals by bash)
 trap 'echo "[ERROR] Aborted while processing: ${CURRENT_FILE_BEING_SCANNED:-N/A}" >&2' ERR
 
@@ -243,10 +247,10 @@ function find_terraform_modules {
     if [[ "$search_recursive" == "true" ]]; then
         # Use anchored, more precise pattern and avoid aborting on grep non-zero statuses
         find "$dir" -name "*.tf" -type f -not -path "*/.terraform/*" \
-            -exec grep -l '^[[:space:]]*module[[:space:]]\+"[^"]\+"[[:space:]]*{' {} \; 2>/dev/null || true
+            -exec grep -l "$MODULE_PATTERN_GREP" {} \; 2>/dev/null || true
     else
         find "$dir" -maxdepth 1 -name "*.tf" -type f \
-            -exec grep -l '^[[:space:]]*module[[:space:]]\+"[^"]\+"[[:space:]]*{' {} \; 2>/dev/null || true
+            -exec grep -l "$MODULE_PATTERN_GREP" {} \; 2>/dev/null || true
     fi
 }
 
@@ -255,7 +259,7 @@ function extract_modules_from_file {
     # Extract module blocks and find source/version pairs robustly (POSIX awk, nested block aware)
     awk '
     BEGIN { in_module=0; block=""; nest=0; }
-    /^[[:space:]]*module[[:space:]]+"[^"]+"[[:space:]]*{/ {
+    '"$MODULE_PATTERN_AWK"' {
       in_module=1; block = $0 "\n"; nest=1; next;
     }
     in_module {
