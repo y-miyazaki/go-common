@@ -177,9 +177,9 @@ function run_go_fmt {
             GO_FMT_FAILED=1
         fi
     else
-        # Check if formatting is needed by running go fmt and checking for changes
+        # Check if formatting is needed by using gofmt -l
         local fmt_output
-        fmt_output=$(go fmt "$TARGET_PATTERN" 2>&1)
+        fmt_output=$(gofmt -l $(find . -name "*.go" -path "$TARGET_PATTERN" 2>/dev/null) 2>/dev/null || true)
         if [[ -n "$fmt_output" ]]; then
             echo "Files that would be formatted:"
             echo "$fmt_output"
@@ -219,7 +219,7 @@ function run_go_build {
     echo_section "Running go build"
 
     if [[ "$DRY_RUN" == "true" ]]; then
-        log "INFO" "DRY-RUN: Would run 'go build $TARGET_PATTERN'"
+        log "INFO" "DRY-RUN: Would run 'go build \"$TARGET_PATTERN\"'"
         return 0
     fi
 

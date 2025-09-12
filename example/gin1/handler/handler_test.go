@@ -1,5 +1,4 @@
 // Package handler provides HTTP request handlers for the Gin web framework.
-// pragma: allowlist-secret
 package handler
 
 import (
@@ -35,7 +34,7 @@ func TestHTTPHandler_HandleEnv(t *testing.T) {
 	}{
 		{
 			name:         "success with env vars",
-			password:     "test_password",
+			password:     "test_password", // pragma: allowlist-secret
 			addr:         "localhost:6379",
 			expectedCode: http.StatusOK,
 		},

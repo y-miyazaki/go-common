@@ -13,8 +13,10 @@ type SlackClientInterface interface {
 }
 
 // SlackRepository struct.
+// Note: client field is intentionally unexported to maintain encapsulation.
+// Use NewSlackRepositoryWithInterface for testing with mock implementations.
 type SlackRepository struct {
-	client    SlackClientInterface
+	client    SlackClientInterface // Unexported for encapsulation; use constructor for injection
 	channelID string
 }
 

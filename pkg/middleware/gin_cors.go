@@ -98,12 +98,12 @@ func GinCors(
 
 // DefaultConfig returns a generic default configuration mapped to localhost.
 func DefaultConfig() *GinCorsConfig {
-	const defaultMaxAgeSecondsStandard = 86400
+	const defaultMaxAgeSecondsStandard = 86400 // 24 hours
 	return &GinCorsConfig{
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type"},
 		AllowCredentials: true,
-		MaxAge:           defaultMaxAgeSecondsStandard * time.Second,
+		MaxAge:           defaultMaxAgeSecondsStandard * time.Second, // Convert seconds to Duration
 	}
 }
 
