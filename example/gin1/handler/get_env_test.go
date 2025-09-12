@@ -1,4 +1,3 @@
-// pragma: allowlist-secret
 package handler
 
 import (
