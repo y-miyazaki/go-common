@@ -35,11 +35,14 @@ jobs:
     # environment:
     #   name: ${{ inputs.environment }}
     permissions:
+      id-token: write
       contents: read
       pull-requests: write
     steps:
       - name: Checkout Code
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Set up Go
         uses: actions/setup-go@v6
@@ -101,12 +104,13 @@ jobs:
       - name: Upload to Codecov
         # Run upload only when repo is public OR codecov_token is provided
         if: ${{ (steps.repo_visibility.outputs.result != 'true') || (inputs.codecov_token != '') }}
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
+          use_oidc: true
           files: ${{ env.GO_PROJECT_PATH }}/coverage/coverage.out
+          token: ${{ inputs.codecov_token }}
+          verbose: true
           fail_ci_if_error: false
-        # env:
-        #   CODECOV_TOKEN: ${{ inputs.codecov_token }}
 
       - name: Install govulncheck
         working-directory: ${{ env.GO_PROJECT_PATH }}
