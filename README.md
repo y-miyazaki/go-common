@@ -3,7 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/y-miyazaki/go-common)](https://goreportcard.com/report/github.com/y-miyazaki/go-common)
 [![GitHub release](https://img.shields.io/github/release/y-miyazaki/go-common.svg)](https://github.com/y-miyazaki/go-common/releases/latest)
 [![ci-push-dev](https://github.com/y-miyazaki/go-common/actions/workflows/ci-push-dev.yaml/badge.svg)](https://github.com/y-miyazaki/go-common/actions/workflows/ci-push-dev.yaml)
-[![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey.svg)]()
+[![Codecov](https://codecov.io/gh/y-miyazaki/go-common/branch/develop/graph/badge.svg)](https://codecov.io/gh/y-miyazaki/go-common)
 
 <!-- omit in toc -->
 # go-common
