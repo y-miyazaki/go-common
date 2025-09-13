@@ -24,10 +24,10 @@ This repository provides common libraries and example applications for Go langua
   - [Local development environment (devcontainer)](#local-development-environment-devcontainer)
     - [Required](#required-1)
     - [Setup](#setup-1)
-- [Commands](#commands)
-  - [Build and Test](#build-and-test)
-  - [Code Quality Check](#code-quality-check)
-  - [Development Support](#development-support)
+  - [Commands](#commands)
+    - [Build and Test](#build-and-test)
+    - [Code Quality Check](#code-quality-check)
+    - [Development Support](#development-support)
 - [Troubleshooting](#troubleshooting)
   - [Common Issues](#common-issues)
   - [Getting Help](#getting-help)
@@ -130,7 +130,11 @@ func main() {
 
 ## Development
 
+This section describes how to set up a local development environment and run example applications.
+
 ### Local development environment
+
+This section explains how to set up a local, non-containerized development workspace on your machine. It includes quick, platform-agnostic steps to clone the repository, install dependencies, and run example applications for development and testing.
 
 #### Required
 
@@ -157,6 +161,8 @@ func main() {
     ```
 
 ### Local development environment (devcontainer)
+
+This section describes how to use a VS Code devcontainer to create a reproducible development environment. The devcontainer provides consistent tool versions and preconfigured mounts so contributors can work with the same development setup.
 
 #### Required
 
@@ -253,9 +259,9 @@ func main() {
     curl http://localhost:8080/health
     ```
 
-## Commands
+### Commands
 
-### Build and Test
+#### Build and Test
 ```bash
 # Batch verification (recommended)
 bash ./scripts/go/check.sh
@@ -269,7 +275,7 @@ go test ./...
 go test -cover ./...
 ```
 
-### Code Quality Check
+#### Code Quality Check
 ```bash
 # Batch verification (recommended)
 bash ./scripts/go/check.sh
@@ -282,7 +288,7 @@ golangci-lint run
 govulncheck ./...
 ```
 
-### Development Support
+#### Development Support
 ```bash
 # Module organization
 go mod tidy
