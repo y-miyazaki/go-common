@@ -3,6 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/y-miyazaki/go-common)](https://goreportcard.com/report/github.com/y-miyazaki/go-common)
 [![GitHub release](https://img.shields.io/github/release/y-miyazaki/go-common.svg)](https://github.com/y-miyazaki/go-common/releases/latest)
 [![ci-push-dev](https://github.com/y-miyazaki/go-common/actions/workflows/ci-push-dev.yaml/badge.svg)](https://github.com/y-miyazaki/go-common/actions/workflows/ci-push-dev.yaml)
+[![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey.svg)]()
 
 <!-- omit in toc -->
 # go-common
@@ -87,6 +88,40 @@ go mod tidy
 ```
 
 This will download and install all necessary dependencies.
+
+## Quick code example
+
+Here is a tiny example showing how to use `pkg/aws` and `pkg/db` helpers (adjust imports and usage to your needs):
+
+```go
+package main
+
+import (
+  "context"
+  "fmt"
+  "github.com/y-miyazaki/go-common/pkg/aws"
+  "github.com/y-miyazaki/go-common/pkg/db"
+)
+
+func main() {
+  ctx := context.Background()
+  // Example: initialize AWS client helper
+  awsCfg, err := aws.NewConfig(ctx)
+  if err != nil {
+    panic(err)
+  }
+  fmt.Println("AWS region:", awsCfg.Region)
+
+  // Example: open database connection
+  dsn := "user:pass@tcp(localhost:3306)/example"
+  conn, err := db.Open(ctx, dsn)
+  if err != nil {
+    panic(err)
+  }
+  defer conn.Close()
+  fmt.Println("DB connected")
+}
+```
 
 ## Local Development Environment
 
