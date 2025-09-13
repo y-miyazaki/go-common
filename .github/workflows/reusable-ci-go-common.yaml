@@ -68,10 +68,6 @@ jobs:
             go-cache-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ env.GO_VERSION }}-
             go-cache-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-
 
-      # - name: Show Go Environment
-      #   run: go env
-      #   working-directory: ${{ env.GO_PROJECT_PATH }}
-
       - name: Download Go Modules
         run: go mod download
         working-directory: ${{ env.GO_PROJECT_PATH }}
@@ -109,7 +105,6 @@ jobs:
           use_oidc: true
           files: ${{ env.GO_PROJECT_PATH }}/coverage/coverage.out
           token: ${{ inputs.codecov_token }}
-          verbose: true
           fail_ci_if_error: false
 
       - name: Install govulncheck
