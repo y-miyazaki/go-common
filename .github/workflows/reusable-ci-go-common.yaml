@@ -105,8 +105,8 @@ jobs:
         with:
           files: ${{ env.GO_PROJECT_PATH }}/coverage/coverage.out
           fail_ci_if_error: false
-        env:
-          CODECOV_TOKEN: ${{ inputs.codecov_token }}
+        # env:
+        #   CODECOV_TOKEN: ${{ inputs.codecov_token }}
 
       - name: Install govulncheck
         working-directory: ${{ env.GO_PROJECT_PATH }}
