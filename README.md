@@ -1,3 +1,6 @@
+<!-- omit in toc -->
+# go-common
+
 ![Go](https://custom-icon-badges.herokuapp.com/badge/Go-00ADD8.svg?logo=Go&logoColor=white)
 ![Apache-2.0](https://custom-icon-badges.herokuapp.com/badge/license-Apache%202.0-8BB80A.svg?logo=law&logoColor=white)
 [![Go Report Card](https://goreportcard.com/badge/github.com/y-miyazaki/go-common)](https://goreportcard.com/report/github.com/y-miyazaki/go-common)
@@ -5,24 +8,26 @@
 [![ci-push-dev](https://github.com/y-miyazaki/go-common/actions/workflows/ci-push-dev.yaml/badge.svg)](https://github.com/y-miyazaki/go-common/actions/workflows/ci-push-dev.yaml)
 [![Codecov](https://codecov.io/gh/y-miyazaki/go-common/branch/develop/graph/badge.svg)](https://codecov.io/gh/y-miyazaki/go-common)
 
-<!-- omit in toc -->
-# go-common
-
 This repository provides common libraries and example applications for Go language, utilizing libraries such as AWS SDK v2, Gin, and GORM with practical samples.
+
+- Go 1.24  
+- AWS SDK v2  
+- Gin (Web Framework)  
+- GORM (ORM)  
+- golangci-lint (Lint Tool)  
+- Delve (Debugger)  
 
 <!-- omit in toc -->
 ## Table of Contents
 
-- [Project Overview](#project-overview)
-  - [Directory Structure](#directory-structure)
 - [Installation](#installation)
 - [Quick code example](#quick-code-example)
 - [Development](#development)
   - [Local development environment](#local-development-environment)
-    - [Required](#required)
+    - [Requirements](#requirements)
     - [Setup](#setup)
   - [Local development environment (devcontainer)](#local-development-environment-devcontainer)
-    - [Required](#required-1)
+    - [Requirements](#requirements-1)
     - [Setup](#setup-1)
   - [Commands](#commands)
     - [Build and Test](#build-and-test)
@@ -33,17 +38,6 @@ This repository provides common libraries and example applications for Go langua
   - [Getting Help](#getting-help)
 - [License](#license)
 - [Note](#note)
-
-## Project Overview
-
-This project provides common libraries and practical example applications to learn Go language best practices. The main technology stack includes:
-
-- Go 1.24  
-- AWS SDK v2  
-- Gin (Web Framework)  
-- GORM (ORM)  
-- golangci-lint (Lint Tool)  
-- Delve (Debugger)  
 
 ### Directory Structure
 
@@ -66,7 +60,6 @@ This project provides common libraries and practical example applications to lea
 | go.mod                | Go module definition          |
 | go.sum                | Go dependencies               |
 | LICENSE               | License file                  |
-| README.md             | This file                     |
 
 ## Installation
 
@@ -136,7 +129,7 @@ This section describes how to set up a local development environment and run exa
 
 This section explains how to set up a local, non-containerized development workspace on your machine. It includes quick, platform-agnostic steps to clone the repository, install dependencies, and run example applications for development and testing.
 
-#### Required
+#### Requirements
 
 - Go 1.24 or higher  
 - Git  
@@ -164,10 +157,14 @@ This section explains how to set up a local, non-containerized development works
 
 This section describes how to use a VS Code devcontainer to create a reproducible development environment. The devcontainer provides consistent tool versions and preconfigured mounts so contributors can work with the same development setup.
 
-#### Required
+#### Requirements
 
-- Visual Studio Code (VSCode)  
-- Docker (when using devcontainer)  
+- [Visual Studio Code](https://code.visualstudio.com/)
+  - [Extension: Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+- Docker (choose one of the following options):
+  - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (recommended for Windows/macOS)
+  - [Docker Engine](https://docs.docker.com/engine/) (for Linux)
+  - [lima+](https://github.com/lima-vm/lima) (alternative for macOS/Linux, integrates with Docker)
 
 #### Setup
 

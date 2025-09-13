@@ -8,7 +8,7 @@ applyTo: "**/*.tf,**/*.tfvars,**/*.tfstate,**/*.tfbackend"
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
 
-## Project Overview
+## Overview
 
 このリポジトリは AWS のセキュリティ・監視インフラを管理する Terraform コードを含みます。
 

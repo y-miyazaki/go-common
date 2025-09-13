@@ -8,7 +8,7 @@ applyTo: "**/*.go"
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
 
-## Project Overview
+## Overview
 
 このリポジトリは Go で構築された共通ライブラリとサンプルアプリケーションを含む。
 

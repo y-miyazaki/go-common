@@ -8,7 +8,7 @@ applyTo: "**/*.sh,scripts/**"
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
 
-## Project Overview
+## Overview
 
 このリポジトリは自動化・インフラ管理用のシェルスクリプトを含みます。スクリプトは以下のように構成されています：
 

@@ -8,7 +8,7 @@ applyTo: "**/*.md"
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
 
-## Project Overview
+## Overview
 
 git clone https://github.com/owner/repo.git
 
@@ -83,7 +83,7 @@ git clone https://github.com/owner/repo.git
 <!-- omit in toc -->
 ## Table of Contents
 
-## Project Overview
+## Overview
 
 ### Directory Structure
 
@@ -131,7 +131,7 @@ applyTo: "**/*.go"
 <!-- omit in toc -->
 ## Table of Contents
 
-## Project Overview
+## Overview
 ## Coding Standards
 ## Naming Conventions
 ## Testing and Validation
