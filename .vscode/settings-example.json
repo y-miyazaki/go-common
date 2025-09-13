@@ -69,7 +69,9 @@
   // ------------------------------------------------------------
   "chat.tools.terminal.autoApprove": {
     "/.*/": true,
-    "rm": false
+    "rm": false,
+    "git add": false,
+    "git commit": false
   },
   "chat.agent.enabled": true,
   "chat.mcp.autostart": "onlyNew",

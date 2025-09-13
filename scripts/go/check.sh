@@ -178,6 +178,8 @@ function run_go_fmt {
         fi
     else
         # Check formatting using gofmt -l to list files that are not formatted
+        # Use go list + mapfile instead of direct gofmt to avoid word splitting issues
+        # with complex package patterns and ensure proper handling of module directories
         local fmt_output
         # Safely build argument list from go list output to avoid word splitting
         mapfile -t go_dirs < <(go list -f '{{.Dir}}' "$TARGET_PATTERN" 2>/dev/null || true)

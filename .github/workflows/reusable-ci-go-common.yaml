@@ -17,6 +17,10 @@ on:
         description: "Path (relative) to the Go project root (directory containing go.mod)"
         required: true
         type: string
+      codecov_token:
+        description: "Codecov token for private repositories (optional for public repos). If provided, the token will be used to upload coverage."
+        required: false
+        type: string
 
 env:
   ENV: ${{ inputs.environment }}
@@ -81,6 +85,28 @@ jobs:
         with:
           name: coverage-${{ env.COMPONENT }}-${{ env.ENV }}
           path: ${{ env.GO_PROJECT_PATH }}/coverage
+
+      - name: Determine repository visibility
+        id: repo_visibility
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { data } = await github.rest.repos.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            // Return string 'true' or 'false' so github-script sets it as outputs.result
+            return data.private ? 'true' : 'false';
+
+      - name: Upload to Codecov
+        # Run upload only when repo is public OR codecov_token is provided
+        if: ${{ (steps.repo_visibility.outputs.result != 'true') || (inputs.codecov_token != '') }}
+        uses: codecov/codecov-action@v4
+        with:
+          files: ${{ env.GO_PROJECT_PATH }}/coverage/coverage.out
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ inputs.codecov_token }}
 
       - name: Install govulncheck
         working-directory: ${{ env.GO_PROJECT_PATH }}

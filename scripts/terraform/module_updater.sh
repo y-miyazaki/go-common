@@ -151,7 +151,7 @@ function get_latest_version {
 
     # Skip non-registry sources (git/https, ssh, local paths)
     if [[ "$module_source" =~ ^git:: ]] ||
-        [[ "$module_source" =~ ^(https?|ssh)://.*\.git(/|$)? ]] ||
+        [[ "$module_source" =~ ^(https?|ssh)://.*\.git(/|$) ]] ||
         [[ "$module_source" =~ ^(github\.com|git@) ]] ||
         [[ "$module_source" =~ ^(~|/|\./|\.\./) ]]; then
         LATEST_VERSION_CACHE[$module_source]="unknown"
