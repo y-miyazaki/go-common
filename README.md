@@ -127,15 +127,51 @@ The devcontainer includes the following tools:
 - Docker CLI
 - GitHub CLI
 
+### Quickstart — run an example app locally
+
+Follow these minimal steps to run an example locally.
+
+1. Clone and enter the repo:
+```bash
+git clone https://github.com/y-miyazaki/go-common.git
+cd go-common
+```
+
+2. Download Go modules:
+```bash
+go mod download
+```
+
+3. Run the Gin example (example/gin1):
+```bash
+cd example/gin1
+go run ./...
+# or from repo root
+# bash ./scripts/go/check.sh -f ./example/gin1/
+```
+
+4. Test the server (default port 8080):
+```bash
+curl http://localhost:8080/health
+```
+
+### Devcontainer (short)
+
+Open the repository in VS Code and choose "Reopen in Container" to use the preconfigured devcontainer with Go, node, and other tools installed.
+
+### Supported Go versions
+
+This project targets Go 1.24+. CI validates builds with Go 1.24. For older Go versions, compatibility is not guaranteed.
+
 ## Commands
 
 ### Build and Test
 ```bash
 # Batch verification (recommended)
-bash /workspace/scripts/go/check.sh
+bash ./scripts/go/check.sh
 
 # Specific directory only
-bash /workspace/scripts/go/check.sh -f ./example/gin1/
+bash ./scripts/go/check.sh -f ./example/gin1/
 
 # Individual execution (when necessary)
 go build ./...
@@ -146,7 +182,7 @@ go test -cover ./...
 ### Code Quality Check
 ```bash
 # Batch verification (recommended)
-bash /workspace/scripts/go/check.sh
+bash ./scripts/go/check.sh
 
 # Individual execution (when necessary)
 go mod tidy
@@ -192,7 +228,7 @@ dlv debug ./example/gin1
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
 
 ## Note
 
