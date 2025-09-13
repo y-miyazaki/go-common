@@ -1,5 +1,5 @@
-[![Go](https://custom-icon-badges.herokuapp.com/badge/Go-00ADD8.svg?logo=Go&logoColor=white)]()
-[![Apache-2.0](https://custom-icon-badges.herokuapp.com/badge/license-Apache%202.0-8BB80A.svg?logo=law&logoColor=white)]()
+[![Go](https://custom-icon-badges.herokuapp.com/badge/Go-00ADD8.svg?logo=Go&logoColor=white)]
+[![Apache-2.0](https://custom-icon-badges.herokuapp.com/badge/license-Apache%202.0-8BB80A.svg?logo=law&logoColor=white)]
 [![Go Report Card](https://goreportcard.com/badge/github.com/y-miyazaki/go-common)](https://goreportcard.com/report/github.com/y-miyazaki/go-common)
 [![GitHub release](https://img.shields.io/github/release/y-miyazaki/go-common.svg)](https://github.com/y-miyazaki/go-common/releases/latest)
 [![ci-push-dev](https://github.com/y-miyazaki/go-common/actions/workflows/ci-push-dev.yaml/badge.svg)](https://github.com/y-miyazaki/go-common/actions/workflows/ci-push-dev.yaml)
@@ -16,10 +16,14 @@ This repository provides common libraries and example applications for Go langua
 - [Project Overview](#project-overview)
   - [Directory Structure](#directory-structure)
 - [Installation](#installation)
-- [Local Development Environment](#local-development-environment)
-  - [Required](#required)
-  - [Setting](#setting)
-  - [Create Local Development Environment](#create-local-development-environment)
+- [Quick code example](#quick-code-example)
+- [Development](#development)
+  - [Local development environment](#local-development-environment)
+    - [Required](#required)
+    - [Setup](#setup)
+  - [Local development environment (devcontainer)](#local-development-environment-devcontainer)
+    - [Required](#required-1)
+    - [Setup](#setup-1)
 - [Commands](#commands)
   - [Build and Test](#build-and-test)
   - [Code Quality Check](#code-quality-check)
@@ -34,12 +38,12 @@ This repository provides common libraries and example applications for Go langua
 
 This project provides common libraries and practical example applications to learn Go language best practices. The main technology stack includes:
 
-- Go 1.24
-- AWS SDK v2
-- Gin (Web Framework)
-- GORM (ORM)
-- golangci-lint (Lint Tool)
-- Delve (Debugger)
+- Go 1.24  
+- AWS SDK v2  
+- Gin (Web Framework)  
+- GORM (ORM)  
+- golangci-lint (Lint Tool)  
+- Delve (Debugger)  
 
 ### Directory Structure
 
@@ -61,6 +65,7 @@ This project provides common libraries and practical example applications to lea
 | pkg/...               | Other common modules          |
 | go.mod                | Go module definition          |
 | go.sum                | Go dependencies               |
+| LICENSE               | License file                  |
 | README.md             | This file                     |
 
 ## Installation
@@ -123,80 +128,130 @@ func main() {
 }
 ```
 
-## Local Development Environment
+## Development
 
-### Required
+### Local development environment
 
-- Go 1.24 or higher
-- Git
-- GitHub CLI (gh)
-- Docker (when using devcontainer)
-- Node.js (optional, when using ESLint)
+#### Required
 
-### Setting
+- Go 1.24 or higher  
+- Git  
+- GitHub CLI (gh)  
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/y-miyazaki/go-common.git
-   cd go-common
-   ```
+#### Setup
 
-2. Install dependencies:
-   ```bash
-   go mod download
-   ```
+1. Clone the repository:  
+    ```bash
+    git clone https://github.com/y-miyazaki/go-common.git
+    cd go-common
+    ```
 
-3. Set up authentication with GitHub CLI:
-   ```bash
-   gh auth login
-   ```
+2. Install dependencies:  
+    ```bash
+    go mod download
+    ```
 
-### Create Local Development Environment
+3. Set up authentication with GitHub CLI:  
+    ```bash
+    gh auth login
+    ```
 
-This project supports devcontainer. Open in VS Code and select "Reopen in Container" to build an environment with pre-installed tools.
+### Local development environment (devcontainer)
 
-The devcontainer includes the following tools:
-- Go and common utilities
-- Git (built from source)
-- Node.js, npm, ESLint
-- Docker CLI
-- GitHub CLI
+#### Required
 
-### Quickstart — run an example app locally
+- Visual Studio Code (VSCode)  
+- Docker (when using devcontainer)  
 
-Follow these minimal steps to run an example locally.
+#### Setup
 
-1. Clone and enter the repo:
-```bash
-git clone https://github.com/y-miyazaki/go-common.git
-cd go-common
-```
+1. Clone the repository (if not already done):  
 
-2. Download Go modules:
-```bash
-go mod download
-```
+    ```bash
+    git clone https://github.com/y-miyazaki/go-common.git
+    cd go-common
+    ```
 
-3. Run the Gin example (example/gin1):
-```bash
-cd example/gin1
-go run ./...
-# or from repo root
-# bash ./scripts/go/check.sh -f ./example/gin1/
-```
+2. Create devcontainer  
 
-4. Test the server (default port 8080):
-```bash
-curl http://localhost:8080/health
-```
+    ```bash
+    mkdir -p .devcontainer
+    mkdir -p env/common/tmp/gh
+    touch env/common/tmp/.gitconfig
+    cp -p env/example/.devcontainer/devcontainer.json .devcontainer/devcontainer.json
+    ```
 
-### Devcontainer (short)
+3. Adjust devcontainer.json  
+    The following excerpt is a locally mounted configuration; update mount paths to match your environment. Replace `${env:HOME}/workspace/go-common` with your actual local path to this repository (e.g., `/Users/yourname/projects/go-common` on macOS or `C:\Users\yourname\projects\go-common` on Windows).
 
-Open the repository in VS Code and choose "Reopen in Container" to use the preconfigured devcontainer with Go, node, and other tools installed.
+    ```bash
+    cat .devcontainer/devcontainer.json
+    ```
 
-### Supported Go versions
+    ```json
+    {
+        "runArgs": [
+            "-v",
+            "${env:HOME}/workspace/go-common:/workspace",
+            "-v",
+            "${env:HOME}/workspace/go-common/env/common/.bashrc:/home/vscode/.bashrc",
+            "-v",
+            "${env:HOME}/workspace/go-common/env/common/tmp/.gitconfig:/home/vscode/.gitconfig",
+            "-v",
+            "${env:HOME}/workspace/go-common/env/common/tmp/.aws:/home/vscode/.aws",
+            "-v",
+            "${env:HOME}/workspace/go-common/env/common/gh:/home/vscode/.config/gh",
+            "-v",
+            "/var/run/docker.sock:/var/run/docker.sock"
+        ]
+    }
+    ```
 
-This project targets Go 1.24+. CI validates builds with Go 1.24. For older Go versions, compatibility is not guaranteed.
+4. Configure .gitconfig  
+    The following excerpt is a locally mounted file; update values for your name and email.
+    ```bash
+    cat env/common/tmp/.gitconfig
+    ```
+
+    ```gitconfig:env/common/tmp/.gitconfig
+    [user]
+        name = Your Name
+        email = your.email@example.com
+    [init]
+        defaultBranch = main
+    [credential]
+        helper = !gh auth git-credential
+    [safe]
+        directory = /workspace
+    ```
+
+5. Launch devcontainer from Visual Studio Code  
+    Open the command palette with `F1` or `Ctrl+Shift+P`, then run `Dev Containers: Open folder in Container` (or `Dev containers: Reopen in Container` / `Dev Containers: Rebuild Container`).  
+
+6. Download Go modules:  
+    ```bash
+    go mod download
+    ```
+
+7. GitHub CLI login  
+    After launching the devcontainer, run the following to log in to GitHub CLI. Skip if already logged in.
+
+    ```bash
+    gh auth login
+    ```
+
+8. Run the Gin example (example/gin1):  
+    ```bash
+    cd example/gin1
+    go run ./...
+    # or from repo root
+    # bash ./scripts/go/check.sh -f ./example/gin1/
+    ```
+
+9. Test the server (default port 8080):  
+    ```bash
+    curl http://localhost:8080/health
+    ```
 
 ## Commands
 
@@ -244,22 +299,22 @@ dlv debug ./example/gin1
 ### Common Issues
 
 - **Git push returns 403 error**  
-  Check if GitHub CLI authentication is set correctly. Use `gh auth status` to verify status, and re-run `gh auth login` if necessary.
+    Check if GitHub CLI authentication is set correctly. Use `gh auth status` to verify status, and re-run `gh auth login` if necessary.
 - **devcontainer startup failure**  
-  Check execution permissions of `env/common/scripts/init.sh` and verify `/bin/sh` compatibility issues. Run with `bash` if needed.
+    Check execution permissions of `env/common/scripts/init.sh` and verify `/bin/sh` compatibility issues. Run with `bash` if needed.
 - **Dependency errors**  
-  Run `go mod tidy` and ensure Go version is 1.24 or higher.
+    Run `go mod tidy` and ensure Go version is 1.24 or higher.
 - **Lint errors**  
-  Check output of `golangci-lint run` and fix pointed locations. Refer to configuration file `.golangci.yml`.
+    Check output of `golangci-lint run` and fix pointed locations. Refer to configuration file `.golangci.yml`.
 
 ### Getting Help
 
 - **Documentation**  
-  Refer to this README and documentation in each directory.
+    Refer to this README and documentation in each directory.
 - **Issues**  
-  Report issues via GitHub Issues.
+    Report issues via GitHub Issues.
 - **Contribution**  
-  Refer to CONTRIBUTING.md and create pull requests.
+    Refer to CONTRIBUTING.md and create pull requests.
 
 ## License
 
