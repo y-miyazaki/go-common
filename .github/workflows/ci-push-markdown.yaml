@@ -14,7 +14,7 @@ on:
       - "**/*.md"
       - ".markdownlint.yaml"
       - ".github/workflows/ci-push-markdown.yaml"
-      - ".github/workflows/reusable-markdownlint.yaml"
+      - ".github/workflows/reusable-ci-markdown.yaml"
   pull_request:
     branches:
       - "main"
@@ -27,11 +27,11 @@ on:
       - "**/*.md"
       - ".markdownlint.yaml"
       - ".github/workflows/ci-push-markdown.yaml"
-      - ".github/workflows/reusable-markdownlint.yaml"
+      - ".github/workflows/reusable-ci-markdown.yaml"
 
 jobs:
   markdown-lint:
-    uses: ./.github/workflows/reusable-markdownlint.yaml
+    uses: ./.github/workflows/reusable-ci-markdown.yaml
     with:
       environment: "markdown"
       component: "base"
