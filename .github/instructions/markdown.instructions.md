@@ -10,7 +10,7 @@ applyTo: "**/*.md"
 
 ## Overview
 
-git clone https://github.com/owner/repo.git
+このリポジトリは技術ドキュメント、README、手順書等の Markdown ファイルを含みます。
 
 | Section       | Description                                                          |
 | ------------- | -------------------------------------------------------------------- |
@@ -172,5 +172,37 @@ applyTo: "**/*.go"
 
 ドキュメント作業での主な活用：
 
-- `aws-knowledge-mcp-server`: 公式ドキュメントの検索・参照
-- `context7`: コンテキスト情報の管理・操作支援
+### aws-knowledge-mcp-server (公式ドキュメント参照)
+
+**技術ドキュメント作成時:**
+
+```
+# AWS サービスの最新情報確認
+mcp_aws-knowledge_aws___search_documentation with search_phrase="Lambda function URLs CloudFormation"
+
+# 詳細設定手順の参照
+mcp_aws-knowledge_aws___read_documentation with url="https://docs.aws.amazon.com/lambda/latest/dg/lambda-urls.html"
+
+# 関連ドキュメントの発見
+mcp_aws-knowledge_aws___recommend with url="https://docs.aws.amazon.com/lambda/latest/dg/"
+```
+
+### context7 (ライブラリドキュメント管理)
+
+**README・技術文書での活用:**
+
+```
+# フレームワーク使用例の確認
+mcp_context7_resolve-library-id with libraryName="next.js"
+mcp_context7_get-library-docs with context7CompatibleLibraryID="/vercel/next.js" and topic="deployment"
+
+# ライブラリのベストプラクティス取得
+mcp_context7_resolve-library-id with libraryName="terraform"
+mcp_context7_get-library-docs with context7CompatibleLibraryID="/hashicorp/terraform" and topic="best practices"
+```
+
+**ドキュメント品質向上での使用パターン:**
+
+- **技術仕様確認**: 公式ドキュメントから最新の仕様・制限事項を確認
+- **コード例作成**: ライブラリドキュメントから適切なサンプルコードを取得
+- **ベストプラクティス反映**: 最新の推奨設定・セキュリティ要件を文書に反映

@@ -21,8 +21,6 @@ applyTo: "**/*.go"
 
 ## Coding Standards
 
-## Coding Standards
-
 ### Production and Test Code Separation
 
 - テスト専用の依存注入関数・ラッパー・テスト用ロジックは本番コードに追加しない
@@ -524,6 +522,55 @@ bash /workspace/scripts/go/check.sh -f ./example/gin1/
 
 Go 開発での主な活用：
 
-- `serena`: コードベース解析・安全な編集支援。プロジェクト初期化時には `/mcp__serena__initial_instructions` を実行
-- `awslabs.aws-api-mcp-server`: AWS CLI コマンド提案・実行
-- `context7`: コンテキスト情報の管理・操作支援
+### serena (コードベース解析・安全編集)
+
+**Go 開発での推奨ワークフロー:**
+
+```
+# 1. プロジェクト初期化（最初の一回のみ）
+mcp_serena_activate_project with project="."
+mcp_serena_onboarding  # 初回のみ実行
+
+# 2. Go構造体・関数の理解
+mcp_serena_get_symbols_overview with relative_path="pkg/service/user_service.go"
+mcp_serena_find_symbol with name_path="UserService" and depth=1 and include_body=false
+
+# 3. メソッド編集例
+mcp_serena_find_symbol with name_path="UserService/GetUser" and include_body=true
+mcp_serena_replace_symbol_body with name_path="UserService/GetUser" and body="新しいメソッド実装"
+
+# 4. 影響範囲確認
+mcp_serena_find_referencing_symbols with name_path="GetUser" and relative_path="pkg/service/user_service.go"
+```
+
+**Go 特有の使用パターン:**
+
+- **パッケージ構造理解**: `pkg/`, `internal/`, `cmd/` の使い分け確認
+- **インターフェース実装確認**: `find_referencing_symbols` で実装クラス特定
+- **テストファイル連携**: `*_test.go` ファイルとの整合性確認
+
+### awslabs.aws-api-mcp-server & aws-knowledge-mcp-server
+
+**Go + AWS 開発での使用例:**
+
+```
+# AWS SDK設定確認
+mcp_awslabs_aws-a_suggest_aws_commands with query="Configure AWS credentials for Go SDK"
+
+# S3操作のベストプラクティス確認
+mcp_aws-knowledge_aws___search_documentation with search_phrase="Go SDK S3 presigned URL best practices"
+```
+
+### context7 (ライブラリドキュメント)
+
+**Go 依存関係の確認:**
+
+```
+# Ginフレームワークのルーティング方法
+mcp_context7_resolve-library-id with libraryName="gin"
+mcp_context7_get-library-docs with context7CompatibleLibraryID="/gin-gonic/gin" and topic="routing middleware"
+
+# GORM使用方法
+mcp_context7_resolve-library-id with libraryName="gorm"
+mcp_context7_get-library-docs with context7CompatibleLibraryID="/go-gorm/gorm" and topic="associations"
+```

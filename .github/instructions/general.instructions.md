@@ -90,11 +90,130 @@ applyTo: "**"
 
 ## MCP Tools
 
-- 本プロジェクトでは Model Context Protocol (MCP) 対応ツールを活用する。
-- 目的: コードベース解析、ドキュメント検索、AWS 操作支援、変更の一貫性向上。
+本プロジェクトでは Model Context Protocol (MCP) 対応ツールを活用する。
+目的: コードベース解析、ドキュメント検索、AWS 操作支援、変更の一貫性向上。
 
-利用する MCP サーバ（固定）:
+### 利用可能な MCP サーバ
 
-- awslabs.aws-api-mcp-server: AWS CLI コマンド提案・実行。
-- aws-knowledge-mcp-server: AWS 公式ドキュメント検索・参照（docs.aws.amazon.com のコンテンツ取得、関連ページ推奨）。
-- context7: コンテキスト情報の管理・操作を支援。
+#### serena (Code Analysis & Safe Editing)
+
+**プロジェクト初期化時の必須操作:**
+
+```
+/mcp__serena__initial_instructions
+```
+
+**主要な使用パターン:**
+
+1. **プロジェクト構造の理解:**
+
+   ```
+   mcp_serena_list_dir with relative_path="." and recursive=true
+   mcp_serena_get_symbols_overview with relative_path="pkg/service/user_service.go"
+   ```
+
+2. **シンボル検索と編集:**
+
+   ```
+   mcp_serena_find_symbol with name_path="UserService" and include_body=true
+   mcp_serena_replace_symbol_body with name_path="UserService/GetUser"
+   ```
+
+3. **安全な一括変更:**
+   ```
+   mcp_serena_find_referencing_symbols with name_path="GetUser" and relative_path="pkg/service/"
+   ```
+
+#### awslabs.aws-api-mcp-server (AWS CLI Operations)
+
+**基本操作パターン:**
+
+1. **リソース確認:**
+
+   ```
+   mcp_awslabs_aws-a_call_aws with cli_command="aws sts get-caller-identity"
+   mcp_awslabs_aws-a_call_aws with cli_command="aws s3 ls --region us-east-1"
+   ```
+
+2. **不明なコマンドの提案:**
+
+   ```
+   mcp_awslabs_aws-a_suggest_aws_commands with query="List all running EC2 instances in us-east-1"
+   ```
+
+3. **安全な実行:**
+   - 必ずリージョンを明示的に指定
+   - 重要な操作は事前に dry-run で確認
+   - 出力は最小限に制限（max_results を活用）
+
+#### aws-knowledge-mcp-server (Documentation Reference)
+
+**ドキュメント検索パターン:**
+
+1. **サービス固有の検索:**
+
+   ```
+   mcp_aws-knowledge_aws___search_documentation with search_phrase="S3 bucket versioning policy"
+   ```
+
+2. **詳細ドキュメント取得:**
+
+   ```
+   mcp_aws-knowledge_aws___read_documentation with url="https://docs.aws.amazon.com/s3/latest/userguide/Versioning.html"
+   ```
+
+3. **関連情報の発見:**
+   ```
+   mcp_aws-knowledge_aws___recommend with url="https://docs.aws.amazon.com/s3/latest/userguide/"
+   ```
+
+#### context7 (Library Documentation)
+
+**ライブラリ情報取得パターン:**
+
+1. **ライブラリ ID の解決:**
+
+   ```
+   mcp_context7_resolve-library-id with libraryName="gin-gonic"
+   ```
+
+2. **ドキュメント取得:**
+   ```
+   mcp_context7_get-library-docs with context7CompatibleLibraryID="/gin-gonic/gin" and topic="routing"
+   ```
+
+### 実践的な使用ワークフロー
+
+#### Go 開発での典型的フロー
+
+1. **初期設定**: `mcp_serena_activate_project` で対象プロジェクトをアクティベート
+2. **構造把握**: `mcp_serena_list_dir` でディレクトリ構造確認
+3. **コード理解**: `mcp_serena_get_symbols_overview` でファイル概要取得
+4. **詳細分析**: `mcp_serena_find_symbol` で特定のシンボル詳細確認
+5. **安全な編集**: `mcp_serena_replace_symbol_body` で変更実行
+6. **影響確認**: `mcp_serena_find_referencing_symbols` で参照元チェック
+
+#### AWS 操作での典型的フロー
+
+1. **権限確認**: `aws sts get-caller-identity`
+2. **リソース調査**: `mcp_awslabs_aws-a_suggest_aws_commands` で適切なコマンド提案
+3. **安全実行**: 提案されたコマンドを段階的に実行
+4. **ドキュメント参照**: 不明点は `aws-knowledge-mcp-server` で公式ドキュメント確認
+
+### 注意事項とベストプラクティス
+
+1. **serena 使用時:**
+
+   - 大きなファイルは `get_symbols_overview` → `find_symbol` の順で段階的に読み取り
+   - `include_body=true` は必要な場合のみ使用
+   - 編集前に必ず `find_referencing_symbols` で影響範囲を確認
+
+2. **AWS MCP 使用時:**
+
+   - リージョンは必ず明示的に指定
+   - 本番環境操作時は特に慎重に
+   - `max_results` で出力量を制御
+
+3. **全般:**
+   - MCP ツールは補助的に使用し、最終的な判断は人間が行う
+   - エラー発生時はツールの制限として受け入れ、代替手段を検討

@@ -54,6 +54,11 @@ applyTo: "**/*.tf,**/*.tfvars,**/*.tfstate,**/*.tfbackend"
 
 ## Error Handling
 
+- Terraform エラーは詳細なログと共に適切に処理する
+- plan/apply 実行時のエラーは必ず原因を特定してから修正する
+- State lock エラー時は適切な解除手順を実行する
+- リソース依存関係エラーは depends_on で明示的に解決する
+
 ## Testing and Validation
 
 ### Code Modification Guidelines
@@ -95,6 +100,60 @@ terraform plan -lock=false -var-file=terraform.${ENV}.tfvars
 
 Terraform 作業での主な活用：
 
-- `awslabs.aws-api-mcp-server`: AWS CLI の提案・実行（明示的なリージョン指定・最小スコープ運用）
-- `aws-knowledge-mcp-server`: 公式ドキュメントの検索・参照
-- `context7`: コンテキスト情報の管理・操作支援
+### awslabs.aws-api-mcp-server (AWS リソース確認・操作)
+
+**Terraform 設計時のリソース確認:**
+
+```
+# 既存リソースの確認
+mcp_awslabs_aws-a_suggest_aws_commands with query="List all VPCs with their CIDR blocks in us-east-1"
+mcp_awslabs_aws-a_call_aws with cli_command="aws ec2 describe-vpcs --region us-east-1"
+
+# Terraformインポート用の情報取得
+mcp_awslabs_aws-a_suggest_aws_commands with query="Get security group details for Terraform import"
+```
+
+**デプロイ前後の状態確認:**
+
+```
+# リソース作成確認
+mcp_awslabs_aws-a_call_aws with cli_command="aws cloudformation describe-stacks --stack-name terraform-managed-stack --region us-east-1"
+
+# セキュリティ設定の確認
+mcp_awslabs_aws-a_call_aws with cli_command="aws s3api get-bucket-versioning --bucket terraform-state-bucket"
+```
+
+### aws-knowledge-mcp-server (公式リファレンス)
+
+**Terraform ベストプラクティス確認:**
+
+```
+# AWSサービス固有の制限・要件確認
+mcp_aws-knowledge_aws___search_documentation with search_phrase="S3 bucket policy terraform cross-account access"
+
+# セキュリティ設定の公式ガイダンス
+mcp_aws-knowledge_aws___read_documentation with url="https://docs.aws.amazon.com/s3/latest/userguide/bucket-policies.html"
+
+# 関連する設定オプションの発見
+mcp_aws-knowledge_aws___recommend with url="https://docs.aws.amazon.com/s3/latest/userguide/security.html"
+```
+
+### context7 (Terraform プロバイダー・モジュール情報)
+
+**Terraform プロバイダー使用方法:**
+
+```
+# AWSプロバイダーの最新機能確認
+mcp_context7_resolve-library-id with libraryName="terraform-aws-provider"
+mcp_context7_get-library-docs with context7CompatibleLibraryID="/hashicorp/terraform-provider-aws" and topic="s3 bucket configuration"
+
+# Terraformモジュール使用例
+mcp_context7_resolve-library-id with libraryName="terraform"
+mcp_context7_get-library-docs with context7CompatibleLibraryID="/hashicorp/terraform" and topic="module composition"
+```
+
+**Infrastructure as Code での品質向上:**
+
+- **設計検証**: AWS 公式ドキュメントでサービス制限・要件を事前確認
+- **セキュリティ**: 最新のセキュリティベストプラクティスを Terraform コードに反映
+- **メンテナンス**: プロバイダーアップデート時の破壊的変更を事前に把握

@@ -134,7 +134,7 @@ fi
 
 - すべてのスクリプトは目的を記載したヘッダーを含める
 - すべての関数は詳細な説明を含める
-- コメント・ドキュメントは日本語で記載する
+- コメント・ドキュメントは英語で記載する
 
 ### Help Function Standards
 
@@ -209,5 +209,44 @@ bash /workspace/scripts/validate_all_scripts.sh -v -f
 
 スクリプト作業での主な活用：
 
-- `awslabs.aws-api-mcp-server`: AWS CLI の提案・実行（明示的なリージョン指定・最小スコープ運用）
-- `context7`: コンテキスト情報の管理・操作支援
+### awslabs.aws-api-mcp-server (AWS CLI 自動化)
+
+**スクリプト内での AWS 操作パターン:**
+
+```bash
+# スクリプト設計前のコマンド確認
+mcp_awslabs_aws-a_suggest_aws_commands with query="List all S3 buckets with specific tags"
+
+# 実際のコマンド実行例
+mcp_awslabs_aws-a_call_aws with cli_command="aws s3api list-buckets --region us-east-1"
+```
+
+**Terraform スクリプトでの活用:**
+
+```
+# Terraformリソース確認
+mcp_awslabs_aws-a_suggest_aws_commands with query="Get Terraform state information for S3 backend"
+
+# AWS CLIでの状態確認
+mcp_awslabs_aws-a_call_aws with cli_command="aws s3 ls s3://terraform-state-bucket/ --region us-east-1"
+```
+
+### context7 (ツール・フレームワーク情報)
+
+**DevOps ツールの使用方法確認:**
+
+```
+# Docker最適化の確認
+mcp_context7_resolve-library-id with libraryName="docker"
+mcp_context7_get-library-docs with context7CompatibleLibraryID="/docker/docker" and topic="multi-stage builds"
+
+# Kubernetesデプロイメント確認
+mcp_context7_resolve-library-id with libraryName="kubernetes"
+mcp_context7_get-library-docs with context7CompatibleLibraryID="/kubernetes/kubernetes" and topic="deployment strategies"
+```
+
+**シェルスクリプト品質向上での使用:**
+
+- **セキュリティ**: AWS 操作前の権限・リージョン確認を自動化
+- **エラー処理**: 適切な exit code とログ出力の実装パターン確認
+- **可搬性**: 異なる環境での動作保証のためのベストプラクティス確認
