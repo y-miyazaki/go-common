@@ -1,0 +1,77 @@
+# Reusable workflow for Markdown linting
+# This workflow runs markdownlint to check Markdown files quality and formatting
+name: reusable-markdownlint
+
+on:
+  workflow_call:
+    inputs:
+      component:
+        description: "Logical component name (e.g. go-common)"
+        required: true
+        type: string
+      environment:
+        description: "Target environment (dev, qa, stg, prd, etc.)"
+        required: true
+        type: string
+
+env:
+  ENV: ${{ inputs.environment }}
+  COMPONENT: ${{ inputs.component }}
+
+jobs:
+  markdownlint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Run markdownlint with reviewdog (PR comments)
+        if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
+        uses: reviewdog/action-markdownlint@v0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          markdownlint_flags: "**/*.md"
+          fail_level: error
+          filter_mode: added
+
+      - name: Run markdownlint-cli2 (non-PR)
+        if: github.event_name != 'pull_request'
+        uses: DavidAnson/markdownlint-cli2-action@v18
+        with:
+          globs: "**/*.md"
+          config: ".markdownlint.yaml"
+          fix: false
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "Markdownlint completed for component: ${{ env.COMPONENT }} in env: ${{ env.ENV }}" | tee -a $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" != "success" ]; then
+            echo "❌ Markdown linting failed. See logs above for details." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ All Markdown files passed linting checks." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Post PR failure comment
+        if: failure() && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = `❌ Markdownlint failed for component: ${process.env.COMPONENT} (env: ${process.env.ENV})\n\n`+
+              `Run page: ${runUrl}\n\n`+
+              `See inline PR review comments from markdownlint (via reviewdog) for details.\n\n`+
+              `Re-run guidance:\n- Fix markdown issues locally\n- Commit & push to trigger CI again.`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });

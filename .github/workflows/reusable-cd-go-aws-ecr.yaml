@@ -1,4 +1,5 @@
 # Reusable workflow for building and pushing Docker images to Amazon ECR
+# This workflow can be called by other workflows to perform go CD operations
 name: reusable-cd-go-aws-ecr
 
 on:

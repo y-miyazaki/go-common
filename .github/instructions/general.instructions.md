@@ -8,6 +8,14 @@ applyTo: "**"
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
 
+## Git Command Guidelines
+
+- コミットメッセージは以下のフォーマットに従う
+  - コミットメッセージは英語で記載
+  - markdown 形式で記載
+  - 先頭行には、#(h1)をつけて、<概要>
+  - ２行目以降には、リスト形式で詳細を記載
+
 ## Copilot fixed code Guidelines
 
 - コード修正後は必ずコマンド動作検証を行う

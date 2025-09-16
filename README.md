@@ -41,8 +41,8 @@ This repository provides common libraries and example applications for Go langua
 
 ### Directory Structure
 
-| Path                  | Description                   |
-| --------------------- | ----------------------------- |
+| Directory/File                  | Description                   |
+| --- | --- |
 | .github/              | GitHub related files          |
 | .github/instructions/ | Copilot instruction files     |
 | .github/workflows/    | GitHub Actions CI/CD          |

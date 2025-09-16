@@ -79,6 +79,11 @@
   "chat.mcp.discovery.enabled": true,
   "editor.inlineSuggest.enabled": true,
   "github.copilot.chat.agent.autoFix": true,
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "file": ".github/instructions/general.instructions.md"
+    }
+  ],
   "github.copilot.chat.localeOverride": "ja",
   "github.copilot.chat.newWorkspace.useContext7": true,
   "github.copilot.enable": {
