@@ -2,8 +2,6 @@
 applyTo: "**/.github/workflows/*.yaml,**/.github/workflows/*.yml"
 ---
 
-<!-- omit in toc -->
-
 # GitHub Copilot Instructions for GitHub Actions Workflows
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
@@ -14,7 +12,7 @@ applyTo: "**/.github/workflows/*.yaml,**/.github/workflows/*.yml"
 
 | ワークフローファイル           | 役割・説明                                   |
 | ------------------------------ | -------------------------------------------- |
-| ci-push-\*.yaml                | 環境別の CI（言語テスト、lint、カバレッジ）  |
+| ci-push-\*.yaml                | CI（言語テスト、lint、カバレッジ）           |
 | ci-push-markdown.yaml          | Markdown ファイル専用 CI（markdownlint）     |
 | reusable-cd-go-aws-ecr.yaml    | Go 用 ECR デプロイ用再利用可能ワークフロー   |
 | reusable-cd-terraform-aws.yaml | Terraform 用デプロイ用再利用可能ワークフロー |
@@ -22,7 +20,9 @@ applyTo: "**/.github/workflows/*.yaml,**/.github/workflows/*.yml"
 | reusable-ci-markdown.yaml      | Markdown 用再利用可能ワークフロー            |
 | reusable-ci-terraform-aws.yaml | Terraform 用再利用可能ワークフロー           |
 
-## Workflow Design Patterns
+## Standards
+
+### Workflow Design Patterns
 
 ### Reusable Workflow Architecture
 
@@ -52,7 +52,7 @@ jobs:
 - **Terraform**: `terraform/**`, `**/*.tf`, `**/*.tfvars`
 - **Workflows**: `.github/workflows/**/*.yaml`
 
-## Workflow Standards
+### Workflow Standards
 
 ### Input/Output Conventions
 
@@ -110,7 +110,9 @@ env:
   GO_VERSION: "1.24.6" # Centralized version management
 ```
 
-## Tool Integration Patterns
+## Guidelines
+
+### Tool Integration Patterns
 
 ### Reviewdog Integration (PR Comments)
 
@@ -148,6 +150,34 @@ env:
     path: ${{ env.GO_PROJECT_PATH }}/coverage
 ```
 
+### Maintenance Guidelines
+
+#### Version Management
+
+- アクションのバージョンは定期的に更新する
+- `@v1`のようなメジャーバージョン指定は避け、`@v1.2.3`形式を使用
+- 破壊的変更のあるアクション更新時は段階的にテストする
+
+#### Performance Optimization
+
+- キャッシュを活用してビルド時間を短縮する
+- 不要な step は条件分岐で除外する
+- 並列実行可能なジョブは`needs`で適切に制御する
+
+## Testing and Validation
+
+### Workflow Testing Guidelines
+
+- 新しいワークフローを作成時は最低 1 回のテスト実行を行う
+- reusable ワークフローの変更時は全ての caller workflow でテスト実行する
+- 権限変更時は特に OIDC 関連の動作を確認する
+
+### Validation Requirements
+
+- すべてのワークフローが構文的に正しい YAML であること
+- 必要な`permissions`が設定されていること
+- `if`条件が適切に設定されていること（dependabot 除外等）
+
 ## Security Guidelines
 
 ### Secret Management
@@ -177,7 +207,7 @@ if: github.actor != 'dependabot[bot]' # Skip for dependabot PRs
       return data.private ? 'true' : 'false';
 ```
 
-## Error Handling and Reporting
+### Error Handling and Reporting
 
 ### Job Failure Handling
 
@@ -209,35 +239,7 @@ if: github.actor != 'dependabot[bot]' # Skip for dependabot PRs
       });
 ```
 
-## Testing and Validation
-
-### Workflow Testing Guidelines
-
-- 新しいワークフローを作成時は最低 1 回のテスト実行を行う
-- reusable ワークフローの変更時は全ての caller workflow でテスト実行する
-- 権限変更時は特に OIDC 関連の動作を確認する
-
-### Validation Requirements
-
-- すべてのワークフローが構文的に正しい YAML であること
-- 必要な`permissions`が設定されていること
-- `if`条件が適切に設定されていること（dependabot 除外等）
-
-## Maintenance Guidelines
-
-### Version Management
-
-- アクションのバージョンは定期的に更新する
-- `@v1`のようなメジャーバージョン指定は避け、`@v1.2.3`形式を使用
-- 破壊的変更のあるアクション更新時は段階的にテストする
-
-### Performance Optimization
-
-- キャッシュを活用してビルド時間を短縮する
-- 不要な step は条件分岐で除外する
-- 並列実行可能なジョブは`needs`で適切に制御する
-
-## MCP Tools Integration
+## MCP Tools
 
 ### AWS CLI Integration
 

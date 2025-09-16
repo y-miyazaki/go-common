@@ -2,8 +2,6 @@
 applyTo: "**/*.md"
 ---
 
-<!-- omit in toc -->
-
 # GitHub Copilot Instructions for Markdown Documentation
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
@@ -23,7 +21,9 @@ applyTo: "**/*.md"
 | Contributing  | Link to CONTRIBUTING.md with contribution guidelines                 |
 | License       | License information and link to LICENSE file                         |
 
-## Markdown Guidelines
+## Standards
+
+### Markdown Guidelines
 
 ### Consistency with Existing Documentation
 
@@ -60,7 +60,7 @@ applyTo: "**/*.md"
   - Script Options（Go 固有）
 - すべて英語名で統一
 
-## Markdown Standards
+### Markdown Standards
 
 - 見出し階層・画像 alt テキストを正しく使う
 - ドキュメントファイル名は kebab-case を使う
@@ -73,13 +73,13 @@ applyTo: "**/*.md"
   - タイトルの後は 2 スペースと改行を入れ、その後に説明を記載
   - インデントを考慮し、リストの次以降には 4 スペースを文章・コードブロックの先頭に付ける
 
-## Markdown Templates
+### Markdown Templates
 
 ### README.md Template
 
 ```
 <!-- omit in toc -->
-# some title
+# Project Title
 <!-- omit in toc -->
 ## Table of Contents
 
@@ -115,19 +115,102 @@ applyTo: "**/*.md"
 
 ### Technical Documentation Template
 
-...existing code...
+````markdown
+<!-- omit in toc -->
 
-## Program Language Template
+# Technical Component Name
 
+**Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
+
+## Overview
+
+Brief description of the component purpose and scope.
+
+## Architecture
+
+- System design overview
+- Component relationships
+- Data flow diagrams (if applicable)
+
+## Installation
+
+### Prerequisites
+
+- List required dependencies
+- Minimum versions
+- Installation links
+
+### Setup Instructions
+
+Step-by-step installation process.
+
+## Configuration
+
+### Environment Variables
+
+| Variable   | Description      | Default         | Required |
+| ---------- | ---------------- | --------------- | -------- |
+| `VAR_NAME` | Variable purpose | `default_value` | Yes/No   |
+
+### Configuration Files
+
+Configuration file formats and examples.
+
+## API Reference
+
+### Endpoints
+
+- `GET /api/endpoint` - Endpoint description
+- `POST /api/resource` - Resource creation
+
+### Request/Response Examples
+
+```json
+{
+  "example": "request_body"
+}
 ```
+````
+
+## Examples
+
+### Basic Usage
+
+```bash
+# Command example
+command --option value
+```
+
+### Advanced Scenarios
+
+Real-world use cases and implementations.
+
+## Troubleshooting
+
+### Common Issues
+
+- **Issue**: Description and solution
+- **Error**: Specific error message and fix
+
+## Contributing
+
+Link to CONTRIBUTING.md and development guidelines.
+
+## License
+
+License information and link to LICENSE file.
+
+`````
+
+### Program Language Template
+
+````markdown
 ---
 applyTo: "**/*.go"
 ---
 
 <!-- omit in toc -->
-# GitHub Copilot Instructions for {Name}
-**Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
-
+# Project Title
 <!-- omit in toc -->
 ## Table of Contents
 
@@ -138,16 +221,17 @@ applyTo: "**/*.go"
 ### Code Modification Guidelines
 ## Security Guidelines
 ## Reference Resources
+`````
 
-```
+## Guidelines
 
-## Content Guidelines
+### Content Guidelines
 
 - 変更前に類似ドキュメントを確認し、トーン・構成・フォーマットを揃える
 - プロジェクト用語は一貫性を保つ
 - バージョン・機能は現状に合わせる
 
-## Documentation Revision Process
+### Documentation Revision Process
 
 1. **構造分析**: 既存の copilot-instructions-\*.md ファイルの構造を確認
 2. **統一化**: 第２項目（##）レベルを標準構造に合わせる
@@ -176,7 +260,7 @@ applyTo: "**/*.go"
 
 **技術ドキュメント作成時:**
 
-```
+```bash
 # AWS サービスの最新情報確認
 mcp_aws-knowledge_aws___search_documentation with search_phrase="Lambda function URLs CloudFormation"
 
@@ -191,7 +275,7 @@ mcp_aws-knowledge_aws___recommend with url="https://docs.aws.amazon.com/lambda/l
 
 **README・技術文書での活用:**
 
-```
+```bash
 # フレームワーク使用例の確認
 mcp_context7_resolve-library-id with libraryName="next.js"
 mcp_context7_get-library-docs with context7CompatibleLibraryID="/vercel/next.js" and topic="deployment"

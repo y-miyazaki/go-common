@@ -2,8 +2,6 @@
 applyTo: "**/*.go"
 ---
 
-<!-- omit in toc -->
-
 # GitHub Copilot Instructions for Go
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
@@ -19,16 +17,96 @@ applyTo: "**/*.go"
 | cmd/                  | 実行可能なコマンドツール（存在する場合） |
 | internal/             | 内部パッケージ（存在する場合）           |
 
-## Coding Standards
+### Go 開発での判断基準
 
-### Production and Test Code Separation
+- **pkg/**: 高品質な共通ライブラリ → 100%テストカバレッジ、詳細ドキュメント必須
+- **example/**: 学習・デモ用 → 分かりやすさ重視、動作確認必須
+- **cmd/**: CLI ツール → エラーハンドリング・ヘルプ機能重視
+- **internal/**: プロジェクト内部用 → パッケージ設計・境界明確化
+
+### Go 特有の MCP 使用パターン
+
+```
+# 構造体・インターフェース理解
+mcp_serena_find_symbol with name_path="UserService" and depth=1
+
+# パッケージ間依存関係確認
+mcp_serena_find_referencing_symbols with name_path="GetUser"
+
+# テストファイルとの整合性確認
+mcp_serena_find_symbol with name_path="TestUserService_GetUser" and relative_path="pkg/service/"
+```
+
+## Standards
+
+### Project Structure (go-common)
+
+#### Repository Layout
+
+この go-common プロジェクトの構造を理解して作業を開始する：
+
+```
+go-common/
+├── .github/
+│   ├── workflows/          # CI/CD ワークフロー
+│   └── instructions/       # Copilot指示ファイル
+├── pkg/                    # 共通ライブラリ（再利用可能コード）
+│   ├── infrastructure/     # AWS・外部サービス接続
+│   ├── repository/         # データアクセス層
+│   ├── service/            # ビジネスロジック層
+│   ├── handler/            # HTTP/API ハンドラー
+│   └── utils/             # ユーティリティ関数
+├── example/                # サンプルアプリケーション
+│   ├── gin1/, gin2/       # Gin フレームワーク例
+│   ├── mysql/, postgres/  # データベース例
+│   └── s3/, s3_v2/       # AWS S3 操作例
+├── scripts/                # 自動化スクリプト
+│   ├── go/                # Go関連スクリプト
+│   ├── terraform/         # Terraform操作スクリプト
+│   └── lib/               # 共通ライブラリ
+└── coverage/              # テストカバレッジレポート
+```
+
+#### 編集時の判断基準
+
+- **pkg/**: 本番環境で使用する共通ライブラリ → 品質・テストを重視
+- **example/**: サンプル・デモコード → 理解しやすさを重視
+- **scripts/**: 自動化・運用スクリプト → 安全性・エラーハンドリングを重視
+- **.github/**: CI/CD・プロジェクト設定 → 一貫性・メンテナンス性を重視
+
+#### 初回作業時の必須手順
+
+新しいプロジェクトまたは初めての作業時は以下を実行：
+
+1. **serena 初期化** (MCP 使用時):
+
+   ```
+   mcp_serena_activate_project with project="."
+   mcp_serena_onboarding  # プロジェクト情報の登録
+   ```
+
+2. **プロジェクト構造把握**:
+
+   ```
+   mcp_serena_list_dir with relative_path="." and recursive=true
+   ```
+
+3. **主要ファイル確認**:
+   - `go.mod` - Go 依存関係
+   - `Makefile` - ビルド・テストコマンド
+   - `README.md` - プロジェクト概要
+   - `.github/workflows/` - CI/CD 設定
+
+### Coding Standards
+
+#### Production and Test Code Separation
 
 - テスト専用の依存注入関数・ラッパー・テスト用ロジックは本番コードに追加しない
 - テスト性が必要な場合はインターフェース設計や構造体埋め込みを使い、テスト専用コードは `*_test.go` ファイルにのみ記述する
 - 本番コードは可読性・保守性・エラー処理・ドキュメントに集中する
 - テストヘルパー・モック・テスト専用ロジックはすべてテストファイルに分離する
 
-## Naming Conventions
+### Naming Conventions
 
 | コンポーネント     | 規則            | 例                                     |
 | ------------------ | --------------- | -------------------------------------- |
@@ -41,7 +119,7 @@ applyTo: "**/*.go"
 | 構造体名           | PascalCase      | Config, Event, User                    |
 | ファイル名         | snake_case      | main.go, event_handler.go              |
 
-## Go Standards
+### Go Language Standards
 
 以下の内容は golangci-lint,go vet で指摘される項目以外の内容を記載する。
 

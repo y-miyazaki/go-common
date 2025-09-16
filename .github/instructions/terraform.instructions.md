@@ -2,8 +2,6 @@
 applyTo: "**/*.tf,**/*.tfvars,**/*.tfstate,**/*.tfbackend"
 ---
 
-<!-- omit in toc -->
-
 # GitHub Copilot Instructions for Terraform
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
@@ -21,9 +19,11 @@ applyTo: "**/*.tf,**/*.tfvars,**/*.tfstate,**/*.tfbackend"
 | lambda/               | サーバレス監視・自動化                     |
 | modules/              | AWS リソース共通モジュール                 |
 
-## Coding Standards
+## Standards
 
-## Naming Conventions
+### Coding Standards
+
+### Naming Conventions
 
 | コンポーネント | 規則                | 例                                        |
 | -------------- | ------------------- | ----------------------------------------- |
@@ -44,7 +44,9 @@ applyTo: "**/*.tf,**/*.tfvars,**/*.tfstate,**/*.tfbackend"
     - 仕様変更でトラブルになる可能性考慮し、特定のパラメータ値を必須とするようなチェックは行わない
     - Required な変数で `length > 0` のようなチェックはしない
 
-## Documentation and Comments
+## Guidelines
+
+### Documentation and Comments
 
 - すべての関数・リソースは詳細な説明を含める
 - 目的・機能は冒頭で明記する
@@ -52,7 +54,7 @@ applyTo: "**/*.tf,**/*.tfvars,**/*.tfstate,**/*.tfbackend"
 - コメント・ドキュメントは英語で記載する
 - 複雑なモジュールは使用例も記載する
 
-## Error Handling
+### Error Handling
 
 - Terraform エラーは詳細なログと共に適切に処理する
 - plan/apply 実行時のエラーは必ず原因を特定してから修正する

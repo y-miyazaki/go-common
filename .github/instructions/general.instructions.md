@@ -2,13 +2,13 @@
 applyTo: "**"
 ---
 
-<!-- omit in toc -->
-
 # GitHub Copilot Base Instructions
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
 
-## Git Command Guidelines
+## Standards
+
+### Git Command Guidelines
 
 - コミットメッセージは以下のフォーマットに従う
   - コミットメッセージは英語で記載
@@ -16,7 +16,7 @@ applyTo: "**"
   - 先頭行には、#(h1)をつけて、<概要>
   - ２行目以降には、リスト形式で詳細を記載
 
-## Copilot fixed code Guidelines
+### Copilot Fixed Code Guidelines
 
 - コード修正後は必ずコマンド動作検証を行う
 - 修正完了報告は全て完了してから報告する
@@ -39,7 +39,7 @@ applyTo: "**"
   - 出力ファイル名はデフォルトから変更しないこと。そのため output オプションは指定しない
   - 出力ファイルは毎回名前変更しないこと。比較が必要な場合のみ許可
 
-## General Principles
+### General Principles
 
 - プロジェクト全体で統一性を保つ
   - 修正時は同ディレクトリの既存コードを参照
@@ -51,14 +51,16 @@ applyTo: "**"
 - 明示的なコードを優先する
 - 非自明なロジックには必ずコメントを付与する
 
-## Documentation and Comments
+## Guidelines
+
+### Documentation and Comments
 
 - すべてのファイル/スクリプト/モジュールは目的を記載したヘッダーを含める
 - すべての関数は目的・引数説明を含める
 - 複雑なロジックにはインラインコメントを付与する
 - コメント・ドキュメントは英語で記載すること（全言語共通）
 
-## Error Handling
+### Error Handling
 
 - 必ずエラーを検知し、適切に処理する
 - 具体的かつ行動可能なエラーメッセージを出す
@@ -80,7 +82,7 @@ applyTo: "**"
 - 機密データは保存・転送時に暗号化する
 - 機密操作はログに記録するが、機密データ自体は記録しない
 
-## Development Workflow
+### Development Workflow
 
 - 新規作業は feature/xxx または hotfix/xxx ブランチで行う
 - 必ずプルリクエストを作成し、コードレビューを受ける
@@ -200,7 +202,75 @@ applyTo: "**"
 3. **安全実行**: 提案されたコマンドを段階的に実行
 4. **ドキュメント参照**: 不明点は `aws-knowledge-mcp-server` で公式ドキュメント確認
 
-### 注意事項とベストプラクティス
+### ツール選択決定木
+
+```
+タスク種別による使用ツール選択:
+
+コード理解・編集タスク
+├─ Goコード → serena (優先) → 標準tools (フォールバック)
+├─ 設定ファイル → 標準tools → serena (大規模変更時)
+└─ ドキュメント → 標準tools
+
+インフラ・AWS操作
+├─ AWSリソース確認 → aws-api-mcp-server
+├─ AWS公式ドキュメント → aws-knowledge-mcp-server
+└─ Terraform → aws-api-mcp-server + aws-knowledge-mcp-server
+
+ライブラリ・フレームワーク情報
+├─ Go依存関係 → context7
+├─ 新しいライブラリ調査 → context7 + aws-knowledge-mcp-server
+└─ 使用例・ベストプラクティス → context7
+```
+
+### ツール使用優先度ルール
+
+#### 1. serena 使用ルール
+
+- **使用すべき場面**:
+  - Go 言語のコード構造理解・編集
+  - 大規模なリファクタリング
+  - 関数・構造体の影響範囲確認
+- **使用を避ける場面**:
+  - 単純なファイル読み取り
+  - 設定ファイルの簡単な編集
+  - 1-2 行の修正
+
+#### 2. AWS MCP 使用ルール
+
+- **aws-api-mcp-server**:
+  - 必ず`--region`を明示的に指定
+  - 本番環境では慎重に実行
+  - 大量データは`max_results`で制限
+- **aws-knowledge-mcp-server**:
+  - 公式ドキュメントが必要な場合のみ
+  - 設計・アーキテクチャ決定時に活用
+
+#### 3. フォールバック戦略
+
+1. **Primary Tool 失敗時**: 標準 tools に切り替え
+2. **情報不足時**: 複数ツールを組み合わせ
+3. **パフォーマンス問題時**: より軽量なアプローチに変更
+
+### ツール組み合わせパターン
+
+#### 新機能開発フロー
+
+```
+1. context7でライブラリ調査
+2. serenaでコード構造理解
+3. serenaで実装・テスト
+4. aws-api-mcp-serverで動作確認（AWS関連時）
+```
+
+#### トラブルシューティングフロー
+
+```
+1. serenaでエラー箇所特定
+2. aws-knowledge-mcp-serverで公式情報確認
+3. aws-api-mcp-serverで実際の状態確認
+4. 標準toolsで修正実行
+```
 
 1. **serena 使用時:**
 

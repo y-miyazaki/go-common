@@ -2,8 +2,6 @@
 applyTo: "**/*.sh,scripts/**"
 ---
 
-<!-- omit in toc -->
-
 # GitHub Copilot Instructions for Shell Scripts
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
@@ -19,9 +17,11 @@ applyTo: "**/*.sh,scripts/**"
 | scripts/lib/                    | 共通ライブラリ・ユーティリティ関数                        |
 | scripts/validate_all_scripts.sh | 全スクリプトの品質チェック・検証ツール                    |
 
-## Coding Standards
+## Standards
 
-## Naming Conventions
+### Coding Standards
+
+### Naming Conventions
 
 | コンポーネント       | 規則                | 例                                       |
 | -------------------- | ------------------- | ---------------------------------------- |
@@ -130,7 +130,9 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 fi
 ```
 
-## Documentation and Comments
+## Guidelines
+
+### Documentation and Comments
 
 - すべてのスクリプトは目的を記載したヘッダーを含める
 - すべての関数は詳細な説明を含める
@@ -148,7 +150,7 @@ fi
   - 複雑なスクリプトはカテゴリ一覧や詳細ヘルプを含める
   - 必ず exit 0 で終了
 
-## Error Handling
+### Error Handling
 
 - すべてのスクリプトは適切なエラー処理を実装する
 - エラーメッセージは具体的かつ行動可能にする
