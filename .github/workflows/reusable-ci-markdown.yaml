@@ -1,6 +1,6 @@
 # Reusable workflow for Markdown CI linting
 # This workflow runs markdownlint to check Markdown files quality and formatting
-name: reusable-ci-markdownlint
+name: reusable-ci-markdown
 
 on:
   workflow_call:
