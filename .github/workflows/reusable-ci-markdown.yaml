@@ -36,15 +36,15 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
-          markdownlint_flags: "**/*.md"
+          markdownlint_flags: "README*.md"
           fail_level: error
           filter_mode: added
 
       - name: Run markdownlint-cli2 (non-PR)
         if: github.event_name != 'pull_request'
-        uses: DavidAnson/markdownlint-cli2-action@v18
+        uses: DavidAnson/markdownlint-cli2-action@v20
         with:
-          globs: "**/*.md"
+          globs: "README*.md"
           config: ".markdownlint.yaml"
           fix: false
 

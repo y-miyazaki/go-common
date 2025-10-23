@@ -22,14 +22,22 @@ description: "Terraformコードの正確性・セキュリティ・保守性・
 
 - G-01 Terraform ファイル構文・リソース設定妥当性 (構文/属性/必須項目)
 - G-02 変数 / outputs / Module の適切利用 (未使用/重複/不要定義検出)
+  - **必須**: 外部モジュール利用時は GitHub リポジトリ・公式 Registry を参照し最新ドキュメントで設定妥当性確認
+  - **必須**: context7 や fetch_webpage ツールを使用して実際のリポジトリ情報を取得
+  - モジュールバージョンが最新かどうかを GitHub releases ページで確認
 - G-03 シークレット・認証情報ハードコーディング禁止 (平文キー/トークンなし)
 - G-04 外部 Module Version ピン + 最新バージョン併記 (ローカル module は除外)
+  - **必須**: GitHub releases や Registry を実際に確認して最新バージョンを調査
+  - 使用中バージョンと最新バージョンを明記
 - G-05 Provider Version constraint 記載 + (レビューコメントで最新バージョンを表示)
+  - **必須**: 実行環境の provider version を確認 (terraform version 出力)
 - G-06 apply 後決定値を for_each / count のキーに使用していない
 - G-07 count より for_each 推奨 (ただし有効化/無効化トグル用途の count は許容)
 - G-08 Module 使用方法: 引数設定妥当 (型/期待値)・不要引数なし
 - G-09 Module 出力の活用 (不要な未参照 output 無 / 必要 output 欠落無)
 - G-10 tfsec 言及があれば trivy へ移行する指摘
+- G-11 命名規則は以下のドキュメントに準拠
+  https://www.terraform-best-practices.com/naming
 
 ### 2. Modules (M)
 

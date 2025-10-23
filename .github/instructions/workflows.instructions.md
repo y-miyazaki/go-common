@@ -1,16 +1,15 @@
 ---
 applyTo: "**/.github/workflows/*.yaml,**/.github/workflows/*.yml"
+description: "AI Assistant Instructions for GitHub Actions Workflows"
 ---
 
-# GitHub Copilot Instructions for GitHub Actions Workflows
+# AI Assistant Instructions for GitHub Actions Workflows
 
-**Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
-
-## Overview
+**言語ポリシー**: ドキュメントは日本語、コード・コメントは英語。
 
 このリポジトリは GitHub Actions を使用した CI/CD ワークフローを含みます。
 
-| ワークフローファイル           | 役割・説明                                   |
+| workflow files                 | Purpose / Description 明                     |
 | ------------------------------ | -------------------------------------------- |
 | ci-push-\*.yaml                | CI（言語テスト、lint、カバレッジ）           |
 | ci-push-markdown.yaml          | Markdown ファイル専用 CI（markdownlint）     |
@@ -107,7 +106,7 @@ env:
   ENV: ${{ inputs.environment }}
   COMPONENT: ${{ inputs.component }}
   GO_PROJECT_PATH: ${{ inputs.go_path }}
-  GO_VERSION: "1.24.6" # Centralized version management
+  GO_VERSION: "1.25.3" # Centralized version management
 ```
 
 ## Guidelines
@@ -241,10 +240,13 @@ if: github.actor != 'dependabot[bot]' # Skip for dependabot PRs
 
 ## MCP Tools
 
-### AWS CLI Integration
+**詳細な MCP Tools の設定・使用方法は `.github/copilot-instructions.md` を参照。**
+
+### GitHub Actions 特有の活用パターン
+
+**ワークフロー内での AWS CLI 実行例:**
 
 ```yaml
-# Example: AWS CLI command execution in workflows
 - name: AWS Resource Check
   run: |
     aws sts get-caller-identity
@@ -253,10 +255,12 @@ if: github.actor != 'dependabot[bot]' # Skip for dependabot PRs
     AWS_REGION: ${{ secrets.AWS_REGION }}
 ```
 
-### Context7 Documentation
+**ワークフロー設計時のベストプラクティス参照:**
 
-ワークフロー設計時のベストプラクティス参照：
+```
+# GitHub Actions 情報取得
+resolve: "github-actions" → get-docs: topic="security best practices"
 
-- GitHub Actions 公式ドキュメント
-- セキュリティベストプラクティス
-- パフォーマンス最適化ガイド
+# CI/CD パフォーマンス最適化
+resolve: "github-actions" → get-docs: topic="workflow optimization"
+```

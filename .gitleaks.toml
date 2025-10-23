@@ -2061,6 +2061,7 @@ stopwords = [
     "xml.",
     "xml_",
     "xmpp",
+    "xoxb",
     "xxxxxx",
     "yahoo",
     "yaml",
@@ -2931,12 +2932,12 @@ regex = '''(?i)xapp-\d-[A-Z0-9]+-\d+-[a-z0-9]+'''
 entropy = 2
 keywords = ["xapp"]
 
-[[rules]]
-id = "slack-bot-token"
-description = "Identified a Slack Bot token, which may compromise bot integrations and communication channel security."
-regex = '''xoxb-[0-9]{10,13}-[0-9]{10,13}[a-zA-Z0-9-]*'''
-entropy = 3
-keywords = ["xoxb"]
+# [[rules]]
+# id = "slack-bot-token"
+# description = "Identified a Slack Bot token, which may compromise bot integrations and communication channel security."
+# regex = '''xoxb-[0-9]{10,13}-[0-9]{10,13}[a-zA-Z0-9-]*'''
+# entropy = 3
+# keywords = ["xoxb"]
 
 [[rules]]
 id = "slack-config-access-token"

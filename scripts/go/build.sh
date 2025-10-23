@@ -256,8 +256,7 @@ function main {
     files=$(find_lambda_functions | sed '/^#/d')
 
     # Build all Lambda functions
-    local built_count
-    built_count=$(build_lambda_functions "$files")
+    build_lambda_functions "$files"
 
     # Calculate elapsed time
     local end_time elapsed minutes seconds
@@ -266,7 +265,7 @@ function main {
     minutes=$((elapsed / 60))
     seconds=$((elapsed % 60))
 
-    echo_section "Build completed successfully! Built $built_count Lambda functions in ${minutes}m ${seconds}s."
+    echo_section "Build completed successfully! Built Lambda functions in ${minutes}m ${seconds}s."
     log "INFO" "All Lambda functions built successfully"
 }
 

@@ -1,7 +1,7 @@
 #--------------------------------------------------------------
 # base build image
 #--------------------------------------------------------------
-FROM mcr.microsoft.com/vscode/devcontainers/go:1.24
+FROM mcr.microsoft.com/vscode/devcontainers/go:1.25
 #--------------------------------------------------------------
 # ARG
 #--------------------------------------------------------------
@@ -14,7 +14,7 @@ ARG GITLEAKS_VERSION=8.18.0
 ARG TRIVY_VERSION=0.65.0
 ARG GH_VERSION=2.73.0
 # version(go)
-ARG GOLANGCI_LINT_VERSION=v2.3.1
+ARG GOLANGCI_LINT_VERSION=v2.5.0
 
 # x86_64
 # ARG ARCH_BASE=amd64
@@ -55,10 +55,15 @@ RUN mkdir -p ${WORKDIR}
 WORKDIR  ${WORKDIR}
 
 #--------------------------------------------------------------
-# Install software-properties-common
+# Install minimal apt/https tooling (avoid software-properties-common)
 #--------------------------------------------------------------
-RUN apt update && \
-    apt -y install software-properties-common
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    ca-certificates \
+    gnupg \
+    dirmngr \
+    apt-transport-https \
+    lsb-release
 
 #--------------------------------------------------------------
 # Install dependent packages

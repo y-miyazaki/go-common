@@ -1,14 +1,13 @@
 ---
 applyTo: "**/*.md"
+description: "AI Assistant Instructions for Markdown Documentation"
 ---
 
-# GitHub Copilot Instructions for Markdown Documentation
+# AI Assistant Instructions for Markdown Documentation
 
-**Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
+**言語ポリシー**: ドキュメントは日本語、コード・コメントは英語。
 
-## Overview
-
-このリポジトリは技術ドキュメント、README、手順書等の Markdown ファイルを含みます。
+This repository contains technical documentation, READMEs, and procedural markdown files.
 
 | Section       | Description                                                          |
 | ------------- | -------------------------------------------------------------------- |
@@ -75,21 +74,24 @@ applyTo: "**/*.md"
 
 ### Markdown Templates
 
-### README.md Template
+#### README.md Template
 
-```
+```markdown
 <!-- omit in toc -->
+
 # Project Title
-<!-- omit in toc -->
-## Table of Contents
 
-## Overview
+description of the project.
+
+<!-- omit in toc -->
+
+## Table of Contents
 
 ### Directory Structure
 
-| Directory/File | Description                          |
-| -------------- | ------------------------------------ |
-| `dir1/`        | Description of dir1                  |
+| Directory/File | Description         |
+| -------------- | ------------------- |
+| `dir1/`        | Description of dir1 |
 
 ## Installation
 
@@ -110,10 +112,9 @@ applyTo: "**/*.md"
 ### Getting Help
 
 ## Note
-
 ```
 
-### Technical Documentation Template
+#### Technical Documentation Template
 
 ````markdown
 <!-- omit in toc -->
@@ -122,7 +123,7 @@ applyTo: "**/*.md"
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
 
-## Overview
+description of the project.
 
 Brief description of the component purpose and scope.
 
@@ -200,28 +201,29 @@ Link to CONTRIBUTING.md and development guidelines.
 
 License information and link to LICENSE file.
 
-`````
-
 ### Program Language Template
 
-````markdown
+```markdown
 ---
 applyTo: "**/*.go"
 ---
 
-<!-- omit in toc -->
 # Project Title
-<!-- omit in toc -->
-## Table of Contents
 
-## Overview
+description of the project.
+
 ## Coding Standards
+
 ## Naming Conventions
+
 ## Testing and Validation
+
 ### Code Modification Guidelines
+
 ## Security Guidelines
+
 ## Reference Resources
-`````
+```
 
 ## Guidelines
 
@@ -240,9 +242,21 @@ applyTo: "**/*.go"
 5. **言語統一**: 本文を日本語に翻訳（TOC・Reference Resources は英語維持）
 6. **検証**: grep_search や read_file で構造と内容を確認
 
-## Security Guidelines
+## Testing and Validation
 
-**詳細な security guidelines は `.github/instructions/general.instructions.md` を参照。**
+### Code Modification Guidelines
+
+- ドキュメント作成・更新後は構文・リンクチェックを必ず実行
+- 可能な限り実機でのレンダリング・動作確認を実施
+- チェック結果は成功/失敗を明示し、失敗時は具体的な修正案を提示
+
+### Validation Requirements
+
+- すべてのリンクが有効であることを確認
+- コードブロックの構文が正しいことを確認
+- 画像リンクが正しく表示されることを確認
+
+## Security Guidelines
 
 ### Markdown Specific Security
 
@@ -252,41 +266,32 @@ applyTo: "**/*.go"
 
 ## MCP Tools
 
-**詳細な MCP Tools の設定は `.github/instructions/general.instructions.md` を参照。**
+**詳細な MCP Tools の設定・使用方法は `.github/copilot-instructions.md` を参照。**
 
-ドキュメント作業での主な活用：
+### Markdown ドキュメント特有の活用パターン
 
-### aws-knowledge-mcp-server (公式ドキュメント参照)
-
-**技術ドキュメント作成時:**
+**技術ドキュメント作成での公式情報参照:**
 
 ```bash
-# AWS サービスの最新情報確認
-mcp_aws-knowledge_aws___search_documentation with search_phrase="Lambda function URLs CloudFormation"
+# AWS サービス最新情報確認
+search: "Lambda function URLs CloudFormation"
 
 # 詳細設定手順の参照
-mcp_aws-knowledge_aws___read_documentation with url="https://docs.aws.amazon.com/lambda/latest/dg/lambda-urls.html"
-
-# 関連ドキュメントの発見
-mcp_aws-knowledge_aws___recommend with url="https://docs.aws.amazon.com/lambda/latest/dg/"
+url: "https://docs.aws.amazon.com/lambda/latest/dg/lambda-urls.html"
 ```
 
-### context7 (ライブラリドキュメント管理)
-
-**README・技術文書での活用:**
+**README・技術文書でのライブラリ情報活用:**
 
 ```bash
-# フレームワーク使用例の確認
-mcp_context7_resolve-library-id with libraryName="next.js"
-mcp_context7_get-library-docs with context7CompatibleLibraryID="/vercel/next.js" and topic="deployment"
+# フレームワーク使用例確認
+resolve: "next.js" → get-docs: topic="deployment"
 
-# ライブラリのベストプラクティス取得
-mcp_context7_resolve-library-id with libraryName="terraform"
-mcp_context7_get-library-docs with context7CompatibleLibraryID="/hashicorp/terraform" and topic="best practices"
+# ベストプラクティス取得
+resolve: "terraform" → get-docs: topic="best practices"
 ```
 
-**ドキュメント品質向上での使用パターン:**
+**品質向上での使用パターン:**
 
 - **技術仕様確認**: 公式ドキュメントから最新の仕様・制限事項を確認
-- **コード例作成**: ライブラリドキュメントから適切なサンプルコードを取得
+- **コードサンプル作成**: ライブラリドキュメントから適切なサンプルコードを取得
 - **ベストプラクティス反映**: 最新の推奨設定・セキュリティ要件を文書に反映

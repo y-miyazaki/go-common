@@ -32,8 +32,8 @@ repos:
         args:
           - --args=-f=compact
           - --args=--chdir=/workspace/modules
-          - --args=--module
           - --args=--no-color
+          - --args=--call-module-type=all
       - id: terraform_trivy
         args:
           - --args=--format=table

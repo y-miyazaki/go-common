@@ -1,16 +1,15 @@
 ---
-applyTo: "**/*.tf,**/*.tfvars,**/*.tfstate,**/*.tfbackend"
+applyTo: "**/*.tf,**/*.tfvars,**/*.hcl"
+description: "AI Assistant Instructions for Terraform"
 ---
 
-# GitHub Copilot Instructions for Terraform
+# AI Assistant Instructions for Terraform
 
-**Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
+**言語ポリシー**: ドキュメントは日本語、コード・コメントは英語。
 
-## Overview
+このリポジトリは Terraform で AWS インフラを管理するためのプロジェクトです。
 
-このリポジトリは AWS のセキュリティ・監視インフラを管理する Terraform コードを含みます。
-
-| ディレクトリ/ファイル | 役割・説明                                 |
+| Directory/File        | Purpose / Description                      |
 | --------------------- | ------------------------------------------ |
 | terraform/application | 基本セキュリティ設定・AWS アカウント初期化 |
 | terraform/base        | 基本セキュリティ設定・AWS アカウント初期化 |
@@ -25,7 +24,10 @@ applyTo: "**/*.tf,**/*.tfvars,**/*.tfstate,**/*.tfbackend"
 
 ### Naming Conventions
 
-| コンポーネント | 規則                | 例                                        |
+命名規則は以下を参照：
+https://www.terraform-best-practices.com/naming
+
+| Component      | Rule                | Example                                   |
 | -------------- | ------------------- | ----------------------------------------- |
 | モジュール変数 | snake_case          | resource_name, is_enabled, vpc_cidr_block |
 | ファイル名     | snake_case          | main_security.tf, iam_roles.tf            |
@@ -65,13 +67,13 @@ applyTo: "**/*.tf,**/*.tfvars,**/*.tfstate,**/*.tfbackend"
 
 ### Code Modification Guidelines
 
-コード修正時は以下を順次実行する：
+コード修正時は以下コマンドで一括検証する：
 
 ```bash
-# 環境変数設定（例：dev環境）
+# Environment variable setup (example: dev environment)
 ENV=dev
 
-# 初期化・検証・プラン
+# Initialize, validate, and plan
 terraform init -reconfigure -backend-config=terraform.${ENV}.tfbackend
 terraform fmt --recursive && terraform validate
 tflint -f compact --var-file=terraform.${ENV}.tfvars
@@ -86,8 +88,6 @@ terraform plan -lock=false -var-file=terraform.${ENV}.tfvars
 
 ## Security Guidelines
 
-**詳細な security guidelines は `.github/instructions/general.instructions.md` を参照。**
-
 ### Terraform Specific Security
 
 - IAM ポリシーは最小権限で設計する
@@ -98,64 +98,37 @@ terraform plan -lock=false -var-file=terraform.${ENV}.tfvars
 
 ## MCP Tools
 
-**詳細な MCP Tools の設定は `.github/instructions/general.instructions.md` を参照。**
+**詳細な MCP Tools の設定・使用方法は `.github/copilot-instructions.md` を参照。**
 
-Terraform 作業での主な活用：
+### Terraform 作業特有の活用パターン
 
-### awslabs.aws-api-mcp-server (AWS リソース確認・操作)
-
-**Terraform 設計時のリソース確認:**
+**AWS リソース設計前の事前調査:**
 
 ```
-# 既存リソースの確認
-mcp_awslabs_aws-a_suggest_aws_commands with query="List all VPCs with their CIDR blocks in us-east-1"
-mcp_awslabs_aws-a_call_aws with cli_command="aws ec2 describe-vpcs --region us-east-1"
+# 既存リソースとの整合性確認
+aws ec2 describe-vpcs --region us-east-1
+aws rds describe-db-instances --region us-east-1
 
-# Terraformインポート用の情報取得
-mcp_awslabs_aws-a_suggest_aws_commands with query="Get security group details for Terraform import"
+# Terraform Import 用の情報収集
+aws s3api get-bucket-versioning --bucket terraform-state-bucket
 ```
 
-**デプロイ前後の状態確認:**
+**公式ドキュメントによるベストプラクティス確認:**
 
 ```
-# リソース作成確認
-mcp_awslabs_aws-a_call_aws with cli_command="aws cloudformation describe-stacks --stack-name terraform-managed-stack --region us-east-1"
+# AWS サービス固有の制約・要件確認
+search: "S3 bucket policy terraform cross-account access"
 
-# セキュリティ設定の確認
-mcp_awslabs_aws-a_call_aws with cli_command="aws s3api get-bucket-versioning --bucket terraform-state-bucket"
+# セキュリティ設定の公式ガイダンス参照
+url: "https://docs.aws.amazon.com/s3/latest/userguide/bucket-policies.html"
 ```
 
-### aws-knowledge-mcp-server (公式リファレンス)
-
-**Terraform ベストプラクティス確認:**
+**プロバイダー・モジュール情報の活用:**
 
 ```
-# AWSサービス固有の制限・要件確認
-mcp_aws-knowledge_aws___search_documentation with search_phrase="S3 bucket policy terraform cross-account access"
+# AWS Provider 最新機能確認
+resolve: "terraform-aws-provider" → get-docs: topic="s3 bucket configuration"
 
-# セキュリティ設定の公式ガイダンス
-mcp_aws-knowledge_aws___read_documentation with url="https://docs.aws.amazon.com/s3/latest/userguide/bucket-policies.html"
-
-# 関連する設定オプションの発見
-mcp_aws-knowledge_aws___recommend with url="https://docs.aws.amazon.com/s3/latest/userguide/security.html"
+# Terraform モジュール構成例
+resolve: "terraform" → get-docs: topic="module composition"
 ```
-
-### context7 (Terraform プロバイダー・モジュール情報)
-
-**Terraform プロバイダー使用方法:**
-
-```
-# AWSプロバイダーの最新機能確認
-mcp_context7_resolve-library-id with libraryName="terraform-aws-provider"
-mcp_context7_get-library-docs with context7CompatibleLibraryID="/hashicorp/terraform-provider-aws" and topic="s3 bucket configuration"
-
-# Terraformモジュール使用例
-mcp_context7_resolve-library-id with libraryName="terraform"
-mcp_context7_get-library-docs with context7CompatibleLibraryID="/hashicorp/terraform" and topic="module composition"
-```
-
-**Infrastructure as Code での品質向上:**
-
-- **設計検証**: AWS 公式ドキュメントでサービス制限・要件を事前確認
-- **セキュリティ**: 最新のセキュリティベストプラクティスを Terraform コードに反映
-- **メンテナンス**: プロバイダーアップデート時の破壊的変更を事前に把握

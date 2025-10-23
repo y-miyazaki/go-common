@@ -1,12 +1,21 @@
----
-applyTo: "**"
----
-
-# GitHub Copilot Base Instructions
+# GitHub Copilot Instructions
 
 **Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
 
-## Standards
+## Core Principles
+
+- 修正完了報告は全て完了してから報告する
+  - 残っている作業内容はリスト化して表示する
+- 各作業開始時に対象ファイルの instructions を読み、要点をメモとして明示する
+- **Path-Specific Instructions の遵守**
+  - 対象ファイルの instructions ファイルが存在する場合は、**作業前に必ず明示的に読み込み・確認する**
+  - 自動適用されていても、コンテキストとして確実に把握するため `read_file` ツールで内容を確認する
+  - instructions ファイルで指定された検証コマンド・コーディング規約を必ず遵守する
+- **統一性の維持**
+  - 修正内容が他のコードにも適用すべき場合は、grep で他ファイルも検索し、必要なら全体を修正する
+- 作業中は常に「残タスクリスト」を維持し、進捗に応じて更新する
+
+## General Standards
 
 ### Git Command Guidelines
 
@@ -20,24 +29,36 @@ applyTo: "**"
 
 - コード修正後は必ずコマンド動作検証を行う
 - 修正完了報告は全て完了してから報告する
-  - 一部の場合は最後に"まだ作業中のため次の指示が必要です"と太字で記載する
   - 残っている作業内容はリスト化して表示する
-- 複数のコード修正時でもユーザの毎回の確認は必要ない
 - 統一性
   - 修正内容が他のコードにも適用すべき場合は、grep で他ファイルも検索し、必要なら全体を修正する
+  - **修正実施時の必須手順**:
+    1. 修正対象のパターンを grep で検索
+    2. 同様のパターンが他ファイルにも存在するか確認
+    3. 存在する場合は全てのファイルに一括適用
+    4. 修正完了後は使用した grep コマンドと検索結果を報告に記載
   - 共通ライブラリの関数内容は全て把握した上で修正する
   - 修正完了後は何を検索しても問題なかったかを grep レベルで記載する
   - grep だけでは問題がありそうな場合は、コード自体も中身も実際に読み込む
 - エラー修正は Copilot が自律的に実行する
 - コマンド動作検証
-  - すべてワンライナーで実行し、複数回の動作確認はユーザー確認不要
   - dry-run オプションは使用しない
-  - && で全てワンライナー対応
-  - 複数結果確認は || でワンライナー対応
-  - ターミナルが終了するため、コマンド実行時に `set -e`は利用しない。
+  - `||` or `&&` で全てワンライナー対応
+  - ターミナルが終了するため、コマンド実行時に `set -e`は利用しない
 - コマンド動作実行
-  - 出力ファイル名はデフォルトから変更しないこと。そのため output オプションは指定しない
-  - 出力ファイルは毎回名前変更しないこと。比較が必要な場合のみ許可
+  - 出力ファイル名はデフォルトから変更しないこと。
+- 長時間の対話（10 ターン以上または 10,000 トークン相当）では、途中で再度ガイドラインを読み直し、遵守状況を報告する
+
+#### Final Checklist
+
+作業完了報告の直前に、以下のチェック項目を Markdown のチェックボックス形式で出力すること。
+
+- [ ] Path-Specific Instructions を再確認した
+- [ ] grep による統一性確認を実施し、結果を報告した
+- [ ] 追加で確認が必要なファイルや関数を読み込んだ
+- [ ] コマンド動作検証は、`{language}.instructions.md` にある `Code Modification Guidelines` に従って実施した
+- [ ] 残作業リストを更新し、未完了項目がないことを確認した
+- [ ] 逸脱や懸念点がある場合は振り返りコメントを残した
 
 ### General Principles
 
@@ -48,10 +69,95 @@ applyTo: "**"
 - 固有ライブラリを利用する際には事前にコンテキストとして利用できるよう把握する
 - すべての関数・リソースは明確な説明を含める
 - DRY 原則（重複排除）を守る
-- 明示的なコードを優先する
 - 非自明なロジックには必ずコメントを付与する
 
+## Language-Specific Guidelines
+
+**重要**: 各言語の作業時は、必ず対応する instructions ファイルの内容を確認・適用すること。
+
+## Path-Specific Instructions
+
+**重要**: このプロジェクトでは `.github/instructions/*.instructions.md` ファイルでパス固有のカスタム指示を定義しています。
+
+### How Path-Specific Instructions Work
+
+各 instructions ファイルには frontmatter で `applyTo` パターンが定義されており、指定されたファイルを編集する際に自動的に適用されます:
+
+```markdown
+---
+applyTo: "**/*.go"
+description: "AI Assistant Instructions for Go Development"
+---
+```
+
+### Available Instructions Files
+
+| File                                                        | Applies To                                               | Description                                            |
+| ----------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------ |
+| `/workspace/.github/instructions/go.instructions.md`        | \*_/_.go                                                 | AI Assistant Instructions for Go Development           |
+| `/workspace/.github/instructions/markdown.instructions.md`  | \*_/_.md                                                 | AI Assistant Instructions for Markdown Documentation   |
+| `/workspace/.github/instructions/scripts.instructions.md`   | **/\*.sh,scripts/**                                      | AI Assistant Instructions for Shell Scripts            |
+| `/workspace/.github/instructions/terraform.instructions.md` | **/\*.tf,**/_.tfvars,\*\*/_.hcl                          | AI Assistant Instructions for Terraform                |
+| `/workspace/.github/instructions/workflows.instructions.md` | **/.github/workflows/\*.yaml,**/.github/workflows/\*.yml | AI Assistant Instructions for GitHub Actions Workflows |
+
+### Usage Rules
+
+1. **自動適用**: 対象ファイル編集時に自動的に適用されます
+2. **明示的確認**: 自動適用されていても、作業前に必ず内容を確認すること
+3. **検証の徹底**: instructions ファイルで指定された検証コマンドを必ず実行すること
+
 ## Guidelines
+
+### Go Language
+
+あなたは Go の専門家です。
+
+**必須参照**:
+
+- ファイルパス: `.github/instructions/go.instructions.md`
+- Go ファイル編集時は必ずこのファイルの内容を確認すること
+- **自動適用**: `applyTo: "**/*.go"` で自動適用されますが、作業前に必ず明示的に確認すること
+
+### Terraform Language
+
+あなたは Terraform の専門家です。
+
+**必須参照**:
+
+- ファイルパス: `.github/instructions/terraform.instructions.md`
+- Terraform ファイル (_.tf, _.tfvars, \*.hcl) 編集時は必ずこのファイルの内容を確認すること
+- **自動適用**: `applyTo: "**/*.tf,**/*.tfvars,**/*.hcl"` で自動適用されますが、作業前に必ず明示的に確認すること
+- 検証コマンド、命名規則、セキュリティガイドラインが記載されています
+
+### Shell Scripts
+
+あなたは Shell スクリプトの専門家です。
+
+**必須参照**:
+
+- ファイルパス: `.github/instructions/scripts.instructions.md`
+- Shell スクリプト編集時は必ずこのファイルの内容を確認すること
+- **自動適用**: `applyTo: "**/*.sh,scripts/**"` で自動適用されますが、作業前に必ず明示的に確認すること
+
+### Markdown
+
+あなたは Github Markdown の専門家です。
+
+**必須参照**:
+
+- ファイルパス: `.github/instructions/markdown.instructions.md`
+- Markdown ファイル編集時は必ずこのファイルの内容を確認すること
+- **自動適用**: `applyTo: "**/*.md"` で自動適用されますが、作業前に必ず明示的に確認すること
+
+### GitHub Actions
+
+あなたは GitHub Actions の専門家です。
+
+**必須参照**:
+
+- ファイルパス: `.github/instructions/workflows.instructions.md`
+- GitHub Actions ワークフロー編集時は必ずこのファイルの内容を確認すること
+- **自動適用**: `applyTo: "**/.github/workflows/*.yaml,**/.github/workflows/*.yml"` で自動適用されますが、作業前に必ず明示的に確認すること
 
 ### Documentation and Comments
 
@@ -95,33 +201,33 @@ applyTo: "**"
 本プロジェクトでは Model Context Protocol (MCP) 対応ツールを活用する。
 目的: コードベース解析、ドキュメント検索、AWS 操作支援、変更の一貫性向上。
 
-### 利用可能な MCP サーバ
+### Available MCP Servers
 
 #### serena (Code Analysis & Safe Editing)
 
-**プロジェクト初期化時の必須操作:**
+**Required step during project initialization:**
 
 ```
 /mcp__serena__initial_instructions
 ```
 
-**主要な使用パターン:**
+**Common usage patterns:**
 
-1. **プロジェクト構造の理解:**
+1. **Understand project structure:**
 
    ```
    mcp_serena_list_dir with relative_path="." and recursive=true
    mcp_serena_get_symbols_overview with relative_path="pkg/service/user_service.go"
    ```
 
-2. **シンボル検索と編集:**
+2. **Find and edit symbols:**
 
    ```
    mcp_serena_find_symbol with name_path="UserService" and include_body=true
    mcp_serena_replace_symbol_body with name_path="UserService/GetUser"
    ```
 
-3. **安全な一括変更:**
+3. **Safe bulk changes:**
    ```
    mcp_serena_find_referencing_symbols with name_path="GetUser" and relative_path="pkg/service/"
    ```
@@ -184,9 +290,9 @@ applyTo: "**"
    mcp_context7_get-library-docs with context7CompatibleLibraryID="/gin-gonic/gin" and topic="routing"
    ```
 
-### 実践的な使用ワークフロー
+### Practical Usage Workflows
 
-#### Go 開発での典型的フロー
+#### Typical Go Development Flow
 
 1. **初期設定**: `mcp_serena_activate_project` で対象プロジェクトをアクティベート
 2. **構造把握**: `mcp_serena_list_dir` でディレクトリ構造確認
@@ -195,14 +301,14 @@ applyTo: "**"
 5. **安全な編集**: `mcp_serena_replace_symbol_body` で変更実行
 6. **影響確認**: `mcp_serena_find_referencing_symbols` で参照元チェック
 
-#### AWS 操作での典型的フロー
+#### Typical AWS Operations Flow
 
 1. **権限確認**: `aws sts get-caller-identity`
 2. **リソース調査**: `mcp_awslabs_aws-a_suggest_aws_commands` で適切なコマンド提案
 3. **安全実行**: 提案されたコマンドを段階的に実行
 4. **ドキュメント参照**: 不明点は `aws-knowledge-mcp-server` で公式ドキュメント確認
 
-### ツール選択決定木
+### Tool Selection Decision Tree
 
 ```
 タスク種別による使用ツール選択:
@@ -223,9 +329,9 @@ applyTo: "**"
 └─ 使用例・ベストプラクティス → context7
 ```
 
-### ツール使用優先度ルール
+### Tool Usage Priority Rules
 
-#### 1. serena 使用ルール
+#### 1. serena Usage Rules
 
 - **使用すべき場面**:
   - Go 言語のコード構造理解・編集
@@ -236,7 +342,7 @@ applyTo: "**"
   - 設定ファイルの簡単な編集
   - 1-2 行の修正
 
-#### 2. AWS MCP 使用ルール
+#### 2. AWS MCP Usage Rules
 
 - **aws-api-mcp-server**:
   - 必ず`--region`を明示的に指定
@@ -246,15 +352,15 @@ applyTo: "**"
   - 公式ドキュメントが必要な場合のみ
   - 設計・アーキテクチャ決定時に活用
 
-#### 3. フォールバック戦略
+#### 3. Fallback Strategy
 
 1. **Primary Tool 失敗時**: 標準 tools に切り替え
 2. **情報不足時**: 複数ツールを組み合わせ
 3. **パフォーマンス問題時**: より軽量なアプローチに変更
 
-### ツール組み合わせパターン
+### Tool Combination Patterns
 
-#### 新機能開発フロー
+#### New Feature Development Flow
 
 ```
 1. context7でライブラリ調査
@@ -263,7 +369,7 @@ applyTo: "**"
 4. aws-api-mcp-serverで動作確認（AWS関連時）
 ```
 
-#### トラブルシューティングフロー
+#### Troubleshooting Flow
 
 ```
 1. serenaでエラー箇所特定

@@ -1,16 +1,15 @@
 ---
 applyTo: "**/*.sh,scripts/**"
+description: "AI Assistant Instructions for Shell Scripts"
 ---
 
-# GitHub Copilot Instructions for Shell Scripts
+# AI Assistant Instructions for Shell Scripts
 
-**Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
-
-## Overview
+**言語ポリシー**: ドキュメントは日本語、コード・コメントは英語。
 
 このリポジトリは自動化・インフラ管理用のシェルスクリプトを含みます。スクリプトは以下のように構成されています：
 
-| ディレクトリ/ファイル           | 役割・説明                                                |
+| Directory/File                  | Purpose / Description                                     |
 | ------------------------------- | --------------------------------------------------------- |
 | scripts/terraform/              | Terraform 操作・AWS リソース管理用の自動化スクリプト      |
 | scripts/go/                     | Go 言語プロジェクトのビルド・テスト・デプロイ用スクリプト |
@@ -157,7 +156,7 @@ fi
 - ログは INFO/WARN/ERROR などレベル分けして記録する
 
   ```bash
-  # ログ関数例
+  # Log function example
   function log {
     local level=$1
     local message=$2
@@ -175,7 +174,7 @@ fi
 コード修正時は以下コマンドで一括検証する：
 
 ```bash
-# 全スクリプトの検証（推奨）
+# All scripts validation (recommended)
 bash /workspace/scripts/validate_all_scripts.sh -v -f
 ```
 
@@ -196,8 +195,6 @@ bash /workspace/scripts/validate_all_scripts.sh -v -f
 
 ## Security Guidelines
 
-**詳細な security guidelines は `.github/instructions/general.instructions.md` を参照。**
-
 ### Shell Script Specific Security
 
 - 入力値は必ずバリデーションし、コマンドインジェクションを防ぐ
@@ -207,47 +204,32 @@ bash /workspace/scripts/validate_all_scripts.sh -v -f
 
 ## MCP Tools
 
-**詳細な MCP Tools の設定は `.github/instructions/general.instructions.md` を参照。**
+**詳細な MCP Tools の設定・使用方法は `.github/copilot-instructions.md` を参照。**
 
-スクリプト作業での主な活用：
+### Shell Script Specific Patterns
 
-### awslabs.aws-api-mcp-server (AWS CLI 自動化)
-
-**スクリプト内での AWS 操作パターン:**
+**AWS CLI 自動化でのコマンド検証:**
 
 ```bash
 # スクリプト設計前のコマンド確認
-mcp_awslabs_aws-a_suggest_aws_commands with query="List all S3 buckets with specific tags"
+suggest: "List all S3 buckets with specific tags"
 
 # 実際のコマンド実行例
-mcp_awslabs_aws-a_call_aws with cli_command="aws s3api list-buckets --region us-east-1"
+aws s3api list-buckets --region us-east-1
+aws s3 ls s3://terraform-state-bucket/ --region us-east-1
 ```
 
-**Terraform スクリプトでの活用:**
+**DevOps ツール情報の活用:**
 
 ```
-# Terraformリソース確認
-mcp_awslabs_aws-a_suggest_aws_commands with query="Get Terraform state information for S3 backend"
+# Docker 最適化確認
+resolve: "docker" → get-docs: topic="multi-stage builds"
 
-# AWS CLIでの状態確認
-mcp_awslabs_aws-a_call_aws with cli_command="aws s3 ls s3://terraform-state-bucket/ --region us-east-1"
+# Kubernetes デプロイメント戦略
+resolve: "kubernetes" → get-docs: topic="deployment strategies"
 ```
 
-### context7 (ツール・フレームワーク情報)
-
-**DevOps ツールの使用方法確認:**
-
-```
-# Docker最適化の確認
-mcp_context7_resolve-library-id with libraryName="docker"
-mcp_context7_get-library-docs with context7CompatibleLibraryID="/docker/docker" and topic="multi-stage builds"
-
-# Kubernetesデプロイメント確認
-mcp_context7_resolve-library-id with libraryName="kubernetes"
-mcp_context7_get-library-docs with context7CompatibleLibraryID="/kubernetes/kubernetes" and topic="deployment strategies"
-```
-
-**シェルスクリプト品質向上での使用:**
+**品質向上のための活用:**
 
 - **セキュリティ**: AWS 操作前の権限・リージョン確認を自動化
 - **エラー処理**: 適切な exit code とログ出力の実装パターン確認

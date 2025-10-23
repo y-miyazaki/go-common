@@ -24,21 +24,21 @@ modules/**/.terraform.lock.hcl
 *.tfstate.*
 # tfvars files
 *.tfvars
-# !terraform.example.tfvars
-# !terraform.dev.tfvars
-# !terraform.qa.tfvars
-# !terraform.stg.tfvars
-# !terraform.prd.tfvars
-# !terraform.root.tfvars
-# !terraform.audit.tfvars
+!terraform.example.tfvars
+!terraform.dev.tfvars
+!terraform.qa.tfvars
+!terraform.stg.tfvars
+!terraform.prd.tfvars
+!terraform.root.tfvars
+!terraform.audit.tfvars
 *.tfbackend
-# !terraform.example.tfbackend
-# !terraform.dev.tfbackend
-# !terraform.qa.tfbackend
-# !terraform.stg.tfbackend
-# !terraform.prd.tfbackend
-# !terraform.root.tfbackend
-# !terraform.audit.tfbackend
+!terraform.example.tfbackend
+!terraform.dev.tfbackend
+!terraform.qa.tfbackend
+!terraform.stg.tfbackend
+!terraform.prd.tfbackend
+!terraform.root.tfbackend
+!terraform.audit.tfbackend
 
 # go
 vendor
@@ -51,10 +51,12 @@ cover.out
 node_modules
 outputs
 !lambda/outputs
+!nodejs/*/nodejs/node_modules
 
 # mcp
 .serena
 
-# other
-db/migrations
-db/dbconfig.yaml
+# python
+__pycache__
+.Python
+.venv

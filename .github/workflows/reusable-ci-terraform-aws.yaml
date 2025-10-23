@@ -33,7 +33,7 @@ env:
   COMPONENT: ${{ inputs.component }}
   TERRAFORM_PATH: ${{ inputs.terraform_path }}
   TERRAFORM_VERSION: "1.12.2"
-  TFLINT_VERSION: "v0.44.1"
+  TFLINT_VERSION: "v0.59.1"
   TFCMT_VERSION: "4.5.1"
 
 jobs:
@@ -42,6 +42,8 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.environment }}
+    outputs:
+      tf_init_cache_key: ${{ steps.compute-init-cache-key.outputs.key }}
     permissions:
       id-token: write
       contents: read
@@ -65,6 +67,10 @@ jobs:
           echo 'plugin_cache_dir="$HOME/.terraform.d/plugin-cache"' >~/.terraformrc
           mkdir --parents ~/.terraform.d/plugin-cache
 
+      - name: Compute Terraform init cache key
+        id: compute-init-cache-key
+        run: echo "key=terraform-init-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/terraform.{1}.tfbackend', env.TERRAFORM_PATH, env.ENV), format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH), format('{0}/**/*.tf', env.TERRAFORM_PATH), 'modules/**/*.tf') }}" >> $GITHUB_OUTPUT
+
       - name: Cache Terraform Plugins
         uses: actions/cache@v4
         with:
@@ -80,7 +86,7 @@ jobs:
           path: |
             ${{ env.TERRAFORM_PATH }}/.terraform
             ${{ env.TERRAFORM_PATH }}/.terraform.lock.hcl
-          key: terraform-init-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/terraform.{1}.tfbackend', env.TERRAFORM_PATH, env.ENV), format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH), format('{0}/**/*.tf', env.TERRAFORM_PATH), 'modules/**/*.tf') }}
+          key: ${{ steps.compute-init-cache-key.outputs.key }}
 
       - name: Exec Terraform init
         id: init
@@ -98,7 +104,7 @@ jobs:
           path: |
             ${{ env.TERRAFORM_PATH }}/.terraform
             ${{ env.TERRAFORM_PATH }}/.terraform.lock.hcl
-          key: terraform-init-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/terraform.{1}.tfbackend', env.TERRAFORM_PATH, env.ENV), format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH), format('{0}/**/*.tf', env.TERRAFORM_PATH), 'modules/**/*.tf') }}
+          key: ${{ steps.compute-init-cache-key.outputs.key }}
 
   lint:
     if: ${{ github.actor != 'dependabot[bot]' }}
@@ -110,13 +116,28 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v5
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform fmt check
+        run: terraform -chdir=${{ env.TERRAFORM_PATH }} fmt -check -recursive
+
+      - name: Terraform validate
+        run: |
+          terraform -chdir=${{ env.TERRAFORM_PATH }} init -backend=false -reconfigure
+          terraform -chdir=${{ env.TERRAFORM_PATH }} validate
+
       - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v5
+        uses: terraform-linters/setup-tflint@v6.2.0
         with:
           tflint_version: ${{ env.TFLINT_VERSION }}
+          cache: true
+          tflint_config_path: ${{ env.TERRAFORM_PATH }}/.tflint.hcl
 
       - name: Exec TFLint (Modules)
-        run: tflint -f compact --chdir ./modules --module
+        run: tflint -f compact --chdir ./modules --call-module-type=all
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -204,7 +225,7 @@ jobs:
           path: |
             ${{ env.TERRAFORM_PATH }}/.terraform
             ${{ env.TERRAFORM_PATH }}/.terraform.lock.hcl
-          key: terraform-init-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/terraform.{1}.tfbackend', env.TERRAFORM_PATH, env.ENV), format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH), format('{0}/**/*.tf', env.TERRAFORM_PATH), 'modules/**/*.tf') }}
+          key: ${{ needs.init.outputs.tf_init_cache_key }}
 
       - name: Exec Terraform init - if cache miss
         run: |

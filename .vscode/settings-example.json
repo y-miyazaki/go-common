@@ -67,25 +67,33 @@
   // ------------------------------------------------------------
   // GitHub Copilot
   // ------------------------------------------------------------
+  "chat.agent.enabled": true,
+
+  "chat.mcp.access": "all",
+  "chat.mcp.autostart": "onlyNew",
+  "chat.mcp.discovery.enabled": {
+    "claude-desktop": true,
+    "windsurf": true,
+    "cursor-global": true,
+    "cursor-workspace": true
+},
   "chat.tools.terminal.autoApprove": {
     "/.*/": true,
     "rm": false,
     "git add": false,
     "git commit": false
   },
-  "chat.agent.enabled": true,
-  "chat.mcp.autostart": "onlyNew",
-  "chat.mcp.enabled": true,
-  "chat.mcp.discovery.enabled": true,
   "editor.inlineSuggest.enabled": true,
   "github.copilot.chat.agent.autoFix": true,
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
   "github.copilot.chat.commitMessageGeneration.instructions": [
     {
-      "file": ".github/instructions/general.instructions.md"
+      "file": ".github/copilot-instructions.md"
     }
   ],
   "github.copilot.chat.localeOverride": "ja",
   "github.copilot.chat.newWorkspace.useContext7": true,
+  "github.copilot.chat.virtualTools.threshold": 128,
   "github.copilot.enable": {
     "*": true,
     "go": true,
