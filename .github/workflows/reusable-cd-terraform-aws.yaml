@@ -13,10 +13,20 @@ on:
         description: "Target environment (dev, qa, stg, prd, audit, root)"
         required: true
         type: string
+      plan:
+        description: "Execute terraform plan"
+        required: false
+        type: boolean
+        default: false
       terraform_path:
         description: "Path to terraform configuration"
         required: true
         type: string
+      terraform_version:
+        description: "Terraform version to use"
+        required: false
+        type: string
+        default: "1.12.2"
     secrets:
       AWS_IAM_ROLE_ARN:
         required: true
@@ -24,56 +34,62 @@ on:
         required: true
 
 env:
-  ENV: ${{ inputs.environment }}
   COMPONENT: ${{ inputs.component }}
+  ENVIRONMENT: ${{ inputs.environment }}
   TERRAFORM_PATH: ${{ inputs.terraform_path }}
-  TERRAFORM_VERSION: "1.12.2"
+  TERRAFORM_VERSION: ${{ inputs.terraform_version }}
 
 jobs:
   init:
+    if: ${{ github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.environment }}
     outputs:
       tf_init_cache_key: ${{ steps.compute-init-cache-key.outputs.key }}
+      tf_plugin_cache_key: ${{ steps.compute-plugin-cache-key.outputs.key }}
     permissions:
-      id-token: write
       contents: read
+      id-token: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v5
+      - name: Setup AWS Credentials
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v5.1.0
         with:
           role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - name: Config Terraform plugin cache
+      - name: Setup Terraform plugin cache
         run: |
           echo 'plugin_cache_dir="$HOME/.terraform.d/plugin-cache"' >~/.terraformrc
           mkdir --parents ~/.terraform.d/plugin-cache
 
-      - name: Compute Terraform init cache key
-        id: compute-init-cache-key
-        run: echo "key=terraform-init-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/terraform.{1}.tfbackend', env.TERRAFORM_PATH, env.ENV), format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH), format('{0}/**/*.tf', env.TERRAFORM_PATH), 'modules/**/*.tf') }}" >> $GITHUB_OUTPUT
+      - name: Setup Terraform plugin cache key
+        id: compute-plugin-cache-key
+        run: echo "key=terraform-plugin-cache-${{ env.ENVIRONMENT }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH)) }}" >> $GITHUB_OUTPUT
 
-      - name: Cache Terraform Plugins
-        uses: actions/cache@v4
+      - name: Setup Terraform init cache key
+        id: compute-init-cache-key
+        run: echo "key=terraform-init-${{ env.ENVIRONMENT }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/terraform.{1}.tfbackend', env.TERRAFORM_PATH, env.ENVIRONMENT), format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH), format('{0}/**/*.tf', env.TERRAFORM_PATH), 'modules/**/*.tf') }}" >> $GITHUB_OUTPUT
+
+      - name: Restore Cache Terraform plugin cache
+        id: restore-terraform-plugin-cache
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             ~/.terraform.d/plugin-cache
-          key: ${{ runner.os }}-terraform-${{ env.COMPONENT }}-${{ hashFiles('**/.terraform.lock.hcl') }}
-          restore-keys: |
-            ${{ runner.os }}-terraform-${{ env.COMPONENT }}-
+          key: ${{ steps.compute-plugin-cache-key.outputs.key }}
 
-      - name: Restore Terraform init results
-        uses: actions/cache/restore@v4
+      - name: Restore Cache Terraform init
+        id: restore-terraform-init
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             ${{ env.TERRAFORM_PATH }}/.terraform
@@ -84,14 +100,23 @@ jobs:
         id: init
         run: |
           if [ ! -d "${{ env.TERRAFORM_PATH }}/.terraform" ]; then
-            echo "Cache miss - initializing Terraform for ${{ env.COMPONENT }}"
-            terraform -chdir=${{ env.TERRAFORM_PATH }} init -reconfigure -backend-config=terraform."${{ env.ENV }}".tfbackend
+            echo "Cache miss or incomplete modules - initializing Terraform for ${{ env.COMPONENT }}"
+            terraform -chdir=${{ env.TERRAFORM_PATH }} init -reconfigure -backend-config=terraform."${{ env.ENVIRONMENT }}".tfbackend
           else
             echo "Cache hit - skipping Terraform init for ${{ env.COMPONENT }}"
           fi
 
-      - name: Cache Terraform init results
-        uses: actions/cache/save@v4
+      - name: Save Cache Terraform plugin cache
+        if: ${{ steps.restore-terraform-plugin-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            ~/.terraform.d/plugin-cache
+          key: ${{ steps.compute-plugin-cache-key.outputs.key }}
+
+      - name: Save Cache Terraform init
+        if: ${{ steps.restore-terraform-init.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             ${{ env.TERRAFORM_PATH }}/.terraform
@@ -105,57 +130,62 @@ jobs:
     environment:
       name: ${{ inputs.environment }}
     permissions:
-      id-token: write
       contents: read
+      id-token: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v5
+      - name: Setup AWS Credentials
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v5.1.0
         with:
           role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - name: Config Terraform plugin cache
+      - name: Setup Terraform plugin cache
         run: |
           echo 'plugin_cache_dir="$HOME/.terraform.d/plugin-cache"' >~/.terraformrc
           mkdir --parents ~/.terraform.d/plugin-cache
 
-      - name: Cache Terraform Plugins
-        uses: actions/cache@v4
+      - name: Restore Cache Terraform plugin cache
+        id: restore-terraform-plugin-cache
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             ~/.terraform.d/plugin-cache
-          key: ${{ runner.os }}-terraform-${{ env.COMPONENT }}-${{ hashFiles('**/.terraform.lock.hcl') }}
-          restore-keys: |
-            ${{ runner.os }}-terraform-${{ env.COMPONENT }}-
+          key: ${{ needs.init.outputs.tf_plugin_cache_key }}
 
-      - name: Restore Terraform init results
-        uses: actions/cache/restore@v4
+      - name: Restore Cache Terraform init
+        id: restore-terraform-init
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             ${{ env.TERRAFORM_PATH }}/.terraform
             ${{ env.TERRAFORM_PATH }}/.terraform.lock.hcl
           key: ${{ needs.init.outputs.tf_init_cache_key }}
 
-      - name: Exec Terraform init - if cache miss
+      - name: Exec Terraform init
+        id: init
         run: |
           if [ ! -d "${{ env.TERRAFORM_PATH }}/.terraform" ]; then
-            terraform -chdir=${{ env.TERRAFORM_PATH }} init -reconfigure -backend-config=terraform."${{ env.ENV }}".tfbackend
+            echo "Cache miss or incomplete modules - initializing Terraform for ${{ env.COMPONENT }}"
+            terraform -chdir=${{ env.TERRAFORM_PATH }} init -reconfigure -backend-config=terraform."${{ env.ENVIRONMENT }}".tfbackend
+          else
+            echo "Cache hit - skipping Terraform init for ${{ env.COMPONENT }}"
           fi
 
       - name: Exec Terraform plan
+        if: ${{ inputs.plan == true }}
         id: plan
         shell: bash
-        run: terraform -chdir=${{ env.TERRAFORM_PATH }} plan -lock=false -var-file=terraform."${{ env.ENV }}".tfvars
+        run: terraform -chdir=${{ env.TERRAFORM_PATH }} plan -lock=false -var-file=terraform."${{ env.ENVIRONMENT }}".tfvars
 
       - name: Exec Terraform apply
         id: apply
         shell: bash
-        run: terraform -chdir=${{ env.TERRAFORM_PATH }} apply --auto-approve -var-file=terraform."${{ env.ENV }}".tfvars
+        run: terraform -chdir=${{ env.TERRAFORM_PATH }} apply --auto-approve -var-file=terraform."${{ env.ENVIRONMENT }}".tfvars

@@ -76,7 +76,7 @@
     "windsurf": true,
     "cursor-global": true,
     "cursor-workspace": true
-},
+  },
   "chat.tools.terminal.autoApprove": {
     "/.*/": true,
     "rm": false,
@@ -320,7 +320,7 @@
   // ------------------------------------------------------------
   // for Shell Script
   // ------------------------------------------------------------
-  "shellformat.flag": "-i 2 -ci -bn -sr",
+  "shellformat.flag": "-i 4 -ci -bn -sr",
   "shellcheck.enable": true,
   "shellcheck.useWorkspaceRootAsCwd": true,
   "shellcheck.run": "onSave",
@@ -329,7 +329,7 @@
     "**/*.zsh": true,
     "**/*.fish": true
   },
-  "shellcheck.customArgs": ["-x"],
+  "shellcheck.customArgs": ["-x -e SC1091"],
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format",
     "editor.formatOnSave": true,

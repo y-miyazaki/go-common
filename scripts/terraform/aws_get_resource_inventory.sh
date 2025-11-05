@@ -239,7 +239,7 @@ function collect_acm_inventory {
         # Get certificate details for creation date
         local cert_details cert_arn
         cert_arn=$(extract_jq_value "$cert_data" '.CertificateArn')
-        cert_details=$(aws acm describe-certificate --certificate-arn "$cert_arn" --region "$region" 2>/dev/null || echo '{}')
+        cert_details=$(aws acm describe-certificate --certificate-arn "$cert_arn" --region "$region" 2> /dev/null || echo '{}')
         cert_created=$(extract_jq_value "$cert_details" '.Certificate.CreatedAt')
 
         buffer+="acm,Certificate,,${region},${cert_name},${cert_arn},${cert_status},${cert_type},${cert_created}\n"
@@ -272,7 +272,7 @@ function collect_alb_inventory {
         alb_type=$(extract_jq_value "$alb_data" '.Type')
         alb_state=$(extract_jq_value "$alb_data" '.State.Code')
         alb_created=$(extract_jq_value "$alb_data" '.CreatedTime')
-        alb_waf=$(extract_jq_value "$(aws wafv2 get-web-acl-for-resource --resource-arn "$alb_arn" --region "$region" 2>/dev/null || echo '{}')" '.WebACL.ARN')
+        alb_waf=$(extract_jq_value "$(aws wafv2 get-web-acl-for-resource --resource-arn "$alb_arn" --region "$region" 2> /dev/null || echo '{}')" '.WebACL.ARN')
         buffer+="alb,LoadBalancer,,${region},$alb_name,$alb_arn,$alb_dns,$alb_type,$alb_waf,,,,,$alb_state,$alb_created\n"
 
         # Target Groups
@@ -286,7 +286,7 @@ function collect_alb_inventory {
             tg_port=$(extract_jq_value "$tg_data" '.Port')
             tg_health_check=$(extract_jq_value "$tg_data" '.HealthCheckPath')
             buffer+="alb,,TargetGroup,${region},$tg_name,$tg_arn,,$tg_type,,$tg_protocol,$tg_port,$tg_health_check,,,\n"
-        done < <(aws elbv2 describe-target-groups --load-balancer-arn "$alb_arn" --region "$region" 2>/dev/null | jq -c '.TargetGroups[]?' || echo "")
+        done < <(aws elbv2 describe-target-groups --load-balancer-arn "$alb_arn" --region "$region" 2> /dev/null | jq -c '.TargetGroups[]?' || echo "")
 
         # Listeners
         while IFS= read -r listener_data; do
@@ -297,7 +297,7 @@ function collect_alb_inventory {
             listener_port=$(extract_jq_value "$listener_data" '.Port')
             listener_ssl_policy=$(extract_jq_value "$listener_data" '.SslPolicy')
             buffer+="alb,,Listener,${region},${listener_protocol}:${listener_port},$listener_arn,,,,$listener_protocol,$listener_port,,$listener_ssl_policy,,\n"
-        done < <(aws elbv2 describe-listeners --load-balancer-arn "$alb_arn" --region "$region" 2>/dev/null | jq -c '.Listeners[]?' || echo "")
+        done < <(aws elbv2 describe-listeners --load-balancer-arn "$alb_arn" --region "$region" 2> /dev/null | jq -c '.Listeners[]?' || echo "")
     done < <(aws elbv2 describe-load-balancers --region "$region" | jq -c '.LoadBalancers[]')
 
     echo "$buffer"
@@ -329,7 +329,7 @@ function collect_apigateway_inventory {
         # Get WAF association for REST API - directly from stage data
         api_waf=""
         local stages_data
-        stages_data=$(aws apigateway get-stages --rest-api-id "$api_id" --region "$region" 2>/dev/null || echo '{"item":[]}')
+        stages_data=$(aws apigateway get-stages --rest-api-id "$api_id" --region "$region" 2> /dev/null || echo '{"item":[]}')
         if [[ "$stages_data" != '{"item":[]}' ]]; then
             api_waf=$(extract_jq_value "$stages_data" '.item[]?.webAclArn')
         fi
@@ -348,7 +348,7 @@ function collect_apigateway_inventory {
         # Get WAF association for HTTP API - directly from stage data
         api_waf=""
         local http_stages_data
-        http_stages_data=$(aws apigatewayv2 get-stages --api-id "$api_id" --region "$region" 2>/dev/null || echo '{"Items":[]}')
+        http_stages_data=$(aws apigatewayv2 get-stages --api-id "$api_id" --region "$region" 2> /dev/null || echo '{"Items":[]}')
         if [[ "$http_stages_data" != '{"Items":[]}' ]]; then
             api_waf=$(extract_jq_value "$http_stages_data" '.Items[]?.WebAclArn')
         fi
@@ -424,7 +424,7 @@ function collect_bedrock_inventory {
 
         buffer+="bedrock,FoundationModel,,${region},$model_name,$model_id,$model_provider,$model_input_modalities,$model_output_modalities\n"
         # Removed count increment (not used)
-    done < <(aws bedrock list-foundation-models --region "$region" 2>/dev/null | jq -c '.modelSummaries[]?' || true)
+    done < <(aws bedrock list-foundation-models --region "$region" 2> /dev/null | jq -c '.modelSummaries[]?' || true)
 
     # List custom models
     while IFS= read -r custom_model_data; do
@@ -436,7 +436,7 @@ function collect_bedrock_inventory {
 
         buffer+="bedrock,CustomModel,,${region},$custom_model_name,$custom_model_arn,$custom_model_status,\n"
         # Removed count increment (not used)
-    done < <(aws bedrock list-custom-models --region "$region" 2>/dev/null | jq -c '.modelSummaries[]?' || true)
+    done < <(aws bedrock list-custom-models --region "$region" 2> /dev/null | jq -c '.modelSummaries[]?' || true)
 
     # List model customization jobs
     while IFS= read -r job_data; do
@@ -448,7 +448,7 @@ function collect_bedrock_inventory {
 
         buffer+="bedrock,CustomizationJob,,${region},$job_name,$job_arn,$job_status,\n"
         # Removed count increment (not used)
-    done < <(aws bedrock list-model-customization-jobs --region "$region" 2>/dev/null | jq -c '.modelCustomizationJobSummaries[]?' || true)
+    done < <(aws bedrock list-model-customization-jobs --region "$region" 2> /dev/null | jq -c '.modelCustomizationJobSummaries[]?' || true)
 
     echo "$buffer"
 }
@@ -486,7 +486,7 @@ function collect_cloudfront_inventory {
 
         # Get WAF WebACLId from distribution config
         local dist_config_json dist_web_acl_id
-        dist_config_json=$(aws cloudfront get-distribution-config --id "$dist_id" 2>/dev/null)
+        dist_config_json=$(aws cloudfront get-distribution-config --id "$dist_id" 2> /dev/null)
         dist_web_acl_id=$(extract_jq_value "$dist_config_json" '.DistributionConfig.WebACLId')
         dist_waf_arn="$dist_web_acl_id"
 
@@ -529,7 +529,7 @@ function collect_cloudwatch_alarms_inventory {
 
         buffer+="cloudwatch,Alarm,,${region},$alarm_name,$alarm_arn,$alarm_metric_name,$alarm_namespace,$alarm_statistic,$alarm_threshold,$alarm_comparison_operator,$alarm_evaluation_periods,$alarm_period,$alarm_treat_missing_data,$alarm_state\n"
 
-    done < <(aws cloudwatch describe-alarms --region "$region" 2>/dev/null | jq -c '.MetricAlarms[], .CompositeAlarms[]' || true)
+    done < <(aws cloudwatch describe-alarms --region "$region" 2> /dev/null | jq -c '.MetricAlarms[], .CompositeAlarms[]' || true)
 
     echo "$buffer"
 }
@@ -564,12 +564,12 @@ function collect_cloudwatch_logs_inventory {
 
         # Convert Unix timestamp to readable format if needed
         if [[ "$log_group_creation_time" =~ ^[0-9]+$ ]]; then
-            log_group_creation_time=$(date -d "@$((log_group_creation_time / 1000))" '+%Y-%m-%d %H:%M:%S' 2>/dev/null || echo "$log_group_creation_time")
+            log_group_creation_time=$(date -d "@$((log_group_creation_time / 1000))" '+%Y-%m-%d %H:%M:%S' 2> /dev/null || echo "$log_group_creation_time")
         fi
 
         buffer+="cloudwatch,LogGroup,,${region},$log_group_name,$log_group_arn,$log_group_retention,$log_group_stored_bytes,$log_group_metric_filter_count,$log_group_subscription_filter_count,$log_group_kms_key_id,$log_group_creation_time\n"
 
-    done < <(aws logs describe-log-groups --region "$region" 2>/dev/null | jq -c '.logGroups[]' || true)
+    done < <(aws logs describe-log-groups --region "$region" 2> /dev/null | jq -c '.logGroups[]' || true)
 
     echo "$buffer"
 }
@@ -662,7 +662,7 @@ function collect_ecr_inventory {
         repo_name=$(extract_jq_value "$repo_data" '.repositoryName')
         repo_uri=$(extract_jq_value "$repo_data" '.repositoryUri')
         repo_created=$(extract_jq_value "$repo_data" '.createdAt')
-        repo_image_count=$(extract_jq_value "$(aws ecr describe-images --repository-name "$repo_name" --region "$region" 2>/dev/null || echo '{}')" '.imageDetails | length' '0')
+        repo_image_count=$(extract_jq_value "$(aws ecr describe-images --repository-name "$repo_name" --region "$region" 2> /dev/null || echo '{}')" '.imageDetails | length' '0')
         buffer+="ecr,Repository,,${region},$repo_name,$repo_uri,$repo_image_count,$repo_created\n"
     done < <(aws ecr describe-repositories --region "$region" | jq -c '.repositories[]')
 
@@ -693,7 +693,7 @@ function collect_ecs_inventory {
 
     # Get all clusters first
     local cluster_arns_raw
-    cluster_arns_raw=$(aws ecs list-clusters --region "$region" --query 'clusterArns[]' --output text 2>/dev/null || true)
+    cluster_arns_raw=$(aws ecs list-clusters --region "$region" --query 'clusterArns[]' --output text 2> /dev/null || true)
     if [[ -z "$cluster_arns_raw" || "$cluster_arns_raw" == "None" ]]; then
         echo ""
         return 0
@@ -703,7 +703,7 @@ function collect_ecs_inventory {
 
     # 事前にEventBridgeルールをregion単位で収集
     local eventbridge_rules
-    eventbridge_rules=$(aws events list-rules --region "$region" --query "Rules[?State==\`ENABLED\`]" --output json 2>/dev/null || echo "[]")
+    eventbridge_rules=$(aws events list-rules --region "$region" --query "Rules[?State==\`ENABLED\`]" --output json 2> /dev/null || echo "[]")
 
     # 事前に全ScheduledTaskのターゲット情報を取得
     declare -A scheduled_tasks_by_cluster
@@ -716,7 +716,7 @@ function collect_ecs_inventory {
             rule_state=$(extract_jq_value "$rule_data" '.State')
             rule_arn="arn:aws:events:${region}:${aws_account_id}:rule/${rule_name}"
             local rule_targets
-            rule_targets=$(aws events list-targets-by-rule --rule "$rule_name" --region "$region" 2>/dev/null || echo '{"Targets":[]}')
+            rule_targets=$(aws events list-targets-by-rule --rule "$rule_name" --region "$region" 2> /dev/null || echo '{"Targets":[]}')
             # ECSターゲットを配列化してforループで処理
             mapfile -t ecs_targets < <(echo "$rule_targets" | jq -c '.Targets[]? | select(.EcsParameters?)')
             for ecs_target in "${ecs_targets[@]}"; do
@@ -727,7 +727,7 @@ function collect_ecs_inventory {
                 if [[ -n "$task_def_arn" && "$task_def_arn" != "N/A" ]]; then
                     task_def_name=$(basename "$task_def_arn" | cut -d':' -f1)
                     local task_def_details
-                    task_def_details=$(aws ecs describe-task-definition --task-definition "$task_def_name" --region "$region" --query 'taskDefinition' 2>/dev/null || echo '{}')
+                    task_def_details=$(aws ecs describe-task-definition --task-definition "$task_def_name" --region "$region" --query 'taskDefinition' 2> /dev/null || echo '{}')
                     task_role_arn=$(extract_jq_value "$task_def_details" '.taskRoleArn // .executionRoleArn')
                 else
                     task_def_arn="N/A"
@@ -746,7 +746,7 @@ function collect_ecs_inventory {
     while IFS= read -r cluster_arn; do
         [[ -z "$cluster_arn" || "$cluster_arn" == "None" ]] && continue
         local cluster_data
-        cluster_data=$(aws ecs describe-clusters --clusters "$cluster_arn" --region "$region" --query 'clusters[0]' 2>/dev/null) || continue
+        cluster_data=$(aws ecs describe-clusters --clusters "$cluster_arn" --region "$region" --query 'clusters[0]' 2> /dev/null) || continue
         local cluster_name cluster_status
         cluster_name=$(extract_jq_value "$cluster_data" '.clusterName')
         cluster_status=$(extract_jq_value "$cluster_data" '.status')
@@ -755,7 +755,7 @@ function collect_ecs_inventory {
 
         # Get services for this cluster
         local service_arns_raw
-        service_arns_raw=$(aws ecs list-services --cluster "$cluster_arn" --region "$region" --query 'serviceArns[]' --output text 2>/dev/null || true)
+        service_arns_raw=$(aws ecs list-services --cluster "$cluster_arn" --region "$region" --query 'serviceArns[]' --output text 2> /dev/null || true)
 
         if [[ -n "$service_arns_raw" && "$service_arns_raw" != "None" ]]; then
             # Convert tab-separated output to newline-separated
@@ -767,7 +767,7 @@ function collect_ecs_inventory {
 
                 # Get service details
                 local service_data
-                service_data=$(aws ecs describe-services --cluster "$cluster_arn" --services "$service_arn" --region "$region" --query 'services[0]' 2>/dev/null) || continue
+                service_data=$(aws ecs describe-services --cluster "$cluster_arn" --services "$service_arn" --region "$region" --query 'services[0]' 2> /dev/null) || continue
 
                 local service_name service_status service_desired service_running service_task_def service_role service_launch_type
                 service_name=$(extract_jq_value "$service_data" '.serviceName')
@@ -787,7 +787,7 @@ function collect_ecs_inventory {
 
                     # Get task role from task definition
                     local task_def_details task_role_arn
-                    task_def_details=$(aws ecs describe-task-definition --task-definition "$service_task_def" --region "$region" --query 'taskDefinition' 2>/dev/null || echo '{}')
+                    task_def_details=$(aws ecs describe-task-definition --task-definition "$service_task_def" --region "$region" --query 'taskDefinition' 2> /dev/null || echo '{}')
                     task_role_arn=$(extract_jq_value "$task_def_details" '.taskRoleArn // .executionRoleArn')
                     service_role="$task_role_arn"
                 else
@@ -799,7 +799,7 @@ function collect_ecs_inventory {
                 # Service row: Category,Subcategory,Subsubcategory,Region,Name,ARN,Role,TaskDefinition,LaunchType,Status,CronSchedule,Spec,RuntimePlatform
                 # For services, CronSchedule and RuntimePlatform are empty
                 current_cluster_output+="ecs,,Service,${region},$service_name,$service_arn,$service_role,$service_task_def_arn,$service_launch_type,$service_status_detail,,,,,\n"
-            done <<<"$service_arns"
+            done <<< "$service_arns"
         fi
 
         # クラスタ直下にScheduledTask出力
@@ -807,7 +807,7 @@ function collect_ecs_inventory {
             current_cluster_output+="${scheduled_tasks_by_cluster[$cluster_arn]}"
         fi
         buffer+="$current_cluster_output"
-    done <<<"$cluster_arns"
+    done <<< "$cluster_arns"
 
     # Collect all Task Definition families (latest revision only, no duplicates)
     # Get unique task definition families first, then get latest revision for each
@@ -820,7 +820,7 @@ function collect_ecs_inventory {
         if [[ -z "${task_def_families[$family_name]:-}" ]]; then
             task_def_families[$family_name]="$task_def_arn"
         fi
-    done < <(aws ecs list-task-definitions --region "$region" --query 'taskDefinitionArns[]' --output text 2>/dev/null | tr '\t' '\n')
+    done < <(aws ecs list-task-definitions --region "$region" --query 'taskDefinitionArns[]' --output text 2> /dev/null | tr '\t' '\n')
 
     # Process each unique task definition family (latest revision only)
     for family_name in "${!task_def_families[@]}"; do
@@ -830,7 +830,7 @@ function collect_ecs_inventory {
         local task_def_details task_def_status task_role_arn task_def_cpu task_def_memory task_def_network_mode task_def_requires_attributes task_def_revision
 
         # Get detailed task definition information for the latest revision
-        task_def_details=$(aws ecs describe-task-definition --task-definition "$family_name" --region "$region" --query 'taskDefinition' 2>/dev/null || echo '{}')
+        task_def_details=$(aws ecs describe-task-definition --task-definition "$family_name" --region "$region" --query 'taskDefinition' 2> /dev/null || echo '{}')
 
         if [[ "$task_def_details" != "{}" ]]; then
             task_def_status=$(extract_jq_value "$task_def_details" '.status')
@@ -856,14 +856,14 @@ function collect_ecs_inventory {
 
             # Get port mappings information
             local task_def_port_mappings
-            task_def_port_mappings=$(echo "$task_def_details" | jq -r '.containerDefinitions[]?.portMappings[]? | "\(.containerPort):\(.hostPort // "dynamic"):\(.protocol // "tcp")"' 2>/dev/null | paste -sd ',' - || echo "")
+            task_def_port_mappings=$(echo "$task_def_details" | jq -r '.containerDefinitions[]?.portMappings[]? | "\(.containerPort):\(.hostPort // "dynamic"):\(.protocol // "tcp")"' 2> /dev/null | paste -sd ',' - || echo "")
 
             # Apply normalize_csv_value to port mappings
             task_def_port_mappings=$(normalize_csv_value "$task_def_port_mappings")
 
             # Get environment variables information
             local task_def_environment
-            task_def_environment=$(echo "$task_def_details" | jq -r '.containerDefinitions[]?.environment[]? | "\(.name)=\(.value)"' 2>/dev/null | paste -sd $'\n' - || echo "")
+            task_def_environment=$(echo "$task_def_details" | jq -r '.containerDefinitions[]?.environment[]? | "\(.name)=\(.value)"' 2> /dev/null | paste -sd $'\n' - || echo "")
 
             # Apply normalize_csv_value to environment variables
             task_def_environment=$(normalize_csv_value "$task_def_environment")
@@ -924,11 +924,11 @@ function collect_efs_inventory {
             mt_state=$(extract_jq_value "$mt_data" '.LifeCycleState')
 
             # Get security groups for this mount target
-            mt_security_groups=$(extract_jq_value "$(aws efs describe-mount-target-security-groups --mount-target-id "$mt_id" --region "$region" 2>/dev/null || echo '{}')" '.SecurityGroups | join(",")')
+            mt_security_groups=$(extract_jq_value "$(aws efs describe-mount-target-security-groups --mount-target-id "$mt_id" --region "$region" 2> /dev/null || echo '{}')" '.SecurityGroups | join(",")')
 
             # MountTarget: Core info with empty fields for filesystem-specific and accesspoint-specific data
             buffer+="efs,MountTarget,,${region},$mt_id,$mt_id,MountTarget,,,,,$mt_subnet_id,$mt_ip,$mt_security_groups,,,,$mt_state,\n"
-        done < <(aws efs describe-mount-targets --file-system-id "$fs_id" --region "$region" 2>/dev/null | jq -c '.MountTargets[]' || true)
+        done < <(aws efs describe-mount-targets --file-system-id "$fs_id" --region "$region" 2> /dev/null | jq -c '.MountTargets[]' || true)
 
         # Get Access Points for this File System
         while IFS= read -r ap_data; do
@@ -948,9 +948,9 @@ function collect_efs_inventory {
 
             # AccessPoint: Core info with empty fields for filesystem-specific and mount-target-specific data
             buffer+="efs,AccessPoint,,${region},$ap_name,$ap_id,AccessPoint,,,,,,,,$ap_path,$ap_uid,$ap_gid,$ap_state,\n"
-        done < <(aws efs describe-access-points --file-system-id "$fs_id" --region "$region" 2>/dev/null | jq -c '.AccessPoints[]' || true)
+        done < <(aws efs describe-access-points --file-system-id "$fs_id" --region "$region" 2> /dev/null | jq -c '.AccessPoints[]' || true)
 
-    done < <(aws efs describe-file-systems --region "$region" 2>/dev/null | jq -c '.FileSystems[]' || true)
+    done < <(aws efs describe-file-systems --region "$region" 2> /dev/null | jq -c '.FileSystems[]' || true)
 
     echo "$buffer"
 }
@@ -982,7 +982,7 @@ function collect_eventbridge_inventory {
 
         # Get targets for this rule to determine role
         local targets_data rule_target_info
-        targets_data=$(aws events list-targets-by-rule --rule "$rule_name" --region "$region" 2>/dev/null || echo '{"Targets":[]}')
+        targets_data=$(aws events list-targets-by-rule --rule "$rule_name" --region "$region" 2> /dev/null || echo '{"Targets":[]}')
 
         # Get first target's role and ARN (automatically get N/A if empty)
         rule_role=$(extract_jq_value "$targets_data" '.Targets[0].RoleArn')
@@ -995,7 +995,7 @@ function collect_eventbridge_inventory {
         # Rule row: EventBridge Rule
         buffer+="eventbridge,Rule,,${region},$rule_name,$rule_arn,$rule_state,$rule_description,$rule_schedule,$rule_role,$rule_target_info\n"
 
-    done < <(aws events list-rules --region "$region" 2>/dev/null | jq -c '.Rules[]' || true)
+    done < <(aws events list-rules --region "$region" 2> /dev/null | jq -c '.Rules[]' || true)
 
     # Collect EventBridge Schedules (from EventBridge Scheduler)
     while IFS= read -r schedule_data; do
@@ -1007,7 +1007,7 @@ function collect_eventbridge_inventory {
 
         # Get detailed schedule information
         local schedule_details
-        schedule_details=$(aws scheduler get-schedule --name "$schedule_name" --region "$region" 2>/dev/null || echo '{}')
+        schedule_details=$(aws scheduler get-schedule --name "$schedule_name" --region "$region" 2> /dev/null || echo '{}')
 
         schedule_description=$(normalize_csv_value "$(extract_jq_value "$schedule_details" '.Description')")
         schedule_expression=$(extract_jq_value "$schedule_details" '.ScheduleExpression')
@@ -1024,7 +1024,7 @@ function collect_eventbridge_inventory {
         # Schedule row: EventBridge Scheduler
         buffer+="eventbridge,Scheduler,,${region},$schedule_name,$schedule_arn,$schedule_state,$schedule_description,$schedule_expression,$schedule_role,$schedule_target\n"
 
-    done < <(aws scheduler list-schedules --region "$region" 2>/dev/null | jq -c '.Schedules[]' || true)
+    done < <(aws scheduler list-schedules --region "$region" 2> /dev/null | jq -c '.Schedules[]' || true)
 
     echo "$buffer"
 }
@@ -1159,7 +1159,7 @@ function collect_kinesis_inventory {
     while IFS= read -r stream_name; do
         [[ -z "$stream_name" ]] && continue
         local stream_desc stream_arn stream_status stream_shards stream_retention stream_created
-        stream_desc=$(aws kinesis describe-stream --stream-name "$stream_name" --region "$region" 2>/dev/null || echo "{}")
+        stream_desc=$(aws kinesis describe-stream --stream-name "$stream_name" --region "$region" 2> /dev/null || echo "{}")
         stream_arn=$(extract_jq_value "$stream_desc" '.StreamDescription.StreamARN')
         stream_status=$(extract_jq_value "$stream_desc" '.StreamDescription.StreamStatus')
         stream_shards=$(extract_jq_value "$stream_desc" '.StreamDescription.Shards | length' '0')
@@ -1172,7 +1172,7 @@ function collect_kinesis_inventory {
     while IFS= read -r ds_name; do
         [[ -z "$ds_name" ]] && continue
         local firehose_data
-        firehose_data=$(aws firehose describe-delivery-stream --delivery-stream-name "$ds_name" --region "$region" 2>/dev/null)
+        firehose_data=$(aws firehose describe-delivery-stream --delivery-stream-name "$ds_name" --region "$region" 2> /dev/null)
         [[ -z "$firehose_data" ]] && continue
         local firehose_name firehose_arn firehose_status firehose_dest firehose_created firehose_last_update
         firehose_name=$(extract_jq_value "$firehose_data" '.DeliveryStreamDescription.DeliveryStreamName')
@@ -1209,7 +1209,7 @@ function collect_kms_inventory {
 
         # Get detailed key information
         local key_details
-        key_details=$(aws kms describe-key --key-id "$key_id" --region "$region" 2>/dev/null || echo '{"KeyMetadata":{}}')
+        key_details=$(aws kms describe-key --key-id "$key_id" --region "$region" 2> /dev/null || echo '{"KeyMetadata":{}}')
 
         key_arn=$(extract_jq_value "$key_details" '.KeyMetadata.Arn')
         key_description=$(normalize_csv_value "$(extract_jq_value "$key_details" '.KeyMetadata.Description')")
@@ -1221,7 +1221,7 @@ function collect_kms_inventory {
         key_manager=$(extract_jq_value "$key_details" '.KeyMetadata.KeyManager')
 
         # Check for aliases and use alias name if available
-        key_aliases=$(extract_jq_value "$(aws kms list-aliases --key-id "$key_id" --region "$region" 2>/dev/null || echo '{}')" '.Aliases[0].AliasName')
+        key_aliases=$(extract_jq_value "$(aws kms list-aliases --key-id "$key_id" --region "$region" 2> /dev/null || echo '{}')" '.Aliases[0].AliasName')
 
         if [[ -n "$key_aliases" && "$key_aliases" != "N/A" ]]; then
             key_name="$key_aliases"
@@ -1265,7 +1265,7 @@ function collect_lambda_inventory {
 
         # 環境変数を1セルにまとめて出力（改行区切り、PRIVATE_KEYはマスク）
         local func_env_vars_raw=""
-        if echo "$func_data" | jq -e '.Environment.Variables' >/dev/null 2>&1; then
+        if echo "$func_data" | jq -e '.Environment.Variables' > /dev/null 2>&1; then
             while IFS= read -r env_pair; do
                 [[ -z "$env_pair" ]] && continue
                 local env_key env_value
@@ -1278,7 +1278,7 @@ function collect_lambda_inventory {
                     func_env_vars_raw+=$'\n'
                 fi
                 func_env_vars_raw+="${env_key}=${env_value}"
-            done < <(echo "$func_data" | jq -r '.Environment.Variables | to_entries[] | "\(.key)=\(.value)"' 2>/dev/null)
+            done < <(echo "$func_data" | jq -r '.Environment.Variables | to_entries[] | "\(.key)=\(.value)"' 2> /dev/null)
         fi
         func_env_vars=$(normalize_csv_value "$func_env_vars_raw")
 
@@ -1311,7 +1311,7 @@ function collect_quicksight_inventory {
         ds_type=$(extract_jq_value "$ds_data" '.Type')
         ds_status=$(extract_jq_value "$ds_data" '.Status')
         buffer+="quicksight,DataSource,,${region},$ds_name,$ds_id,$ds_type,$ds_status,N/A\n"
-    done < <(aws quicksight list-data-sources --aws-account-id "$(get_aws_account_id 2>/dev/null || echo 'unknown')" --region "$region" 2>/dev/null | jq -c '.DataSources[]' || true)
+    done < <(aws quicksight list-data-sources --aws-account-id "$(get_aws_account_id 2> /dev/null || echo 'unknown')" --region "$region" 2> /dev/null | jq -c '.DataSources[]' || true)
 
     while IFS= read -r analysis_data; do
         [[ -z "$analysis_data" ]] && continue
@@ -1322,7 +1322,7 @@ function collect_quicksight_inventory {
         analysis_status=$(extract_jq_value "$analysis_data" '.Status')
         analysis_created=$(extract_jq_value "$analysis_data" '.CreatedTime')
         buffer+="quicksight,Analysis,,${region},$analysis_name,$analysis_id,$analysis_status,$analysis_created\n"
-    done < <(aws quicksight list-analyses --aws-account-id "$(get_aws_account_id 2>/dev/null || echo 'unknown')" --region "$region" 2>/dev/null | jq -c '.AnalysisSummaryList[]' || true)
+    done < <(aws quicksight list-analyses --aws-account-id "$(get_aws_account_id 2> /dev/null || echo 'unknown')" --region "$region" 2> /dev/null | jq -c '.AnalysisSummaryList[]' || true)
 
     echo "$buffer"
 }
@@ -1609,7 +1609,7 @@ function collect_route53_inventory {
 
             # Record: TTL, RecordType, Value (empty fields for hostedzone-specific data)
             current_zone_output+="route53,,Record,Global,$record_name,,,,$record_ttl,$record_type,$record_values,\n"
-        done < <(aws route53 list-resource-record-sets --hosted-zone-id "$zone_id" 2>/dev/null | jq -c '.ResourceRecordSets[]?' || echo "")
+        done < <(aws route53 list-resource-record-sets --hosted-zone-id "$zone_id" 2> /dev/null | jq -c '.ResourceRecordSets[]?' || echo "")
 
         # Add this zone's data to overall output
         buffer+="$current_zone_output"
@@ -1648,20 +1648,20 @@ function collect_s3_inventory {
 
         bucket_name=$(extract_jq_value "$bucket_data" '.Name')
         bucket_created=$(extract_jq_value "$bucket_data" '.CreationDate')
-        bucket_region=$(extract_jq_value "$(aws s3api get-bucket-location --bucket "$bucket_name" 2>/dev/null || echo '{}')" '.LocationConstraint' 'us-east-1')
+        bucket_region=$(extract_jq_value "$(aws s3api get-bucket-location --bucket "$bucket_name" 2> /dev/null || echo '{}')" '.LocationConstraint' 'us-east-1')
 
         # Construct bucket ARN
         bucket_arn="arn:aws:s3:::${bucket_name}"
 
         # Get encryption
-        bucket_encryption=$(extract_jq_value "$(aws s3api get-bucket-encryption --bucket "$bucket_name" 2>/dev/null || echo '{}')" '.ServerSideEncryptionConfiguration.Rules[0].ApplyServerSideEncryptionByDefault.SSEAlgorithm' 'None')
+        bucket_encryption=$(extract_jq_value "$(aws s3api get-bucket-encryption --bucket "$bucket_name" 2> /dev/null || echo '{}')" '.ServerSideEncryptionConfiguration.Rules[0].ApplyServerSideEncryptionByDefault.SSEAlgorithm' 'None')
 
         # Get versioning
-        bucket_versioning=$(extract_jq_value "$(aws s3api get-bucket-versioning --bucket "$bucket_name" 2>/dev/null || echo '{}')" '.Status' 'Disabled')
+        bucket_versioning=$(extract_jq_value "$(aws s3api get-bucket-versioning --bucket "$bucket_name" 2> /dev/null || echo '{}')" '.Status' 'Disabled')
 
         # Get Public Access Block settings
         local pab_data
-        pab_data=$(aws s3api get-public-access-block --bucket "$bucket_name" 2>/dev/null | jq '.PublicAccessBlockConfiguration' 2>/dev/null || echo "null")
+        pab_data=$(aws s3api get-public-access-block --bucket "$bucket_name" 2> /dev/null | jq '.PublicAccessBlockConfiguration' 2> /dev/null || echo "null")
 
         # Parse each Public Access Block setting with defaults
         bucket_pab_block_public_acls=$(extract_jq_value "$pab_data" '.BlockPublicAcls' 'false')
@@ -1671,7 +1671,7 @@ function collect_s3_inventory {
 
         # Get access logging configuration
         local access_log_data bucket_access_log_bucket
-        access_log_data=$(aws s3api get-bucket-logging --bucket "$bucket_name" 2>/dev/null | jq '.LoggingEnabled' 2>/dev/null || echo "null")
+        access_log_data=$(aws s3api get-bucket-logging --bucket "$bucket_name" 2> /dev/null | jq '.LoggingEnabled' 2> /dev/null || echo "null")
         if [[ "$access_log_data" != "null" && -n "$access_log_data" ]]; then
             bucket_access_log_bucket=$(extract_jq_value "$access_log_data" '.TargetBucket')
             if [[ -n "$bucket_access_log_bucket" && "$bucket_access_log_bucket" != "N/A" ]]; then
@@ -1686,7 +1686,7 @@ function collect_s3_inventory {
 
         # Get lifecycle configuration with actual rule names
         local lifecycle_config lifecycle_rule_names
-        lifecycle_config=$(aws s3api get-bucket-lifecycle-configuration --bucket "$bucket_name" 2>/dev/null | jq '.Rules' 2>/dev/null || echo "null")
+        lifecycle_config=$(aws s3api get-bucket-lifecycle-configuration --bucket "$bucket_name" 2> /dev/null | jq '.Rules' 2> /dev/null || echo "null")
         if [[ "$lifecycle_config" != "null" && "$lifecycle_config" != "[]" ]]; then
             # Extract rule names or IDs
             lifecycle_rule_names=$(extract_jq_value "$lifecycle_config" '.[] | .ID' 'Unnamed')
@@ -1752,8 +1752,8 @@ function collect_sns_inventory {
         topic_arn=$(extract_jq_value "$topic_data" '.TopicArn')
         # Extract topic name from ARN (last part after the last colon)
         topic_name="${topic_arn##*:}"
-        topic_display_name=$(extract_jq_value "$(aws sns get-topic-attributes --topic-arn "$topic_arn" --region "$region" 2>/dev/null || echo '{}')" '.Attributes.DisplayName')
-        topic_subscriptions=$(extract_jq_value "$(aws sns list-subscriptions-by-topic --topic-arn "$topic_arn" --region "$region" 2>/dev/null || echo '{}')" '.Subscriptions | length' '0')
+        topic_display_name=$(extract_jq_value "$(aws sns get-topic-attributes --topic-arn "$topic_arn" --region "$region" 2> /dev/null || echo '{}')" '.Attributes.DisplayName')
+        topic_subscriptions=$(extract_jq_value "$(aws sns list-subscriptions-by-topic --topic-arn "$topic_arn" --region "$region" 2> /dev/null || echo '{}')" '.Subscriptions | length' '0')
         buffer+="sns,Topic,,${region},${topic_name},${topic_arn},${topic_display_name},${topic_subscriptions}\n"
         # Removed count increment (not used)
     done < <(aws sns list-topics --region "$region" | jq -c '.Topics[]')
@@ -1783,7 +1783,7 @@ function collect_sqs_inventory {
 
         # Get queue attributes
         local queue_attrs
-        queue_attrs=$(aws sqs get-queue-attributes --queue-url "$queue_url" --attribute-names All --region "$region" 2>/dev/null || echo '{"Attributes":{}}')
+        queue_attrs=$(aws sqs get-queue-attributes --queue-url "$queue_url" --attribute-names All --region "$region" 2> /dev/null || echo '{"Attributes":{}}')
 
         queue_type=$(extract_jq_value "$queue_attrs" '.Attributes.FifoQueue' 'false')
         if [[ "$queue_type" == "true" ]]; then
@@ -1813,10 +1813,10 @@ function collect_sqs_inventory {
 
         # Convert timestamps to readable format
         if [[ -n "$created_timestamp" && "$created_timestamp" =~ ^[0-9]+$ ]]; then
-            created_timestamp=$(date -d "@$created_timestamp" "+%Y-%m-%d %H:%M:%S" 2>/dev/null || echo "$created_timestamp")
+            created_timestamp=$(date -d "@$created_timestamp" "+%Y-%m-%d %H:%M:%S" 2> /dev/null || echo "$created_timestamp")
         fi
         if [[ -n "$last_modified_timestamp" && "$last_modified_timestamp" =~ ^[0-9]+$ ]]; then
-            last_modified_timestamp=$(date -d "@$last_modified_timestamp" "+%Y-%m-%d %H:%M:%S" 2>/dev/null || echo "$last_modified_timestamp")
+            last_modified_timestamp=$(date -d "@$last_modified_timestamp" "+%Y-%m-%d %H:%M:%S" 2> /dev/null || echo "$last_modified_timestamp")
         fi
         created_timestamp=$(normalize_csv_value "$created_timestamp")
         last_modified_timestamp=$(normalize_csv_value "$last_modified_timestamp")
@@ -1874,7 +1874,7 @@ function collect_vpc_inventory {
 
     # Collect all VPC data in a single call with tags
     local vpc_json
-    vpc_json=$(aws ec2 describe-vpcs --region "$region" 2>/dev/null) || return 0
+    vpc_json=$(aws ec2 describe-vpcs --region "$region" 2> /dev/null) || return 0
 
     if [[ $(extract_jq_value "$vpc_json" '.Vpcs | length' '0') -eq 0 ]]; then
         echo ""
@@ -1901,11 +1901,11 @@ function collect_vpc_inventory {
 
         # Get route tables for this VPC to help classify subnets
         local rt_json
-        rt_json=$(aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$vpc_id" --region "$region" 2>/dev/null) || true
+        rt_json=$(aws ec2 describe-route-tables --filters "Name=vpc-id,Values=$vpc_id" --region "$region" 2> /dev/null) || true
 
         # Collect and classify subnets for this VPC
         local subnet_json
-        subnet_json=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$vpc_id" --region "$region" 2>/dev/null) || true
+        subnet_json=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$vpc_id" --region "$region" 2> /dev/null) || true
 
         local public_subnets="" private_subnets=""
         while IFS= read -r subnet_data; do
@@ -1934,7 +1934,7 @@ function collect_vpc_inventory {
                     is_public=true
                     break
                 fi
-            done <<<"$subnet_rt_associations"
+            done <<< "$subnet_rt_associations"
 
             if [[ "$is_public" == "true" ]]; then
                 public_subnets+="vpc,,PublicSubnet,${region},${subnet_name},$subnet_id,,$subnet_cidr,\n"
@@ -1956,7 +1956,7 @@ function collect_vpc_inventory {
         # Collect internet gateways for this VPC
         local internet_gateways=""
         local igw_json
-        igw_json=$(aws ec2 describe-internet-gateways --filters "Name=attachment.vpc-id,Values=$vpc_id" --region "$region" 2>/dev/null) || true
+        igw_json=$(aws ec2 describe-internet-gateways --filters "Name=attachment.vpc-id,Values=$vpc_id" --region "$region" 2> /dev/null) || true
 
         while IFS= read -r igw_data; do
             [[ -z "$igw_data" ]] && continue
@@ -1969,7 +1969,7 @@ function collect_vpc_inventory {
         # Collect NAT gateways for this VPC
         local nat_gateways=""
         local nat_json
-        nat_json=$(aws ec2 describe-nat-gateways --filter "Name=vpc-id,Values=$vpc_id" --region "$region" 2>/dev/null) || true
+        nat_json=$(aws ec2 describe-nat-gateways --filter "Name=vpc-id,Values=$vpc_id" --region "$region" 2> /dev/null) || true
 
         while IFS= read -r nat_data; do
             [[ -z "$nat_data" ]] && continue
@@ -1983,7 +1983,7 @@ function collect_vpc_inventory {
         # Collect Network ACLs for this VPC
         local network_acls=""
         local nacl_json
-        nacl_json=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=$vpc_id" --region "$region" 2>/dev/null) || true
+        nacl_json=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=$vpc_id" --region "$region" 2> /dev/null) || true
         while IFS= read -r nacl_data; do
             [[ -z "$nacl_data" ]] && continue
             local nacl_id nacl_name nacl_desc nacl_entries nacl_associations
@@ -2002,7 +2002,7 @@ function collect_vpc_inventory {
         # Collect security groups for this VPC
         local security_groups=""
         local sg_json
-        sg_json=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$vpc_id" --region "$region" 2>/dev/null) || true
+        sg_json=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=$vpc_id" --region "$region" 2> /dev/null) || true
         while IFS= read -r sg_data; do
             [[ -z "$sg_data" ]] && continue
             local sg_id sg_name sg_desc sg_inbound sg_outbound
@@ -2021,7 +2021,7 @@ function collect_vpc_inventory {
         # Collect VPC endpoints for this VPC
         local endpoints=""
         local endpoint_json
-        endpoint_json=$(aws ec2 describe-vpc-endpoints --filters "Name=vpc-id,Values=$vpc_id" --region "$region" 2>/dev/null) || true
+        endpoint_json=$(aws ec2 describe-vpc-endpoints --filters "Name=vpc-id,Values=$vpc_id" --region "$region" 2> /dev/null) || true
         while IFS= read -r ep_data; do
             [[ -z "$ep_data" ]] && continue
             local ep_id ep_name ep_type ep_state ep_service ep_subnets ep_route_tables ep_security_groups ep_desc
@@ -2111,7 +2111,7 @@ function collect_aws_resources {
 
     # Get header from the first call
     local collect_function="collect_${category}_inventory"
-    if ! declare -f "$collect_function" >/dev/null; then
+    if ! declare -f "$collect_function" > /dev/null; then
         log "WARN" "Collection function $collect_function not found for category $category"
         return 1
     fi
@@ -2153,7 +2153,7 @@ function output_csv_data {
                 printf "%b" "$buffer"
             fi
             echo ""
-        } >>"$OUTPUT_FILE"
+        } >> "$OUTPUT_FILE"
     fi
     log "INFO" "$category inventory written to $OUTPUT_FILE"
 }
@@ -2215,13 +2215,13 @@ function main {
     fi
 
     # Initialize output file
-    true >"$OUTPUT_FILE"
+    true > "$OUTPUT_FILE"
 
     # Determine which categories to process
     local categories_to_process=()
     if [[ -n "$CATEGORIES" ]]; then
         # Split comma-separated categories into array
-        IFS=',' read -ra categories_to_process <<<"$CATEGORIES"
+        IFS=',' read -ra categories_to_process <<< "$CATEGORIES"
         log "INFO" "Processing specified categories: ${categories_to_process[*]}"
 
         # Validate specified categories

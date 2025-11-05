@@ -111,11 +111,11 @@ function find_shell_scripts {
                 if [[ -f "$script" ]]; then
                     scripts+=("$script")
                 fi
-            done < <(find "$search_path" -type f -name "*.sh" -print0 2>/dev/null)
+            done < <(find "$search_path" -type f -name "*.sh" -print0 2> /dev/null)
 
             # Find files with shell shebang but no .sh extension
             while IFS= read -r -d '' script; do
-                if [[ -f "$script" ]] && head -1 "$script" 2>/dev/null | grep -q "^#!/.*sh"; then
+                if [[ -f "$script" ]] && head -1 "$script" 2> /dev/null | grep -q "^#!/.*sh"; then
                     # Only add if not already in scripts array
                     local already_added=false
                     for existing in "${scripts[@]}"; do
@@ -128,7 +128,7 @@ function find_shell_scripts {
                         scripts+=("$script")
                     fi
                 fi
-            done < <(find "$search_path" -type f ! -name "*.sh" -executable -print0 2>/dev/null)
+            done < <(find "$search_path" -type f ! -name "*.sh" -executable -print0 2> /dev/null)
         else
             # Send debug log to stderr
             custom_log "DEBUG" "Search path does not exist or is not a directory: $search_path" >&2
@@ -153,7 +153,7 @@ function validate_syntax {
 
     custom_log "DEBUG" "Validating syntax for: $script_name"
 
-    if bash -n "$script" 2>/dev/null; then
+    if bash -n "$script" 2> /dev/null; then
         custom_log "DEBUG" "✅ Syntax validation passed: $script_name"
         return 0
     else
@@ -183,8 +183,8 @@ function auto_fix_formatting {
 
     custom_log "DEBUG" "Auto-fixing formatting for: $script_name"
 
-    if command -v shfmt &>/dev/null; then
-        if shfmt -w -i 4 -ci "$script" 2>/dev/null; then
+    if command -v shfmt &> /dev/null; then
+        if shfmt -w -i 4 -ci -bn -sr "$script" 2> /dev/null; then
             custom_log "INFO" "✅ Formatted with shfmt: $script_name"
             return 0
         else
@@ -213,10 +213,10 @@ function auto_fix_shellcheck {
 
     # Get shellcheck suggestions in diff format for auto-fixable issues
     local shellcheck_fixes
-    if shellcheck_fixes=$(shellcheck -e SC1091 -f diff "$script" 2>/dev/null); then
+    if shellcheck_fixes=$(shellcheck -e SC1091 -f diff "$script" 2> /dev/null); then
         if [[ -n "$shellcheck_fixes" ]]; then
             # Apply the diff patches
-            if echo "$shellcheck_fixes" | patch -p1 --silent 2>/dev/null; then
+            if echo "$shellcheck_fixes" | patch -p1 --silent 2> /dev/null; then
                 custom_log "INFO" "✅ Applied shellcheck fixes: $script_name"
                 return 0
             else
@@ -265,7 +265,7 @@ function validate_shebang {
     custom_log "DEBUG" "Validating shebang for: $script_name"
 
     local first_line
-    first_line=$(head -1 "$script" 2>/dev/null)
+    first_line=$(head -1 "$script" 2> /dev/null)
 
     if [[ "$first_line" =~ ^#!/.*sh ]]; then
         custom_log "DEBUG" "✅ Valid shebang: $script_name ($first_line)"
@@ -279,8 +279,8 @@ function validate_shebang {
             custom_log "INFO" "Auto-fixing shebang for: $script_name"
             # Create backup and add shebang
             cp "$script" "$script.bak"
-            echo "#!/bin/bash" >"$script.tmp"
-            cat "$script.bak" >>"$script.tmp"
+            echo "#!/bin/bash" > "$script.tmp"
+            cat "$script.bak" >> "$script.tmp"
             mv "$script.tmp" "$script"
             rm "$script.bak"
             custom_log "INFO" "✅ Added shebang to: $script_name"
@@ -328,7 +328,7 @@ function analyze_functions {
     custom_log "DEBUG" "Analyzing functions in: $script_name"
 
     local functions
-    functions=$(grep -n "^function\|^[a-zA-Z_][a-zA-Z0-9_]*\s*()" "$script" 2>/dev/null | head -10)
+    functions=$(grep -n "^function\|^[a-zA-Z_][a-zA-Z0-9_]*\s*()" "$script" 2> /dev/null | head -10)
 
     if [[ -n "$functions" ]]; then
         custom_log "INFO" "Functions found in $script_name:"
@@ -355,10 +355,10 @@ function check_complexity {
     custom_log "DEBUG" "Checking complexity for: $script_name"
 
     local line_count
-    line_count=$(wc -l <"$script" 2>/dev/null)
+    line_count=$(wc -l < "$script" 2> /dev/null)
 
     local function_count
-    function_count=$(grep -c "^function\|^[a-zA-Z_][a-zA-Z0-9_]*\s*()" "$script" 2>/dev/null)
+    function_count=$(grep -c "^function\|^[a-zA-Z_][a-zA-Z0-9_]*\s*()" "$script" 2> /dev/null)
 
     local complexity_score=0
 

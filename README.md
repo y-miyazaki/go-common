@@ -131,7 +131,7 @@ This section explains how to set up a local, non-containerized development works
 
 #### Requirements
 
-- Go 1.24 or higher  
+- Go 1.25 or higher  
 - Git  
 - GitHub CLI (gh)  
 

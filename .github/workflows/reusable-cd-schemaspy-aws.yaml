@@ -1,0 +1,667 @@
+# Reusable workflow for SchemaSpy database documentation generation
+# This workflow can be called by other workflows to generate database schema documentation using SchemaSpy
+name: reusable-cd-schemaspy-aws
+
+on:
+  workflow_call:
+    inputs:
+      # Bastion Configuration
+      bastion_instance_id:
+        description: "EC2 Bastion instance ID (auto-detected if not specified and use_bastion=true)"
+        required: false
+        type: string
+        default: ""
+      bastion_local_port:
+        description: "Local port for SSM port forwarding (default: 13306 for mysql, 15432 for pgsql, 15439 for redshift, 11521 for oracle)"
+        required: false
+        type: string
+        default: ""
+      bastion_tag_name:
+        description: "EC2 tag Name filter for Bastion auto-detection (default: '*bastion*')"
+        required: false
+        type: string
+        default: "*bastion*"
+
+      # Secrets Manager Configuration
+      secrets_manager_secret_id:
+        description: "[Secrets Manager] Secret ID containing JSON with DB connection info (only if use_secrets_manager=true)" # pragma: allowlist secret
+        required: false
+        type: string
+        default: ""
+
+      # Systems Manager Parameter Store Configuration
+      parameter_store_name:
+        description: "[SSM Parameter Store] Parameter name containing JSON with all DB connection info (only if use_ssm=true)"
+        required: false
+        type: string
+        default: ""
+
+      # Use Flags (Boolean Controls)
+      use_bastion:
+        description: "Whether to use EC2 Bastion server for database connection"
+        required: false
+        type: boolean
+        default: false
+      use_secrets_manager:
+        description: "Whether to use AWS Secrets Manager for credentials"
+        required: false
+        type: boolean
+        default: true
+      use_ssm:
+        description: "Whether to use AWS Systems Manager Parameter Store for credentials"
+        required: false
+        type: boolean
+        default: false
+
+      # Database Connection (Direct Parameters - No AWS Required)
+      db_host:
+        description: "[Direct] Database host (only if use_secrets_manager=false and use_ssm=false)" # pragma: allowlist secret
+        required: false
+        type: string
+        default: ""
+      db_name:
+        description: "[Direct] Database name (only if use_secrets_manager=false and use_ssm=false)" # pragma: allowlist secret
+        required: false
+        type: string
+        default: ""
+      db_password:
+        description: "[Direct] Database password (only if use_secrets_manager=false and use_ssm=false)" # pragma: allowlist secret
+        required: false
+        type: string
+        default: ""
+      db_port:
+        description: "[Direct] Database port (only if use_secrets_manager=false and use_ssm=false)" # pragma: allowlist secret
+        required: false
+        type: string
+        default: ""
+      db_ssl_mode:
+        description: "Database SSL mode (require, verify-full, verify-ca, disable). Default: require for pgsql/redshift, true for mysql"
+        required: false
+        type: string
+        default: "require"
+      db_type:
+        description: "Database type (pgsql, redshift, mysql, oracle, mssql, etc.)"
+        required: true
+        type: string
+      db_username:
+        description: "[Direct] Database username (only if use_secrets_manager=false and use_ssm=false)" # pragma: allowlist secret
+        required: false
+        type: string
+        default: ""
+
+      # Environment Configuration
+      environment:
+        description: "Target environment (dev, qa, stg, prd)"
+        required: true
+        type: string
+
+      # JSON Key Mapping (for Secrets Manager and SSM JSON parameters)
+      json_key_database_name:
+        description: "JSON key for database name (default: 'database')"
+        required: false
+        type: string
+        default: "dbname"
+      json_key_host:
+        description: "JSON key for host (default: 'host')"
+        required: false
+        type: string
+        default: "host"
+      json_key_password:
+        description: "JSON key for password (default: 'password')"
+        required: false
+        type: string
+        default: "password"
+      json_key_port:
+        description: "JSON key for port (default: 'port')"
+        required: false
+        type: string
+        default: "port"
+      json_key_username:
+        description: "JSON key for username (default: 'username')"
+        required: false
+        type: string
+        default: "username"
+
+      # SchemaSpy Configuration
+      schema_name:
+        description: "Database schema name to document (optional: if empty, -all flag is used to document all schemas)"
+        required: false
+        type: string
+        default: ""
+      schemaspy_version:
+        description: "SchemaSpy version to use"
+        required: false
+        type: string
+        default: "6.2.4"
+      db_threads:
+        description: "Number of database threads for parallel processing (default: 1 for stability) (https://docs.aws.amazon.com/redshift/latest/mgmt/jdbc20-download-driver.html)"
+        required: false
+        type: string
+        default: "1"
+    secrets:
+      AWS_IAM_ROLE_ARN:
+        required: false
+      AWS_REGION:
+        required: false
+
+env:
+  DB_TYPE: ${{ inputs.db_type }}
+  DB_SSL_MODE: ${{ inputs.db_ssl_mode }}
+  ENVIRONMENT: ${{ inputs.environment }}
+  SCHEMASPY_VERSION: ${{ inputs.schemaspy_version }}
+  SCHEMA_NAME: ${{ inputs.schema_name }}
+  DB_THREADS: ${{ inputs.db_threads }}
+
+jobs:
+  generate-schema-documentation:
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      artifact_name: ${{ steps.set-artifact-name.outputs.artifact_name }}
+      db_name: ${{ steps.set-db-name.outputs.db_name }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Setup AWS Credentials
+        if: ${{ inputs.use_ssm == true || inputs.use_secrets_manager == true || inputs.use_bastion == true }} # pragma: allowlist secret
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v5.1.0
+        with:
+          role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Bastion Connection
+        if: ${{ inputs.use_bastion == true }}
+        id: setup-bastion
+        run: |
+          echo "Setting up EC2 Bastion connection via AWS Systems Manager Session Manager"
+
+          # Install Session Manager plugin
+          echo "Installing AWS Session Manager plugin..."
+          curl -fsSL "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o session-manager-plugin.deb
+          sudo dpkg -i session-manager-plugin.deb
+          rm session-manager-plugin.deb
+
+          # Determine Bastion instance ID
+          if [ -n "${{ inputs.bastion_instance_id }}" ]; then
+            BASTION_ID="${{ inputs.bastion_instance_id }}"
+            echo "Using specified Bastion instance ID: ${BASTION_ID}"
+          else
+            echo "Auto-detecting Bastion instance with tag Name=${{ inputs.bastion_tag_name }}..."
+            BASTION_ID=$(aws ec2 describe-instances \
+              --filters "Name=tag:Name,Values=${{ inputs.bastion_tag_name }}" "Name=instance-state-name,Values=running" \
+              --query 'Reservations[*].Instances[*].[InstanceId]' \
+              --output text | head -n 1)
+
+            if [ -z "${BASTION_ID}" ]; then
+              echo "Error: No running Bastion instance found with tag Name=${{ inputs.bastion_tag_name }}"
+              echo "Please specify bastion_instance_id explicitly or check the bastion_tag_name filter"
+              exit 1
+            fi
+
+            echo "Auto-detected Bastion instance ID: ${BASTION_ID}"
+          fi
+
+          echo "BASTION_ID=${BASTION_ID}" >> $GITHUB_ENV
+          echo "bastion_id=${BASTION_ID}" >> $GITHUB_OUTPUT
+
+          # Verify Session Manager connectivity
+          echo "Verifying Session Manager connectivity to ${BASTION_ID}..."
+          aws ssm describe-instance-information --filters "Key=InstanceIds,Values=${BASTION_ID}" --query 'InstanceInformationList[*].[InstanceId,PingStatus]' --output table
+
+          echo "Bastion setup completed successfully"
+
+      - name: Fetch Database Connection Parameters
+        id: fetch-db-params
+        run: | # pragma: allowlist secret
+          # Validate credential source configuration
+          CRED_SOURCE_COUNT=0
+          if [ "${{ inputs.use_ssm }}" == "true" ]; then
+            CRED_SOURCE_COUNT=$((CRED_SOURCE_COUNT + 1))
+          fi
+          if [ "${{ inputs.use_secrets_manager }}" == "true" ]; then
+            CRED_SOURCE_COUNT=$((CRED_SOURCE_COUNT + 1))
+          fi
+          if [ "${{ inputs.use_ssm }}" == "false" ] && [ "${{ inputs.use_secrets_manager }}" == "false" ]; then
+            CRED_SOURCE_COUNT=$((CRED_SOURCE_COUNT + 1))
+          fi
+
+          if [ ${CRED_SOURCE_COUNT} -gt 1 ]; then
+            echo "Error: Only one credential source can be enabled at a time"
+            echo "- use_ssm: ${{ inputs.use_ssm }}"
+            echo "- use_secrets_manager: ${{ inputs.use_secrets_manager }}"
+            exit 1
+          fi
+
+          # Fetch credentials based on source
+          if [ "${{ inputs.use_secrets_manager }}" == "true" ]; then
+            echo "Fetching database connection parameters from AWS Secrets Manager"
+
+            if [ -z "${{ inputs.secrets_manager_secret_id }}" ]; then
+              echo "Error: secrets_manager_secret_id is required when use_secrets_manager=true"
+              exit 1
+            fi
+
+            echo "Retrieving secret: ${{ inputs.secrets_manager_secret_id }}"
+            SECRET_JSON=$(aws secretsmanager get-secret-value \
+              --secret-id "${{ inputs.secrets_manager_secret_id }}" \
+              --query SecretString \
+              --output text)
+
+            # Extract individual values using jq
+            DB_HOST=$(echo "$SECRET_JSON" | jq -r '.${{ inputs.json_key_host }}')
+            DB_PORT=$(echo "$SECRET_JSON" | jq -r '.${{ inputs.json_key_port }}')
+            DB_NAME_FROM_JSON=$(echo "$SECRET_JSON" | jq -r '.${{ inputs.json_key_database_name }}')
+            DB_USER=$(echo "$SECRET_JSON" | jq -r '.${{ inputs.json_key_username }}')
+            DB_PASSWORD=$(echo "$SECRET_JSON" | jq -r '.${{ inputs.json_key_password }}')
+
+            # Use db_name input if provided, otherwise use JSON value
+            if [ -n "${{ inputs.db_name }}" ]; then
+              DB_NAME="${{ inputs.db_name }}"
+              echo "Using db_name from input: ${DB_NAME}"
+            elif [ "${DB_NAME_FROM_JSON}" != "null" ] && [ -n "${DB_NAME_FROM_JSON}" ]; then
+              DB_NAME="${DB_NAME_FROM_JSON}"
+              echo "Using database name from JSON: ${DB_NAME}"
+            else
+              echo "Error: Database name not found in JSON and db_name input not provided"
+              exit 1
+            fi
+
+            echo "Successfully extracted database parameters from Secrets Manager"
+
+          elif [ "${{ inputs.use_ssm }}" == "true" ]; then
+            echo "Fetching database connection parameters from AWS Systems Manager Parameter Store"
+
+            if [ -z "${{ inputs.parameter_store_name }}" ]; then
+              echo "Error: parameter_store_name is required when use_ssm=true"
+              exit 1
+            fi
+
+            echo "Using JSON-based SSM parameter: ${{ inputs.parameter_store_name }}"
+
+            # Fetch JSON parameter
+            DB_JSON=$(aws ssm get-parameter --name "${{ inputs.parameter_store_name }}" --with-decryption --query "Parameter.Value" --output text)
+
+            # Extract individual values using jq
+            DB_HOST=$(echo "$DB_JSON" | jq -r '.${{ inputs.json_key_host }}')
+            DB_PORT=$(echo "$DB_JSON" | jq -r '.${{ inputs.json_key_port }}')
+            DB_NAME_FROM_JSON=$(echo "$DB_JSON" | jq -r '.${{ inputs.json_key_database_name }}')
+            DB_USER=$(echo "$DB_JSON" | jq -r '.${{ inputs.json_key_username }}')
+            DB_PASSWORD=$(echo "$DB_JSON" | jq -r '.${{ inputs.json_key_password }}')
+
+            # Use db_name input if provided, otherwise use JSON value
+            if [ -n "${{ inputs.db_name }}" ]; then
+              DB_NAME="${{ inputs.db_name }}"
+              echo "Using db_name from input: ${DB_NAME}"
+            elif [ "${DB_NAME_FROM_JSON}" != "null" ] && [ -n "${DB_NAME_FROM_JSON}" ]; then
+              DB_NAME="${DB_NAME_FROM_JSON}"
+              echo "Using database name from JSON: ${DB_NAME}"
+            else
+              echo "Error: Database name not found in JSON and db_name input not provided"
+              exit 1
+            fi
+
+            echo "Successfully extracted database parameters from SSM Parameter Store JSON"
+
+          else
+            echo "Using direct database connection parameters"
+
+            # Validate required parameters
+              if [ -z "${{ inputs.db_host }}" ] || [ -z "${{ inputs.db_port }}" ] || [ -z "${{ inputs.db_name }}" ] || [ -z "${{ inputs.db_username }}" ] || [ -z "${{ inputs.db_password }}" ]; then
+                echo "Error: When use_ssm=false and use_secrets_manager=false, all db_* inputs must be provided" # pragma: allowlist secret
+              exit 1
+            fi
+
+            # Use direct parameters
+            DB_HOST="${{ inputs.db_host }}"
+            DB_PORT="${{ inputs.db_port }}"
+            DB_NAME="${{ inputs.db_name }}"
+            DB_USER="${{ inputs.db_username }}"
+            DB_PASSWORD="${{ inputs.db_password }}"
+          fi
+
+          # Set environment variables
+          echo "DB_HOST=${DB_HOST}" >> $GITHUB_ENV
+          echo "DB_PORT=${DB_PORT}" >> $GITHUB_ENV
+          echo "DB_NAME=${DB_NAME}" >> $GITHUB_ENV
+          echo "DB_USER=${DB_USER}" >> $GITHUB_ENV
+          echo "::add-mask::${DB_PASSWORD}"
+          echo "DB_PASSWORD=${DB_PASSWORD}" >> $GITHUB_ENV
+
+          echo "Database connection parameters retrieved successfully"
+          echo "Host: ${DB_HOST}:${DB_PORT}"
+          echo "Database: ${DB_NAME}"
+          echo "User: ${DB_USER}"
+
+      - name: Setup SSM Port Forwarding
+        if: ${{ inputs.use_bastion == true }}
+        id: start-port-forward
+        run: |
+          echo "Starting AWS Systems Manager Session Manager port forwarding"
+
+          # Determine local port based on database type
+          if [ -n "${{ inputs.bastion_local_port }}" ]; then
+            LOCAL_PORT="${{ inputs.bastion_local_port }}"
+          else
+            case "${{ env.DB_TYPE }}" in
+              mysql)
+                LOCAL_PORT="13306"
+                ;;
+              pgsql|postgresql)
+                LOCAL_PORT="15432"
+                ;;
+              redshift)
+                LOCAL_PORT="15439"
+                ;;
+              oracle)
+                LOCAL_PORT="11521"
+                ;;
+              *)
+                LOCAL_PORT="13306"
+                ;;
+            esac
+          fi
+
+          echo "LOCAL_PORT=${LOCAL_PORT}" >> $GITHUB_ENV
+          echo "local_port=${LOCAL_PORT}" >> $GITHUB_OUTPUT
+
+          echo "Starting port forwarding: localhost:${LOCAL_PORT} -> ${BASTION_ID} -> ${DB_HOST}:${DB_PORT}"
+
+          # Start SSM port forwarding in background (MUST be background to allow other commands)
+          aws ssm start-session \
+            --target "${BASTION_ID}" \
+            --document-name AWS-StartPortForwardingSessionToRemoteHost \
+            --parameters "{\"host\":[\"${DB_HOST}\"],\"portNumber\":[\"${DB_PORT}\"],\"localPortNumber\":[\"${LOCAL_PORT}\"]}" \
+            > /tmp/ssm-session.log 2>&1 &
+
+          SSM_PID=$!
+          echo "SSM_PID=${SSM_PID}" >> $GITHUB_ENV
+          echo "ssm_pid=${SSM_PID}" >> $GITHUB_OUTPUT
+          echo "SSM Session started with PID: ${SSM_PID}"
+
+          # Wait for port forwarding to be established by monitoring SSM log
+          echo "Waiting for port forwarding to be ready..."
+          MAX_WAIT=60
+          ELAPSED=0
+
+          while [ ${ELAPSED} -lt ${MAX_WAIT} ]; do
+            # Check if SSM process is still running
+            if ! ps -p ${SSM_PID} > /dev/null 2>&1; then
+              echo "❌ SSM session process died unexpectedly"
+              echo "SSM Session log:"
+              cat /tmp/ssm-session.log
+              exit 1
+            fi
+
+            # Check log for successful port opening
+            if grep -q "Port ${LOCAL_PORT} opened" /tmp/ssm-session.log 2>/dev/null && \
+               grep -q "Waiting for connections" /tmp/ssm-session.log 2>/dev/null; then
+              echo "✅ Port forwarding is ready on localhost:${LOCAL_PORT} (confirmed by SSM log)"
+              # Give additional 2 seconds for port to be fully ready
+              sleep 2
+              break
+            fi
+
+            sleep 1
+            ELAPSED=$((ELAPSED + 1))
+
+            if [ ${ELAPSED} -eq ${MAX_WAIT} ]; then
+              echo "❌ Port forwarding failed to start within ${MAX_WAIT} seconds"
+              echo "SSM Session log:"
+              cat /tmp/ssm-session.log
+              exit 1
+            fi
+
+            # Show progress every 10 seconds
+            if [ $((ELAPSED % 10)) -eq 0 ] && [ ${ELAPSED} -gt 0 ]; then
+              echo "  ${ELAPSED}/${MAX_WAIT} seconds: Still waiting for port forwarding..."
+            fi
+          done
+
+          echo "Port forwarding established successfully"
+
+      - name: Setup Java
+        uses: actions/setup-java@8df1039502a15bceb9433410b1a100fbe190c53b # v5.0.0
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Setup SchemaSpy Dependencies
+        run: |
+          echo "Installing Graphviz for ER diagram generation..."
+          sudo apt-get update -qq
+          sudo apt-get install -y fontconfig fonts-noto-cjk
+
+          # Rebuild font cache to ensure Graphviz can find fonts
+          sudo fc-cache -fv
+
+          # Verify font configuration
+          fc-list | grep -i noto || echo "Warning: Noto fonts not found"
+
+      - name: Setup SchemaSpy and JDBC Driver
+        run: |
+          echo "Downloading SchemaSpy v${{ env.SCHEMASPY_VERSION }}"
+          curl -fsSL -o schemaspy.jar "https://github.com/schemaspy/schemaspy/releases/download/v${{ env.SCHEMASPY_VERSION }}/schemaspy-${{ env.SCHEMASPY_VERSION }}.jar"
+
+          echo "Downloading JDBC driver for ${{ env.DB_TYPE }}"
+          case "${{ env.DB_TYPE }}" in
+            mysql)
+              curl -fsSL -o mysql-connector.tar.gz "https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-j-9.1.0.tar.gz"
+              tar -xzf mysql-connector.tar.gz
+              mv mysql-connector-j-9.1.0/mysql-connector-j-9.1.0.jar jdbc-driver.jar
+              rm -rf mysql-connector-j-9.1.0 mysql-connector.tar.gz
+              ;;
+            pgsql|postgresql)
+              curl -fsSL -o jdbc-driver.jar "https://jdbc.postgresql.org/download/postgresql-42.7.5.jar"
+              ;;
+            redshift)
+              echo "Downloading Amazon Redshift JDBC driver"
+              curl -fsSL -o jdbc-driver.jar "https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/2.1.0.32/redshift-jdbc42-2.1.0.32.jar"
+              echo "Downloading AWS SDK Core (required by Redshift JDBC driver)"
+              curl -fsSL -o aws-sdk-core.jar "https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-core/1.12.529/aws-java-sdk-core-1.12.529.jar"
+              ;;
+            oracle)
+              echo "Oracle JDBC driver requires manual download due to licensing"
+              echo "Downloading Oracle JDBC driver from Maven Central"
+              curl -fsSL -o jdbc-driver.jar "https://repo1.maven.org/maven2/com/oracle/database/jdbc/ojdbc11/23.6.0.24.10/ojdbc11-23.6.0.24.10.jar"
+              ;;
+            *)
+              echo "Unsupported database type: ${{ env.DB_TYPE }}"
+              echo "Supported types: mysql, pgsql, redshift, oracle"
+              exit 1
+              ;;
+          esac
+
+          echo "SchemaSpy and JDBC driver downloaded successfully"
+          ls -lh schemaspy.jar jdbc-driver.jar
+
+      - name: Exec SchemaSpy
+        run: |
+          echo "Running SchemaSpy for database: ${{ env.DB_NAME }}"
+
+          mkdir -p output
+
+          # Determine connection host and port (use localhost if bastion is enabled)
+          if [ "${{ inputs.use_bastion }}" == "true" ]; then
+            CONN_HOST="localhost"
+            CONN_PORT="${LOCAL_PORT}"
+            echo "Connecting via Bastion: ${CONN_HOST}:${CONN_PORT}"
+          else
+            CONN_HOST="${DB_HOST}"
+            CONN_PORT="${DB_PORT}"
+            echo "Direct connection: ${CONN_HOST}:${CONN_PORT}"
+          fi
+
+          # Determine SchemaSpy database type
+          # Note: Redshift uses 'redshift' type with custom properties
+          SCHEMASPY_TYPE="${{ env.DB_TYPE }}"
+          echo "Using SchemaSpy type: ${SCHEMASPY_TYPE}"
+
+          # Set up classpath: add AWS SDK for Redshift
+          JDBC_CLASSPATH="jdbc-driver.jar"
+          if [ "${{ env.DB_TYPE }}" == "redshift" ]; then
+            if [ -f "aws-sdk-core.jar" ]; then
+              JDBC_CLASSPATH="jdbc-driver.jar:aws-sdk-core.jar"
+              echo "Added AWS SDK Core to classpath for Redshift"
+            else
+              echo "Warning: AWS SDK Core JAR not found, Redshift connection may fail"
+            fi
+          fi
+
+          # Build base SchemaSpy arguments
+          SSL_MODE="${{ env.DB_SSL_MODE }}"
+          echo "SSL Mode: ${SSL_MODE}"
+
+          SCHEMASPY_ARGS=(
+            -t "${SCHEMASPY_TYPE}"
+            -u "${{ env.DB_USER }}"
+            -p "${{ env.DB_PASSWORD }}"
+            -o output
+            -dp "${JDBC_CLASSPATH}"
+            -vizjs
+          )
+
+          # Add database-specific host, port, and SSL configuration
+          case "${{ env.DB_TYPE }}" in
+            pgsql|postgresql)
+              # PostgreSQL: standard -host and -db parameters with sslmode in connprops
+              SCHEMASPY_ARGS+=(-host "${CONN_HOST}:${CONN_PORT}")
+              SCHEMASPY_ARGS+=(-db "${{ env.DB_NAME }}")
+              SCHEMASPY_ARGS+=(-connprops "sslmode\\=${SSL_MODE}")
+              ;;
+            redshift)
+              # Redshift: host with port, db with SSL parameter in connection string
+              SCHEMASPY_ARGS+=(-host "${CONN_HOST}:${CONN_PORT}")
+              if [ "${SSL_MODE}" == "disable" ]; then
+                SCHEMASPY_ARGS+=(-db "${{ env.DB_NAME }}?ssl=false")
+              else
+                SCHEMASPY_ARGS+=(-db "${{ env.DB_NAME }}?ssl=true")
+              fi
+              echo "Using Redshift type with SSL in connection string"
+              ;;
+            mysql)
+              # MySQL: standard -host and -db parameters with useSSL in connprops
+              SCHEMASPY_ARGS+=(-host "${CONN_HOST}:${CONN_PORT}")
+              SCHEMASPY_ARGS+=(-db "${{ env.DB_NAME }}")
+              if [ "${SSL_MODE}" == "disable" ]; then
+                SCHEMASPY_ARGS+=(-connprops "useSSL\\=false")
+              else
+                SCHEMASPY_ARGS+=(-connprops "useSSL\\=true")
+              fi
+              ;;
+            oracle)
+              # Oracle: standard -host and -db parameters
+              SCHEMASPY_ARGS+=(-host "${CONN_HOST}:${CONN_PORT}")
+              SCHEMASPY_ARGS+=(-db "${{ env.DB_NAME }}")
+              echo "Oracle SSL configuration via connection string or wallet"
+              ;;
+          esac
+
+          # Add schema parameter: -s for specific schema, -all for all schemas
+          if [ -n "${{ env.SCHEMA_NAME }}" ]; then
+            echo "Documenting specific schema: ${{ env.SCHEMA_NAME }}"
+            SCHEMASPY_ARGS+=(-s "${{ env.SCHEMA_NAME }}")
+          else
+            echo "Documenting all schemas in database (-all)"
+            SCHEMASPY_ARGS+=(-all)
+          fi
+
+          # Add database threads parameter to control concurrent connections
+          # https://docs.aws.amazon.com/redshift/latest/mgmt/jdbc20-download-driver.html
+          echo "Using ${{ env.DB_THREADS }} database threads for parallel processing"
+          SCHEMASPY_ARGS+=(-dbthreads "${{ env.DB_THREADS }}")
+
+          # Run SchemaSpy with JVM memory optimization
+          # -Xmx4g: Maximum heap size (2GB for large databases)
+          # -Xms512m: Initial heap size (512MB for faster startup)
+          echo "Running SchemaSpy with JVM options: -Xmx4g -Xms512m"
+          java -Xmx4g -Xms512m -jar schemaspy.jar "${SCHEMASPY_ARGS[@]}"
+
+          echo "SchemaSpy execution completed"
+          echo "Generated files:"
+          ls -lh output/
+
+      - name: Cleanup SSM Port Forwarding
+        if: ${{ always() && inputs.use_bastion == true }}
+        run: |
+          echo "Cleaning up SSM port forwarding session"
+
+          if [ -n "${SSM_PID}" ]; then
+            echo "Terminating SSM session (PID: ${SSM_PID})"
+            kill ${SSM_PID} 2>/dev/null || true
+
+            # Wait for process to terminate
+            for i in {1..5}; do
+              if ! ps -p ${SSM_PID} > /dev/null 2>&1; then
+                echo "✅ SSM session terminated successfully"
+                break
+              fi
+              sleep 1
+            done
+
+            # Force kill if still running
+            if ps -p ${SSM_PID} > /dev/null 2>&1; then
+              echo "Force killing SSM session..."
+              kill -9 ${SSM_PID} 2>/dev/null || true
+            fi
+          fi
+
+          echo "SSM port forwarding cleanup completed"
+
+      - name: Set artifact name
+        id: set-artifact-name
+        run: |
+          ARTIFACT_NAME="schemaspy-${DB_NAME}-${ENVIRONMENT}"
+          echo "artifact_name=${ARTIFACT_NAME}" >> $GITHUB_OUTPUT
+          echo "artifact_name=${ARTIFACT_NAME}" >> $GITHUB_ENV
+
+      - name: Set db name output
+        id: set-db-name
+        run: |
+          echo "db_name=${DB_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Prepare artifact structure
+        run: |
+          echo "Organizing SchemaSpy output for artifact upload"
+
+          # Create artifact directory with DB_NAME subdirectory
+          mkdir -p artifact-output/${DB_NAME}
+
+          # Move SchemaSpy output to subdirectory
+          mv output/* artifact-output/${DB_NAME}/
+
+          echo "Artifact structure:"
+          ls -lR artifact-output/
+
+      - name: Upload SchemaSpy Artifact
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v5.0.0
+        with:
+          name: ${{ steps.set-artifact-name.outputs.artifact_name }}
+          path: artifact-output
+          retention-days: 30
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "# SchemaSpy Documentation Generation" | tee -a $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Database Name**: ${DB_NAME} (${{ env.DB_TYPE }})" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment**: ${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
+          echo "**SchemaSpy Version**: ${{ env.SCHEMASPY_VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Documentation generated successfully" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Artifact**: ${{ steps.set-artifact-name.outputs.artifact_name }}" >> $GITHUB_STEP_SUMMARY
+            echo "**Download**: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Documentation generation failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "See logs above for details." >> $GITHUB_STEP_SUMMARY
+          fi

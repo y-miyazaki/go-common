@@ -91,6 +91,7 @@ terraform plan -lock=false -var-file=terraform.${ENV}.tfvars
 ### Terraform Specific Security
 
 - IAM ポリシーは最小権限で設計する
+- IAM ポリシーはヒアドキュメントは利用しない。json_encode もしくは aws_iam_policy_document を使用
 - S3 等はデフォルトで暗号化を有効化する
 - API Gateway 等は WAF・レート制限を設定する
 - モジュール・依存関係は最新バージョンを使用する

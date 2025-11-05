@@ -39,8 +39,8 @@ jobs:
       component: "go-common"
       go_path: "."
     permissions:
-      id-token: write
       contents: read
+      id-token: write
       pull-requests: write
 
   # ------------------------------------------------------------------

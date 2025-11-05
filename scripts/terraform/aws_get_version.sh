@@ -84,7 +84,7 @@ nodejs|nodejs18.x|deprecation_scheduled|2025-09-01|2025-10-01|2025-11-01|false
 nodejs|nodejs20.x|available|2026-04-30|2026-06-01|2026-07-01|false
 nodejs|nodejs22.x|available|2027-04-30|2027-06-01|2027-07-01|true
 python|python3.8|deprecated|2024-10-14|2025-10-01|2025-11-01|false
-python|python3.9|deprecation_scheduled|2025-12-15|2026-01-15|2026-02-15|false
+python|python3.9|deprecation_scheduled|2025-12-15|2026-02-03|2026-03-09|false
 python|python3.10|available|2026-06-30|2026-07-31|2026-08-31|false
 python|python3.11|available|2026-06-30|2026-07-31|2026-08-31|false
 python|python3.12|available|2028-10-31|2028-11-30|2029-01-10|false
@@ -95,12 +95,12 @@ java|java11|available|2026-06-30|2026-07-31|2026-08-31|false
 java|java17|available|2026-06-30|2026-07-31|2026-08-31|false
 java|java21|available|2029-06-30|2029-07-31|2029-08-31|true
 dotnet|dotnet6|deprecated|2024-12-20|2025-10-01|2025-11-01|false
-dotnet|dotnet8|available|2026-11-10|2026-12-10|2027-01-11|true
-dotnet|dotnet9|available|2027-11-10|2027-12-10|2028-01-11|false
+dotnet|dotnet8|available|2026-11-10|2026-12-10|2027-01-11|false
+dotnet|dotnet9|available||||true
 ruby|ruby2.7|deprecated|2023-12-07|2024-01-09|2025-11-01|false
 ruby|ruby3.2|available|2026-03-31|2026-04-30|2026-05-31|false
-ruby|ruby3.3|available|2027-03-31|2027-04-30|2027-05-31|true
-ruby|ruby3.4|available|2028-03-31|2028-04-30|2028-05-31|false
+ruby|ruby3.3|available|2027-03-31|2027-04-30|2027-05-31|false
+ruby|ruby3.4|available||||true
 provided|provided|available|2026-06-30|2026-07-31|2026-08-31|false
 provided|provided.al2|available|2026-06-30|2026-07-31|2026-08-31|false
 provided|provided.al2023|available|2029-06-30|2029-07-31|2029-08-31|true
@@ -116,7 +116,8 @@ go|provided.al2023|available|2029-06-30|2029-07-31|2029-08-31|true'
 # Dates format: YYYY-MM-DD (empty for current supported versions)
 # Update this variable to add/modify Glue versions
 #######################################
-GLUE_DATA='1.0|deprecated|2022-09-30|2026-04-01|false
+GLUE_DATA='0.9|deprecated|2022-06-01|2026-04-01|false
+1.0|deprecated|2022-09-30|2026-04-01|false
 2.0|deprecated|2024-01-31|2026-04-01|false
 3.0|available|||false
 4.0|available|||false
@@ -126,7 +127,7 @@ GLUE_DATA='1.0|deprecated|2022-09-30|2026-04-01|false
 # Display usage information
 #######################################
 function show_usage {
-    cat <<EOF
+    cat << EOF
 Usage: $(basename "$0") [options]
 
 Description: Collect AWS Lambda, Glue, and RDS available runtime/engine versions and mark latest versions.
@@ -217,7 +218,7 @@ function collect_lambda_versions {
         fi
 
         buffer+="Lambda,Runtime,$family,$region,$runtime,$is_latest,$status,$deprecation_date,$block_create_date,$block_update_date\n"
-    done <<<"$LAMBDA_DATA"
+    done <<< "$LAMBDA_DATA"
 
     echo "$buffer"
 }
@@ -248,7 +249,7 @@ function collect_glue_versions {
         fi
 
         buffer+="Glue,Version,glue,$region,$version,$is_latest,$status,$end_of_support_date,$end_of_life_date\n"
-    done <<<"$GLUE_DATA"
+    done <<< "$GLUE_DATA"
 
     echo "$buffer"
 }
@@ -273,7 +274,7 @@ function collect_rds_versions {
 
     for engine in "${engines[@]}"; do
         local engine_versions_json
-        engine_versions_json=$(aws rds describe-db-engine-versions --engine "$engine" --region "$region" 2>/dev/null | jq '.DBEngineVersions' || echo "[]")
+        engine_versions_json=$(aws rds describe-db-engine-versions --engine "$engine" --region "$region" 2> /dev/null | jq '.DBEngineVersions' || echo "[]")
 
         # Get latest version by sorting versions properly
         local latest_version
@@ -317,7 +318,7 @@ function collect_runtime_versions {
 
     # Get header from the first call
     local collect_function="collect_${category}_versions"
-    if ! declare -f "$collect_function" >/dev/null; then
+    if ! declare -f "$collect_function" > /dev/null; then
         log "WARN" "Collection function $collect_function not found for category $category"
         return 1
     fi
@@ -358,7 +359,7 @@ function output_csv_data {
                 printf "%b" "$buffer"
             fi
             echo ""
-        } >>"$OUTPUT_FILE"
+        } >> "$OUTPUT_FILE"
     fi
     log "INFO" "$category runtime/engine versions written to $OUTPUT_FILE"
 }
@@ -390,13 +391,13 @@ function main {
     fi
 
     # Initialize output file
-    true >"$OUTPUT_FILE"
+    true > "$OUTPUT_FILE"
 
     # Determine which categories to process
     local categories_to_process=()
     if [[ -n "$CATEGORIES" ]]; then
         # Split comma-separated categories into array
-        IFS=',' read -ra categories_to_process <<<"$CATEGORIES"
+        IFS=',' read -ra categories_to_process <<< "$CATEGORIES"
         log "INFO" "Processing specified categories: ${categories_to_process[*]}"
 
         # Validate specified categories
@@ -430,7 +431,7 @@ function main {
 
     # Display summary
     local total_entries
-    total_entries=$(($(wc -l <"$OUTPUT_FILE") - $(echo "${RUNTIME_CATEGORIES[@]}" | wc -w))) # Subtract header lines
+    total_entries=$(($(wc -l < "$OUTPUT_FILE") - $(echo "${RUNTIME_CATEGORIES[@]}" | wc -w))) # Subtract header lines
     log "INFO" "Total runtime/engine versions collected: $total_entries"
 
     echo "Results written to: $OUTPUT_FILE"

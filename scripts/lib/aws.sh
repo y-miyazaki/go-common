@@ -12,7 +12,7 @@
 #######################################
 
 # Ensure common.sh is loaded for logging functions
-if ! declare -f log >/dev/null 2>&1; then
+if ! declare -f log > /dev/null 2>&1; then
     # Try to source common.sh from the same directory
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     # shellcheck source=./common.sh
@@ -57,7 +57,7 @@ function aws_safe_exec {
 #######################################
 function check_aws_credentials {
     local identity
-    identity=$(aws sts get-caller-identity --query 'Arn' --output text 2>/dev/null)
+    identity=$(aws sts get-caller-identity --query 'Arn' --output text 2> /dev/null)
     if [[ -z "$identity" || "$identity" == "null" ]]; then
         log "ERROR" "AWS credentials are not set or invalid."
         return 1
@@ -92,7 +92,7 @@ function extract_jq_array {
 
     # Execute jq query to get array and join with separator
     local result
-    if result=$(echo "$json_data" | jq -r "${jq_query} | if type == \"array\" then join(\"${separator}\") else . end" 2>/dev/null); then
+    if result=$(echo "$json_data" | jq -r "${jq_query} | if type == \"array\" then join(\"${separator}\") else . end" 2> /dev/null); then
         # Handle null, empty, or array results
         if [[ -z "$result" || "$result" == "null" || "$result" == "[]" ]]; then
             echo "$default_value"
@@ -134,7 +134,7 @@ function extract_jq_value {
 
     # Execute jq query and handle errors
     local result
-    if result=$(echo "$json_data" | jq -r "$jq_query" 2>/dev/null); then
+    if result=$(echo "$json_data" | jq -r "$jq_query" 2> /dev/null); then
         # Handle null or empty results
         if [[ -z "$result" || "$result" == "null" ]]; then
             echo "$default_value"
@@ -171,7 +171,7 @@ function format_aws_timestamp {
     fi
 
     # Format timestamp
-    if date -d "@$timestamp" '+%Y-%m-%d %H:%M:%S' 2>/dev/null; then
+    if date -d "@$timestamp" '+%Y-%m-%d %H:%M:%S' 2> /dev/null; then
         return 0
     else
         echo "N/A"
@@ -188,7 +188,7 @@ function format_aws_timestamp {
 #######################################
 function get_aws_account_id {
     local account_id
-    if ! account_id=$(aws sts get-caller-identity --query Account --output text 2>/dev/null); then
+    if ! account_id=$(aws sts get-caller-identity --query Account --output text 2> /dev/null); then
         log "ERROR" "Failed to get AWS account ID. Check AWS credentials."
         return 1
     fi
@@ -205,9 +205,9 @@ function get_aws_account_id {
 #######################################
 function get_aws_region {
     local region
-    if ! region=$(aws configure get region 2>/dev/null); then
+    if ! region=$(aws configure get region 2> /dev/null); then
         # Try to get from instance metadata if running on EC2
-        if ! region=$(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/placement/region 2>/dev/null); then
+        if ! region=$(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/placement/region 2> /dev/null); then
             error_exit "Failed to determine AWS region. Set AWS_DEFAULT_REGION or configure AWS CLI."
         fi
     fi
@@ -260,7 +260,7 @@ function get_waf_association {
 
     # Try WAFv2 first, then WAF Classic
     local waf_result
-    waf_result=$(aws wafv2 get-web-acl-for-resource --resource-arn "$resource_arn" --region "$region" 2>/dev/null || echo '{}')
+    waf_result=$(aws wafv2 get-web-acl-for-resource --resource-arn "$resource_arn" --region "$region" 2> /dev/null || echo '{}')
 
     extract_jq_value "$waf_result" '.WebACL.ARN'
 }
@@ -287,13 +287,13 @@ function is_service_available_in_region {
     # Check if service is available in region by attempting to list resources
     case "$service" in
         ec2)
-            aws ec2 describe-regions --region "$region" --region-names "$region" >/dev/null 2>&1
+            aws ec2 describe-regions --region "$region" --region-names "$region" > /dev/null 2>&1
             ;;
         s3)
-            aws s3api list-buckets --region "$region" >/dev/null 2>&1
+            aws s3api list-buckets --region "$region" > /dev/null 2>&1
             ;;
         lambda)
-            aws lambda list-functions --region "$region" >/dev/null 2>&1
+            aws lambda list-functions --region "$region" > /dev/null 2>&1
             ;;
         *)
             # Generic check - try to call a basic list operation
@@ -322,7 +322,7 @@ function parse_arn {
     fi
 
     # Split ARN into components
-    IFS=':' read -ra ARN_PARTS <<<"$arn"
+    IFS=':' read -ra ARN_PARTS <<< "$arn"
 
     # Create JSON object
     jq -n \
@@ -349,7 +349,7 @@ function validate_aws_config {
     validate_dependencies "aws" "jq"
 
     # Test AWS CLI access
-    if ! aws sts get-caller-identity >/dev/null 2>&1; then
+    if ! aws sts get-caller-identity > /dev/null 2>&1; then
         error_exit "AWS CLI is not properly configured. Run 'aws configure' or set AWS credentials."
     fi
 

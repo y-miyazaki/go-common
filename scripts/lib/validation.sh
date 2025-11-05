@@ -11,7 +11,7 @@
 #######################################
 
 # Ensure common.sh is loaded for logging functions
-if ! declare -f log >/dev/null 2>&1; then
+if ! declare -f log > /dev/null 2>&1; then
     # Try to source common.sh from the same directory
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     # shellcheck source=./common.sh
@@ -85,7 +85,7 @@ function validate_script_syntax {
     fi
 
     # Validate syntax with bash
-    if bash -n "$script_path" 2>/dev/null; then
+    if bash -n "$script_path" 2> /dev/null; then
         log "DEBUG" "Script syntax valid: $script_path"
         return 0
     else
@@ -109,7 +109,7 @@ function validate_file_permissions {
     validate_file_exists "$file_path" "File"
 
     local current_perms
-    current_perms=$(stat -c "%a" "$file_path" 2>/dev/null)
+    current_perms=$(stat -c "%a" "$file_path" 2> /dev/null)
 
     if [[ "$current_perms" == "$required_perms" ]]; then
         log "DEBUG" "File permissions correct ($current_perms): $file_path"
@@ -153,7 +153,7 @@ function validate_json_file {
 
     validate_file_exists "$json_file" "JSON file"
 
-    if jq empty "$json_file" >/dev/null 2>&1; then
+    if jq empty "$json_file" > /dev/null 2>&1; then
         log "DEBUG" "JSON file is valid: $json_file"
         return 0
     else
@@ -175,13 +175,13 @@ function validate_yaml_file {
     validate_file_exists "$yaml_file" "YAML file"
 
     # Try yq first, then python with yaml module
-    if command -v yq >/dev/null 2>&1; then
-        if yq eval 'true' "$yaml_file" >/dev/null 2>&1; then
+    if command -v yq > /dev/null 2>&1; then
+        if yq eval 'true' "$yaml_file" > /dev/null 2>&1; then
             log "DEBUG" "YAML file is valid: $yaml_file"
             return 0
         fi
-    elif command -v python3 >/dev/null 2>&1; then
-        if python3 -c "import yaml; yaml.safe_load(open('$yaml_file'))" >/dev/null 2>&1; then
+    elif command -v python3 > /dev/null 2>&1; then
+        if python3 -c "import yaml; yaml.safe_load(open('$yaml_file'))" > /dev/null 2>&1; then
             log "DEBUG" "YAML file is valid: $yaml_file"
             return 0
         fi
@@ -206,13 +206,13 @@ function validate_network_connectivity {
     local host="$1"
     local timeout="${2:-5}"
 
-    if command -v curl >/dev/null 2>&1; then
-        if curl -s --max-time "$timeout" --head "$host" >/dev/null 2>&1; then
+    if command -v curl > /dev/null 2>&1; then
+        if curl -s --max-time "$timeout" --head "$host" > /dev/null 2>&1; then
             log "DEBUG" "Network connectivity confirmed: $host"
             return 0
         fi
-    elif command -v wget >/dev/null 2>&1; then
-        if wget -q --timeout="$timeout" --spider "$host" >/dev/null 2>&1; then
+    elif command -v wget > /dev/null 2>&1; then
+        if wget -q --timeout="$timeout" --spider "$host" > /dev/null 2>&1; then
             log "DEBUG" "Network connectivity confirmed: $host"
             return 0
         fi
@@ -239,13 +239,13 @@ function validate_port_availability {
     local port="$2"
     local timeout="${3:-3}"
 
-    if command -v nc >/dev/null 2>&1; then
-        if nc -z -w "$timeout" "$host" "$port" >/dev/null 2>&1; then
+    if command -v nc > /dev/null 2>&1; then
+        if nc -z -w "$timeout" "$host" "$port" > /dev/null 2>&1; then
             log "DEBUG" "Port is available: $host:$port"
             return 0
         fi
-    elif command -v telnet >/dev/null 2>&1; then
-        if timeout "$timeout" telnet "$host" "$port" </dev/null >/dev/null 2>&1; then
+    elif command -v telnet > /dev/null 2>&1; then
+        if timeout "$timeout" telnet "$host" "$port" < /dev/null > /dev/null 2>&1; then
             log "DEBUG" "Port is available: $host:$port"
             return 0
         fi
@@ -303,7 +303,7 @@ function validate_files_in_directory {
 
     # Find files with specified extension
     local files
-    mapfile -t files < <(find "$dir_path" -type f -name "*.${extension}" 2>/dev/null)
+    mapfile -t files < <(find "$dir_path" -type f -name "*.${extension}" 2> /dev/null)
 
     if [[ ${#files[@]} -eq 0 ]]; then
         log "INFO" "No .$extension files found in: $dir_path"

@@ -137,8 +137,8 @@ function prepare_build_environment {
 
     # Clean output directories
     log "INFO" "Cleaning output directories..."
-    rm -rf outputs/"${BINDIR}"/* 2>/dev/null || true
-    rm -rf bin/"${BINDIR}"/* 2>/dev/null || true
+    rm -rf outputs/"${BINDIR}"/* 2> /dev/null || true
+    rm -rf bin/"${BINDIR}"/* 2> /dev/null || true
 
     # Create output directories
     log "INFO" "Creating output directories..."
@@ -219,12 +219,12 @@ function build_lambda_functions {
         export -f build_function log error_exit echo_section
         export BINDIR ARCH VERBOSE
         # Redirect informational output to stderr; keep stdout reserved for the final count
-        echo "$files" | parallel build_function {} 1>/dev/null || error_exit "Failed in parallel build"
+        echo "$files" | parallel build_function {} 1> /dev/null || error_exit "Failed in parallel build"
     else
         # Sequential build
         for file in $files; do
             # Ensure per-function informational output goes to stderr
-            build_function "$file" 1>/dev/null
+            build_function "$file" 1> /dev/null
         done
     fi
 

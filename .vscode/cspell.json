@@ -140,6 +140,7 @@
     "rowserrcheck",
     "scopelint",
     "shellcheck",
+    "shfmt",
     "sirupsen",
     "skaffold",
     "slaveof",

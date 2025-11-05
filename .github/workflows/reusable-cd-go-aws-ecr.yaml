@@ -49,33 +49,33 @@ on:
       AWS_REGION:
         required: true
 
+env:
+  ENVIRONMENT: ${{ inputs.environment }}
+  GO_PROJECT_PATH: ${{ inputs.go_path }}
+
 jobs:
-  build_and_push:
+  deploy:
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.environment }}
     permissions:
       contents: read
-      id-token: write # For AWS OIDC
-    env:
-      GO_PROJECT_PATH: ${{ inputs.go_path }}
-      AWS_IAM_ROLE_ARN: ${{ secrets.AWS_IAM_ROLE_ARN }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
+      id-token: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v5
+      - name: Setup AWS Credentials
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v5.1.0
         with:
-          role-to-assume: ${{ env.AWS_IAM_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Login to Amazon ECR
+      - name: Setup Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
 
-      - name: Prepare image metadata
+      - name: Setup image metadata
         id: meta
         run: |
           IMAGE_TAG="${{ inputs.image_tag }}"
@@ -92,16 +92,16 @@ jobs:
           echo "dockerfile_path=${{ inputs.dockerfile }}" >> $GITHUB_OUTPUT
           echo "platforms=${{ inputs.platform }}" >> $GITHUB_OUTPUT
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
         with:
           platforms: all
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
 
-      - name: Build and Push Docker image
-        uses: docker/build-push-action@v6
+      - name: Exec Build and Push Docker image
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         with:
           context: ${{ steps.meta.outputs.docker_context }}
           file: ${{ steps.meta.outputs.dockerfile_path }}

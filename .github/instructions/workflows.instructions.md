@@ -23,6 +23,10 @@ description: "AI Assistant Instructions for GitHub Actions Workflows"
 
 ### Workflow Design Patterns
 
+- inputs, secrets, permissions は A-Z 順に整理
+- job 名、step 名は一貫性を持たせる
+- 再利用可能ワークフローは汎用的に設計し、特定プロジェクト依存を避ける
+
 ### Reusable Workflow Architecture
 
 このプロジェクトでは**再利用可能ワークフロー**パターンを採用しています：
@@ -103,8 +107,8 @@ permissions:
 
 ```yaml
 env:
-  ENV: ${{ inputs.environment }}
   COMPONENT: ${{ inputs.component }}
+  ENVIRONMENT: ${{ inputs.environment }}
   GO_PROJECT_PATH: ${{ inputs.go_path }}
   GO_VERSION: "1.25.3" # Centralized version management
 ```
@@ -118,7 +122,7 @@ env:
 ```yaml
 - name: Run linter with reviewdog (PR comments)
   if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
-  uses: reviewdog/action-golangci-lint@v2
+  uses: reviewdog/action-golangci-lint@f9bba13753278f6a73b27a56a3ffb1bfda90ed71 # v2.8.0
   with:
     github_token: ${{ secrets.GITHUB_TOKEN }}
     reporter: github-pr-review
@@ -131,7 +135,7 @@ env:
 ```yaml
 - name: Upload to Codecov
   if: ${{ (steps.repo_visibility.outputs.result != 'true') || (inputs.codecov_token != '') }}
-  uses: codecov/codecov-action@v5
+  uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
   with:
     use_oidc: true
     files: ${{ env.GO_PROJECT_PATH }}/coverage/coverage.out
@@ -143,9 +147,9 @@ env:
 
 ```yaml
 - name: Upload Coverage Artifact
-  uses: actions/upload-artifact@v4
+  uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v5.0.0
   with:
-    name: coverage-${{ env.COMPONENT }}-${{ env.ENV }}
+  name: coverage-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}
     path: ${{ env.GO_PROJECT_PATH }}/coverage
 ```
 
@@ -153,9 +157,10 @@ env:
 
 #### Version Management
 
-- アクションのバージョンは定期的に更新する
-- `@v1`のようなメジャーバージョン指定は避け、`@v1.2.3`形式を使用
-- 破壊的変更のあるアクション更新時は段階的にテストする
+- GitHub Actions のバージョンは定期的に更新する
+- バージョン指定は、@v1.2.3 のようなバージョン指定は避け、Commit SHA を使用する
+- Commit SHA だけだと可読性が低いため、コメントでバージョン情報を併記する
+- 破壊的変更のある GitHub Actions 更新時は段階的にテストする
 
 #### Performance Optimization
 
@@ -196,7 +201,7 @@ if: github.actor != 'dependabot[bot]' # Skip for dependabot PRs
 ```yaml
 - name: Determine repository visibility
   id: repo_visibility
-  uses: actions/github-script@v8
+  uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
   with:
     script: |
       const { data } = await github.rest.repos.get({
@@ -214,7 +219,7 @@ if: github.actor != 'dependabot[bot]' # Skip for dependabot PRs
 - name: Summary
   if: always()
   run: |
-    echo "CI completed for component: ${{ env.COMPONENT }} in env: ${{ env.ENV }}" | tee -a $GITHUB_STEP_SUMMARY
+  echo "CI completed for component: ${{ env.COMPONENT }} in env: ${{ env.ENVIRONMENT }}" | tee -a $GITHUB_STEP_SUMMARY
     if [ "${{ job.status }}" != "success" ]; then
       echo "❌ One or more steps failed. See logs above for details." >> $GITHUB_STEP_SUMMARY
     fi
@@ -225,7 +230,7 @@ if: github.actor != 'dependabot[bot]' # Skip for dependabot PRs
 ```yaml
 - name: Post PR failure comment
   if: failure() && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
-  uses: actions/github-script@v8
+  uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
   with:
     script: |
       const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;

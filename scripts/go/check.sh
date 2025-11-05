@@ -145,14 +145,14 @@ function run_go_mod_tidy {
         fi
     fi
 
-    pushd "$mod_dir" >/dev/null || true
+    pushd "$mod_dir" > /dev/null || true
     if go mod tidy; then
         log "INFO" "go mod tidy completed successfully (dir=$mod_dir)"
     else
         log "ERROR" "go mod tidy failed (dir=$mod_dir)"
         EXIT_CODE=1
     fi
-    popd >/dev/null || true
+    popd > /dev/null || true
 }
 
 #######################################
@@ -182,7 +182,7 @@ function run_go_fmt {
         # with complex package patterns and ensure proper handling of module directories
         local fmt_output
         # Safely build argument list from go list output to avoid word splitting
-        mapfile -t go_dirs < <(go list -f '{{.Dir}}' "$TARGET_PATTERN" 2>/dev/null || true)
+        mapfile -t go_dirs < <(go list -f '{{.Dir}}' "$TARGET_PATTERN" 2> /dev/null || true)
         if [[ ${#go_dirs[@]} -eq 0 ]]; then
             fmt_output=""
         else
@@ -273,7 +273,7 @@ function run_golangci_lint {
         LINT_FAILED=1
         # Count issues
         if [[ -f /tmp/golint_output.txt ]]; then
-            LINT_ISSUES_COUNT=$(grep -cE '^\S+\.go:' /tmp/golint_output.txt 2>/dev/null || echo 0)
+            LINT_ISSUES_COUNT=$(grep -cE '^\S+\.go:' /tmp/golint_output.txt 2> /dev/null || echo 0)
         else
             LINT_ISSUES_COUNT=0
         fi
@@ -403,7 +403,7 @@ function run_security_checks {
     fi
 
     # Check for govulncheck
-    if command -v govulncheck &>/dev/null; then
+    if command -v govulncheck &> /dev/null; then
         log "INFO" "Running govulncheck... (root=$search_root)"
         if govulncheck "$TARGET_PATTERN"; then
             log "INFO" "No known vulnerabilities found"
@@ -431,11 +431,11 @@ function run_benchmark_tests {
 
     # Check if there are any benchmark tests
     local has_benchmarks
-    has_benchmarks=$(find . -name "*_test.go" -not -path "./vendor/*" -not -path "./.*" -exec grep -l "func Benchmark" {} + 2>/dev/null | head -1 || true)
+    has_benchmarks=$(find . -name "*_test.go" -not -path "./vendor/*" -not -path "./.*" -exec grep -l "func Benchmark" {} + 2> /dev/null | head -1 || true)
 
     if [[ -n "$has_benchmarks" ]]; then
         log "INFO" "Running benchmark tests..."
-        if go test -bench=. -benchmem "$TARGET_PATTERN" >/dev/null 2>&1; then
+        if go test -bench=. -benchmem "$TARGET_PATTERN" > /dev/null 2>&1; then
             log "INFO" "Benchmark tests completed"
             if [[ "$VERBOSE" == "true" ]]; then
                 go test -bench=. -benchmem "$TARGET_PATTERN"

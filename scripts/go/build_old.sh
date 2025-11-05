@@ -102,8 +102,8 @@ function prepare_build_environment {
 
     # Clean output directories
     log "INFO" "Cleaning output directories..."
-    rm -rf outputs/"${BINDIR}"/* 2>/dev/null || true
-    rm -rf bin/"${BINDIR}"/* 2>/dev/null || true
+    rm -rf outputs/"${BINDIR}"/* 2> /dev/null || true
+    rm -rf bin/"${BINDIR}"/* 2> /dev/null || true
 
     # Create output directories
     log "INFO" "Creating output directories..."

@@ -58,7 +58,7 @@ function main {
 
     # Check for outdated packages
     log "INFO" "📅 Checking for outdated packages..."
-    if ! execute_command "npm outdated" 2>/dev/null; then
+    if ! execute_command "npm outdated" 2> /dev/null; then
         log "INFO" "✅ All packages are up to date"
     else
         log "INFO" "ℹ️  Some packages have updates available (see above)"

@@ -77,10 +77,10 @@ function process_dlq_information {
 
     for queue_url in $queue_urls; do
         # Get queue attributes (RedrivePolicy contains DLQ information)
-        if redrive_policy=$(aws sqs get-queue-attributes --queue-url "$queue_url" --attribute-names RedrivePolicy 2>/dev/null | jq -r '.Attributes.RedrivePolicy' 2>/dev/null); then
+        if redrive_policy=$(aws sqs get-queue-attributes --queue-url "$queue_url" --attribute-names RedrivePolicy 2> /dev/null | jq -r '.Attributes.RedrivePolicy' 2> /dev/null); then
             if [ "$redrive_policy" != "null" ] && [ -n "$redrive_policy" ]; then
                 # Extract DLQ ARN from RedrivePolicy
-                if dlq_arn=$(echo "$redrive_policy" | jq -r '.deadLetterTargetArn' 2>/dev/null); then
+                if dlq_arn=$(echo "$redrive_policy" | jq -r '.deadLetterTargetArn' 2> /dev/null); then
                     if [ "$dlq_arn" != "null" ] && [ -n "$dlq_arn" ]; then
                         # Extract queue name from ARN
                         dlq_name=$(echo "$dlq_arn" | awk -F':' '{print $NF}')

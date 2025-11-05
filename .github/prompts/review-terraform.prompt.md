@@ -128,6 +128,7 @@ description: "Terraformコードの正確性・セキュリティ・保守性・
 - COMP-01 Organization / Security Hub / Config などガバナンスリソースは意図と整合
 - COMP-02 脆弱性スキャン (trivy) 結果をパイプラインに統合 (失敗基準定義)
 - COMP-03 デフォルト VPC / オープンな SG / パブリック S3 バケット等の禁止パターン検出
+- COMP-04 IAM ポリシーはヒアドキュメントは利用しない。json_encode もしくは aws_iam_policy_document を使用
 
 ### 15. Cost Optimization (COST)
 
