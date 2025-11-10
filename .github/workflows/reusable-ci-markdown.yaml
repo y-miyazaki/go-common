@@ -32,7 +32,7 @@ jobs:
 
       - name: Exec markdownlint with reviewdog (PR comments)
         if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
-        uses: reviewdog/action-markdownlint@f991c651e0e0509e4b51961e18ede607e6a942d7 # v0.26.2
+        uses: reviewdog/action-markdownlint@3667398db9118d7e78f7a63d10e26ce454ba5f58 # v0.26.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
