@@ -3,6 +3,14 @@
   // https://code.visualstudio.com/mcp
   "servers": {
     // https://github.com/awslabs/mcp/
+    "awslabs.dac-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.dac-mcp-server@latest"],
+      "env": {
+        "AWS_REGION": "us-east-1"
+      }
+    },
+    // https://github.com/awslabs/mcp/
     "awslabs.aws-api-mcp-server": {
       "command": "uvx",
       "args": ["awslabs.aws-api-mcp-server@latest"],

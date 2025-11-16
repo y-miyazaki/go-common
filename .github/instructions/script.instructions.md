@@ -1,27 +1,26 @@
 ---
 applyTo: "**/*.sh,scripts/**"
+description: "AI Assistant Instructions for Shell Scripts"
 ---
 
-<!-- omit in toc -->
+# AI Assistant Instructions for Shell Scripts
 
-# GitHub Copilot Instructions for Shell Scripts
-
-**Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
-
-## Project Overview
+**言語ポリシー**: ドキュメントは日本語、コード・コメントは英語。
 
 このリポジトリは自動化・インフラ管理用のシェルスクリプトを含みます。スクリプトは以下のように構成されています：
 
-| ディレクトリ/ファイル           | 役割・説明                                                |
+| Directory/File                  | Purpose / Description                                     |
 | ------------------------------- | --------------------------------------------------------- |
 | scripts/terraform/              | Terraform 操作・AWS リソース管理用の自動化スクリプト      |
 | scripts/go/                     | Go 言語プロジェクトのビルド・テスト・デプロイ用スクリプト |
 | scripts/lib/                    | 共通ライブラリ・ユーティリティ関数                        |
 | scripts/validate_all_scripts.sh | 全スクリプトの品質チェック・検証ツール                    |
 
-## Coding Standards
+## Standards
 
-## Naming Conventions
+### Coding Standards
+
+### Naming Conventions
 
 | コンポーネント       | 規則                | 例                                       |
 | -------------------- | ------------------- | ---------------------------------------- |
@@ -130,11 +129,17 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 fi
 ```
 
-## Documentation and Comments
+## Guidelines
+
+### Documentation and Comments
 
 - すべてのスクリプトは目的を記載したヘッダーを含める
 - すべての関数は詳細な説明を含める
-- コメント・ドキュメントは日本語で記載する
+- コメント・ドキュメントは英語で記載する
+- function 定義順序:
+  - show_usage,parse_arguments function は最初に定義
+  - main function は最後に定義
+  - その他の関数は a-z 順に定義
 
 ### Help Function Standards
 
@@ -148,14 +153,14 @@ fi
   - 複雑なスクリプトはカテゴリ一覧や詳細ヘルプを含める
   - 必ず exit 0 で終了
 
-## Error Handling
+### Error Handling
 
 - すべてのスクリプトは適切なエラー処理を実装する
 - エラーメッセージは具体的かつ行動可能にする
 - ログは INFO/WARN/ERROR などレベル分けして記録する
 
   ```bash
-  # ログ関数例
+  # Log function example
   function log {
     local level=$1
     local message=$2
@@ -173,7 +178,7 @@ fi
 コード修正時は以下コマンドで一括検証する：
 
 ```bash
-# 全スクリプトの検証（推奨）
+# All scripts validation (recommended)
 bash /workspace/scripts/validate_all_scripts.sh -v -f
 ```
 
@@ -194,8 +199,6 @@ bash /workspace/scripts/validate_all_scripts.sh -v -f
 
 ## Security Guidelines
 
-**詳細な security guidelines は `.github/instructions/general.instructions.md` を参照。**
-
 ### Shell Script Specific Security
 
 - 入力値は必ずバリデーションし、コマンドインジェクションを防ぐ
@@ -205,9 +208,33 @@ bash /workspace/scripts/validate_all_scripts.sh -v -f
 
 ## MCP Tools
 
-**詳細な MCP Tools の設定は `.github/instructions/general.instructions.md` を参照。**
+**詳細な MCP Tools の設定・使用方法は `.github/copilot-instructions.md` を参照。**
 
-スクリプト作業での主な活用：
+### Shell Script Specific Patterns
 
-- `awslabs.aws-api-mcp-server`: AWS CLI の提案・実行（明示的なリージョン指定・最小スコープ運用）
-- `context7`: コンテキスト情報の管理・操作支援
+**AWS CLI 自動化でのコマンド検証:**
+
+```bash
+# スクリプト設計前のコマンド確認
+suggest: "List all S3 buckets with specific tags"
+
+# 実際のコマンド実行例
+aws s3api list-buckets --region us-east-1
+aws s3 ls s3://terraform-state-bucket/ --region us-east-1
+```
+
+**DevOps ツール情報の活用:**
+
+```
+# Docker 最適化確認
+resolve: "docker" → get-docs: topic="multi-stage builds"
+
+# Kubernetes デプロイメント戦略
+resolve: "kubernetes" → get-docs: topic="deployment strategies"
+```
+
+**品質向上のための活用:**
+
+- **セキュリティ**: AWS 操作前の権限・リージョン確認を自動化
+- **エラー処理**: 適切な exit code とログ出力の実装パターン確認
+- **可搬性**: 異なる環境での動作保証のためのベストプラクティス確認

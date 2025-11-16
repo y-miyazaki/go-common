@@ -1,36 +1,125 @@
 ---
 applyTo: "**/*.go"
+description: "AI Assistant Instructions for Go Development"
 ---
 
-<!-- omit in toc -->
+# AI Assistant Instructions for Go Development
 
-# GitHub Copilot Instructions for Go
+**言語ポリシー**: ドキュメントは日本語、コード・コメントは英語。
+**AI 対応**: GitHub Copilot、Claude、GPT-4、その他の AI アシスタント。
 
-**Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
+このリポジトリは Go で構築された共通ライブラリとサンプルアプリケーションを含むプロジェクトです。
 
-## Project Overview
+| Directory/File | Purpose / Description                    |
+| -------------- | ---------------------------------------- |
+| example/       | サンプルアプリケーション（Gin、S3 等）   |
+| pkg/           | 共通ライブラリ・ユーティリティ           |
+| cmd/           | 実行可能なコマンドツール（存在する場合） |
+| internal/      | 内部パッケージ（存在する場合）           |
 
-このリポジトリは Go で構築された共通ライブラリとサンプルアプリケーションを含む。
+## Standards
 
-| ディレクトリ/ファイル | 役割・説明                               |
-| --------------------- | ---------------------------------------- |
-| example/              | サンプルアプリケーション（Gin、S3 等）   |
-| pkg/                  | 共通ライブラリ・ユーティリティ           |
-| cmd/                  | 実行可能なコマンドツール（存在する場合） |
-| internal/             | 内部パッケージ（存在する場合）           |
+## Guidelines
 
-## Coding Standards
+### Code Organization
 
-## Coding Standards
+- パッケージは機能別に明確に分離する
+- interface は使用する側のパッケージで定義する（Dependency Inversion 原則）
+- 循環参照を避けるため、依存関係を明確にする
 
-### Production and Test Code Separation
+### Error Handling Best Practices
+
+- error は無視せず、必ず処理する
+- context.Context を使用してキャンセレーション・タイムアウトを適切に処理
+- ログ出力時は構造化ログ（structured logging）を使用
+
+### Performance Guidelines
+
+- goroutine のリークを防ぐため、適切に cleanup する
+- channel の close 責任を明確にする
+- メモリプールの使用を検討（high-frequency operations）
+
+### Go-Specific MCP Usage Patterns
+
+```bash
+# Struct & Interface Understanding
+mcp_serena_find_symbol with name_path="UserService" and depth=1
+
+# Package Dependencies Verification
+mcp_serena_find_referencing_symbols with name_path="GetUser"
+
+# Test File Consistency Check
+mcp_serena_find_symbol with name_path="TestUserService_GetUser" and relative_path="pkg/service/"
+```
+
+### Project Structure (go-common)
+
+#### Repository Layout
+
+この go-common プロジェクトの構造を理解して作業を開始する：
+
+```
+go-common/
+├── .github/
+│   ├── workflows/          # CI/CD Workflows
+│   └── instructions/       # Copilot instruction files
+├── pkg/                    # Common library (reusable code)
+│   ├── infrastructure/     # AWS & external service integrations
+│   ├── repository/         # Data access layer
+│   ├── service/            # Business logic layer
+│   ├── handler/            # HTTP/API handlers
+│   └── utils/             # Utility functions
+├── example/                # Sample applications
+│   ├── gin1/, gin2/       # Gin framework examples
+│   ├── mysql/, postgres/  # Database examples
+│   └── s3/, s3_v2/       # AWS S3 operation examples
+├── scripts/                # Automation scripts
+│   ├── go/                # Go-related scripts
+│   ├── terraform/         # Terraform scripts
+│   └── lib/               # Shared libraries
+└── coverage/              # Test coverage reports
+```
+
+#### Editing Guidelines
+
+- **pkg/**: 本番環境で使用する共通ライブラリ → 品質・テストを重視
+- **example/**: サンプル・デモコード → 理解しやすさを重視
+- **scripts/**: 自動化・運用スクリプト → 安全性・エラーハンドリングを重視
+- **.github/**: CI/CD・プロジェクト設定 → 一貫性・メンテナンス性を重視
+
+#### Initial Onboarding Steps
+
+新しいプロジェクトまたは初めての作業時は以下を実行：
+
+1. **serena initialization** (when using MCP):
+
+   ```
+   mcp_serena_activate_project with project="."
+    mcp_serena_onboarding  # register project info
+   ```
+
+2. **プロジェクト構造把握**:
+
+   ```
+   mcp_serena_list_dir with relative_path="." and recursive=true
+   ```
+
+3. **主要ファイル確認**:
+   - `go.mod` - Go 依存関係
+   - `Makefile` - ビルド・テストコマンド
+   - `README.md` - プロジェクト概要
+   - `.github/workflows/` - CI/CD 設定
+
+### Coding Standards
+
+#### Production and Test Code Separation
 
 - テスト専用の依存注入関数・ラッパー・テスト用ロジックは本番コードに追加しない
 - テスト性が必要な場合はインターフェース設計や構造体埋め込みを使い、テスト専用コードは `*_test.go` ファイルにのみ記述する
 - 本番コードは可読性・保守性・エラー処理・ドキュメントに集中する
 - テストヘルパー・モック・テスト専用ロジックはすべてテストファイルに分離する
 
-## Naming Conventions
+### Naming Conventions
 
 | コンポーネント     | 規則            | 例                                     |
 | ------------------ | --------------- | -------------------------------------- |
@@ -43,7 +132,7 @@ applyTo: "**/*.go"
 | 構造体名           | PascalCase      | Config, Event, User                    |
 | ファイル名         | snake_case      | main.go, event_handler.go              |
 
-## Go Standards
+### Go Language Standards
 
 以下の内容は golangci-lint,go vet で指摘される項目以外の内容を記載する。
 
@@ -360,10 +449,10 @@ func TestUserService_UpdateUser(t *testing.T) {
 - カバレッジレポートは `go test -cover` で確認
 
 ```bash
-# カバレッジレポート生成
+# Generate coverage report
 go test -cover ./pkg/...
 
-# HTMLレポート生成
+# Generate HTML report
 go test -coverprofile=coverage.out ./pkg/...
 go tool cover -html=coverage.out -o coverage.html
 ```
@@ -402,9 +491,9 @@ func TestUserService_Integration(t *testing.T) {
 
 #### Benchmark Test Guidelines
 
-- ベンチマークテストは `Benchmark` で始まる関数名
-- パフォーマンス測定対象の関数をテスト
-- `testing.B` を使用
+- Benchmark tests should use function names starting with `Benchmark`
+- Test functions targeted for performance measurement
+- Use `testing.B` for benchmarks
 
 ```go
 func BenchmarkUserService_GetUser(b *testing.B) {
@@ -464,24 +553,42 @@ func createTestUser() *User {
 }
 ```
 
+### Code Organization (Advanced)
+
+- パッケージは機能別に明確に分離する
+- interface は使用する側のパッケージで定義する（Dependency Inversion）
+- 循環参照を避けるため、依存関係を明確にする
+
+### Error Handling Best Practices (Advanced)
+
+- error は無視せず、必ず処理する
+- context.Context を使用してキャンセレーション・タイムアウトを適切に処理
+- ログ出力時は構造化ログ（structured logging）を使用
+
+### Performance Guidelines (Advanced)
+
+- goroutine のリークを防ぐため、適切に cleanup する
+- channel の close 責任を明確にする
+- メモリプールの使用を検討（high-frequency operations）
+
 ## Testing and Validation
 
 ### Code Modification Guidelines
 
-コード修正時は `/workspace/scripts/go/check.sh` で一括検証する
+コード修正時は以下コマンドで一括検証する：
 
 ```bash
-# 特定ディレクトリのみ（推奨: 対象ディレクトリ）
+# Target specific directory (recommended during development)
 bash /workspace/scripts/go/check.sh -f ./example/gin1/
 
-# プロジェクト全体
+# Entire project
 bash /workspace/scripts/go/check.sh
 
-# 自動修正付き
-bash /workspace/scripts/go/check.sh -f ./example/gin1/
+# With auto-fix where supported
+bash /workspace/scripts/go/check.sh -f ./example/gin1/ --fix
 ```
 
-検証内容：
+検証内容
 
 - `go mod tidy`（依存管理・不要パッケージ削除）
 - `go fmt`（自動整形）
@@ -508,8 +615,6 @@ bash /workspace/scripts/go/check.sh -f ./example/gin1/
 
 ## Security Guidelines
 
-**詳細な security guidelines は `.github/instructions/general.instructions.md` を参照。**
-
 ### Go Specific Security Best Practices
 
 - エラーメッセージに機密情報を含めない
@@ -520,10 +625,43 @@ bash /workspace/scripts/go/check.sh -f ./example/gin1/
 
 ## MCP Tools
 
-**詳細な MCP Tools の設定は `.github/instructions/general.instructions.md` を参照。**
+**詳細な MCP Tools の設定・使用方法は `.github/copilot-instructions.md` を参照。**
 
-Go 開発での主な活用：
+### Go 開発での言語固有の活用パターン
 
-- `serena`: コードベース解析・安全な編集支援。プロジェクト初期化時には `/mcp__serena__initial_instructions` を実行
-- `awslabs.aws-api-mcp-server`: AWS CLI コマンド提案・実行
-- `context7`: コンテキスト情報の管理・操作支援
+**Go 特有の serena 使用パターン:**
+
+```bash
+# Go structs & functions の理解
+mcp_serena_get_symbols_overview with relative_path="pkg/service/user_service.go"
+mcp_serena_find_symbol with name_path="UserService" and depth=1 and include_body=false
+
+# Go method の編集例
+mcp_serena_find_symbol with name_path="UserService/GetUser" and include_body=true
+mcp_serena_replace_symbol_body with name_path="UserService/GetUser" and body="<new method implementation>"
+
+# インターフェース実装確認
+mcp_serena_find_referencing_symbols with name_path="GetUser" and relative_path="pkg/service/"
+```
+
+**Go + AWS 開発例:**
+
+```bash
+# Go SDK 設定確認
+mcp_awslabs_aws-a_suggest_aws_commands with query="Configure AWS credentials for Go SDK"
+
+# Go SDK ベストプラクティス確認
+mcp_aws-knowledge_aws___search_documentation with search_phrase="Go SDK S3 presigned URL best practices"
+```
+
+**Go 依存関係確認:**
+
+```bash
+# Gin framework routing examples
+mcp_context7_resolve-library-id with libraryName="gin"
+mcp_context7_get-library-docs with context7CompatibleLibraryID="/gin-gonic/gin" and topic="routing middleware"
+
+# GORM usage examples
+mcp_context7_resolve-library-id with libraryName="gorm"
+mcp_context7_get-library-docs with context7CompatibleLibraryID="/go-gorm/gorm" and topic="associations"
+```

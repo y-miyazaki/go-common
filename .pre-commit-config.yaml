@@ -24,6 +24,17 @@ repos:
     rev: v8.24.2
     hooks:
       - id: gitleaks
+  - repo: https://github.com/cisagov/pre-commit-shfmt
+    rev: v0.0.2
+    hooks:
+      - id: shfmt
+        args:
+          - -w
+          - -i
+          - "4"
+          - -ci
+          - -bn
+          - -sr
   - repo: https://github.com/antonbabenko/pre-commit-terraform
     rev: v1.100.0 # https://github.com/antonbabenko/pre-commit-terraform/releases
     hooks:
@@ -32,8 +43,8 @@ repos:
         args:
           - --args=-f=compact
           - --args=--chdir=/workspace/modules
-          - --args=--module
           - --args=--no-color
+          - --args=--call-module-type=all
       - id: terraform_trivy
         args:
           - --args=--format=table
@@ -45,7 +56,7 @@ repos:
         name: golangci-lint
         description: Fast linters runner for Go.
         entry: golangci-lint run --max-same-issues=0 --max-issues-per-linter=0 --config=.golangci.yaml --fix
-        types: [go]
-        language: golang
         exclude: ^.*_test.go$
+        language: golang
         pass_filenames: false
+        types: [go]

@@ -1,0 +1,167 @@
+# Reusable workflow: generate AWS resources and upload as zip artifact
+# This workflow can be called by other workflows to generate AWS resources
+name: reusable-cd-resources-aws
+
+on:
+  workflow_call:
+    inputs:
+      categories:
+        description: "Comma-separated categories to limit collection (optional)"
+        required: false
+        type: string
+        default: ""
+      environment:
+        description: "Target environment (dev, qa, stg, prd, etc.)"
+        required: true
+        type: string
+      output_dir:
+        description: "Output directory where CSVs will be written"
+        required: false
+        type: string
+        default: "./output"
+      output_file:
+        description: "Combined output file name (placed inside output_dir)"
+        required: false
+        type: string
+        default: "aws_resources.csv"
+      region:
+        description: "AWS region to query (optional)"
+        required: false
+        type: string
+        default: ""
+    outputs:
+      artifact_name:
+        description: "Name of the uploaded artifact"
+        value: ${{ jobs.generate-documentation.outputs.artifact_name }}
+    secrets:
+      AWS_IAM_ROLE_ARN:
+        required: true
+      AWS_REGION:
+        required: true
+
+env:
+  ENVIRONMENT: ${{ inputs.environment }}
+
+jobs:
+  generate-documentation:
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    concurrency:
+      group: aws-resources-${{ inputs.environment }}
+      cancel-in-progress: false
+    environment:
+      name: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+    outputs:
+      artifact_name: ${{ steps.setup-parameters.outputs.artifact_name }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Setup AWS Credentials
+        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
+        with:
+          role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Parameters
+        id: setup-parameters
+        shell: bash
+        run: | # pragma: allowlist secret
+          # shellcheck disable=SC2086,SC2129,SC2002
+          set -euo pipefail
+
+          # Define common output and artifact naming variables here so downstream steps reuse them
+          ARTIFACT_BASE="resources-${{ inputs.environment }}"
+          ARTIFACT_NAME="${ARTIFACT_BASE}.zip"
+          OUTDIR="${{ inputs.output_dir }}"
+          OUTFILE="${{ inputs.output_file }}"
+          TITLE="AWS Resources(${ENVIRONMENT})"
+
+          # Write environment variables to the GitHub environment file in one grouped redirect
+          {
+            echo "ARTIFACT_BASE=${ARTIFACT_BASE}"
+            echo "ARTIFACT_NAME=${ARTIFACT_NAME}"
+            echo "OUTDIR=${OUTDIR}"
+            echo "OUTFILE=${OUTFILE}"
+            echo "TITLE=${TITLE}"
+          } >> "$GITHUB_ENV"
+
+          # Write outputs to the GitHub output file in one grouped redirect
+          {
+            echo "artifact_base=${ARTIFACT_BASE}"
+            echo "artifact_name=${ARTIFACT_NAME}"
+            echo "outdir=${OUTDIR}"
+            echo "outfile=${OUTFILE}"
+            echo "title=${TITLE}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Exec get AWS Resource Script
+        run: |
+          # shellcheck disable=SC2086,SC2046
+          set -euo pipefail
+          CATS="${{ inputs.categories }}"
+          REGION_ARG="${{ inputs.region }}"
+
+          CMD=("./scripts/terraform/aws_get_resources.sh" -v -p -H -D "$OUTDIR" -o "$OUTFILE" -T "$TITLE")
+          if [[ -n "$CATS" ]]; then
+            CMD+=( -c "$CATS" )
+          fi
+          if [[ -n "$REGION_ARG" ]]; then
+            CMD+=( -r "$REGION_ARG" )
+          fi
+
+          # Print command safely, then execute using array expansion
+          printf 'Running: %s\n' "${CMD[*]}"
+          "${CMD[@]}"
+
+      - name: Prepare artifact structure
+        id: prepare-artifact-structure
+        run: |
+          set -euo pipefail
+
+          # Create artifact directory named after artifact base
+          mkdir -p artifact-output/"${ARTIFACT_BASE}"
+
+          # Move output to artifact base directory (move directory contents safely)
+          mv "$OUTDIR"/* "artifact-output/${ARTIFACT_BASE}/" || true
+
+          echo "Artifact structure:"
+          ls -lR artifact-output/
+
+      - name: Create zip archive
+        run: |
+          set -euo pipefail
+
+          cd artifact-output
+          zip -r ../"${ARTIFACT_NAME}" "${ARTIFACT_BASE}" -x "*.git/*"
+          cd ..
+
+          echo "Archive created successfully: ${ARTIFACT_NAME}"
+          ls -lh "${ARTIFACT_NAME}"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: ${{ steps.setup-parameters.outputs.artifact_name }}
+          path: ${{ steps.setup-parameters.outputs.artifact_name }}
+          retention-days: 30
+
+      - name: Summary
+        if: always()
+        uses: ./.github/actions/summary
+        with:
+          title: "${{ steps.setup-parameters.outputs.title }}"
+          status: "${{ job.status }}"
+          params: |
+            environment: ${{ inputs.environment }}
+            categories: ${{ inputs.categories }}
+            region: ${{ inputs.region }}
+            output_dir: ${{ inputs.output_dir }}
+            output_file: ${{ inputs.output_file }}
+          outputs: |
+            artifact_name: ${{ steps.setup-parameters.outputs.artifact_name }}
+          artifacts: |
+            ${{ steps.setup-parameters.outputs.artifact_name }}

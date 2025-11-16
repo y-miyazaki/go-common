@@ -12,6 +12,7 @@
         "eamodio.gitlens",
         "editorconfig.editorconfig",
         "esbenp.prettier-vscode",
+        "fabiospampinato.vscode-diff",
         "github.vscode-github-actions",
         "github.vscode-pull-request-github",
         "ibm.output-colorizer",
@@ -57,7 +58,7 @@
   "features": {
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
       "version": "latest",
-      "moby": true,
+      "moby": false,
       "dockerDashComposeVersion": "v2"
     }
   }

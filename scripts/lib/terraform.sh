@@ -11,7 +11,7 @@
 #######################################
 
 # Ensure common.sh is loaded for logging functions
-if ! declare -f log >/dev/null 2>&1; then
+if ! declare -f log > /dev/null 2>&1; then
     # Try to source common.sh from the same directory
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     # shellcheck source=./common.sh
@@ -63,7 +63,7 @@ function terraform_install {
 
     # Show installed version
     local tf_version
-    tf_version=$(terraform version -json 2>/dev/null | jq -r '.terraform_version' 2>/dev/null || terraform version | head -n1)
+    tf_version=$(terraform version -json 2> /dev/null | jq -r '.terraform_version' 2> /dev/null || terraform version | head -n1)
     log "INFO" "Terraform version: $tf_version"
 }
 
@@ -314,7 +314,7 @@ function terraform_workflow {
 #   0 on success
 #######################################
 function terraform_get_workspace {
-    terraform workspace show 2>/dev/null || echo "default"
+    terraform workspace show 2> /dev/null || echo "default"
 }
 
 #######################################
@@ -332,7 +332,7 @@ function terraform_select_workspace {
     fi
 
     # Check if workspace exists, create if it doesn't
-    if ! terraform workspace select "$workspace" 2>/dev/null; then
+    if ! terraform workspace select "$workspace" 2> /dev/null; then
         log "INFO" "Creating new workspace: $workspace"
         execute_command "terraform workspace new '$workspace'"
     fi

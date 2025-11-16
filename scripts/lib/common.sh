@@ -120,7 +120,7 @@ function validate_dependencies {
     local missing_tools=()
 
     for tool in "${required_tools[@]}"; do
-        if ! command -v "$tool" &>/dev/null; then
+        if ! command -v "$tool" &> /dev/null; then
             missing_tools+=("$tool")
         fi
     done

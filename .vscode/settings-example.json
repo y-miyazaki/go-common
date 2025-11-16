@@ -67,18 +67,33 @@
   // ------------------------------------------------------------
   // GitHub Copilot
   // ------------------------------------------------------------
+  "chat.agent.enabled": true,
+
+  "chat.mcp.access": "all",
+  "chat.mcp.autostart": "onlyNew",
+  "chat.mcp.discovery.enabled": {
+    "claude-desktop": true,
+    "windsurf": true,
+    "cursor-global": true,
+    "cursor-workspace": true
+  },
   "chat.tools.terminal.autoApprove": {
     "/.*/": true,
-    "rm": false
+    "rm": false,
+    "git add": false,
+    "git commit": false
   },
-  "chat.agent.enabled": true,
-  "chat.mcp.autostart": "onlyNew",
-  "chat.mcp.enabled": true,
-  "chat.mcp.discovery.enabled": true,
   "editor.inlineSuggest.enabled": true,
   "github.copilot.chat.agent.autoFix": true,
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "file": ".github/copilot-instructions.md"
+    }
+  ],
   "github.copilot.chat.localeOverride": "ja",
   "github.copilot.chat.newWorkspace.useContext7": true,
+  "github.copilot.chat.virtualTools.threshold": 128,
   "github.copilot.enable": {
     "*": true,
     "go": true,
@@ -305,7 +320,7 @@
   // ------------------------------------------------------------
   // for Shell Script
   // ------------------------------------------------------------
-  "shellformat.flag": "-i 2 -ci -bn -sr",
+  "shellformat.flag": "-i 4 -ci -bn -sr",
   "shellcheck.enable": true,
   "shellcheck.useWorkspaceRootAsCwd": true,
   "shellcheck.run": "onSave",
@@ -314,7 +329,7 @@
     "**/*.zsh": true,
     "**/*.fish": true
   },
-  "shellcheck.customArgs": ["-x"],
+  "shellcheck.customArgs": ["-x -e SC1091"],
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format",
     "editor.formatOnSave": true,

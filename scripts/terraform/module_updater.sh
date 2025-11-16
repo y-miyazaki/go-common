@@ -150,10 +150,10 @@ function get_latest_version {
     fi
 
     # Skip non-registry sources (git/https, ssh, local paths)
-    if [[ "$module_source" =~ ^git:: ]] ||
-        [[ "$module_source" =~ ^(https?|ssh)://.*\.git(/|$)? ]] ||
-        [[ "$module_source" =~ ^(github\.com|git@) ]] ||
-        [[ "$module_source" =~ ^(~|/|\./|\.\./) ]]; then
+    if [[ "$module_source" =~ ^git:: ]] \
+        || [[ "$module_source" =~ ^(https?|ssh)://.*\.git(/|$) ]] \
+        || [[ "$module_source" =~ ^(github\.com|git@) ]] \
+        || [[ "$module_source" =~ ^(~|/|\./|\.\./) ]]; then
         LATEST_VERSION_CACHE[$module_source]="unknown"
         echo "unknown"
         return 0
@@ -170,14 +170,14 @@ function get_latest_version {
 
     # Try versions endpoint (preferred and stable)
     local response latest
-    if response=$(timeout 12s curl -sf --connect-timeout 5 --max-time 10 "$api_versions" 2>/dev/null); then
+    if response=$(timeout 12s curl -sf --connect-timeout 5 --max-time 10 "$api_versions" 2> /dev/null); then
         latest=$(echo "$response" | jq -r '
             ( .versions // empty | map(.version) )
             // ( .modules // empty | first | .versions // empty | map(.version) )
             | select(length>0)
             | sort_by(split(".")|map(tonumber? // 0))
             | last
-        ' 2>/dev/null || echo "")
+        ' 2> /dev/null || echo "")
         if [[ -n "$latest" && "$latest" != "null" ]]; then
             LATEST_VERSION_CACHE[$module_source]="$latest"
             echo "$latest"
@@ -186,8 +186,8 @@ function get_latest_version {
     fi
 
     # Fallback to module base endpoint (may include .version for some registries)
-    if response=$(timeout 12s curl -sf --connect-timeout 5 --max-time 10 "$api_base" 2>/dev/null); then
-        latest=$(echo "$response" | jq -r '(.version // empty) // empty' 2>/dev/null || echo "")
+    if response=$(timeout 12s curl -sf --connect-timeout 5 --max-time 10 "$api_base" 2> /dev/null); then
+        latest=$(echo "$response" | jq -r '(.version // empty) // empty' 2> /dev/null || echo "")
         if [[ -n "$latest" && "$latest" != "null" ]]; then
             LATEST_VERSION_CACHE[$module_source]="$latest"
             echo "$latest"
@@ -212,7 +212,7 @@ function backup_file {
     local backup_file
     # Place backup files under the project-specific artifact directory to avoid basename collisions
     local project_dir
-    project_dir=$(find_terraform_project_root "$file" 2>/dev/null || true)
+    project_dir=$(find_terraform_project_root "$file" 2> /dev/null || true)
     local proj_artifacts
     if [[ -n "$project_dir" ]]; then
         proj_artifacts=$(artifact_dir_for "$project_dir")
@@ -247,10 +247,10 @@ function find_terraform_modules {
     if [[ "$search_recursive" == "true" ]]; then
         # Use anchored, more precise pattern and avoid aborting on grep non-zero statuses
         find "$dir" -name "*.tf" -type f -not -path "*/.terraform/*" \
-            -exec grep -l "$MODULE_PATTERN_GREP" {} \; 2>/dev/null || true
+            -exec grep -l "$MODULE_PATTERN_GREP" {} \; 2> /dev/null || true
     else
         find "$dir" -maxdepth 1 -name "*.tf" -type f \
-            -exec grep -l "$MODULE_PATTERN_GREP" {} \; 2>/dev/null || true
+            -exec grep -l "$MODULE_PATTERN_GREP" {} \; 2> /dev/null || true
     fi
 }
 
@@ -396,7 +396,7 @@ function process_batch_module_updates {
         local files_list="${MODULE_FILES_MAP[$module_source]}"
 
         # Split files and update all at once
-        IFS='|' read -ra files_array <<<"$files_list"
+        IFS='|' read -ra files_array <<< "$files_list"
 
         local update_success=true
         local updated_files=()
@@ -509,24 +509,24 @@ function rollback_module_files {
 
         # Try project-specific artifact dir first
         local project_dir
-        project_dir=$(find_terraform_project_root "$file" 2>/dev/null || true)
+        project_dir=$(find_terraform_project_root "$file" 2> /dev/null || true)
         if [[ -n "$project_dir" ]]; then
             local proj_artifacts
             proj_artifacts=$(artifact_dir_for "$project_dir")
             if [[ -d "$proj_artifacts" ]]; then
                 # pick the newest backup by mtime
-                target_backup=$(find "$proj_artifacts" -maxdepth 1 -type f -name "$(basename "$file").*.bak" -printf '%T@ %p\n' 2>/dev/null | sort -n | awk '{print $2}' | tail -n1 || true)
+                target_backup=$(find "$proj_artifacts" -maxdepth 1 -type f -name "$(basename "$file").*.bak" -printf '%T@ %p\n' 2> /dev/null | sort -n | awk '{print $2}' | tail -n1 || true)
             fi
         fi
 
         # Fallback: search runtime BACKUP_DIR
         if [[ -z "$target_backup" && -n "$BACKUP_DIR" && -d "$BACKUP_DIR" ]]; then
-            target_backup=$(find "$BACKUP_DIR" -maxdepth 2 -type f -name "$(basename "$file").*.bak" -printf '%T@ %p\n' 2>/dev/null | sort -n | awk '{print $2}' | tail -n1 || true)
+            target_backup=$(find "$BACKUP_DIR" -maxdepth 2 -type f -name "$(basename "$file").*.bak" -printf '%T@ %p\n' 2> /dev/null | sort -n | awk '{print $2}' | tail -n1 || true)
         fi
 
         # Legacy fallback
         if [[ -z "$target_backup" ]]; then
-            target_backup=$(find "$TERRAFORM_DIR" -type d -name ".terraform_module_backups" -exec find {} -maxdepth 1 -type f -name "$(basename "$file").*.bak" -printf '%T@ %p\n' \; 2>/dev/null | sort -n | awk '{print $2}' | tail -n1 || true)
+            target_backup=$(find "$TERRAFORM_DIR" -type d -name ".terraform_module_backups" -exec find {} -maxdepth 1 -type f -name "$(basename "$file").*.bak" -printf '%T@ %p\n' \; 2> /dev/null | sort -n | awk '{print $2}' | tail -n1 || true)
         fi
 
         if [[ -n "$target_backup" && -f "$target_backup" ]]; then
@@ -615,7 +615,7 @@ function process_terraform_directory {
             echo "📦 Update available: $module_source: $current_version -> $latest_version in $file_basename"
             process_single_module_update "$file" "$module_source" "$current_version" "$latest_version"
 
-        done <<<"$modules_info"
+        done <<< "$modules_info"
         log "INFO" "Finished scanning: $file_basename"
     done
 
@@ -680,7 +680,7 @@ function create_baseline_plan {
     fi
 
     # Initialize terraform
-    if ! terraform init "${init_options[@]}" >/dev/null 2>&1; then
+    if ! terraform init "${init_options[@]}" > /dev/null 2>&1; then
         set +x
         log "ERROR" "Initial terraform init failed"
         if [[ "$VERBOSE" == "true" ]]; then
@@ -710,7 +710,7 @@ function create_baseline_plan {
         baseline_plan_command="$baseline_plan_command $plan_options"
     fi
 
-    if ! $baseline_plan_command >"${baseline_log_file}" 2>&1; then
+    if ! $baseline_plan_command > "${baseline_log_file}" 2>&1; then
         log "ERROR" "Failed to create baseline plan"
         if [[ "$VERBOSE" == "true" ]]; then
             echo_section "BASELINE PLAN ERROR OUTPUT"
@@ -752,7 +752,7 @@ function validate_terraform_with_plan_comparison {
     local proj_artifacts
     proj_artifacts=$(artifact_dir_for "$(pwd)")
     local init_log_file="${proj_artifacts}/.terraform_init.log"
-    if ! terraform init "${init_options[@]}" >"${init_log_file}" 2>&1; then
+    if ! terraform init "${init_options[@]}" > "${init_log_file}" 2>&1; then
         log "ERROR" "Terraform init failed after module update"
         if [[ "$VERBOSE" == "true" ]]; then
             echo_section "TERRAFORM INIT ERROR OUTPUT"
@@ -765,7 +765,7 @@ function validate_terraform_with_plan_comparison {
     fi
 
     # Validate syntax after init
-    if ! terraform validate >.terraform_validate.log 2>&1; then
+    if ! terraform validate > .terraform_validate.log 2>&1; then
         log "ERROR" "Terraform syntax validation failed"
         if [[ "$VERBOSE" == "true" ]]; then
             echo_section "TERRAFORM VALIDATE ERROR OUTPUT"
@@ -793,7 +793,7 @@ function validate_terraform_with_plan_comparison {
         current_plan_command="$current_plan_command $plan_options"
     fi
 
-    if ! $current_plan_command >"${current_log_file}" 2>&1; then
+    if ! $current_plan_command > "${current_log_file}" 2>&1; then
         log "ERROR" "Failed to create current plan"
         if [[ "$VERBOSE" == "true" ]]; then
             echo_section "CURRENT PLAN ERROR OUTPUT"
@@ -806,10 +806,10 @@ function validate_terraform_with_plan_comparison {
     fi
 
     # Compare plan file contents using 'terraform show' from artifacts
-    terraform show -no-color "${proj_artifacts}/.terraform_baseline.plan" >"${proj_artifacts}/.terraform_baseline.txt" 2>/dev/null
-    terraform show -no-color "${proj_artifacts}/.terraform_current.plan" >"${proj_artifacts}/.terraform_current.txt" 2>/dev/null
+    terraform show -no-color "${proj_artifacts}/.terraform_baseline.plan" > "${proj_artifacts}/.terraform_baseline.txt" 2> /dev/null
+    terraform show -no-color "${proj_artifacts}/.terraform_current.plan" > "${proj_artifacts}/.terraform_current.txt" 2> /dev/null
 
-    if diff -q "${proj_artifacts}/.terraform_baseline.txt" "${proj_artifacts}/.terraform_current.txt" >/dev/null 2>&1; then
+    if diff -q "${proj_artifacts}/.terraform_baseline.txt" "${proj_artifacts}/.terraform_current.txt" > /dev/null 2>&1; then
         log "INFO" "✅ No infrastructure changes detected"
         # Clean up transient plan files in working dir (artifact copies kept)
         rm -f .terraform_baseline.plan .terraform_baseline.log .terraform_baseline.txt || true
@@ -824,7 +824,7 @@ function validate_terraform_with_plan_comparison {
             echo ""
 
             # Show unified diff with context (use artifact files)
-            if command -v colordiff >/dev/null 2>&1; then
+            if command -v colordiff > /dev/null 2>&1; then
                 diff -u "${proj_artifacts}/.terraform_baseline.txt" "${proj_artifacts}/.terraform_current.txt" | colordiff
             else
                 diff -u "${proj_artifacts}/.terraform_baseline.txt" "${proj_artifacts}/.terraform_current.txt"
@@ -856,7 +856,7 @@ function validate_terraform_with_plan_comparison {
                 echo "# Baseline vs Current Plan Content Comparison"
                 echo ""
                 diff -u "${proj_artifacts}/.terraform_baseline.txt" "${proj_artifacts}/.terraform_current.txt"
-            } >"$diff_log_file"
+            } > "$diff_log_file"
 
             log "INFO" "Detailed diff saved to: $diff_log_file"
             echo ""
@@ -884,16 +884,16 @@ function cleanup_plan_files {
 
     # Also remove artifact copies under any .terraform_backups for this project
     local proj_backup_dirs
-    readarray -t proj_backup_dirs < <(find . -maxdepth 2 -type d -name ".terraform_backups" -print 2>/dev/null || true)
+    readarray -t proj_backup_dirs < <(find . -maxdepth 2 -type d -name ".terraform_backups" -print 2> /dev/null || true)
     for b in "${proj_backup_dirs[@]}"; do
-        find "$b" -maxdepth 2 -type f -name ".terraform_baseline.*" -delete 2>/dev/null || true
-        find "$b" -maxdepth 2 -type f -name ".terraform_current.*" -delete 2>/dev/null || true
-        find "$b" -maxdepth 2 -type f -name "terraform_show_diff_*.log" -delete 2>/dev/null || true
+        find "$b" -maxdepth 2 -type f -name ".terraform_baseline.*" -delete 2> /dev/null || true
+        find "$b" -maxdepth 2 -type f -name ".terraform_current.*" -delete 2> /dev/null || true
+        find "$b" -maxdepth 2 -type f -name "terraform_show_diff_*.log" -delete 2> /dev/null || true
     done
 
     # Remove terraform show diff log files (both old and new naming)
-    find . -maxdepth 1 -name "terraform_show_diff_*.log" -type f -delete 2>/dev/null || true
-    find . -maxdepth 1 -name "terraform_plan_diff_*.log" -type f -delete 2>/dev/null || true
+    find . -maxdepth 1 -name "terraform_show_diff_*.log" -type f -delete 2> /dev/null || true
+    find . -maxdepth 1 -name "terraform_plan_diff_*.log" -type f -delete 2> /dev/null || true
 
     log "INFO" "Plan comparison files cleaned up"
 }
@@ -911,7 +911,7 @@ function cleanup_all_artifacts {
 
     # Remove all per-project .terraform_backups directories under the terraform root
     local backup_dirs
-    readarray -t backup_dirs < <(find "$TERRAFORM_DIR" -type d -name ".terraform_backups" 2>/dev/null || true)
+    readarray -t backup_dirs < <(find "$TERRAFORM_DIR" -type d -name ".terraform_backups" 2> /dev/null || true)
 
     for backup_dir in "${backup_dirs[@]}"; do
         if [[ -d "$backup_dir" ]]; then
@@ -921,7 +921,7 @@ function cleanup_all_artifacts {
     done
 
     # Also remove legacy backup directories named .terraform_module_backups for compatibility
-    readarray -t backup_dirs < <(find "$TERRAFORM_DIR" -type d -name ".terraform_module_backups" 2>/dev/null || true)
+    readarray -t backup_dirs < <(find "$TERRAFORM_DIR" -type d -name ".terraform_module_backups" 2> /dev/null || true)
     for backup_dir in "${backup_dirs[@]}"; do
         if [[ -d "$backup_dir" ]]; then
             log "INFO" "Removing legacy backup directory: $backup_dir"
@@ -937,7 +937,7 @@ function cleanup_all_artifacts {
     # Cleanup plan comparison files in all terraform directories
     local terraform_dirs
     if [[ "$RECURSIVE_SEARCH" == "true" ]]; then
-        readarray -t terraform_dirs < <(find "$TERRAFORM_DIR" -name "*.tf" -type f -exec dirname {} \; 2>/dev/null | sort -u)
+        readarray -t terraform_dirs < <(find "$TERRAFORM_DIR" -name "*.tf" -type f -exec dirname {} \; 2> /dev/null | sort -u)
     else
         terraform_dirs=("$TERRAFORM_DIR")
     fi
@@ -958,8 +958,8 @@ function cleanup_all_artifacts {
             done
 
             # Remove terraform show diff log files (both old and new naming)
-            find . -maxdepth 1 -name "terraform_show_diff_*.log" -type f -delete 2>/dev/null || true
-            find . -maxdepth 1 -name "terraform_plan_diff_*.log" -type f -delete 2>/dev/null || true
+            find . -maxdepth 1 -name "terraform_show_diff_*.log" -type f -delete 2> /dev/null || true
+            find . -maxdepth 1 -name "terraform_plan_diff_*.log" -type f -delete 2> /dev/null || true
         fi
     done
 

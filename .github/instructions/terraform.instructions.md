@@ -1,18 +1,15 @@
 ---
-applyTo: "**/*.tf,**/*.tfvars,**/*.tfstate,**/*.tfbackend"
+applyTo: "**/*.tf,**/*.tfvars,**/*.hcl"
+description: "AI Assistant Instructions for Terraform"
 ---
 
-<!-- omit in toc -->
+# AI Assistant Instructions for Terraform
 
-# GitHub Copilot Instructions for Terraform
+**言語ポリシー**: ドキュメントは日本語、コード・コメントは英語。
 
-**Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
+このリポジトリは Terraform で AWS インフラを管理するためのプロジェクトです。
 
-## Project Overview
-
-このリポジトリは AWS のセキュリティ・監視インフラを管理する Terraform コードを含みます。
-
-| ディレクトリ/ファイル | 役割・説明                                 |
+| Directory/File        | Purpose / Description                      |
 | --------------------- | ------------------------------------------ |
 | terraform/application | 基本セキュリティ設定・AWS アカウント初期化 |
 | terraform/base        | 基本セキュリティ設定・AWS アカウント初期化 |
@@ -21,11 +18,16 @@ applyTo: "**/*.tf,**/*.tfvars,**/*.tfstate,**/*.tfbackend"
 | lambda/               | サーバレス監視・自動化                     |
 | modules/              | AWS リソース共通モジュール                 |
 
-## Coding Standards
+## Standards
 
-## Naming Conventions
+### Coding Standards
 
-| コンポーネント | 規則                | 例                                        |
+### Naming Conventions
+
+命名規則は以下を参照：
+https://www.terraform-best-practices.com/naming
+
+| Component      | Rule                | Example                                   |
 | -------------- | ------------------- | ----------------------------------------- |
 | モジュール変数 | snake_case          | resource_name, is_enabled, vpc_cidr_block |
 | ファイル名     | snake_case          | main_security.tf, iam_roles.tf            |
@@ -44,7 +46,9 @@ applyTo: "**/*.tf,**/*.tfvars,**/*.tfstate,**/*.tfbackend"
     - 仕様変更でトラブルになる可能性考慮し、特定のパラメータ値を必須とするようなチェックは行わない
     - Required な変数で `length > 0` のようなチェックはしない
 
-## Documentation and Comments
+## Guidelines
+
+### Documentation and Comments
 
 - すべての関数・リソースは詳細な説明を含める
 - 目的・機能は冒頭で明記する
@@ -52,19 +56,24 @@ applyTo: "**/*.tf,**/*.tfvars,**/*.tfstate,**/*.tfbackend"
 - コメント・ドキュメントは英語で記載する
 - 複雑なモジュールは使用例も記載する
 
-## Error Handling
+### Error Handling
+
+- Terraform エラーは詳細なログと共に適切に処理する
+- plan/apply 実行時のエラーは必ず原因を特定してから修正する
+- State lock エラー時は適切な解除手順を実行する
+- リソース依存関係エラーは depends_on で明示的に解決する
 
 ## Testing and Validation
 
 ### Code Modification Guidelines
 
-コード修正時は以下を順次実行する：
+コード修正時は以下コマンドで一括検証する：
 
 ```bash
-# 環境変数設定（例：dev環境）
+# Environment variable setup (example: dev environment)
 ENV=dev
 
-# 初期化・検証・プラン
+# Initialize, validate, and plan
 terraform init -reconfigure -backend-config=terraform.${ENV}.tfbackend
 terraform fmt --recursive && terraform validate
 tflint -f compact --var-file=terraform.${ENV}.tfvars
@@ -79,11 +88,10 @@ terraform plan -lock=false -var-file=terraform.${ENV}.tfvars
 
 ## Security Guidelines
 
-**詳細な security guidelines は `.github/instructions/general.instructions.md` を参照。**
-
 ### Terraform Specific Security
 
 - IAM ポリシーは最小権限で設計する
+- IAM ポリシーはヒアドキュメントは利用しない。json_encode もしくは aws_iam_policy_document を使用
 - S3 等はデフォルトで暗号化を有効化する
 - API Gateway 等は WAF・レート制限を設定する
 - モジュール・依存関係は最新バージョンを使用する
@@ -91,10 +99,37 @@ terraform plan -lock=false -var-file=terraform.${ENV}.tfvars
 
 ## MCP Tools
 
-**詳細な MCP Tools の設定は `.github/instructions/general.instructions.md` を参照。**
+**詳細な MCP Tools の設定・使用方法は `.github/copilot-instructions.md` を参照。**
 
-Terraform 作業での主な活用：
+### Terraform 作業特有の活用パターン
 
-- `awslabs.aws-api-mcp-server`: AWS CLI の提案・実行（明示的なリージョン指定・最小スコープ運用）
-- `aws-knowledge-mcp-server`: 公式ドキュメントの検索・参照
-- `context7`: コンテキスト情報の管理・操作支援
+**AWS リソース設計前の事前調査:**
+
+```
+# 既存リソースとの整合性確認
+aws ec2 describe-vpcs --region us-east-1
+aws rds describe-db-instances --region us-east-1
+
+# Terraform Import 用の情報収集
+aws s3api get-bucket-versioning --bucket terraform-state-bucket
+```
+
+**公式ドキュメントによるベストプラクティス確認:**
+
+```
+# AWS サービス固有の制約・要件確認
+search: "S3 bucket policy terraform cross-account access"
+
+# セキュリティ設定の公式ガイダンス参照
+url: "https://docs.aws.amazon.com/s3/latest/userguide/bucket-policies.html"
+```
+
+**プロバイダー・モジュール情報の活用:**
+
+```
+# AWS Provider 最新機能確認
+resolve: "terraform-aws-provider" → get-docs: topic="s3 bucket configuration"
+
+# Terraform モジュール構成例
+resolve: "terraform" → get-docs: topic="module composition"
+```

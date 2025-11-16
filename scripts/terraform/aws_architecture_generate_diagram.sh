@@ -208,7 +208,7 @@ function generate_generic_resources {
         return 0
     fi
 
-    IFS='|' read -r aws_service list_command name_field type_field region_specific <<<"${RESOURCE_CONFIGS[$resource_name]}"
+    IFS='|' read -r aws_service list_command name_field type_field region_specific <<< "${RESOURCE_CONFIGS[$resource_name]}"
 
     case "$output_mode" in
         "stacks")
@@ -225,27 +225,27 @@ function generate_generic_resources {
                 local resources
 
                 # Get resources using AWS CLI
-                if aws "$aws_service" "$list_command" --region "$region" &>/dev/null; then
+                if aws "$aws_service" "$list_command" --region "$region" &> /dev/null; then
                     case "$aws_service" in
                         "ec2")
                             # Only get EC2 instances not in VPC (standalone EC2-Classic instances)
-                            resources=$(aws ec2 describe-instances --region "$region" --query "Reservations[].Instances[?State.Name==\`running\` && VpcId==null]" --output json 2>/dev/null || echo '[]')
+                            resources=$(aws ec2 describe-instances --region "$region" --query "Reservations[].Instances[?State.Name==\`running\` && VpcId==null]" --output json 2> /dev/null || echo '[]')
                             resources=$(echo "$resources" | jq -c 'flatten')
                             ;;
                         "rds")
                             # Only get RDS instances not in VPC
-                            all_rds=$(aws rds describe-db-instances --region "$region" --query "DBInstances[]" --output json 2>/dev/null || echo '[]')
+                            all_rds=$(aws rds describe-db-instances --region "$region" --query "DBInstances[]" --output json 2> /dev/null || echo '[]')
                             resources=$(echo "$all_rds" | jq -c '[.[] | select(.DBSubnetGroup.VpcId == null or .DBSubnetGroup == null)]')
                             ;;
                         "ecs")
-                            resources=$(aws ecs list-clusters --region "$region" --query "clusterArns[]" --output json 2>/dev/null || echo '[]')
+                            resources=$(aws ecs list-clusters --region "$region" --query "clusterArns[]" --output json 2> /dev/null || echo '[]')
                             ;;
                         "dynamodb")
-                            resources=$(aws dynamodb list-tables --region "$region" --query "TableNames[]" --output json 2>/dev/null || echo '[]')
+                            resources=$(aws dynamodb list-tables --region "$region" --query "TableNames[]" --output json 2> /dev/null || echo '[]')
                             ;;
                         *)
                             # Generic command execution for other services
-                            resources=$(aws "$aws_service" "$list_command" --region "$region" --output json 2>/dev/null || echo '[]')
+                            resources=$(aws "$aws_service" "$list_command" --region "$region" --output json 2> /dev/null || echo '[]')
                             ;;
                     esac
                 else
@@ -284,7 +284,7 @@ function generate_generic_resources {
 
                 # Generate stack and resources if count > 0
                 if [[ $resource_count -gt 0 ]]; then
-                    cat >>"$TEMP_YAML_FILE" <<EOF
+                    cat >> "$TEMP_YAML_FILE" << EOF
 
     ${resource_name^}Stack_${safe_region}:
       Type: AWS::Diagram::VerticalStack
@@ -294,7 +294,7 @@ EOF
 
                     local counter=1
                     for res_name in "${resource_names[@]}"; do
-                        echo "        - ${resource_name^}_${safe_region}_${counter}" >>"$TEMP_YAML_FILE"
+                        echo "        - ${resource_name^}_${safe_region}_${counter}" >> "$TEMP_YAML_FILE"
                         counter=$((counter + 1))
                     done
 
@@ -305,7 +305,7 @@ EOF
                         local clean_name
                         clean_name=$(echo "$res_name" | sed 's/^"//;s/"$//;s/[<>:"/\\|?*]/-/g')
 
-                        cat >>"$TEMP_YAML_FILE" <<EOF
+                        cat >> "$TEMP_YAML_FILE" << EOF
 
     ${resource_name^}_${safe_region}_${counter}:
       Type: $type_field
@@ -330,7 +330,7 @@ function generate_stack_children {
     local generate_function="generate_${category}_resources"
     local stack_lines
 
-    if declare -f "$generate_function" >/dev/null; then
+    if declare -f "$generate_function" > /dev/null; then
         # Use custom function if exists
         stack_lines=$(${generate_function} "" "stacks")
     elif [[ -n "${HIERARCHICAL_CONFIGS[$category]:-}" ]]; then
@@ -359,7 +359,7 @@ function generate_stack_children {
         if [[ -n "$stack_name" && -n "$title_suffix" ]]; then
             echo "        - ${stack_name}_${safe_region}"
         fi
-    done <<<"$stack_lines"
+    done <<< "$stack_lines"
 }
 
 #######################################
@@ -394,7 +394,7 @@ function output_yaml {
     log "INFO" "Generating awsdac YAML from AWS CLI"
 
     # Generate YAML header
-    cat >"$TEMP_YAML_FILE" <<EOF
+    cat > "$TEMP_YAML_FILE" << EOF
 Diagram:
   DefinitionFiles:
     - Type: URL
@@ -424,12 +424,12 @@ EOF
     for region in "${REGIONS_TO_CHECK[@]}"; do
         local safe_region="${region//-/_}"
         echo "        - Region_${safe_region}"
-    done >>"$TEMP_YAML_FILE"
+    done >> "$TEMP_YAML_FILE"
 
     # Generate region definitions
     for region in "${REGIONS_TO_CHECK[@]}"; do
         local safe_region="${region//-/_}"
-        cat >>"$TEMP_YAML_FILE" <<EOF
+        cat >> "$TEMP_YAML_FILE" << EOF
 
     Region_${safe_region}:
       Type: AWS::Region
@@ -439,14 +439,14 @@ EOF
         # Add children for each resource type that has resources in this region
         for category in "${AWS_RESOURCE_CATEGORIES[@]}"; do
             generate_stack_children "$category" "$safe_region"
-        done >>"$TEMP_YAML_FILE"
+        done >> "$TEMP_YAML_FILE"
     done
 
     # Generate complete YAML (stack definitions and resources) for each category
     for category in "${AWS_RESOURCE_CATEGORIES[@]}"; do
         local generate_function="generate_${category}_resources"
 
-        if declare -f "$generate_function" >/dev/null; then
+        if declare -f "$generate_function" > /dev/null; then
             # Use custom function if exists
             ${generate_function} "aws_cli" "yaml"
         elif [[ -n "${HIERARCHICAL_CONFIGS[$category]:-}" ]]; then
@@ -461,7 +461,7 @@ EOF
     done
 
     # Generate YAML footer
-    cat >>"$TEMP_YAML_FILE" <<'EOF'
+    cat >> "$TEMP_YAML_FILE" << 'EOF'
 
   Links:
     - Source: User
@@ -492,8 +492,8 @@ function generate_vpc_hierarchical_resources {
 
                 # Get VPC information using AWS CLI
                 local vpcs
-                if aws ec2 describe-vpcs --region "$region" &>/dev/null; then
-                    vpcs=$(aws ec2 describe-vpcs --region "$region" --output json 2>/dev/null || echo '{"Vpcs":[]}')
+                if aws ec2 describe-vpcs --region "$region" &> /dev/null; then
+                    vpcs=$(aws ec2 describe-vpcs --region "$region" --output json 2> /dev/null || echo '{"Vpcs":[]}')
                 else
                     vpcs='{"Vpcs":[]}'
                 fi
@@ -518,7 +518,7 @@ function generate_vpc_hierarchical_resources {
                 # Only generate if there are VPCs
                 if [[ $vpc_count -gt 0 ]]; then
                     # Generate main VPC stack
-                    cat >>"$TEMP_YAML_FILE" <<EOF
+                    cat >> "$TEMP_YAML_FILE" << EOF
 
     VPCHierarchicalStack_${safe_region}:
       Type: AWS::Diagram::VerticalStack
@@ -529,7 +529,7 @@ EOF
                     # Add VPC references to main stack
                     local vpc_counter=1
                     for vpc_info in "${vpc_data[@]}"; do
-                        echo "        - VPCHierarchical_${safe_region}_${vpc_counter}" >>"$TEMP_YAML_FILE"
+                        echo "        - VPCHierarchical_${safe_region}_${vpc_counter}" >> "$TEMP_YAML_FILE"
                         vpc_counter=$((vpc_counter + 1))
                     done
 
@@ -541,14 +541,14 @@ EOF
                         vpc_id=$(echo "$vpc_info" | jq -r '.VpcId // ""')
 
                         # Try to get VPC name from tags
-                        vpc_name=$(echo "$vpc_info" | jq -r '.Tags[]? | select(.Key=="Name") | .Value // ""' 2>/dev/null || echo "")
+                        vpc_name=$(echo "$vpc_info" | jq -r '.Tags[]? | select(.Key=="Name") | .Value // ""' 2> /dev/null || echo "")
                         if [[ -z "$vpc_name" || "$vpc_name" == "null" ]]; then
                             vpc_name="$vpc_id"
                         fi
 
                         # Get subnets for this VPC
                         local subnets
-                        subnets=$(aws ec2 describe-subnets --region "$region" --filters "Name=vpc-id,Values=$vpc_id" --output json 2>/dev/null || echo '{"Subnets":[]}')
+                        subnets=$(aws ec2 describe-subnets --region "$region" --filters "Name=vpc-id,Values=$vpc_id" --output json 2> /dev/null || echo '{"Subnets":[]}')
 
                         local subnet_children=()
                         local subnet_counter=1
@@ -567,7 +567,7 @@ EOF
                         done < <(echo "$subnets" | jq -c '.Subnets[]? // empty')
 
                         # Generate VPC definition with subnet children
-                        cat >>"$TEMP_YAML_FILE" <<EOF
+                        cat >> "$TEMP_YAML_FILE" << EOF
 
     VPCHierarchical_${safe_region}_${vpc_counter}:
       Type: AWS::EC2::VPC
@@ -576,9 +576,9 @@ EOF
 
                         # Add children if subnets exist
                         if [[ ${#subnet_children[@]} -gt 0 ]]; then
-                            echo "      Children:" >>"$TEMP_YAML_FILE"
+                            echo "      Children:" >> "$TEMP_YAML_FILE"
                             for subnet_child in "${subnet_children[@]}"; do
-                                echo "        - $subnet_child" >>"$TEMP_YAML_FILE"
+                                echo "        - $subnet_child" >> "$TEMP_YAML_FILE"
                             done
                         fi
 
@@ -594,18 +594,18 @@ EOF
 
                                 if [[ -n "$subnet_id" && "$subnet_id" != "null" ]]; then
                                     # Try to get subnet name from tags
-                                    subnet_name=$(echo "$subnet_info" | jq -r '.Tags[]? | select(.Key=="Name") | .Value // ""' 2>/dev/null || echo "")
+                                    subnet_name=$(echo "$subnet_info" | jq -r '.Tags[]? | select(.Key=="Name") | .Value // ""' 2> /dev/null || echo "")
                                     if [[ -z "$subnet_name" || "$subnet_name" == "null" ]]; then
                                         subnet_name="$subnet_id ($availability_zone)"
                                     fi
 
                                     # Get EC2 instances in this subnet
                                     local ec2_instances
-                                    ec2_instances=$(aws ec2 describe-instances --region "$region" --filters "Name=subnet-id,Values=$subnet_id" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[]" --output json 2>/dev/null || echo '[]')
+                                    ec2_instances=$(aws ec2 describe-instances --region "$region" --filters "Name=subnet-id,Values=$subnet_id" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[]" --output json 2> /dev/null || echo '[]')
 
                                     # Get Lambda functions in this VPC
                                     local lambda_functions
-                                    lambda_functions=$(aws lambda list-functions --region "$region" 2>/dev/null || echo '{"Functions":[]}')
+                                    lambda_functions=$(aws lambda list-functions --region "$region" 2> /dev/null || echo '{"Functions":[]}')
 
                                     local ec2_children=()
                                     local lambda_children=()
@@ -628,7 +628,7 @@ EOF
                                     # Collect Lambda functions in this VPC
                                     while IFS= read -r function_base64; do
                                         local function_json
-                                        function_json=$(echo "$function_base64" | base64 --decode 2>/dev/null)
+                                        function_json=$(echo "$function_base64" | base64 --decode 2> /dev/null)
                                         [[ -z "$function_json" ]] && continue
 
                                         local function_name
@@ -663,7 +663,7 @@ EOF
                                     done
 
                                     # Generate subnet definition
-                                    cat >>"$TEMP_YAML_FILE" <<EOF
+                                    cat >> "$TEMP_YAML_FILE" << EOF
 
     Subnet_${safe_region}_${vpc_counter}_${subnet_counter}:
       Type: AWS::EC2::Subnet
@@ -672,9 +672,9 @@ EOF
 
                                     # Add all children if they exist
                                     if [[ ${#all_children[@]} -gt 0 ]]; then
-                                        echo "      Children:" >>"$TEMP_YAML_FILE"
+                                        echo "      Children:" >> "$TEMP_YAML_FILE"
                                         for child in "${all_children[@]}"; do
-                                            echo "        - $child" >>"$TEMP_YAML_FILE"
+                                            echo "        - $child" >> "$TEMP_YAML_FILE"
                                         done
                                     fi
 
@@ -690,12 +690,12 @@ EOF
 
                                             if [[ -n "$instance_id" && "$instance_id" != "null" ]]; then
                                                 # Try to get instance name from tags
-                                                instance_name=$(echo "$instance_info" | jq -r '.Tags[]? | select(.Key=="Name") | .Value // ""' 2>/dev/null || echo "")
+                                                instance_name=$(echo "$instance_info" | jq -r '.Tags[]? | select(.Key=="Name") | .Value // ""' 2> /dev/null || echo "")
                                                 if [[ -z "$instance_name" || "$instance_name" == "null" ]]; then
                                                     instance_name="$instance_id ($instance_type)"
                                                 fi
 
-                                                cat >>"$TEMP_YAML_FILE" <<EOF
+                                                cat >> "$TEMP_YAML_FILE" << EOF
 
     EC2Hierarchical_${safe_region}_${vpc_counter}_${subnet_counter}_${ec2_counter}:
       Type: AWS::EC2::Instance
@@ -710,7 +710,7 @@ EOF
                                     local lambda_child_counter=1
                                     for lambda_child in "${lambda_children[@]}"; do
                                         local lambda_name="${lambda_child##*:}"
-                                        cat >>"$TEMP_YAML_FILE" <<EOF
+                                        cat >> "$TEMP_YAML_FILE" << EOF
 
     LambdaVPC_${safe_region}_${vpc_counter}_${subnet_counter}_${lambda_child_counter}:
       Type: AWS::Lambda::Function
@@ -777,13 +777,13 @@ generate_lambda_nonvpc_hierarchical_resources() {
 
         # Get all Lambda functions
         local functions_json
-        functions_json=$(aws lambda list-functions --region "$region" 2>/dev/null || echo '{"Functions":[]}')
+        functions_json=$(aws lambda list-functions --region "$region" 2> /dev/null || echo '{"Functions":[]}')
 
         # Filter Non-VPC functions
         local nonvpc_functions=()
         while IFS= read -r function_base64; do
             local function_json
-            function_json=$(echo "$function_base64" | base64 --decode 2>/dev/null)
+            function_json=$(echo "$function_base64" | base64 --decode 2> /dev/null)
             [[ -z "$function_json" ]] && continue
 
             local function_name
@@ -810,7 +810,7 @@ generate_lambda_nonvpc_hierarchical_resources() {
 
         # Generate stack if Non-VPC functions exist
         if [[ ${#nonvpc_functions[@]} -gt 0 ]]; then
-            cat >>"$TEMP_YAML_FILE" <<EOF
+            cat >> "$TEMP_YAML_FILE" << EOF
 
     LambdaNonVPCStack_${safe_region}:
       Type: AWS::Diagram::VerticalStack
@@ -819,14 +819,14 @@ generate_lambda_nonvpc_hierarchical_resources() {
 EOF
             local counter=1
             for func_name in "${nonvpc_functions[@]}"; do
-                echo "        - LambdaNonVPC_${safe_region}_${counter}" >>"$TEMP_YAML_FILE"
+                echo "        - LambdaNonVPC_${safe_region}_${counter}" >> "$TEMP_YAML_FILE"
                 counter=$((counter + 1))
             done
 
             # Generate resource definitions
             counter=1
             for func_name in "${nonvpc_functions[@]}"; do
-                cat >>"$TEMP_YAML_FILE" <<EOF
+                cat >> "$TEMP_YAML_FILE" << EOF
 
     LambdaNonVPC_${safe_region}_${counter}:
       Type: AWS::Lambda::Function
@@ -850,13 +850,13 @@ generate_s3_hierarchical_resources() {
 
         # Get all S3 buckets (global)
         local buckets_json
-        buckets_json=$(aws s3api list-buckets 2>/dev/null || echo '{"Buckets":[]}')
+        buckets_json=$(aws s3api list-buckets 2> /dev/null || echo '{"Buckets":[]}')
 
         # Filter buckets by region
         local region_buckets=()
         while IFS= read -r bucket_base64; do
             local bucket_json
-            bucket_json=$(echo "$bucket_base64" | base64 --decode 2>/dev/null)
+            bucket_json=$(echo "$bucket_base64" | base64 --decode 2> /dev/null)
             [[ -z "$bucket_json" ]] && continue
 
             local bucket_name
@@ -865,7 +865,7 @@ generate_s3_hierarchical_resources() {
 
             # Get bucket location
             local bucket_region
-            bucket_region=$(aws s3api get-bucket-location --bucket "$bucket_name" 2>/dev/null | jq -r '.LocationConstraint // "us-east-1"')
+            bucket_region=$(aws s3api get-bucket-location --bucket "$bucket_name" 2> /dev/null | jq -r '.LocationConstraint // "us-east-1"')
 
             # Handle us-east-1 special case
             if [[ "$bucket_region" == "null" || -z "$bucket_region" ]]; then
@@ -880,7 +880,7 @@ generate_s3_hierarchical_resources() {
 
         # Generate stack if buckets exist in this region
         if [[ ${#region_buckets[@]} -gt 0 ]]; then
-            cat >>"$TEMP_YAML_FILE" <<EOF
+            cat >> "$TEMP_YAML_FILE" << EOF
 
     S3Stack_${safe_region}:
       Type: AWS::Diagram::VerticalStack
@@ -889,14 +889,14 @@ generate_s3_hierarchical_resources() {
 EOF
             local counter=1
             for bucket_name in "${region_buckets[@]}"; do
-                echo "        - S3_${safe_region}_${counter}" >>"$TEMP_YAML_FILE"
+                echo "        - S3_${safe_region}_${counter}" >> "$TEMP_YAML_FILE"
                 counter=$((counter + 1))
             done
 
             # Generate resource definitions
             counter=1
             for bucket_name in "${region_buckets[@]}"; do
-                cat >>"$TEMP_YAML_FILE" <<EOF
+                cat >> "$TEMP_YAML_FILE" << EOF
 
     S3_${safe_region}_${counter}:
       Type: AWS::S3::Bucket
@@ -917,7 +917,7 @@ function generate_diagram {
 
     log "INFO" "Generating diagram: $out_file from $yaml_file"
 
-    if ! command -v awsdac >/dev/null 2>&1; then
+    if ! command -v awsdac > /dev/null 2>&1; then
         error_exit "awsdac command not found. Please install awsdac."
     fi
 
@@ -949,7 +949,7 @@ function update_git_repository {
     fi
 
     # Check if we're in a git repository
-    if ! git rev-parse --git-dir >/dev/null 2>&1; then
+    if ! git rev-parse --git-dir > /dev/null 2>&1; then
         log "WARN" "Not in a git repository, skipping git operations"
         return 0
     fi

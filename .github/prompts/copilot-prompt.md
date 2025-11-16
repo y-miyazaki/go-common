@@ -1,13 +1,12 @@
 # Prompt
 
-## Overview
-
 ## List
 ### Review for Scripts
+あなたは、Bashスクリプトのエキスパートです。
 GitHub Copilotはレビュー時に以下の内容をチェックし、実際に動作確認も行うこと。
 以下の内容を完了後にチェックをつけた形でMarkdown形式でアウトプットすること。
 ```
-- [ ] copilot-instructions-scripts.mdの内容に従ってレビューを行うこと
+- [ ] .github/instructions/scripts.instructions.mdの内容に従ってレビューを行うこと
 - [ ] コードの一貫性・規約準拠を確認すること
   - [ ] 同一ディレクトリにあるコードも参考にして乖離がある場合は一貫性を担保したコードに修正すること
 - [ ] レビュー後、必ず下記コマンドで動作確認を行うこと
@@ -16,10 +15,11 @@ GitHub Copilotはレビュー時に以下の内容をチェックし、実際に
 ```
 
 ### Review for Go
+あなたは、Goのエキスパートです。
 GitHub Copilotはレビュー時に以下の内容をチェックし、実際に動作確認も行うこと。
 以下の内容を完了後にチェックをつけた形でMarkdown形式でアウトプットすること。
 ```
-- [ ] copilot-instructions-go.mdの内容に従ってレビューを行うこと
+- [ ] .github/instructions/go.instructions.mdの内容に従ってレビューを行うこと
   - [ ] 同一ディレクトリにあるコードも参考にして乖離がある場合は一貫性を担保したコードに修正すること
 - [ ] コードの一貫性・規約準拠を確認すること
 - [ ] /workspace/scripts/go/check.sh -f {target directory}
@@ -27,10 +27,11 @@ GitHub Copilotはレビュー時に以下の内容をチェックし、実際に
 ```
 
 ### Review for Terraform
+あなたは、Terraformのエキスパートです。
 GitHub Copilotはレビュー時に以下の内容をチェックし、実際に動作確認も行うこと。
 以下の内容を完了後にチェックをつけた形でMarkdown形式でアウトプットすること。
 ```
-- [ ] copilot-instructions-terraform.mdの内容に従ってレビューを行うこと
+- [ ] .github/instructions/terraform.instructions.mdの内容に従ってレビューを行うこと
 - [ ] 対象ファイルおよび関連箇所の一貫性・セキュリティを確認すること
 - [ ] コードの一貫性・規約準拠を確認すること
 - [ ] export ENV=dev; terraform init -reconfigure -backend-config=terraform."${ENV}".tfbackend
@@ -40,33 +41,14 @@ GitHub Copilotはレビュー時に以下の内容をチェックし、実際に
 ```
 
 ### Review for Markdown
+あなたは、GitHubのMarkdownドキュメントのエキスパートです。
 GitHub Copilotはレビュー時に以下の内容をチェックし、実際に動作確認も行うこと。
 以下の内容を完了後にチェックをつけた形でMarkdown形式でアウトプットすること。
 ```
-- [ ] copilot-instructions-markdown.mdの内容に従ってレビューを行うこと
+- [ ] .github/instructions/markdown.instructions.mdの内容に従ってレビューを行うこと
 - [ ] ドキュメントの一貫性・規約準拠を確認すること
 - [ ] Markdownlintを実行し、修正可能なものは修正できていること
 - [ ] 同一種類のMarkdownは文書構成を揃えること
 - [ ] 誤字脱字があれば修正すること
+- [ ] 文章は日本語、章名は英語とする
 ```
-
-## Copilot 修正コードガイドライン
-
-- コード修正後は必ずコマンド動作検証を行うこと
-- 修正完了報告は全て完了してから報告すること
-  - 一部の場合は最後に"まだ作業中のため次の指示が必要です"と必ず記載すること
-  - 残っている作業内容は明確にすること
-- 複数のコード修正時でもユーザの毎回の確認は必要ない
-- 統一性
-  - 修正内容が他のコードにも適用すべき場合は、grep で他ファイルも検索し、必要なら全体を修正すること
-  - 共通ライブラリの関数内容は全て把握した上で修正すること
-  - 修正完了後は何を検索しても問題なかったかをgrepレベルで記載すること
-  - grepだけでは問題がありそうな場合は、コード自体も中身も実際に読み込むこと
-- エラー修正は Copilot が自律的に実行すること
-- コマンド動作検証
-  - 全てワンライナーで実行し、複数回の動作確認はユーザー確認不要
-  - &&で全てワンライナー対応
-  - 複数結果確認は||でワンライナー対応
-- コマンド動作実行
-  - 成果物ファイル作成のみなら dry-run 不要。実際に動作させ成果物を調査すること
-  - 成果物ファイルは毎回名前変更しないこと。比較が必要な場合のみ許可

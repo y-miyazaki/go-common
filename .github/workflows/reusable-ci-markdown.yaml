@@ -1,0 +1,80 @@
+# Reusable workflow for Markdown CI linting
+# This workflow runs markdownlint to check Markdown files quality and formatting
+name: reusable-ci-markdown
+
+on:
+  workflow_call:
+    inputs:
+      component:
+        description: "Logical component name (e.g. go-common)"
+        required: true
+        type: string
+      environment:
+        description: "Target environment (dev, qa, stg, prd, etc.)"
+        required: true
+        type: string
+
+env:
+  COMPONENT: ${{ inputs.component }}
+  ENVIRONMENT: ${{ inputs.environment }}
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Exec markdownlint with reviewdog (PR comments)
+        if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
+        uses: reviewdog/action-markdownlint@3667398db9118d7e78f7a63d10e26ce454ba5f58 # v0.26.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          markdownlint_flags: "README*.md"
+          fail_level: error
+          filter_mode: added
+
+      - name: Exec markdownlint-cli2 (non-PR)
+        if: github.event_name != 'pull_request'
+        uses: DavidAnson/markdownlint-cli2-action@992badcdf24e3b8eb7e87ff9287fe931bcb00c6e # v20.0.0
+        with:
+          globs: "README*.md"
+          config: ".markdownlint.yaml"
+          fix: false
+
+      - name: Post PR failure comment
+        if: failure() && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = `❌ Markdownlint failed for component: ${process.env.COMPONENT} (environment: ${process.env.ENVIRONMENT})\n\n`+
+              `Run page: ${runUrl}\n\n`+
+              `See inline PR review comments from markdownlint (via reviewdog) for details.\n\n`+
+              `Re-run guidance:\n- Fix markdown issues locally\n- Commit & push to trigger CI again.`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });
+
+      - name: Summary
+        if: always()
+        uses: ./.github/actions/summary
+        with:
+          title: "Markdownlint"
+          status: "${{ job.status }}"
+          params: |
+            component: ${{ inputs.component }}
+            environment: ${{ inputs.environment }}
+          outputs: |
+            (none)
+          artifacts: |
+            (none)

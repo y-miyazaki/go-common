@@ -73,7 +73,7 @@ function parse_arguments {
 function check_optional_tools {
     local optional_tools=("tflint" "terraform-docs" "trivy")
     for tool in "${optional_tools[@]}"; do
-        if ! command -v "$tool" &>/dev/null; then
+        if ! command -v "$tool" &> /dev/null; then
             log "WARN" "$tool is not installed or not in PATH. Related features will be skipped."
         fi
     done
@@ -92,7 +92,7 @@ function process_terraform_directory {
         return 0
     fi
 
-    pushd "$dir" >/dev/null || error_exit "Failed to enter directory $dir"
+    pushd "$dir" > /dev/null || error_exit "Failed to enter directory $dir"
 
     log "INFO" "Validating in directory: $(pwd)"
 
@@ -101,7 +101,7 @@ function process_terraform_directory {
     terraform_install
 
     # Step 1: Run tflint first (no init required)
-    if command -v tflint &>/dev/null; then
+    if command -v tflint &> /dev/null; then
         log "INFO" "Running tflint (pre-init check) in $(pwd)"
         if ! execute_command "tflint"; then
             error_exit "tflint found issues in $dir"
@@ -119,7 +119,7 @@ function process_terraform_directory {
     terraform_validate
 
     # Step 4: Generate documentation (terraform-docs) if available
-    if command -v terraform-docs &>/dev/null; then
+    if command -v terraform-docs &> /dev/null; then
         log "INFO" "Generating documentation (terraform-docs)"
         if ! execute_command "terraform-docs markdown --output-file README.md ./"; then
             error_exit "Failed to generate documentation for $dir"
@@ -127,7 +127,7 @@ function process_terraform_directory {
     fi
 
     log "INFO" "Completed processing: $dir"
-    popd >/dev/null || true
+    popd > /dev/null || true
 }
 
 #######################################
@@ -162,7 +162,7 @@ function run_recursive_validation {
 #######################################
 function run_security_scan {
     # Run security scan with trivy
-    if command -v trivy &>/dev/null; then
+    if command -v trivy &> /dev/null; then
         echo_section "Running security scan with trivy"
         if ! execute_command "trivy fs . --format table"; then
             error_exit "trivy found security issues that must be addressed."

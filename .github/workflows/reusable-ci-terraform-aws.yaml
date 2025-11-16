@@ -22,112 +22,209 @@ on:
         description: "Path to terraform configuration"
         required: true
         type: string
+      terraform_version:
+        description: "Terraform version to use"
+        required: false
+        type: string
+        default: "1.12.2"
+      tfcmt_version:
+        description: "tfcmt (tfcmt) version to use for PR plan comments"
+        required: false
+        type: string
+        default: "4.5.1"
+      tflint_version:
+        description: "TFLint version to use"
+        required: false
+        type: string
+        default: "v0.59.1"
     secrets:
       AWS_IAM_ROLE_ARN:
         required: true
       AWS_REGION:
         required: true
 
+# Keep top-level env for truly global constants only (tool defaults etc.)
 env:
-  ENV: ${{ inputs.environment }}
   COMPONENT: ${{ inputs.component }}
+  ENVIRONMENT: ${{ inputs.environment }}
   TERRAFORM_PATH: ${{ inputs.terraform_path }}
-  TERRAFORM_VERSION: "1.12.2"
-  TFLINT_VERSION: "v0.44.1"
-  TFCMT_VERSION: "4.5.1"
+  TERRAFORM_VERSION: ${{ inputs.terraform_version }}
+  TFCMT_VERSION: ${{ inputs.tfcmt_version }}
+  TFLINT_VERSION: ${{ inputs.tflint_version }}
 
 jobs:
   init:
     if: ${{ github.actor != 'dependabot[bot]' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     environment:
       name: ${{ inputs.environment }}
+    # env moved to top-level for consistency
+    outputs:
+      tf_init_cache_key: ${{ steps.compute-init-cache-key.outputs.key }}
+      tf_plugin_cache_key: ${{ steps.compute-plugin-cache-key.outputs.key }}
     permissions:
-      id-token: write
       contents: read
+      id-token: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v5
+      - name: Setup AWS Credentials
+        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
         with:
           role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - name: Config Terraform plugin cache
+      - name: Setup Terraform plugin cache
         run: |
+          # shellcheck disable=SC2016
           echo 'plugin_cache_dir="$HOME/.terraform.d/plugin-cache"' >~/.terraformrc
           mkdir --parents ~/.terraform.d/plugin-cache
 
-      - name: Cache Terraform Plugins
-        uses: actions/cache@v4
+      - name: Setup Terraform plugin cache key
+        id: compute-plugin-cache-key
+        run: |
+          # shellcheck disable=SC2016,SC2086
+          echo "key=terraform-plugin-cache-${{ env.ENVIRONMENT }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH)) }}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Terraform init cache key
+        id: compute-init-cache-key
+        run: |
+          # shellcheck disable=SC2016,SC2086
+          echo "key=terraform-init-${{ env.ENVIRONMENT }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/terraform.{1}.tfbackend', env.TERRAFORM_PATH, env.ENVIRONMENT), format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH), format('{0}/**/*.tf', env.TERRAFORM_PATH), 'modules/**/*.tf') }}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Cache Terraform plugin cache
+        id: restore-terraform-plugin-cache
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             ~/.terraform.d/plugin-cache
-          key: ${{ runner.os }}-terraform-${{ env.COMPONENT }}-${{ hashFiles('**/.terraform.lock.hcl') }}
-          restore-keys: |
-            ${{ runner.os }}-terraform-${{ env.COMPONENT }}-
+          key: ${{ steps.compute-plugin-cache-key.outputs.key }}
 
-      - name: Restore Terraform init results
-        uses: actions/cache/restore@v4
+      - name: Restore Cache Terraform init
+        id: restore-terraform-init
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             ${{ env.TERRAFORM_PATH }}/.terraform
             ${{ env.TERRAFORM_PATH }}/.terraform.lock.hcl
-          key: terraform-init-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/terraform.{1}.tfbackend', env.TERRAFORM_PATH, env.ENV), format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH), format('{0}/**/*.tf', env.TERRAFORM_PATH), 'modules/**/*.tf') }}
+          key: ${{ steps.compute-init-cache-key.outputs.key }}
 
       - name: Exec Terraform init
         id: init
         run: |
           if [ ! -d "${{ env.TERRAFORM_PATH }}/.terraform" ]; then
             echo "Cache miss or incomplete modules - initializing Terraform for ${{ env.COMPONENT }}"
-            terraform -chdir=${{ env.TERRAFORM_PATH }} init -reconfigure -backend-config=terraform."${{ env.ENV }}".tfbackend
+            terraform -chdir="${{ env.TERRAFORM_PATH }}" init -reconfigure -backend-config=terraform."${{ env.ENVIRONMENT }}".tfbackend
           else
             echo "Cache hit - skipping Terraform init for ${{ env.COMPONENT }}"
           fi
 
-      - name: Cache Terraform init results
-        uses: actions/cache/save@v4
+      - name: Save Cache Terraform plugin cache
+        if: ${{ steps.restore-terraform-plugin-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            ~/.terraform.d/plugin-cache
+          key: ${{ steps.compute-plugin-cache-key.outputs.key }}
+
+      - name: Save Cache Terraform init
+        if: ${{ steps.restore-terraform-init.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             ${{ env.TERRAFORM_PATH }}/.terraform
             ${{ env.TERRAFORM_PATH }}/.terraform.lock.hcl
-          key: terraform-init-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/terraform.{1}.tfbackend', env.TERRAFORM_PATH, env.ENV), format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH), format('{0}/**/*.tf', env.TERRAFORM_PATH), 'modules/**/*.tf') }}
+          key: ${{ steps.compute-init-cache-key.outputs.key }}
 
   lint:
     if: ${{ github.actor != 'dependabot[bot]' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: init
     environment:
       name: ${{ inputs.environment }}
+    # env moved to top-level for consistency
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Setup Terraform plugin cache
+        run: |
+          # shellcheck disable=SC2016
+          echo 'plugin_cache_dir="$HOME/.terraform.d/plugin-cache"' >~/.terraformrc
+          mkdir --parents ~/.terraform.d/plugin-cache
+
+      - name: Setup TFLint plugin cache
+        run: |
+          mkdir -p ~/.tflint.d/plugins
 
       - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v5
+        uses: terraform-linters/setup-tflint@4cb9feea73331a35b422df102992a03a44a3bb33 # v6.2.1
         with:
           tflint_version: ${{ env.TFLINT_VERSION }}
+          cache: true
+          tflint_config_path: ${{ env.TERRAFORM_PATH }}/.tflint.hcl
+
+      - name: Restore Cache Terraform plugin cache
+        id: restore-terraform-plugin-cache
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            ~/.terraform.d/plugin-cache
+          key: ${{ needs.init.outputs.tf_plugin_cache_key }}
+
+      - name: Restore Cache Terraform init
+        id: restore-terraform-init
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            ${{ env.TERRAFORM_PATH }}/.terraform
+            ${{ env.TERRAFORM_PATH }}/.terraform.lock.hcl
+          key: ${{ needs.init.outputs.tf_init_cache_key }}
+
+      - name: Exec Terraform init
+        id: init
+        run: |
+          if [ ! -d "${{ env.TERRAFORM_PATH }}/.terraform" ]; then
+            echo "Cache miss or incomplete modules - initializing Terraform for ${{ env.COMPONENT }}"
+            terraform -chdir="${{ env.TERRAFORM_PATH }}" init -backend=false -reconfigure
+          else
+            echo "Cache hit - skipping Terraform init for ${{ env.COMPONENT }}"
+          fi
+
+      - name: Exec Terraform fmt check
+        run: |
+          terraform -chdir="${{ env.TERRAFORM_PATH }}" fmt -check -recursive
+
+      - name: Exec Terraform validate
+        run: |
+          terraform -chdir="${{ env.TERRAFORM_PATH }}" validate
 
       - name: Exec TFLint (Modules)
-        run: tflint -f compact --chdir ./modules --module
+        run: tflint -f compact --chdir ./modules --call-module-type=all
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Exec TFLint (Terraform)
-        run: tflint -f compact --chdir ${{ env.TERRAFORM_PATH }} --var-file=terraform.${{ env.ENV }}.tfvars
+        run: |
+          # Quote paths/filenames to avoid shell splitting (addresses SC2086)
+          tflint -f compact --chdir "${{ env.TERRAFORM_PATH }}" --var-file="terraform.${{ env.ENVIRONMENT }}.tfvars"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # https://github.com/aquasecurity/trivy-action/tree/0.33.1/?tab=readme-ov-file#inputs
-      - name: Trivy Vulnerability Scan
-        uses: aquasecurity/trivy-action@0.33.1
+      - name: Exec Trivy Vulnerability Scan
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
         with:
           exit-code: 1
           format: table
@@ -138,20 +235,21 @@ jobs:
           trivy-config: trivy.yaml
 
       # https://github.com/aquasecurity/trivy-action/tree/0.33.1/?tab=readme-ov-file#inputs
-      - name: Trivy Generate SBOM (CycloneDX)
-        uses: aquasecurity/trivy-action@0.33.1
+      - name: Exec Trivy Generate SBOM (CycloneDX)
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
         with:
           exit-code: 0
           format: cyclonedx
-          output: ${{ env.TERRAFORM_PATH }}/sbom-${{ env.COMPONENT }}-${{ env.ENV }}.json
+          output: ${{ env.TERRAFORM_PATH }}/sbom-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}.json
           scan-ref: .
           scan-type: "fs"
 
       - name: Upload SBOM Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
-          name: sbom-${{ env.COMPONENT }}-${{ env.ENV }}
-          path: ${{ env.TERRAFORM_PATH }}/sbom-${{ env.COMPONENT }}-${{ env.ENV }}.json
+          name: sbom-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}
+          path: ${{ env.TERRAFORM_PATH }}/sbom-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}.json
+          retention-days: 30
 
   plan:
     if: ${{ github.actor != 'dependabot[bot]' }}
@@ -160,98 +258,96 @@ jobs:
     environment:
       name: ${{ inputs.environment }}
     permissions:
-      id-token: write
       contents: read
+      id-token: write
       pull-requests: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v5
+      - name: Setup AWS Credentials
+        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
         with:
           role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - name: Config Terraform plugin cache
+      - name: Setup Terraform plugin cache
         run: |
+          # shellcheck disable=SC2016
           echo 'plugin_cache_dir="$HOME/.terraform.d/plugin-cache"' >~/.terraformrc
           mkdir --parents ~/.terraform.d/plugin-cache
 
-      - name: Cache Terraform Plugins
-        uses: actions/cache@v4
+      - name: Restore Cache Terraform plugin cache
+        id: restore-terraform-plugin-cache
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             ~/.terraform.d/plugin-cache
-          key: ${{ runner.os }}-terraform-${{ env.COMPONENT }}-${{ hashFiles('**/.terraform.lock.hcl') }}
-          restore-keys: |
-            ${{ runner.os }}-terraform-${{ env.COMPONENT }}-
+          key: ${{ needs.init.outputs.tf_plugin_cache_key }}
 
-      - name: Setup tfcmt
-        if: ${{ github.event_name == 'pull_request' }}
-        run: |
-          sudo curl -fL -o tfcmt.tar.gz https://github.com/suzuki-shunsuke/tfcmt/releases/download/v${{env.TFCMT_VERSION }}/tfcmt_linux_amd64.tar.gz
-          sudo tar -C /usr/bin -xzf ./tfcmt.tar.gz
-
-      - name: Restore Terraform init results
-        uses: actions/cache/restore@v4
+      - name: Restore Cache Terraform init
+        id: restore-terraform-init
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: |
             ${{ env.TERRAFORM_PATH }}/.terraform
             ${{ env.TERRAFORM_PATH }}/.terraform.lock.hcl
-          key: terraform-init-${{ env.ENV }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/terraform.{1}.tfbackend', env.TERRAFORM_PATH, env.ENV), format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH), format('{0}/**/*.tf', env.TERRAFORM_PATH), 'modules/**/*.tf') }}
+          key: ${{ needs.init.outputs.tf_init_cache_key }}
 
-      - name: Exec Terraform init - if cache miss
+      - name: Exec Terraform init
+        id: init
         run: |
           if [ ! -d "${{ env.TERRAFORM_PATH }}/.terraform" ]; then
-            terraform -chdir=${{ env.TERRAFORM_PATH }} init -reconfigure -backend-config=terraform."${{ env.ENV }}".tfbackend
+            echo "Cache miss or incomplete modules - initializing Terraform for ${{ env.COMPONENT }}"
+            terraform -chdir="${{ env.TERRAFORM_PATH }}" init -reconfigure -backend-config=terraform."${{ env.ENVIRONMENT }}".tfbackend
+          else
+            echo "Cache hit - skipping Terraform init for ${{ env.COMPONENT }}"
           fi
 
-      - name: Exec Terraform plan (Push)
-        if: ${{ github.event_name != 'pull_request' }}
-        id: plan
-        run: terraform -chdir=${{ env.TERRAFORM_PATH }} plan -lock=false -var-file=terraform."${{ env.ENV }}".tfvars
-
-      - name: Terraform plan (PR)
+      - name: Exec Terraform plan (PR)
         if: ${{ github.event_name == 'pull_request' }}
         run: |
+          # shellcheck disable=SC2016,SC2086
+          sudo curl -fL -o tfcmt.tar.gz https://github.com/suzuki-shunsuke/tfcmt/releases/download/v${{env.TFCMT_VERSION }}/tfcmt_linux_amd64.tar.gz
+          sudo tar -C /usr/bin -xzf ./tfcmt.tar.gz
           if [ -n "$PR_HEAD_SHA" ]; then
             export GITHUB_SHA=$PR_HEAD_SHA
           fi
-          tfcmt -repo ${GITHUB_REPOSITORY#*/} -pr "$PR_NUMBER" plan -- terraform -chdir=${{ env.TERRAFORM_PATH }} plan -lock=false -var-file=terraform."${{ env.ENV }}".tfvars
+          tfcmt -repo "${GITHUB_REPOSITORY#*/}" -pr "$PR_NUMBER" plan -- terraform -chdir="${{ env.TERRAFORM_PATH }}" plan -lock=false -var-file=terraform."${{ env.ENVIRONMENT }}".tfvars
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           PR_NUMBER: ${{ github.event.number }}
 
-      - name: Exec Terraform apply (Deploy enabled only)
+      - name: Exec Terraform plan (Push) (deploy=false)
+        if: ${{ github.event_name != 'pull_request' && inputs.deploy == false }}
+        id: plan
+        run: |
+          terraform -chdir="${{ env.TERRAFORM_PATH }}" plan -lock=false -var-file=terraform."${{ env.ENVIRONMENT }}".tfvars
+
+      - name: Exec Terraform apply (Push) (deploy=true)
         if: ${{ github.event_name != 'pull_request' && inputs.deploy == true }}
         id: apply
-        shell: bash
-        run: terraform -chdir=${{ env.TERRAFORM_PATH }} apply --auto-approve -var-file=terraform."${{ env.ENV }}".tfvars
+        run: |
+          terraform -chdir="${{ env.TERRAFORM_PATH }}" apply --auto-approve -var-file=terraform."${{ env.ENVIRONMENT }}".tfvars
 
       - name: Summary
         if: always()
-        run: |
-          echo "Terraform CI completed for component: ${{ env.COMPONENT }} in env: ${{ env.ENV }}" | tee -a $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Artifacts (download from run page below):" >> $GITHUB_STEP_SUMMARY
-          echo "- sbom-${{ env.COMPONENT }}-${{ env.ENV }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Run page (artifacts available): ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "TFLint: See annotations for Terraform configuration issues." >> $GITHUB_STEP_SUMMARY
-          echo "Trivy: Security scan results in job logs." >> $GITHUB_STEP_SUMMARY
-          if [ "${{ inputs.deploy }}" == "true" ]; then
-            echo "Deploy: Terraform apply executed (deploy=true)." >> $GITHUB_STEP_SUMMARY
-          else
-            echo "Deploy: Terraform plan only (deploy=false)." >> $GITHUB_STEP_SUMMARY
-          fi
-          if [ "${{ job.status }}" != "success" ]; then
-            echo "One or more steps failed. See logs above for details." >> $GITHUB_STEP_SUMMARY
-          fi
+        uses: ./.github/actions/summary
+        with:
+          title: "${{ format('Terraform CI: {0}', env.COMPONENT) }}"
+          status: "${{ job.status }}"
+          params: |
+            component: ${{ inputs.component }}
+            environment: ${{ inputs.environment }}
+            terraform_path: ${{ inputs.terraform_path }}
+            deploy: ${{ inputs.deploy }}
+          outputs: |
+            (none)
+          artifacts: |
+            sbom-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}

@@ -148,7 +148,7 @@ function authenticate_ecr {
     fi
 
     # Debug: Show current AWS identity and region
-    log "INFO" "Current AWS identity: $(aws sts get-caller-identity --query 'Arn' --output text 2>/dev/null || echo 'Failed to get identity')"
+    log "INFO" "Current AWS identity: $(aws sts get-caller-identity --query 'Arn' --output text 2> /dev/null || echo 'Failed to get identity')"
     log "INFO" "Using AWS region: $AWS_REGION"
 
     # Get ECR login password first, then pipe to docker login
@@ -160,7 +160,7 @@ function authenticate_ecr {
     fi
 
     log "INFO" "Authenticating Docker with ECR..."
-    if ! echo "$login_password" | docker login --username AWS --password-stdin "$registry_url" >/dev/null 2>&1; then
+    if ! echo "$login_password" | docker login --username AWS --password-stdin "$registry_url" > /dev/null 2>&1; then
         error_exit "Failed to authenticate to ECR registry"
     fi
 
@@ -241,7 +241,7 @@ function main {
     fi
 
     # Confirm AWS account ID after credential validation
-    if ! get_aws_account_id >/dev/null 2>&1; then
+    if ! get_aws_account_id > /dev/null 2>&1; then
         error_exit "Unable to retrieve AWS account ID. Please check your credentials and permissions."
     fi
 

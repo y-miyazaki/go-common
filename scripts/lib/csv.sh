@@ -117,7 +117,7 @@ function csv_sort {
     local input_data="$1"
 
     # For complex CSV data with quoted fields, use Python to sort properly
-    if command -v python3 >/dev/null 2>&1; then
+    if command -v python3 > /dev/null 2>&1; then
         printf "%b" "$input_data" | python3 -c "
 import csv
 import sys

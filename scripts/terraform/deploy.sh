@@ -1,5 +1,21 @@
 #!/bin/bash
 #######################################
+# Description: Deploy Terraform configuration with validation and approval
+# Usage: ./deploy.sh [directory]
+#   directory       Target directory (optional, defaults to current)
+#
+# Required environment variables:
+#   TF_PLUGIN_CACHE_DIR     - Terraform plugin cache directory
+#   ENV                     - Environment (e.g., dev, staging, prod)
+#
+# Examples:
+#   ENV=dev ./deploy.sh ./terraform/base
+#   ENV=prod ./deploy.sh ./terraform/application
+#
+# Design Rules:
+#   - Validates required environment variables before execution
+#   - Uses terraform_workflow from common library for consistency
+#   - Automatically approves deployment (use with caution)
 #######################################
 
 # Error handling: exit on error, unset variable, or failed pipeline

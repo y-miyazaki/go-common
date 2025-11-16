@@ -1,7 +1,7 @@
 #--------------------------------------------------------------
 # base build image
 #--------------------------------------------------------------
-FROM mcr.microsoft.com/vscode/devcontainers/go:1.24
+FROM mcr.microsoft.com/vscode/devcontainers/go:1.25
 #--------------------------------------------------------------
 # ARG
 #--------------------------------------------------------------
@@ -9,12 +9,13 @@ FROM mcr.microsoft.com/vscode/devcontainers/go:1.24
 ARG USER=vscode
 ARG WORKDIR=/workspace
 # version(base)
-ARG NODE_VERSION=24
-ARG GITLEAKS_VERSION=8.18.0
-ARG TRIVY_VERSION=0.65.0
-ARG GH_VERSION=2.73.0
+ARG NODE_VERSION=24 # https://github.com/nodejs/node/releases
+ARG GITLEAKS_VERSION=8.18.0 # https://github.com/gitleaks/gitleaks/releases
+ARG TRIVY_VERSION=0.65.0 # https://github.com/aquasecurity/trivy/releases
+ARG GH_VERSION=2.73.0 # https://github.com/cli/cli/releases
+ARG ACTION_LINT_VERSION=1.7.8 # https://github.com/rhysd/actionlint/releases
 # version(go)
-ARG GOLANGCI_LINT_VERSION=v2.3.1
+ARG GOLANGCI_LINT_VERSION=v2.5.0 # https://github.com/golangci/golangci-lint/releases
 
 # x86_64
 # ARG ARCH_BASE=amd64
@@ -55,16 +56,21 @@ RUN mkdir -p ${WORKDIR}
 WORKDIR  ${WORKDIR}
 
 #--------------------------------------------------------------
-# Install software-properties-common
+# Install minimal apt/https tooling (avoid software-properties-common)
 #--------------------------------------------------------------
-RUN apt update && \
-    apt -y install software-properties-common
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    ca-certificates \
+    gnupg \
+    dirmngr \
+    apt-transport-https \
+    lsb-release
 
 #--------------------------------------------------------------
 # Install dependent packages
 #--------------------------------------------------------------
 RUN apt update && \
-    apt -y install make openssl git tar curl zip jq groff gcc bison python3 python3-dev python3-pip fish shellcheck shfmt
+    apt -y install make openssl git tar curl zip jq groff gcc bison python3 python3-dev python3-pip fish shellcheck shfmt bats
 
 # Install Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -E - && \
@@ -93,6 +99,9 @@ RUN wget https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VER
 
 # Install npm packages
 RUN npm install -g markdownlint-cli markdown-link-check cspell textlint textlint-rule-preset-ja-technical-writing textlint-rule-no-dead-link
+
+# Install actionlint for GitHub Actions linting
+RUN go install github.com/rhysd/actionlint/cmd/actionlint@v${ACTION_LINT_VERSION}
 
 #--------------------------------------------------------------
 # Install for MCP Server

@@ -1,0 +1,85 @@
+name: "Summary"
+description: "Composite action to write a standardized job summary to GITHUB_STEP_SUMMARY\nSections: H1 title, H2 Results, H2 Parameters, H2 Outputs, H2 Artifacts"
+
+inputs:
+  title:
+    description: "Title to use for the summary (H1)"
+    required: true
+  status:
+    description: "Job status (pass from workflow using job.status)"
+    required: false
+    default: ""
+  params:
+    description: "Multiline parameters block (key: value per line)"
+    required: false
+    default: ""
+  outputs:
+    description: "Multiline outputs block (key: value per line)"
+    required: false
+    default: ""
+  artifacts:
+    description: "Multiline artifacts list (one per line)"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: Write Title
+      shell: bash
+      run: |
+        echo "# ${{ inputs.title }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+    - name: Write Results
+      shell: bash
+      run: |
+        echo "## Results" >> $GITHUB_STEP_SUMMARY
+        if [ -n "${{ inputs.status }}" ]; then
+          if [ "${{ inputs.status }}" = "success" ]; then
+            echo "- Status: ✅ success" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- Status: ❌ ${{ inputs.status }}" >> $GITHUB_STEP_SUMMARY
+          fi
+        else
+          # Fallback: do not fail if status missing
+          echo "- Status: (unknown)" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "" >> $GITHUB_STEP_SUMMARY
+    - name: Write Parameters
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.params }}" ]; then
+          echo "## Parameters" >> $GITHUB_STEP_SUMMARY
+          echo "${{ inputs.params }}" | sed '/^$/d' | while IFS= read -r line; do
+            echo "- $line" >> $GITHUB_STEP_SUMMARY
+          done
+          echo "" >> $GITHUB_STEP_SUMMARY
+        fi
+    - name: Write Outputs
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.outputs }}" ]; then
+          echo "## Outputs" >> $GITHUB_STEP_SUMMARY
+          echo "${{ inputs.outputs }}" | sed '/^$/d' | while IFS= read -r line; do
+            echo "- $line" >> $GITHUB_STEP_SUMMARY
+          done
+          echo "" >> $GITHUB_STEP_SUMMARY
+        fi
+    - name: Write Artifacts
+      shell: bash
+      run: |
+        echo "## Artifacts" >> $GITHUB_STEP_SUMMARY
+        if [ -n "${{ inputs.artifacts }}" ]; then
+          echo "${{ inputs.artifacts }}" | sed '/^$/d' | while IFS= read -r line; do
+            echo "- $line" >> $GITHUB_STEP_SUMMARY
+          done
+        else
+          # Fallback: if caller didn't pass artifacts, try reading /tmp/artifact-paths.txt if present
+          if [ -f /tmp/artifact-paths.txt ]; then
+            awk -F'|' '{print "- " $2 " (" $3 ")"}' /tmp/artifact-paths.txt | while IFS= read -r l; do
+              echo "$l" >> $GITHUB_STEP_SUMMARY
+            done
+          else
+            echo "- (none)" >> $GITHUB_STEP_SUMMARY
+          fi
+        fi

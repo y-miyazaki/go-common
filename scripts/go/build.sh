@@ -137,8 +137,8 @@ function prepare_build_environment {
 
     # Clean output directories
     log "INFO" "Cleaning output directories..."
-    rm -rf outputs/"${BINDIR}"/* 2>/dev/null || true
-    rm -rf bin/"${BINDIR}"/* 2>/dev/null || true
+    rm -rf outputs/"${BINDIR}"/* 2> /dev/null || true
+    rm -rf bin/"${BINDIR}"/* 2> /dev/null || true
 
     # Create output directories
     log "INFO" "Creating output directories..."
@@ -158,12 +158,7 @@ function find_lambda_functions {
     local files
     files=$(find "$DIR" -type f -name 'main.go')
     local file_count
-    # Count non-empty lines directly - more efficient than sed/wc
-    if [[ -n "$files" ]]; then
-        file_count=$(printf "%s\n" "$files" | grep -c .)
-    else
-        file_count=0
-    fi
+    file_count=$(printf "%s\n" "$files" | grep -c . || echo 0)
 
     if [[ $file_count -eq 0 ]]; then
         error_exit "No main.go files found in $DIR"
@@ -219,23 +214,22 @@ function build_lambda_functions {
         log "INFO" "Parallel build enabled"
     fi
 
-    local count=0
-
     if [[ "$PARALLEL" == "true" && $(command -v parallel) ]]; then
         # Use GNU parallel if available and parallel build is enabled
         export -f build_function log error_exit echo_section
         export BINDIR ARCH VERBOSE
         # Redirect informational output to stderr; keep stdout reserved for the final count
-        echo "$files" | parallel build_function {} 1>/dev/null || error_exit "Failed in parallel build"
-        count=$file_count
+        echo "$files" | parallel build_function {} 1> /dev/null || error_exit "Failed in parallel build"
     else
         # Sequential build
         for file in $files; do
             # Ensure per-function informational output goes to stderr
-            build_function "$file" 1>/dev/null
-            count=$((count + 1))
+            build_function "$file" 1> /dev/null
         done
     fi
+
+    # Return the count of built functions
+    echo "$file_count"
 }
 
 #######################################
@@ -262,7 +256,6 @@ function main {
     files=$(find_lambda_functions | sed '/^#/d')
 
     # Build all Lambda functions
-    local count
     build_lambda_functions "$files"
 
     # Calculate elapsed time
