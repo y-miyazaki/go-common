@@ -41,7 +41,7 @@ env:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     environment:
       name: ${{ inputs.environment }}
     permissions:
@@ -64,8 +64,11 @@ jobs:
         id: go-cache-paths
         working-directory: ${{ env.GO_PROJECT_PATH }}
         run: |
-          echo "gomodcache=$(go env GOMODCACHE)" >> $GITHUB_OUTPUT
-          echo "gocache=$(go env GOCACHE)" >> $GITHUB_OUTPUT
+          # Write outputs in a single grouped redirect to avoid multiple >> usage
+          {
+            echo "gomodcache=$(go env GOMODCACHE)"
+            echo "gocache=$(go env GOCACHE)"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Cache Go build and module caches
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
@@ -114,10 +117,11 @@ jobs:
         working-directory: ${{ env.GO_PROJECT_PATH }}
 
       - name: Upload Coverage Artifact
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v5.0.0
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: coverage-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}
           path: ${{ env.GO_PROJECT_PATH }}/coverage
+          retention-days: 30
 
       - name: Determine repository visibility
         id: repo_visibility
@@ -157,10 +161,11 @@ jobs:
           govulncheck ./... > security/govulncheck-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}.txt || true
 
       - name: Upload govulncheck Artifact
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v5.0.0
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: govulncheck-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}
           path: ${{ env.GO_PROJECT_PATH }}/security
+          retention-days: 30
 
       # https://github.com/aquasecurity/trivy-action/tree/0.33.1/?tab=readme-ov-file#inputs
       - name: Exec Trivy Vulnerability Scan
@@ -185,10 +190,11 @@ jobs:
           scan-type: "fs"
 
       - name: Upload SBOM Artifact
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v5.0.0
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: sbom-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}
           path: ${{ env.GO_PROJECT_PATH }}/sbom-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}.json
+          retention-days: 30
 
       - name: Exec GolangCI-Lint via reviewdog (PR inline comments)
         if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
@@ -210,23 +216,6 @@ jobs:
           version: ${{ env.GOLANGCI_LINT_VERSION }}
           working-directory: ${{ env.GO_PROJECT_PATH }}
           args: --config=.golangci.yaml --max-same-issues=0 --max-issues-per-linter=0
-
-      - name: Summary
-        if: always()
-        run: |
-          echo "Go CI completed for component: ${{ env.COMPONENT }} in env: ${{ env.ENVIRONMENT }}" | tee -a $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Artifacts (download from run page below):" >> $GITHUB_STEP_SUMMARY
-          echo "- coverage-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
-          echo "- govulncheck-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
-          echo "- sbom-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Run page (artifacts available): ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "GolangCI-Lint: See annotations (push) or PR review comments (pull_request)." >> $GITHUB_STEP_SUMMARY
-          if [ "${{ job.status }}" != "success" ]; then
-            echo "One or more steps failed. See logs above for details." >> $GITHUB_STEP_SUMMARY
-          fi
 
       - name: Post PR failure comment
         if: failure() && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
@@ -250,3 +239,19 @@ jobs:
               repo: context.repo.repo,
               body
             });
+
+      - name: Summary
+        if: always()
+        uses: ./.github/actions/summary
+        with:
+          title: "${{ format('Go CI: {0}', env.COMPONENT) }}"
+          status: "${{ job.status }}"
+          params: |
+            component: ${{ inputs.component }}
+            environment: ${{ inputs.environment }}
+          outputs: |
+            (none)
+          artifacts: |
+            coverage-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}
+            govulncheck-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}
+            sbom-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}

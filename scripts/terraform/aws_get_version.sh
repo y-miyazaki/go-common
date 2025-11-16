@@ -13,7 +13,7 @@
 # Output:
 # - Generates CSV file containing available runtime/engine versions for Lambda, Glue, and RDS
 # - Marks latest versions available for each runtime/engine type
-# - CSV columns: Category,Subcategory,Subsubcategory,Region,Version,Is_Latest,Status,Deprecation_Date,EOL_Date
+# - CSV columns: Category,Subcategory,Subsubcategory,Name,Region,Is_Latest,Status,Deprecation_Date,EOL_Date
 #
 # CSV Format Notes:
 # - Compatible with Excel, Numbers, Google Sheets
@@ -197,7 +197,7 @@ function parse_arguments {
 #######################################
 function collect_lambda_versions {
     local region=$1
-    local header="Category,Subcategory,Subsubcategory,Region,Version,Is_Latest,Status,Deprecation_Date,Block_Function_Create,Block_Function_Update"
+    local header="Category,Subcategory,Subsubcategory,Name,Region,Is_Latest,Status,Deprecation_Date,Block_Function_Create,Block_Function_Update"
 
     # Return header if requested
     if [[ "$region" == "header" ]]; then
@@ -217,7 +217,7 @@ function collect_lambda_versions {
             is_latest="Yes"
         fi
 
-        buffer+="Lambda,Runtime,$family,$region,$runtime,$is_latest,$status,$deprecation_date,$block_create_date,$block_update_date\n"
+        buffer+="Lambda,Runtime,$family,$runtime,$region,$is_latest,$status,$deprecation_date,$block_create_date,$block_update_date\n"
     done <<< "$LAMBDA_DATA"
 
     echo "$buffer"
@@ -228,7 +228,7 @@ function collect_lambda_versions {
 #######################################
 function collect_glue_versions {
     local region=$1
-    local header="Category,Subcategory,Subsubcategory,Region,Version,Is_Latest,Status,End_of_Support,End_of_Life"
+    local header="Category,Subcategory,Subsubcategory,Name,Region,Is_Latest,Status,End_of_Support,End_of_Life"
 
     # Return header if requested
     if [[ "$region" == "header" ]]; then
@@ -248,7 +248,7 @@ function collect_glue_versions {
             is_latest="Yes"
         fi
 
-        buffer+="Glue,Version,glue,$region,$version,$is_latest,$status,$end_of_support_date,$end_of_life_date\n"
+        buffer+="Glue,Version,glue,$version,$region,$is_latest,$status,$end_of_support_date,$end_of_life_date\n"
     done <<< "$GLUE_DATA"
 
     echo "$buffer"
@@ -259,7 +259,7 @@ function collect_glue_versions {
 #######################################
 function collect_rds_versions {
     local region=$1
-    local header="Category,Subcategory,Subsubcategory,Region,Version,Is_Latest,Status,Deprecation_Date,EOL_Date"
+    local header="Category,Subcategory,Subsubcategory,Name,Region,Is_Latest,Status,Deprecation_Date,EOL_Date"
 
     # Return header if requested
     if [[ "$region" == "header" ]]; then
@@ -298,7 +298,7 @@ function collect_rds_versions {
                 # RDS versions don't have standardized deprecation dates from AWS API
                 local deprecation_date=""
                 local eol_date=""
-                buffer+="RDS,Engine,$engine,$region,$version,$is_latest,$status,$deprecation_date,$eol_date\n"
+                buffer+="RDS,Engine,$engine,$version,$region,$is_latest,$status,$deprecation_date,$eol_date\n"
             fi
         done < <(echo "$engine_versions_json" | jq -c '.[]?')
     done

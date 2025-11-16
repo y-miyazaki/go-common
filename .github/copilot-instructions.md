@@ -48,6 +48,7 @@
 - コマンド動作実行
   - 出力ファイル名はデフォルトから変更しないこと。
 - 長時間の対話（10 ターン以上または 10,000 トークン相当）では、途中で再度ガイドラインを読み直し、遵守状況を報告する
+- CLI は必ず help で確認した上で実行する。もしくは公式ドキュメントを参考にする
 
 #### Final Checklist
 
@@ -129,14 +130,14 @@ description: "AI Assistant Instructions for Go Development"
 - **自動適用**: `applyTo: "**/*.tf,**/*.tfvars,**/*.hcl"` で自動適用されますが、作業前に必ず明示的に確認すること
 - 検証コマンド、命名規則、セキュリティガイドラインが記載されています
 
-### Shell Scripts
+### Shell Script
 
-あなたは Shell スクリプトの専門家です。
+あなたは Shell Script の専門家です。
 
 **必須参照**:
 
 - ファイルパス: `.github/instructions/scripts.instructions.md`
-- Shell スクリプト編集時は必ずこのファイルの内容を確認すること
+- Shell Script 編集時は必ずこのファイルの内容を確認すること
 - **自動適用**: `applyTo: "**/*.sh,scripts/**"` で自動適用されますが、作業前に必ず明示的に確認すること
 
 ### Markdown

@@ -7,7 +7,7 @@
 #     -v, --verbose        Enable verbose output
 #     -d, --dry-run        Show what would be done without executing
 #     -e, --environment    Environment name (dev, qa, stg, prd) (required)
-#     -t, --db-type        Database type (pgsql, mysql, oracle, redshift) (default: pgsql)
+#     -t, --db-type        Database type (pgsql, pgsql11, mysql, redshift) (default: pgsql11)
 #     -n, --db-name        Database name (required)
 #     -s, --schema-name    Schema name to document (optional: if not specified, uses -all to document all schemas)
 #     -o, --output-dir     Output directory for generated documentation (optional)
@@ -53,18 +53,18 @@ VERBOSE=false
 export VERBOSE
 DRY_RUN=false
 ENVIRONMENT=""
-DB_TYPE="pgsql"
+DB_TYPE="pgsql11"
 DB_NAME=""
-SCHEMA_NAME=""  # Empty means all schemas will be documented
+SCHEMA_NAME="" # Empty means all schemas will be documented
 OUTPUT_DIR=""
 LOCAL_PORT=""
 SECRET_ID=""
 BASTION_ID=""
 BASTION_TAG="*bastion*"
-SCHEMASPY_VERSION="6.2.4"
+SCHEMASPY_VERSION="7.0.2"
 SSL_MODE="require"
 SKIP_CLEANUP=false
-DB_THREADS="1"  # Database threads for parallel processing (default: 3 for stability)
+DB_THREADS="3" # Database threads for parallel processing (default: 3 for stability)
 
 # Runtime variables
 SSM_PID=""
@@ -91,7 +91,7 @@ Optional Options:
   -h, --help           Display this help message
   -v, --verbose        Enable verbose output
   -d, --dry-run        Show what would be done without executing
-  -t, --db-type        Database type (pgsql, mysql, oracle, redshift) (default: pgsql)
+  -t, --db-type        Database type (pgsql, pgsql11, mysql, redshift) (default: pgsql11)
   -s, --schema-name    Schema name to document (optional: if not specified, uses -all to document all schemas)
   -o, --output-dir     Output directory (default: /workspace/tmp/schemaspy-{env}-{type}-{db})
   -p, --local-port     Local port for port forwarding (default: auto-detected by db-type)
@@ -104,11 +104,9 @@ Optional Options:
   --skip-cleanup       Skip SSM session cleanup (for debugging)
 
 Examples:
-  $(basename "$0") -e dev -n aurora_dev                                            # All schemas (-all)
-  $(basename "$0") -e dev -n aurora_dev -s public                                  # Specific schema
-  $(basename "$0") -e prd -n production_db -s public -v
-  $(basename "$0") -e dev -n myapp -t mysql --bastion-id i-0123456789abcdef0
-  $(basename "$0") -e dev -t redshift -n redshift_dev --secret-id dev/redshift/credentials
+  $(basename "$0") -e dev -t mysql    -n myapp        --bastion-id i-0123456789abcdef0
+  $(basename "$0") -e dev -t pgsql11  -n aurora_dev   -s public --secret-id dev/db/credentials
+  $(basename "$0") -e dev -t redshift -n redshift_dev           --secret-id dev/redshift/credentials
 
 Workflow:
   1. Validates required parameters and AWS connectivity
@@ -234,7 +232,7 @@ validate_parameters() {
     # Set default local port based on database type if not specified
     if [ -z "${LOCAL_PORT}" ]; then
         case "${DB_TYPE}" in
-            pgsql | postgresql)
+            pgsql | pgsql11)
                 LOCAL_PORT="15432"
                 ;;
             redshift)
@@ -242,9 +240,6 @@ validate_parameters() {
                 ;;
             mysql)
                 LOCAL_PORT="13306"
-                ;;
-            oracle)
-                LOCAL_PORT="11521"
                 ;;
             *)
                 LOCAL_PORT="15432"
@@ -297,13 +292,13 @@ cleanup() {
     # Also clean up any session-manager-plugin processes on our port
     if [ -n "${LOCAL_PORT}" ]; then
         local remaining_pids
-        remaining_pids=$(pgrep -f "session-manager-plugin.*${LOCAL_PORT}" 2>/dev/null || true)
+        remaining_pids=$(pgrep -f "session-manager-plugin.*${LOCAL_PORT}" 2> /dev/null || true)
         if [ -n "${remaining_pids}" ]; then
             log "INFO" "Cleaning up remaining SSM sessions on port ${LOCAL_PORT}..."
-            pkill -TERM -f "session-manager-plugin.*${LOCAL_PORT}" 2>/dev/null || true
+            pkill -TERM -f "session-manager-plugin.*${LOCAL_PORT}" 2> /dev/null || true
             sleep 2
             # Force kill any that are still running
-            pkill -9 -f "session-manager-plugin.*${LOCAL_PORT}" 2>/dev/null || true
+            pkill -9 -f "session-manager-plugin.*${LOCAL_PORT}" 2> /dev/null || true
         fi
     fi
 
@@ -415,12 +410,12 @@ verify_bastion() {
 start_port_forwarding() {
     # Clean up any existing sessions on this port first
     local existing_pids
-    existing_pids=$(pgrep -f "session-manager-plugin.*${LOCAL_PORT}" 2>/dev/null || true)
+    existing_pids=$(pgrep -f "session-manager-plugin.*${LOCAL_PORT}" 2> /dev/null || true)
     if [ -n "${existing_pids}" ]; then
         log "WARN" "Found existing SSM sessions on port ${LOCAL_PORT}, cleaning up..."
-        pkill -TERM -f "session-manager-plugin.*${LOCAL_PORT}" 2>/dev/null || true
+        pkill -TERM -f "session-manager-plugin.*${LOCAL_PORT}" 2> /dev/null || true
         sleep 2
-        pkill -9 -f "session-manager-plugin.*${LOCAL_PORT}" 2>/dev/null || true
+        pkill -9 -f "session-manager-plugin.*${LOCAL_PORT}" 2> /dev/null || true
         sleep 1
     fi
 
@@ -488,13 +483,13 @@ download_dependencies() {
     log "INFO" "Checking SchemaSpy and JDBC driver..."
 
     local cache_dir="/workspace/tmp"
-    SCHEMASPY_JAR="${cache_dir}/schemaspy-${SCHEMASPY_VERSION}.jar"
+    SCHEMASPY_JAR="${cache_dir}/schemaspy.jar"
     JDBC_DRIVER="${cache_dir}/${DB_TYPE}-jdbc.jar"
 
     # Download SchemaSpy if not cached
     if [ ! -f "${SCHEMASPY_JAR}" ]; then
         log "INFO" "Downloading SchemaSpy ${SCHEMASPY_VERSION}..."
-        curl -fsSL "https://github.com/schemaspy/schemaspy/releases/download/v${SCHEMASPY_VERSION}/schemaspy-${SCHEMASPY_VERSION}.jar" \
+        curl -fsSL "https://github.com/schemaspy/schemaspy/releases/download/v${SCHEMASPY_VERSION}/schemaspy-app.jar" \
             -o "${SCHEMASPY_JAR}"
         log "INFO" "SchemaSpy downloaded"
     else
@@ -505,7 +500,7 @@ download_dependencies() {
     if [ ! -f "${JDBC_DRIVER}" ]; then
         log "INFO" "Downloading JDBC driver for ${DB_TYPE}..."
         case "${DB_TYPE}" in
-            pgsql)
+            pgsql | pgsql11)
                 curl -fsSL "https://jdbc.postgresql.org/download/postgresql-42.7.5.jar" \
                     -o "${JDBC_DRIVER}"
                 ;;
@@ -516,9 +511,6 @@ download_dependencies() {
             mysql)
                 curl -fsSL "https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar" \
                     -o "${JDBC_DRIVER}"
-                ;;
-            oracle)
-                error_exit "Oracle JDBC driver must be manually downloaded due to license restrictions"
                 ;;
             *)
                 error_exit "Unsupported database type: ${DB_TYPE}"
@@ -545,7 +537,7 @@ run_schemaspy() {
     # Set connection properties based on database type and SSL mode
     local conn_props=""
     case "${DB_TYPE}" in
-        pgsql | postgresql)
+        pgsql | pgsql11)
             conn_props="sslmode\\=${SSL_MODE}"
             ;;
         redshift)
@@ -562,9 +554,6 @@ run_schemaspy() {
                 conn_props="useSSL\\=true"
             fi
             ;;
-        oracle)
-            conn_props=""
-            ;;
     esac
 
     local schemaspy_log="${OUTPUT_DIR}/schemaspy.log"
@@ -580,7 +569,6 @@ run_schemaspy() {
         -t "${schemaspy_type}"
         -u "${DB_USER}"
         -p "${DB_PASSWORD}"
-        -vizjs
     )
 
     # Add schema parameter: -s for specific schema, -all for all schemas
@@ -595,41 +583,80 @@ run_schemaspy() {
     java_cmd+=(-o "${OUTPUT_DIR}")
 
     # Add database threads parameter to control concurrent connections
-    java_cmd+=(-dbthreads "${DB_THREADS}")
-    log "INFO" "Using ${DB_THREADS} database threads for parallel processing"
-
-    # Add JDBC driver to classpath, including AWS SDK for Redshift
     if [ "${DB_TYPE}" == "redshift" ]; then
-        # Redshift JDBC driver requires AWS SDK dependencies
-        local aws_sdk_jar="/workspace/tmp/aws-java-sdk-core.jar"
-        if [ ! -f "${aws_sdk_jar}" ]; then
-            log "WARN" "AWS SDK JAR not found, downloading..."
-            curl -sSL -o "${aws_sdk_jar}" "https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-core/1.12.529/aws-java-sdk-core-1.12.529.jar"
-        fi
-        java_cmd+=(-dp "${JDBC_DRIVER}:${aws_sdk_jar}")
+        # Redshift can be sensitive to too many connections; use 1 thread by default
+        # https://docs.aws.amazon.com/redshift/latest/mgmt/jdbc20-download-driver.html
+        java_cmd+=(-dbthreads "1")
+        log "INFO" "Using 1 database threads for Redshift parallel processing"
     else
-        java_cmd+=(-dp "${JDBC_DRIVER}")
+        java_cmd+=(-dbthreads "${DB_THREADS}")
+        log "INFO" "Using ${DB_THREADS} database threads for parallel processing"
     fi
 
-    # For Redshift, use built-in type and add SSL to connection string
-    if [ "${DB_TYPE}" == "redshift" ]; then
-        java_cmd+=(-host "localhost:${LOCAL_PORT}")
-        if [ "${SSL_MODE}" != "disable" ]; then
-            java_cmd+=(-db "${DB_NAME}?ssl=true")
-        else
-            java_cmd+=(-db "${DB_NAME}?ssl=false")
-        fi
-        log "INFO" "Using built-in Redshift type (SchemaSpy 6.2.4+)"
+    # Consolidated handling for JDBC driver classpath, host, DB and connection properties
+    # Combine driver (-dp) and connection (-host/-db/-connprops) setup per DB type to avoid duplicate case blocks
+    case "${DB_TYPE}" in
+        redshift)
+            # Redshift JDBC driver requires AWS SDK dependencies
+            local aws_sdk_jar="/workspace/tmp/aws-java-sdk-core.jar"
+            if [ ! -f "${aws_sdk_jar}" ]; then
+                log "WARN" "AWS SDK JAR not found, downloading..."
+                curl -sSL -o "${aws_sdk_jar}" "https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-core/1.12.529/aws-java-sdk-core-1.12.529.jar"
+            fi
+            # Add Redshift driver + AWS SDK to classpath
+            java_cmd+=(-dp "${JDBC_DRIVER}:${aws_sdk_jar}")
 
-    else
-        # Standard host/db parameters for other databases
-        java_cmd+=(-host "localhost:${LOCAL_PORT}")
-        java_cmd+=(-db "${DB_NAME}")
+            # Host and DB URL (add ssl flag for non-disabled SSL modes)
+            java_cmd+=(-host "localhost:${LOCAL_PORT}")
+            if [ "${SSL_MODE}" != "disable" ]; then
+                java_cmd+=(-db "${DB_NAME}?ssl=true")
+            else
+                java_cmd+=(-db "${DB_NAME}?ssl=false")
+            fi
 
-        if [ -n "${conn_props}" ]; then
-            java_cmd+=(-connprops "${conn_props}")
-        fi
-    fi
+            log "INFO" "Using built-in Redshift type (SchemaSpy 6.2.4+)"
+            ;;
+
+        pgsql | pgsql11)
+            # PostgreSQL driver on classpath
+            java_cmd+=(-dp "${JDBC_DRIVER}")
+
+            # Host and DB URL (add ssl flag for non-disabled SSL modes)
+            java_cmd+=(-host "localhost:${LOCAL_PORT}")
+            if [ "${SSL_MODE}" != "disable" ]; then
+                java_cmd+=(-db "${DB_NAME}?ssl=true")
+            else
+                java_cmd+=(-db "${DB_NAME}?ssl=false")
+            fi
+
+            # Optional connection properties (sslmode etc.)
+            if [ -n "${conn_props}" ]; then
+                java_cmd+=(-connprops "${conn_props}")
+            fi
+            ;;
+
+        mysql)
+            # MySQL driver on classpath
+            java_cmd+=(-dp "${JDBC_DRIVER}")
+
+            # Host and DB name
+            java_cmd+=(-host "localhost:${LOCAL_PORT}")
+            java_cmd+=(-db "${DB_NAME}")
+            if [ -n "${conn_props}" ]; then
+                java_cmd+=(-connprops "${conn_props}")
+            fi
+            ;;
+
+        *)
+            # Default handling for unknown DB types: place JDBC driver on classpath and basic connection
+            java_cmd+=(-dp "${JDBC_DRIVER}")
+            java_cmd+=(-host "localhost:${LOCAL_PORT}")
+            java_cmd+=(-db "${DB_NAME}")
+            if [ -n "${conn_props}" ]; then
+                java_cmd+=(-connprops "${conn_props}")
+            fi
+            ;;
+    esac
 
     if [ "${DRY_RUN}" = true ]; then
         log "INFO" "DRY RUN - Would execute:"

@@ -55,7 +55,7 @@ env:
 jobs:
   init:
     if: ${{ github.actor != 'dependabot[bot]' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     environment:
       name: ${{ inputs.environment }}
     # env moved to top-level for consistency
@@ -70,7 +70,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Setup AWS Credentials
-        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v5.1.0
+        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
         with:
           role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
@@ -82,16 +82,21 @@ jobs:
 
       - name: Setup Terraform plugin cache
         run: |
+          # shellcheck disable=SC2016
           echo 'plugin_cache_dir="$HOME/.terraform.d/plugin-cache"' >~/.terraformrc
           mkdir --parents ~/.terraform.d/plugin-cache
 
       - name: Setup Terraform plugin cache key
         id: compute-plugin-cache-key
-        run: echo "key=terraform-plugin-cache-${{ env.ENVIRONMENT }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH)) }}" >> $GITHUB_OUTPUT
+        run: |
+          # shellcheck disable=SC2016,SC2086
+          echo "key=terraform-plugin-cache-${{ env.ENVIRONMENT }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH)) }}" >> "$GITHUB_OUTPUT"
 
       - name: Setup Terraform init cache key
         id: compute-init-cache-key
-        run: echo "key=terraform-init-${{ env.ENVIRONMENT }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/terraform.{1}.tfbackend', env.TERRAFORM_PATH, env.ENVIRONMENT), format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH), format('{0}/**/*.tf', env.TERRAFORM_PATH), 'modules/**/*.tf') }}" >> $GITHUB_OUTPUT
+        run: |
+          # shellcheck disable=SC2016,SC2086
+          echo "key=terraform-init-${{ env.ENVIRONMENT }}-${{ env.COMPONENT }}-${{ runner.os }}-${{ hashFiles(format('{0}/terraform.{1}.tfbackend', env.TERRAFORM_PATH, env.ENVIRONMENT), format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH), format('{0}/**/*.tf', env.TERRAFORM_PATH), 'modules/**/*.tf') }}" >> "$GITHUB_OUTPUT"
 
       - name: Restore Cache Terraform plugin cache
         id: restore-terraform-plugin-cache
@@ -115,7 +120,7 @@ jobs:
         run: |
           if [ ! -d "${{ env.TERRAFORM_PATH }}/.terraform" ]; then
             echo "Cache miss or incomplete modules - initializing Terraform for ${{ env.COMPONENT }}"
-            terraform -chdir=${{ env.TERRAFORM_PATH }} init -reconfigure -backend-config=terraform."${{ env.ENVIRONMENT }}".tfbackend
+            terraform -chdir="${{ env.TERRAFORM_PATH }}" init -reconfigure -backend-config=terraform."${{ env.ENVIRONMENT }}".tfbackend
           else
             echo "Cache hit - skipping Terraform init for ${{ env.COMPONENT }}"
           fi
@@ -139,7 +144,7 @@ jobs:
 
   lint:
     if: ${{ github.actor != 'dependabot[bot]' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     needs: init
     environment:
       name: ${{ inputs.environment }}
@@ -155,6 +160,7 @@ jobs:
 
       - name: Setup Terraform plugin cache
         run: |
+          # shellcheck disable=SC2016
           echo 'plugin_cache_dir="$HOME/.terraform.d/plugin-cache"' >~/.terraformrc
           mkdir --parents ~/.terraform.d/plugin-cache
 
@@ -191,17 +197,18 @@ jobs:
         run: |
           if [ ! -d "${{ env.TERRAFORM_PATH }}/.terraform" ]; then
             echo "Cache miss or incomplete modules - initializing Terraform for ${{ env.COMPONENT }}"
-            terraform -chdir=${{ env.TERRAFORM_PATH }} init -backend=false -reconfigure
+            terraform -chdir="${{ env.TERRAFORM_PATH }}" init -backend=false -reconfigure
           else
             echo "Cache hit - skipping Terraform init for ${{ env.COMPONENT }}"
           fi
 
       - name: Exec Terraform fmt check
-        run: terraform -chdir=${{ env.TERRAFORM_PATH }} fmt -check -recursive
+        run: |
+          terraform -chdir="${{ env.TERRAFORM_PATH }}" fmt -check -recursive
 
       - name: Exec Terraform validate
         run: |
-          terraform -chdir=${{ env.TERRAFORM_PATH }} validate
+          terraform -chdir="${{ env.TERRAFORM_PATH }}" validate
 
       - name: Exec TFLint (Modules)
         run: tflint -f compact --chdir ./modules --call-module-type=all
@@ -209,7 +216,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Exec TFLint (Terraform)
-        run: tflint -f compact --chdir ${{ env.TERRAFORM_PATH }} --var-file=terraform.${{ env.ENVIRONMENT }}.tfvars
+        run: |
+          # Quote paths/filenames to avoid shell splitting (addresses SC2086)
+          tflint -f compact --chdir "${{ env.TERRAFORM_PATH }}" --var-file="terraform.${{ env.ENVIRONMENT }}.tfvars"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -236,10 +245,11 @@ jobs:
           scan-type: "fs"
 
       - name: Upload SBOM Artifact
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v5.0.0
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: sbom-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}
           path: ${{ env.TERRAFORM_PATH }}/sbom-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}.json
+          retention-days: 30
 
   plan:
     if: ${{ github.actor != 'dependabot[bot]' }}
@@ -256,7 +266,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Setup AWS Credentials
-        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v5.1.0
+        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
         with:
           role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
@@ -268,6 +278,7 @@ jobs:
 
       - name: Setup Terraform plugin cache
         run: |
+          # shellcheck disable=SC2016
           echo 'plugin_cache_dir="$HOME/.terraform.d/plugin-cache"' >~/.terraformrc
           mkdir --parents ~/.terraform.d/plugin-cache
 
@@ -293,7 +304,7 @@ jobs:
         run: |
           if [ ! -d "${{ env.TERRAFORM_PATH }}/.terraform" ]; then
             echo "Cache miss or incomplete modules - initializing Terraform for ${{ env.COMPONENT }}"
-            terraform -chdir=${{ env.TERRAFORM_PATH }} init -reconfigure -backend-config=terraform."${{ env.ENVIRONMENT }}".tfbackend
+            terraform -chdir="${{ env.TERRAFORM_PATH }}" init -reconfigure -backend-config=terraform."${{ env.ENVIRONMENT }}".tfbackend
           else
             echo "Cache hit - skipping Terraform init for ${{ env.COMPONENT }}"
           fi
@@ -301,12 +312,13 @@ jobs:
       - name: Exec Terraform plan (PR)
         if: ${{ github.event_name == 'pull_request' }}
         run: |
+          # shellcheck disable=SC2016,SC2086
           sudo curl -fL -o tfcmt.tar.gz https://github.com/suzuki-shunsuke/tfcmt/releases/download/v${{env.TFCMT_VERSION }}/tfcmt_linux_amd64.tar.gz
           sudo tar -C /usr/bin -xzf ./tfcmt.tar.gz
           if [ -n "$PR_HEAD_SHA" ]; then
             export GITHUB_SHA=$PR_HEAD_SHA
           fi
-          tfcmt -repo ${GITHUB_REPOSITORY#*/} -pr "$PR_NUMBER" plan -- terraform -chdir=${{ env.TERRAFORM_PATH }} plan -lock=false -var-file=terraform."${{ env.ENVIRONMENT }}".tfvars
+          tfcmt -repo "${GITHUB_REPOSITORY#*/}" -pr "$PR_NUMBER" plan -- terraform -chdir="${{ env.TERRAFORM_PATH }}" plan -lock=false -var-file=terraform."${{ env.ENVIRONMENT }}".tfvars
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
@@ -315,30 +327,27 @@ jobs:
       - name: Exec Terraform plan (Push) (deploy=false)
         if: ${{ github.event_name != 'pull_request' && inputs.deploy == false }}
         id: plan
-        run: terraform -chdir=${{ env.TERRAFORM_PATH }} plan -lock=false -var-file=terraform."${{ env.ENVIRONMENT }}".tfvars
+        run: |
+          terraform -chdir="${{ env.TERRAFORM_PATH }}" plan -lock=false -var-file=terraform."${{ env.ENVIRONMENT }}".tfvars
 
       - name: Exec Terraform apply (Push) (deploy=true)
         if: ${{ github.event_name != 'pull_request' && inputs.deploy == true }}
         id: apply
-        run: terraform -chdir=${{ env.TERRAFORM_PATH }} apply --auto-approve -var-file=terraform."${{ env.ENVIRONMENT }}".tfvars
+        run: |
+          terraform -chdir="${{ env.TERRAFORM_PATH }}" apply --auto-approve -var-file=terraform."${{ env.ENVIRONMENT }}".tfvars
 
       - name: Summary
         if: always()
-        run: |
-          echo "Terraform CI completed for component: ${{ env.COMPONENT }} in environment: ${{ env.ENVIRONMENT }}" | tee -a $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Artifacts (download from run page below):" >> $GITHUB_STEP_SUMMARY
-          echo "- sbom-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Run page (artifacts available): ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "TFLint: See annotations for Terraform configuration issues." >> $GITHUB_STEP_SUMMARY
-          echo "Trivy: Security scan results in job logs." >> $GITHUB_STEP_SUMMARY
-          if [ "${{ inputs.deploy }}" == "true" ]; then
-            echo "Deploy: Terraform apply executed (deploy=true)." >> $GITHUB_STEP_SUMMARY
-          else
-            echo "Deploy: Terraform plan only (deploy=false)." >> $GITHUB_STEP_SUMMARY
-          fi
-          if [ "${{ job.status }}" != "success" ]; then
-            echo "One or more steps failed. See logs above for details." >> $GITHUB_STEP_SUMMARY
-          fi
+        uses: ./.github/actions/summary
+        with:
+          title: "${{ format('Terraform CI: {0}', env.COMPONENT) }}"
+          status: "${{ job.status }}"
+          params: |
+            component: ${{ inputs.component }}
+            environment: ${{ inputs.environment }}
+            terraform_path: ${{ inputs.terraform_path }}
+            deploy: ${{ inputs.deploy }}
+          outputs: |
+            (none)
+          artifacts: |
+            sbom-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}

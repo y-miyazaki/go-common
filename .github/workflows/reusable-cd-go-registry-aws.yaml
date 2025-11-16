@@ -1,6 +1,6 @@
 # Reusable workflow for building and pushing Docker images to Amazon ECR
 # This workflow can be called by other workflows to perform go CD operations
-name: reusable-cd-go-aws-ecr
+name: reusable-cd-go-registry-aws
 
 on:
   workflow_call:
@@ -66,7 +66,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Setup AWS Credentials
-        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v5.1.0
+        uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0
         with:
           role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
@@ -85,15 +85,18 @@ jobs:
           REPOSITORY="${{ inputs.ecr_repository }}"
           DOCKER_CONTEXT="${{ inputs.docker_context }}"
           if [ -z "$DOCKER_CONTEXT" ]; then DOCKER_CONTEXT="${{ env.GO_PROJECT_PATH }}"; fi
-          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
-          echo "registry=$REGISTRY_INPUT" >> $GITHUB_OUTPUT
-          echo "repository=$REPOSITORY" >> $GITHUB_OUTPUT
-          echo "docker_context=$DOCKER_CONTEXT" >> $GITHUB_OUTPUT
-          echo "dockerfile_path=${{ inputs.dockerfile }}" >> $GITHUB_OUTPUT
-          echo "platforms=${{ inputs.platform }}" >> $GITHUB_OUTPUT
+          # Write meta outputs in one grouped redirect to avoid multiple >> usage
+          {
+            echo "image_tag=$IMAGE_TAG"
+            echo "registry=$REGISTRY_INPUT"
+            echo "repository=$REPOSITORY"
+            echo "docker_context=$DOCKER_CONTEXT"
+            echo "dockerfile_path=${{ inputs.dockerfile }}"
+            echo "platforms=${{ inputs.platform }}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Setup QEMU
-        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
         with:
           platforms: all
 
@@ -111,5 +114,15 @@ jobs:
 
       - name: Summary
         if: always()
-        run: |
-          echo "Pushed image: ${{ steps.meta.outputs.registry }}/${{ steps.meta.outputs.repository }}:${{ steps.meta.outputs.image_tag }}" | tee -a $GITHUB_STEP_SUMMARY
+        uses: ./.github/actions/summary
+        with:
+          title: "${{ format('Docker Image: {0}/{1}:{2}', steps.meta.outputs.registry, steps.meta.outputs.repository, steps.meta.outputs.image_tag) }}"
+          status: "${{ job.status }}"
+          params: |
+            component: ${{ inputs.component }}
+            ecr_repository: ${{ inputs.ecr_repository }}
+            image_tag: ${{ inputs.image_tag }}
+          outputs: |
+            image: ${{ steps.meta.outputs.registry }}/${{ steps.meta.outputs.repository }}:${{ steps.meta.outputs.image_tag }}
+          artifacts: |
+            (none)

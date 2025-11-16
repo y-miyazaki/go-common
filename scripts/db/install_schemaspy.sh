@@ -55,12 +55,13 @@ SKIP_JAVA=false
 SKIP_GRAPHVIZ=false
 SKIP_SCHEMASPY=false
 SKIP_JDBC=false
-SCHEMASPY_VERSION="6.2.4"
+SCHEMASPY_VERSION="7.0.2"
 INSTALL_DIR="/workspace/tmp"
 
 # JDBC driver versions
 POSTGRESQL_JDBC_VERSION="42.7.5"
 MYSQL_JDBC_VERSION="8.0.33"
+REDSHIFT_JDBC_VERSION="2.1.0.32"
 
 #######################################
 # Display usage information
@@ -245,7 +246,24 @@ install_java() {
     if command -v apt-get &> /dev/null; then
         log "INFO" "Using apt-get to install Java..."
         sudo apt-get update -qq
-        sudo apt-get install -y openjdk-17-jdk
+
+        # Try several candidate packages to handle different distro images
+        local candidates=(openjdk-17-jdk openjdk-17-jdk-headless default-jdk openjdk-11-jdk-headless)
+        local installed=false
+        for pkg in "${candidates[@]}"; do
+            log "DEBUG" "Attempting to install Java package: ${pkg}"
+            if sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "${pkg}"; then
+                log "INFO" "Installed Java package: ${pkg}"
+                installed=true
+                break
+            else
+                log "WARN" "Package ${pkg} not available or failed to install, trying next candidate..."
+            fi
+        done
+
+        if [ "${installed}" = false ]; then
+            error_exit "Failed to install any Java package via apt-get. Please install Java manually (e.g. openjdk) and re-run the script."
+        fi
     elif command -v yum &> /dev/null; then
         log "INFO" "Using yum to install Java..."
         sudo yum install -y java-17-openjdk-devel
@@ -345,7 +363,7 @@ download_schemaspy() {
 
     log "INFO" "Checking SchemaSpy..."
 
-    local schemaspy_jar="${INSTALL_DIR}/schemaspy-${SCHEMASPY_VERSION}.jar"
+    local schemaspy_jar="${INSTALL_DIR}/schemaspy.jar"
 
     if [ -f "${schemaspy_jar}" ] && [ "${FORCE_INSTALL}" = false ]; then
         log "INFO" "SchemaSpy is already downloaded: ${schemaspy_jar}"
@@ -359,7 +377,7 @@ download_schemaspy() {
         return 0
     fi
 
-    local download_url="https://github.com/schemaspy/schemaspy/releases/download/v${SCHEMASPY_VERSION}/schemaspy-${SCHEMASPY_VERSION}.jar"
+    local download_url="https://github.com/schemaspy/schemaspy/releases/download/v${SCHEMASPY_VERSION}/schemaspy-app.jar"
 
     curl -fsSL "${download_url}" -o "${schemaspy_jar}"
 
@@ -401,6 +419,8 @@ download_postgresql_jdbc() {
     if [ -f "${jdbc_jar}" ]; then
         local file_size
         file_size=$(du -h "${jdbc_jar}" | cut -f1)
+        ln -s "${jdbc_jar}" "${INSTALL_DIR}/postgresql-jdbc.jar"
+        ln -s "${jdbc_jar}" "${INSTALL_DIR}/pgsql11-jdbc.jar"
         log "INFO" "PostgreSQL JDBC driver downloaded successfully: ${file_size}"
     else
         error_exit "PostgreSQL JDBC driver download failed"

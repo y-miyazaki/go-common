@@ -136,6 +136,10 @@ fi
 - すべてのスクリプトは目的を記載したヘッダーを含める
 - すべての関数は詳細な説明を含める
 - コメント・ドキュメントは英語で記載する
+- function 定義順序:
+  - show_usage,parse_arguments function は最初に定義
+  - main function は最後に定義
+  - その他の関数は a-z 順に定義
 
 ### Help Function Standards
 

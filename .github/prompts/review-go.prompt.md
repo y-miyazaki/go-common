@@ -1,6 +1,7 @@
 ---
 mode: "agent"
 description: "Go言語のコード品質・セキュリティ・パフォーマンス・ベストプラクティス準拠レビュー"
+tools: ["awslabs.aws-api-mcp-server", "aws-knowledge-mcp-server", "context7", "serena"]
 ---
 
 # Go Review Prompt

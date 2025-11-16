@@ -205,13 +205,23 @@ function get_aws_account_id {
 #######################################
 function get_aws_region {
     local region
-    if ! region=$(aws configure get region 2> /dev/null); then
-        # Try to get from instance metadata if running on EC2
-        if ! region=$(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/placement/region 2> /dev/null); then
-            error_exit "Failed to determine AWS region. Set AWS_DEFAULT_REGION or configure AWS CLI."
-        fi
+    local region_from_aws
+    # aws configure get region returns empty string (exit 0) when not set, so capture value and test
+    region_from_aws=$(aws configure get region 2> /dev/null || true)
+    if [[ -n "$region_from_aws" ]]; then
+        echo "$region_from_aws"
+        return 0
     fi
-    echo "$region"
+
+    # Try to get from instance metadata if running on EC2
+    local region_from_meta
+    region_from_meta=$(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/placement/region 2> /dev/null || true)
+    if [[ -n "$region_from_meta" ]]; then
+        echo "$region_from_meta"
+        return 0
+    fi
+
+    error_exit "Failed to determine AWS region. Set AWS_DEFAULT_REGION or configure AWS CLI."
 }
 
 #######################################
@@ -242,6 +252,195 @@ function get_resource_name_from_arn {
         # Simple resource name
         echo "$resource_part"
     fi
+}
+
+#######################################
+# Function to resolve a Security Group ID to a human-friendly name
+# Arguments:
+#   $1 - Security Group ID (e.g. sg-0123456789abcdef0)
+#   $2 - AWS region (optional, defaults to current region)
+# Outputs:
+#   Security Group name (Tag Name or GroupName) or the original ID if not resolvable
+# Returns:
+#   0 on success, 1 on error
+#######################################
+function get_security_group_name {
+    local sg_id="$1"
+    local region="${2:-$(get_aws_region)}"
+
+    if [[ -z "$sg_id" ]]; then
+        echo "N/A"
+        return 1
+    fi
+
+    # Only attempt to resolve well-formed SG IDs
+    if [[ ! "$sg_id" =~ ^sg-[0-9a-fA-F]+$ ]]; then
+        # Not an SG id; return as-is
+        echo "$sg_id"
+        return 0
+    fi
+
+    local cmd out
+    cmd=(aws ec2 describe-security-groups --group-ids "$sg_id" --region "$region" --output json)
+    if out=$(aws_safe_exec "${cmd[*]}" 2> /dev/null); then
+        # Prefer Tag 'Name' if present, otherwise GroupName
+        local sg_name
+        sg_name=$(echo "$out" | jq -r '.SecurityGroups[0] | (.Tags[]? | select(.Key=="Name") | .Value) // .GroupName // ""' 2> /dev/null || true)
+        if [[ -n "$sg_name" ]]; then
+            echo "$sg_name"
+            return 0
+        fi
+        # Fallback to returning the ID
+        echo "$sg_id"
+        return 0
+    else
+        # If AWS call failed, return the ID to avoid breaking consumers
+        echo "$sg_id"
+        return 1
+    fi
+}
+
+#######################################
+# Function to resolve a VPC ID to a human-friendly name
+# Arguments:
+#   $1 - VPC ID (e.g. vpc-0123456789abcdef0)
+#   $2 - AWS region (optional, defaults to current region)
+# Outputs:
+#   VPC Name (Tag 'Name') or the original VPC ID if not resolvable
+# Returns:
+#   0 on success, 1 on error
+#######################################
+function get_vpc_name {
+    local vpc_id="$1"
+    local region="${2:-$(get_aws_region)}"
+
+    if [[ -z "$vpc_id" ]]; then
+        echo "N/A"
+        return 1
+    fi
+
+    # Only attempt to resolve well-formed VPC IDs
+    if [[ ! "$vpc_id" =~ ^vpc-[0-9a-fA-F]+$ ]]; then
+        # Not a VPC id; return as-is
+        echo "$vpc_id"
+        return 0
+    fi
+
+    local cmd out
+    cmd=(aws ec2 describe-vpcs --vpc-ids "$vpc_id" --region "$region" --output json)
+    if out=$(aws_safe_exec "${cmd[*]}" 2> /dev/null); then
+        # Prefer Tag 'Name' if present, otherwise fall back to VpcId
+        local vpc_name
+        vpc_name=$(echo "$out" | jq -r '.Vpcs[0] | (.Tags[]? | select(.Key=="Name") | .Value) // .VpcId // ""' 2> /dev/null || true)
+        if [[ -n "$vpc_name" ]]; then
+            echo "$vpc_name"
+            return 0
+        fi
+        # Fallback to returning the ID
+        echo "$vpc_id"
+        return 0
+    else
+        # If AWS call failed, return the ID to avoid breaking consumers
+        echo "$vpc_id"
+        return 1
+    fi
+}
+
+#######################################
+# Function to resolve a Subnet ID to a human-friendly name
+# Arguments:
+#   $1 - Subnet ID (e.g. subnet-0123456789abcdef0)
+#   $2 - AWS region (optional, defaults to current region)
+# Outputs:
+#   Subnet Name (Tag 'Name') or the original Subnet ID if not resolvable
+# Returns:
+#   0 on success, 1 on error
+#######################################
+function get_subnet_name {
+    local subnet_id="$1"
+    local region="${2:-$(get_aws_region)}"
+
+    if [[ -z "$subnet_id" ]]; then
+        echo "N/A"
+        return 1
+    fi
+
+    # Only attempt to resolve well-formed Subnet IDs
+    if [[ ! "$subnet_id" =~ ^subnet-[0-9a-fA-F]+$ ]]; then
+        # Not a Subnet id; return as-is
+        echo "$subnet_id"
+        return 0
+    fi
+
+    local cmd out
+    cmd=(aws ec2 describe-subnets --subnet-ids "$subnet_id" --region "$region" --output json)
+    if out=$(aws_safe_exec "${cmd[*]}" 2> /dev/null); then
+        # Prefer Tag 'Name' if present, otherwise fall back to SubnetId
+        local subnet_name
+        subnet_name=$(echo "$out" | jq -r '.Subnets[0] | (.Tags[]? | select(.Key=="Name") | .Value) // .SubnetId // ""' 2> /dev/null || true)
+        if [[ -n "$subnet_name" ]]; then
+            echo "$subnet_name"
+            return 0
+        fi
+        # Fallback to returning the ID
+        echo "$subnet_id"
+        return 0
+    else
+        # If AWS call failed, return the ID to avoid breaking consumers
+        echo "$subnet_id"
+        return 1
+    fi
+}
+
+#######################################
+# Function to resolve a WAFv2 WebACL ARN to its human friendly Name
+# Arguments:
+#   $1 - WAF WebACL ARN (e.g. arn:aws:wafv2:us-east-1:123456789012:regional/webacl/MyWebACL/uuid)
+#   $2 - optional region (falls back to get_aws_region)
+# Outputs:
+#   WebACL Name or ARN (if unresolved)
+# Returns:
+#   0 on success (found name), 1 on failure (returns ARN or N/A)
+#######################################
+function get_waf_name {
+    local waf_arn="$1"
+    local region="${2:-$(get_aws_region)}"
+
+    if [[ -z "$waf_arn" || "$waf_arn" == "N/A" ]]; then
+        echo "N/A"
+        return 1
+    fi
+
+    # Try to extract the name directly from ARN: /webacl/<name>/...
+    local waf_name
+    waf_name=$(echo "$waf_arn" | sed -n 's#.*/webacl/\([^/]*\)/.*#\1#p' || true)
+    if [[ -n "$waf_name" ]]; then
+        echo "$waf_name"
+        return 0
+    fi
+
+    # Fallback: query list-web-acls for REGIONAL and CLOUDFRONT scopes and match ARN
+    for scope in REGIONAL CLOUDFRONT; do
+        local out
+        # WAF CLOUDFRONT scope is global and should be queried in us-east-1 for reliability
+        local list_region
+        if [[ "$scope" == "CLOUDFRONT" ]]; then
+            list_region="us-east-1"
+        else
+            list_region="$region"
+        fi
+
+        out=$(aws wafv2 list-web-acls --scope "$scope" --region "$list_region" --output json 2> /dev/null || echo '{}')
+        waf_name=$(echo "$out" | jq -r --arg arn "$waf_arn" '.WebACLs[]? | select(.ARN==$arn) | .Name' 2> /dev/null || true)
+        if [[ -n "$waf_name" && "$waf_name" != "null" ]]; then
+            echo "$waf_name"
+            return 0
+        fi
+    done
+
+    # As a last resort, return the ARN so callers have something to show
+    echo "$waf_arn"
+    return 1
 }
 
 #######################################
@@ -287,13 +486,24 @@ function is_service_available_in_region {
     # Check if service is available in region by attempting to list resources
     case "$service" in
         ec2)
-            aws ec2 describe-regions --region "$region" --region-names "$region" > /dev/null 2>&1
+            # Check that the region exists in the aws ec2 describe-regions output
+            if aws ec2 describe-regions --output json 2> /dev/null | jq -r '.Regions[].RegionName' 2> /dev/null | grep -qx "$region"; then
+                return 0
+            else
+                return 1
+            fi
             ;;
         s3)
-            aws s3api list-buckets --region "$region" > /dev/null 2>&1
+            # S3 is global but we can attempt a head-bucket call is not appropriate here; assume S3 generally available
+            return 0
             ;;
         lambda)
-            aws lambda list-functions --region "$region" > /dev/null 2>&1
+            # Try a lightweight call to list-functions in the target region
+            if aws lambda list-functions --region "$region" --max-items 1 > /dev/null 2>&1; then
+                return 0
+            else
+                return 1
+            fi
             ;;
         *)
             # Generic check - try to call a basic list operation

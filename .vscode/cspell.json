@@ -138,6 +138,7 @@
     "resourcegroups",
     "reviewdog",
     "rowserrcheck",
+    "schemaspy",
     "scopelint",
     "shellcheck",
     "shfmt",

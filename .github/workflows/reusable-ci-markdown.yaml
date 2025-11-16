@@ -32,7 +32,7 @@ jobs:
 
       - name: Exec markdownlint with reviewdog (PR comments)
         if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
-        uses: reviewdog/action-markdownlint@f991c651e0e0509e4b51961e18ede607e6a942d7 # v0.26.2
+        uses: reviewdog/action-markdownlint@3667398db9118d7e78f7a63d10e26ce454ba5f58 # v0.26.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
@@ -47,17 +47,6 @@ jobs:
           globs: "README*.md"
           config: ".markdownlint.yaml"
           fix: false
-
-      - name: Summary
-        if: always()
-        run: |
-          echo "Markdownlint completed for component: ${{ env.COMPONENT }} in environment: ${{ env.ENVIRONMENT }}" | tee -a $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ job.status }}" != "success" ]; then
-            echo "❌ Markdown linting failed. See logs above for details." >> $GITHUB_STEP_SUMMARY
-          else
-            echo "✅ All Markdown files passed linting checks." >> $GITHUB_STEP_SUMMARY
-          fi
 
       - name: Post PR failure comment
         if: failure() && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
@@ -75,3 +64,17 @@ jobs:
               repo: context.repo.repo,
               body
             });
+
+      - name: Summary
+        if: always()
+        uses: ./.github/actions/summary
+        with:
+          title: "Markdownlint"
+          status: "${{ job.status }}"
+          params: |
+            component: ${{ inputs.component }}
+            environment: ${{ inputs.environment }}
+          outputs: |
+            (none)
+          artifacts: |
+            (none)

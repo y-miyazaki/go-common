@@ -26,6 +26,10 @@ description: "AI Assistant Instructions for GitHub Actions Workflows"
 - inputs, secrets, permissions は A-Z 順に整理
 - job 名、step 名は一貫性を持たせる
 - 再利用可能ワークフローは汎用的に設計し、特定プロジェクト依存を避ける
+- 再利用可能ワークフローでは環境変数(例: `OUTDIR`, `ARTIFACT_NAME`, `ARTIFACT_BASE`)の定義は一箇所に集約してください。通常は `Setup Parameters` のような専用 step で `echo "NAME=value" >> $GITHUB_ENV` を行い、以降の step はその環境変数を直接参照するだけにします。
+- 他の step で同じ変数を再定義したり、冗長にフォールバック式（例: `OUTDIR="${OUTDIR:-${{ inputs.output_dir }}}"`）を多用するのは避けてください。ドキュメントや repository の `workflows.instructions.md` で明示的に『一箇所で定義し、再定義は行わない』方針を示すべきです。
+- 例外: 呼び出し元が明示的に上書きできる設計にする場合は、`Setup Parameters` で入力（`inputs`）を優先するか、`setup-parameters` step に `id` を付けて `outputs` で上書き値を渡す方法を採用してください。
+  理由: `GITHUB_ENV` に書き出すことで別 step が同じ値を確実に読み取れるようになります。逆に同じ変数を複数箇所で定義すると可読性が低下し、意図しない値の衝突やデバッグ困難さを招きます。
 
 ### Reusable Workflow Architecture
 
@@ -147,7 +151,7 @@ env:
 
 ```yaml
 - name: Upload Coverage Artifact
-  uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v5.0.0
+  uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
   with:
   name: coverage-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}
     path: ${{ env.GO_PROJECT_PATH }}/coverage
@@ -158,8 +162,8 @@ env:
 #### Version Management
 
 - GitHub Actions のバージョンは定期的に更新する
-- バージョン指定は、@v1.2.3 のようなバージョン指定は避け、Commit SHA を使用する
-- Commit SHA だけだと可読性が低いため、コメントでバージョン情報を併記する
+- uses で利用するバージョン指定は、@v1.2.3 のようなバージョン指定は避け、Commit SHA を使用する
+  - Commit SHA だけだと可読性が低いため、コメントでバージョン情報を併記する
 - 破壊的変更のある GitHub Actions 更新時は段階的にテストする
 
 #### Performance Optimization
@@ -169,6 +173,14 @@ env:
 - 並列実行可能なジョブは`needs`で適切に制御する
 
 ## Testing and Validation
+
+### Code Modification Guidelines
+
+コード修正時は以下コマンドで一括検証する：
+
+```bash
+actionlint
+```
 
 ### Workflow Testing Guidelines
 

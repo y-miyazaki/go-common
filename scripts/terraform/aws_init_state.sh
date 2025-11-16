@@ -204,13 +204,13 @@ function verify_bucket_config {
 function apply_bucket_policy {
     echo_section "Applying bucket policy"
 
-    local policy_template="${SCRIPT_DIR}/files/aws/terraform_state_policy.template.json"
+    local policy_template="${SCRIPT_DIR}/files/aws_init_state/terraform_state_policy.template.json"
 
     if [ -f "${policy_template}" ]; then
         log "INFO" "Creating bucket policy from template"
 
         # Create temporary policy file with substituted values
-        local temp_policy_file="${SCRIPT_DIR}/files/aws/terraform_state_policy.json"
+        local temp_policy_file="${SCRIPT_DIR}/files/aws_init_state/terraform_state_policy.json"
 
         # Substitute placeholders in template
         if ! sed -e "s/##AWS_ID##/${AWS_ID}/g" -e "s/##BUCKET##/${BUCKET}/g" \

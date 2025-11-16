@@ -28,7 +28,7 @@ on:
 jobs:
   deploy-to-github-pages:
     if: ${{ github.actor != 'dependabot[bot]' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       contents: read
       pages: write
@@ -37,24 +37,91 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
       - name: Parse artifacts configuration
         id: parse-inputs
         run: |
+          # shellcheck disable=SC2034,SC2129
           echo "Parsing artifacts configuration..."
           echo '${{ inputs.artifacts }}' | jq -c '.[]' > /tmp/artifacts.jsonl
 
           echo "Artifacts to process:"
-          cat /tmp/artifacts.jsonl | jq -r '.name'
+          jq -r '.name' /tmp/artifacts.jsonl || true
 
-          echo "Total artifacts: $(cat /tmp/artifacts.jsonl | wc -l)"
+          echo "Total artifacts: $(wc -l < /tmp/artifacts.jsonl)"
+
+      - name: Validate artifacts configuration
+        run: |
+          echo "Validating artifacts configuration..."
+
+          # Check if artifacts is valid JSON array
+          if ! echo '${{ inputs.artifacts }}' | jq -e 'type == "array"' > /dev/null; then
+            echo "❌ Error: artifacts input must be a JSON array"
+            exit 1
+          fi
+
+          # Check if array is not empty
+          artifact_count=$(wc -l < /tmp/artifacts.jsonl)
+          if [ "${artifact_count}" -eq 0 ]; then
+            echo "❌ Error: artifacts array is empty"
+            exit 1
+          fi
+
+          # Check required fields
+          while IFS= read -r artifact_json; do
+            name=$(echo "${artifact_json}" | jq -r '.name // empty')
+            display_name=$(echo "${artifact_json}" | jq -r '.display_name // empty')
+
+            if [ -z "${name}" ] || [ -z "${display_name}" ]; then
+              echo "❌ Error: Each artifact must have 'name' and 'display_name'"
+              echo "Invalid artifact: ${artifact_json}"
+              exit 1
+            fi
+          done < /tmp/artifacts.jsonl
+
+          echo "✅ Artifacts configuration is valid (${artifact_count} artifacts)"
 
       - name: Download all artifacts
-        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v6.0.0
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           path: all-artifacts
 
+      - name: Extract zip archives if present
+        run: |
+          # shellcheck disable=SC2034
+          echo "Checking for zip archives in downloaded artifacts..."
+
+          # Use null-delimited find to safely handle arbitrary filenames
+          find all-artifacts -name "*.zip" -type f -print0 | while IFS= read -r -d '' zip_file; do
+            echo "Found zip archive: ${zip_file}"
+
+            # Get directory containing the zip
+            zip_dir=$(dirname "${zip_file}")
+            zip_name=$(basename "${zip_file}")
+
+            echo "  Extracting to: ${zip_dir}"
+
+            # Extract zip to its directory with error handling
+            if unzip -q "${zip_file}" -d "${zip_dir}"; then
+              # Remove the zip file only after successful extraction
+              rm "${zip_file}"
+              echo "  ✅ Extracted and removed: ${zip_name}"
+            else
+              echo "  ❌ Failed to extract: ${zip_name}"
+              exit 1
+            fi
+          done
+
+          echo "Extraction complete"
+          echo ""
+          echo "Artifacts structure after extraction:"
+          ls -lR all-artifacts/
+
       - name: Merge artifacts
         run: |
+          # shellcheck disable=SC2129,SC2034
           echo "Merging multiple artifacts for GitHub Pages deployment"
 
           mkdir -p merged-pages
@@ -62,18 +129,57 @@ jobs:
           # Process each artifact configuration
           while IFS= read -r artifact_json; do
             artifact_name=$(echo "${artifact_json}" | jq -r '.name')
+            # Mark artifact_name as used for static analysis (no-op, safe)
+            printf "%s" "${artifact_name}" > /dev/null
             display_name=$(echo "${artifact_json}" | jq -r '.display_name')
-            artifact_path_in_archive=$(echo "${artifact_json}" | jq -r '.path // .name')
+            artifact_path_specified=$(echo "${artifact_json}" | jq -r '.path // empty')
 
+            # artifact_name is used to derive the artifact directory (may appear unused to shellcheck)
             echo "Processing artifact: ${artifact_name}"
             echo "  Display name: ${display_name}"
-            echo "  Path in archive: ${artifact_path_in_archive}"
 
             artifact_dir="all-artifacts/${artifact_name}"
 
             if [ ! -d "${artifact_dir}" ]; then
               echo "  ⚠️  Warning: Artifact directory not found: ${artifact_dir}"
               continue
+            fi
+
+            # Determine actual path in archive
+            if [ -n "${artifact_path_specified}" ]; then
+              # Use specified path if provided (explicit configuration)
+              artifact_path_in_archive="${artifact_path_specified}"
+              echo "  📌 Using specified path: ${artifact_path_in_archive}"
+            else
+              # Auto-detect: recursively search for the first directory that contains an index.html
+              # This ensures we find the actual content directory regardless of zip structure
+              found_index_file=$(find "${artifact_dir}" -type f -name 'index.html' -print -quit 2>/dev/null || echo "")
+
+              if [ -n "${found_index_file}" ]; then
+                found_index_dir=$(dirname "${found_index_file}")
+
+                # If index.html is at the root of the artifact directory, use artifact name
+                if [ "${found_index_dir}" = "${artifact_dir}" ]; then
+                  artifact_path_in_archive="${artifact_name}"
+                  echo "  🔍 Found index.html at artifact root; using artifact name as path: ${artifact_path_in_archive}"
+                else
+                  # Compute relative path from artifact_dir
+                  # shellcheck disable=SC2295
+                  artifact_path_in_archive="${found_index_dir#${artifact_dir}/}"
+                  echo "  🔍 Found index.html at: ${artifact_path_in_archive}"
+                fi
+              else
+                # Fallback: use first subdirectory if no index.html found
+                first_subdir=$(find "${artifact_dir}" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" -quit 2>/dev/null || echo "")
+                if [ -n "${first_subdir}" ]; then
+                  artifact_path_in_archive="${first_subdir}"
+                  echo "  � Auto-detected path (no index.html found): ${artifact_path_in_archive}"
+                else
+                  # Last resort: use artifact name
+                  artifact_path_in_archive="${artifact_name}"
+                  echo "  ⚠️  No subdirectory or index.html found, using artifact name: ${artifact_path_in_archive}"
+                fi
+              fi
             fi
 
             # Determine source directory
@@ -93,7 +199,19 @@ jobs:
             echo "  📂 Copying to: ${target_dir}"
 
             mkdir -p "${target_dir}"
-            cp -r "${source_dir}"/* "${target_dir}/" 2>/dev/null || cp -r "${source_dir}" "${target_dir}" 2>/dev/null || echo "  ⚠️  Copy operation had issues"
+
+            # Copy with error handling
+            # Use cp from the directory content to avoid unquoted glob expansion
+            if cp -r "${source_dir}/." "${target_dir}/" 2>&1; then
+              echo "  ✅ Copy successful"
+            else
+              echo "  ❌ Error: Failed to copy ${source_dir} to ${target_dir}"
+              exit 1
+            fi
+
+            # Metadata file format: artifact_name|display_name|artifact_path
+            # Example: schemaspy-pgsql11-aurora_dev-dev|Aurora PostgreSQL(dev)|aurora_dev
+            echo "${artifact_name}|${display_name}|${artifact_path_in_archive}" >> /tmp/artifact-paths.txt
 
             echo "  ✓ Processed successfully"
             echo ""
@@ -104,6 +222,7 @@ jobs:
 
       - name: Create index page
         run: |
+          # shellcheck disable=SC2129,SC2034
           echo "Creating unified index page with links to all items"
 
           cat > merged-pages/index.html <<'EOF'
@@ -192,15 +311,24 @@ jobs:
             <ul>
           EOF
 
-          # Add links for each artifact
-          while IFS= read -r artifact_json; do
-            display_name=$(echo "${artifact_json}" | jq -r '.display_name')
-            artifact_path_in_archive=$(echo "${artifact_json}" | jq -r '.path // .name')
-
-            if [ -d "merged-pages/${artifact_path_in_archive}" ]; then
-              echo "              <li><a href=\"./${artifact_path_in_archive}/index.html\">${display_name}</a></li>" >> merged-pages/index.html
-            fi
-          done < /tmp/artifacts.jsonl
+          # Add links for each artifact using saved metadata
+          if [ -f /tmp/artifact-paths.txt ]; then
+            # Redirect the loop output into index.html in one shot to avoid multiple appends (SC2129)
+            while IFS='|' read -r _artifact_name display_name artifact_path; do
+              if [ -d "merged-pages/${artifact_path}" ]; then
+                # Use directory path without index.html (GitHub Pages auto-serves index.html)
+                printf '              <li><a href="./%s/">%s</a></li>\n' "${artifact_path}" "${display_name}"
+                # echo "Added link: ${display_name} -> ./${artifact_path}/"
+              else
+                echo "❌ Error: Directory not found for ${display_name}: merged-pages/${artifact_path}"
+                exit 1
+              fi
+            done < /tmp/artifact-paths.txt >> merged-pages/index.html
+          else
+            echo "❌ Error: /tmp/artifact-paths.txt not found"
+            echo "This indicates merge artifacts step did not complete successfully"
+            exit 1
+          fi
 
           cat >> merged-pages/index.html <<EOF
             </ul>
@@ -217,21 +345,25 @@ jobs:
 
       - name: Create buildinfo
         run: |
-          echo "Generated at: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" > merged-pages/.buildinfo
-          echo "Workflow: ${{ github.workflow }}" >> merged-pages/.buildinfo
-          echo "Run ID: ${{ github.run_id }}" >> merged-pages/.buildinfo
-          echo "Items:" >> merged-pages/.buildinfo
-          while IFS= read -r artifact_json; do
-            display_name=$(echo "${artifact_json}" | jq -r '.display_name')
-            artifact_path=$(echo "${artifact_json}" | jq -r '.path // .name')
-            echo "  - ${display_name} (${artifact_path})" >> merged-pages/.buildinfo
-          done < /tmp/artifacts.jsonl
+          # shellcheck disable=SC2129,SC2034
+          # Write build info once using a grouped redirect to avoid multiple appends
+          {
+            echo "Generated at: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+            echo "Workflow: ${{ github.workflow }}"
+            echo "Run ID: ${{ github.run_id }}"
+            echo "Items:"
+            if [ -f /tmp/artifact-paths.txt ]; then
+              while IFS='|' read -r _artifact_name display_name artifact_path; do
+                echo "  - ${display_name} (${artifact_path})"
+              done < /tmp/artifact-paths.txt
+            fi
+          } >> merged-pages/.buildinfo
 
       - name: Setup Pages
-        uses: actions/configure-pages@983d7736d9b0ae8b0fb0855d0112c7a492a7ae1f # v5.0.0
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
 
       - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
         with:
           path: merged-pages
 
@@ -241,25 +373,12 @@ jobs:
 
       - name: Summary
         if: always()
-        run: |
-          echo "# GitHub Pages Deployment" | tee -a $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ Deployed successfully to GitHub Pages" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**URL**: ${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Items Deployed**:" >> $GITHUB_STEP_SUMMARY
-            while IFS= read -r artifact_json; do
-              display_name=$(echo "${artifact_json}" | jq -r '.display_name')
-              artifact_path=$(echo "${artifact_json}" | jq -r '.path // .name')
-              echo "- ${display_name} (\`${artifact_path}\`)" >> $GITHUB_STEP_SUMMARY
-            done < /tmp/artifacts.jsonl
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Note**: Access the index page to navigate to individual documentation" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ Deployment failed" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "See logs above for details." >> $GITHUB_STEP_SUMMARY
-          fi
+        uses: ./.github/actions/summary
+        with:
+          title: "${{ inputs.index_title }}"
+          status: "${{ job.status }}"
+          params: |
+            index_title: ${{ inputs.index_title }}
+            index_description: ${{ inputs.index_description }}
+          outputs: |
+            page_url: ${{ steps.deployment.outputs.page_url }}
