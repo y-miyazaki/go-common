@@ -41,7 +41,7 @@ env:
 
 jobs:
   lint:
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.environment }}
     permissions:
