@@ -22,7 +22,7 @@ __bash_prompt() {
     local userpart='`export XIT=$? \
         && [ ! -z "${GITHUB_USER}" ] && echo -n "\[\033[0;32m\]@${GITHUB_USER} " || echo -n "\[\033[0;32m\]\u " \
         && [ "$XIT" -ne "0" ] && echo -n "\[\033[1;31m\]➜" || echo -n "\[\033[0m\]➜"`'
-    local aws_profile=`[ ! -z "${AWS_PROFILE}" ] && echo -n "\[\033[0;31m\]${AWS_PROFILE} \[\033[0m\]➜" || echo -n "\[\033[0;31m\](no) \[\033[0m\]➜"`
+    local aws_profile=$([ ! -z "${AWS_PROFILE}" ] && echo -n "\[\033[0;31m\]${AWS_PROFILE} \[\033[0m\]➜" || echo -n "\[\033[0;31m\](no) \[\033[0m\]➜")
     # local envpart=`[ ! -z "${ENV}" ] && echo -n "\[\033[0;31m\]${ENV} \[\033[0m\]➜" || echo -n "\[\033[0;31m\](no) \[\033[0m\]➜"`
     local gitbranch='`\
         if [ "$(git config --get codespaces-theme.hide-status 2>/dev/null)" != 1 ]; then \
@@ -54,3 +54,6 @@ export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
 alias tinit='terraform init -reconfigure -backend-config="terraform.${ENV}.tfbackend"'
 alias tplan='terraform plan -lock=false -var-file="terraform.${ENV}.tfvars"'
 alias tapply='terraform apply -auto-approve -var-file="terraform.${ENV}.tfvars"'
+
+# for aqua
+export PATH="$(aqua root-dir)/bin:$PATH"

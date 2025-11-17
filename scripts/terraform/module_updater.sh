@@ -42,6 +42,7 @@ declare -A MODULE_FILES_MAP=()     # module_source -> list of files
 declare -A MODULE_VERSIONS_MAP=()  # module_source -> current_version|latest_version
 declare -A PROJECT_DIRS_MAP=()     # project_dir -> 1 (for tracking unique project directories)
 declare -A LATEST_VERSION_CACHE=() # module_source -> latest_version cache
+declare -A BASELINE_CREATED_MAP=() # project_dir -> 1 when baseline created
 
 # Track current file for better error context on unexpected errors
 CURRENT_FILE_BEING_SCANNED=""
@@ -451,9 +452,20 @@ function create_baseline_plans_for_projects {
     echo_section "Creating baseline plans for affected projects"
 
     for project_dir in "${!PROJECT_DIRS_MAP[@]}"; do
-        log "INFO" "Creating baseline plan for: $project_dir"
-        if ! create_baseline_plan "$project_dir" "$DEFAULT_ENV"; then
-            log "ERROR" "Failed to create baseline plan for: $project_dir"
+        # Sanitize keys: remove surrounding quotes and trim newlines/whitespace
+        local proj
+        proj="${project_dir//\"/}"
+        proj="${proj//\'/}"
+        # remove CR/LF and trim leading/trailing spaces
+        proj=$(printf '%s' "$proj" | tr -d '\r\n' | sed 's/^\s*//;s/\s*$//')
+
+        log "INFO" "Creating baseline plan for: $proj"
+        # Prefer exported ENV if set, otherwise fall back to DEFAULT_ENV
+        if create_baseline_plan "$proj" "${ENV:-$DEFAULT_ENV}"; then
+            BASELINE_CREATED_MAP[$proj]=1
+        else
+            # In normal (no --no-plan) mode, failing to create a baseline plan should be an error.
+            log "ERROR" "Failed to create baseline plan for: $proj"
             error_exit "Cannot proceed without baseline plans"
         fi
     done
@@ -487,8 +499,15 @@ function validate_all_affected_projects {
 
     # Validate each project
     for project_dir in "${project_dirs_to_validate[@]}"; do
+        # Skip validation if baseline plan could not be created for this project
+        if [[ -z "${BASELINE_CREATED_MAP[$project_dir]:-}" ]]; then
+            log "WARN" "Skipping validation for project (no baseline): $project_dir"
+            continue
+        fi
+
         log "INFO" "Validating project: $project_dir"
-        if ! validate_terraform_with_plan_comparison "$project_dir" "$DEFAULT_ENV"; then
+        # Prefer exported ENV if set, otherwise fall back to DEFAULT_ENV
+        if ! validate_terraform_with_plan_comparison "$project_dir" "${ENV:-$DEFAULT_ENV}"; then
             log "ERROR" "Validation failed for project: $project_dir"
             return 1
         fi
@@ -659,7 +678,8 @@ function generate_summary_report {
 #######################################
 function create_baseline_plan {
     local terraform_dir="$1"
-    local env="${2:-$DEFAULT_ENV}"
+    # Use the provided env parameter; if not provided prefer exported ENV, otherwise DEFAULT_ENV
+    local env="${2:-${ENV:-$DEFAULT_ENV}}"
 
     cd "$terraform_dir" || return 1
 
@@ -733,7 +753,8 @@ function create_baseline_plan {
 #######################################
 function validate_terraform_with_plan_comparison {
     local terraform_dir="$1"
-    local env="${2:-$DEFAULT_ENV}"
+    # Use the provided env parameter; if not provided prefer exported ENV, otherwise DEFAULT_ENV
+    local env="${2:-${ENV:-$DEFAULT_ENV}}"
 
     cd "$terraform_dir" || return 1
 

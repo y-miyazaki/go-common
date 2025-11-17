@@ -215,13 +215,25 @@ function is_dry_run {
 #   Command exit code (or 0 in dry-run mode)
 #######################################
 function execute_command {
-    local cmd="$*"
-
+    # Execute a command safely without eval. Accepts arguments and runs them
+    # Example: execute_command aws s3 cp "src" "dest"
     if is_dry_run; then
-        log "INFO" "DRY-RUN: Would execute: $cmd"
+        # Always print dry-run info regardless of VERBOSE so users see planned actions
+        echo "DRY-RUN: Would execute: $*"
         return 0
     fi
 
-    log "DEBUG" "Executing: $cmd"
-    eval "$cmd"
+    log "DEBUG" "Executing: $*"
+
+    # Execute the command. Support two calling styles:
+    # 1) execute_command cmd arg1 arg2 ...  --> safe, runs the command directly
+    # 2) execute_command "cmd arg1 arg2"   --> common in older scripts; run via bash -lc
+    if [[ $# -eq 1 ]]; then
+        # Single-string command (may contain spaces/options) — run under bash -lc so
+        # shell parsing behaves as the caller expects.
+        bash -lc "$1"
+    else
+        # Multi-argument safe execution
+        "${@}"
+    fi
 }

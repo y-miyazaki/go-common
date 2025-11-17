@@ -36,7 +36,7 @@ function validate_terraform_env {
     validate_env_vars "ENV" "TF_PLUGIN_CACHE_DIR"
 
     # Validate dependencies
-    validate_dependencies "terraform" "tfenv"
+    validate_dependencies "terraform"
 
     # Create plugin cache directory
     if [[ -n "${TF_PLUGIN_CACHE_DIR}" ]]; then
@@ -45,26 +45,6 @@ function validate_terraform_env {
     fi
 
     log "INFO" "Terraform environment validated for: $env_name"
-}
-
-#######################################
-# Function to install Terraform version using tfenv
-# Arguments:
-#   None (uses .terraform-version file if present)
-# Returns:
-#   0 on success, exits on error
-#######################################
-function terraform_install {
-    echo_section "Installing Terraform version"
-
-    if ! execute_command "tfenv install"; then
-        error_exit "Failed to install Terraform with tfenv"
-    fi
-
-    # Show installed version
-    local tf_version
-    tf_version=$(terraform version -json 2> /dev/null | jq -r '.terraform_version' 2> /dev/null || terraform version | head -n1)
-    log "INFO" "Terraform version: $tf_version"
 }
 
 #######################################
@@ -278,8 +258,8 @@ function terraform_workflow {
     # Validate environment
     validate_terraform_env "$env_name"
 
-    # Install Terraform
-    terraform_install
+    # # Install Terraform
+    # terraform_install
 
     # Initialize Terraform
     terraform_init "$env_name"

@@ -96,10 +96,6 @@ function process_terraform_directory {
 
     log "INFO" "Validating in directory: $(pwd)"
 
-    # Install Terraform version (idempotent)
-    log "INFO" "Installing Terraform version..."
-    terraform_install
-
     # Step 1: Run tflint first (no init required)
     if command -v tflint &> /dev/null; then
         log "INFO" "Running tflint (pre-init check) in $(pwd)"
@@ -179,7 +175,7 @@ function main {
     parse_arguments "$@"
 
     # Validate dependencies
-    validate_dependencies "terraform" "tfenv"
+    validate_dependencies "terraform"
 
     # Check optional tools
     check_optional_tools

@@ -46,6 +46,7 @@ jobs:
   generate-documentation:
     if: ${{ github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     concurrency:
       group: aws-resources-${{ inputs.environment }}
       cancel-in-progress: false
@@ -59,6 +60,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
 
       - name: Setup AWS Credentials
         uses: aws-actions/configure-aws-credentials@00943011d9042930efac3dcd3a170e4273319bc8 # v5.1.0

@@ -3,6 +3,7 @@
   "language": "en,en-GB",
   "words": [
     "accessanalyzer",
+    "aquaproj",
     "aquasecurity",
     "argocd",
     "arounds",
@@ -57,6 +58,7 @@
     "funcs",
     "funlen",
     "Getenv",
+    "ghalint",
     "gmail",
     "GOARCH",
     "GOCACHE",
@@ -133,6 +135,7 @@
     "pipefail",
     "prealloc",
     "printf",
+    "protoc",
     "redrive",
     "referer",
     "resourcegroups",
@@ -184,7 +187,8 @@
     "xerrors",
     "xoxb",
     "ymiyazakixyz",
-    "yourname"
+    "yourname",
+    "zizmor"
   ],
   "ignorePaths": [
     "**/package-lock.json",

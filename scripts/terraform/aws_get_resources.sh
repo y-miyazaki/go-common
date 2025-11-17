@@ -88,6 +88,7 @@ AWS_RESOURCE_CATEGORIES=(
     "cognito"
     "cloudwatch_alarms"
     "cloudwatch_logs"
+    "dynamodb"
     "ec2"
     "ecr"
     "ecs"
@@ -699,6 +700,58 @@ function collect_ec2_inventory {
 }
 
 #######################################
+# Function to collect DynamoDB inventory (with categories)
+#######################################
+function collect_dynamodb_inventory {
+    local region=$1
+    local header="Category,Subcategory,Subsubcategory,Name,Region,ARN,BillingMode,ItemCount,TableSize(Bytes),SSE,StreamEnabled,GlobalTable,PointInTimeRecovery,RecoveryPeriodInDays,EarliestRestorableDateTime,LatestRestorableDateTime,DeletionProtection,Status"
+
+    # Return header if requested
+    if [[ "$region" == "header" ]]; then
+        echo "$header"
+        return 0
+    fi
+
+    local buffer=""
+
+    while IFS= read -r table_name; do
+        [[ -z "$table_name" || "$table_name" == "null" ]] && continue
+
+        # Get detailed table information
+        local table_details
+        table_details=$(aws dynamodb describe-table --table-name "$table_name" --region "$region" 2> /dev/null || echo '{"Table":{}}')
+
+        local table_arn table_status billing_mode item_count table_size
+        local sse_status stream_enabled global_table_version pitr_enabled deletion_protection
+        local recovery_period earliest_restorable latest_restorable
+
+        table_arn=$(extract_jq_value "$table_details" '.Table.TableArn')
+        table_status=$(extract_jq_value "$table_details" '.Table.TableStatus')
+        billing_mode=$(extract_jq_value "$table_details" '.Table.BillingModeSummary.BillingMode' 'PROVISIONED')
+        item_count=$(extract_jq_value "$table_details" '.Table.ItemCount' '0')
+        table_size=$(extract_jq_value "$table_details" '.Table.TableSizeBytes' '0')
+        sse_status=$(extract_jq_value "$table_details" '.Table.SSEDescription.Status' 'DISABLED')
+        stream_enabled=$(extract_jq_value "$table_details" '.Table.StreamSpecification.StreamEnabled' 'false')
+        global_table_version=$(extract_jq_value "$table_details" '.Table.GlobalTableVersion')
+
+        # Get Point-in-Time Recovery status and backup information
+        local pitr_details
+        pitr_details=$(aws dynamodb describe-continuous-backups --table-name "$table_name" --region "$region" 2> /dev/null || echo '{"ContinuousBackupsDescription":{}}')
+        pitr_enabled=$(extract_jq_value "$pitr_details" '.ContinuousBackupsDescription.PointInTimeRecoveryDescription.PointInTimeRecoveryStatus' 'DISABLED')
+        recovery_period=$(extract_jq_value "$pitr_details" '.ContinuousBackupsDescription.PointInTimeRecoveryDescription.RecoveryPeriodInDays' 'N/A')
+        earliest_restorable=$(extract_jq_value "$pitr_details" '.ContinuousBackupsDescription.PointInTimeRecoveryDescription.EarliestRestorableDateTime')
+        latest_restorable=$(extract_jq_value "$pitr_details" '.ContinuousBackupsDescription.PointInTimeRecoveryDescription.LatestRestorableDateTime')
+
+        # Get Deletion Protection status
+        deletion_protection=$(extract_jq_value "$table_details" '.Table.DeletionProtectionEnabled' 'false')
+
+        buffer+="dynamodb,Table,,$table_name,${region},$table_arn,$billing_mode,$item_count,$table_size,$sse_status,$stream_enabled,$global_table_version,$pitr_enabled,$recovery_period,$earliest_restorable,$latest_restorable,$deletion_protection,$table_status\n"
+    done < <(aws dynamodb list-tables --region "$region" 2> /dev/null | jq -r '.TableNames[]?')
+
+    echo "$buffer"
+}
+
+#######################################
 # Function to collect ECR inventory (with categories)
 #######################################
 function collect_ecr_inventory {
@@ -1092,7 +1145,7 @@ function collect_elb_inventory {
             listener_protocol=$(extract_jq_value "$listener_data" '.Protocol')
             listener_port=$(extract_jq_value "$listener_data" '.Port')
             listener_ssl_policy=$(extract_jq_value "$listener_data" '.SslPolicy')
-            buffer+="elb,,Listener,${listener_protocol}:${listener_port},${region},$listener_arn,,,,,,$listener_protocol,$listener_port,,$listener_ssl_policy,,\n"
+            buffer+="elb,,Listener,${listener_protocol}:${listener_port},${region},$listener_arn,,,,,,,$listener_protocol,$listener_port,,$listener_ssl_policy,,\n"
         done < <(aws elbv2 describe-listeners --load-balancer-arn "$elb_arn" --region "$region" 2> /dev/null | jq -c '.Listeners[]?' || echo "")
     done < <(aws elbv2 describe-load-balancers --region "$region" | jq -c '.LoadBalancers[]')
 

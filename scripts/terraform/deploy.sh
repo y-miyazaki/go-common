@@ -62,7 +62,7 @@ function validate_and_prepare {
 
     # Validate environment variables and dependencies
     validate_env_vars "ENV" "TF_PLUGIN_CACHE_DIR"
-    validate_dependencies "terraform" "tfenv"
+    validate_dependencies "terraform"
 
     # Change to target directory
     if ! cd "$dir"; then

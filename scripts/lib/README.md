@@ -33,7 +33,6 @@ AWS-specific utility functions:
 ### `terraform.sh`
 Terraform workflow and utility functions:
 - **Environment setup**: `validate_terraform_env()`, environment validation
-- **Installation**: `terraform_install()`, tfenv integration
 - **Workflow operations**: `terraform_init()`, `terraform_plan()`, `terraform_apply()`
 - **Formatting**: `terraform_format()`, code formatting utilities
 - **Workspace management**: `terraform_get_workspace()`, `terraform_select_workspace()`
@@ -276,7 +275,7 @@ The libraries require the following tools to be installed:
 - `bash` (version 4.0+)
 - `jq` (for JSON processing)
 - `aws` (AWS CLI v2 recommended)
-- `terraform` and `tfenv` (for Terraform libraries)
+- `terraform` (for Terraform libraries)
 
 Optional tools for enhanced functionality:
 - `curl` or `wget` (for network validation)
