@@ -1,4 +1,4 @@
-package model
+package gorm
 
 import (
 	"testing"

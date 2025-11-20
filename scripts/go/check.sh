@@ -12,6 +12,10 @@
 # Error handling: exit on error, unset variable, or failed pipeline
 set -euo pipefail
 
+# Secure defaults
+umask 027
+export LC_ALL=C.UTF-8
+
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export SCRIPT_DIR
@@ -52,7 +56,20 @@ COVERAGE_PERCENT=""
 # Functions are now provided by common.sh library
 
 #######################################
-# Display usage information
+# show_usage: Display script usage information
+#
+# Description:
+#   Displays usage information for the script, including options and examples
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (outputs to stdout and exits)
+#
+# Usage:
+#   show_usage
+#
 #######################################
 function show_usage {
     echo "Usage: $(basename "$0") [options]"
@@ -79,18 +96,82 @@ function show_usage {
     exit 0
 }
 
+#######################################
+# parse_arguments: Parse command line arguments
+#
+# Description:
+#   Parses command line arguments and sets global variables accordingly
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Returns:
+#   None (sets global variables)
+#
+# Usage:
+#   parse_arguments "$@"
+#
+#######################################
+function parse_arguments {
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -h | --help)
+                show_usage
+                ;;
+            -v | --verbose)
+                VERBOSE=true
+                shift
+                ;;
+            -d | --dry-run)
+                DRY_RUN=true
+                shift
+                ;;
+            -f | --fix)
+                FIX_MODE=true
+                shift
+                ;;
+            -*)
+                error_exit "Unknown option: $1"
+                ;;
+            *)
+                if [[ -z "${TARGET_DIR:-}" ]]; then
+                    TARGET_DIR="$1"
+                else
+                    error_exit "Unexpected argument: $1"
+                fi
+                shift
+                ;;
+        esac
+    done
+    if [[ -z "${TARGET_DIR:-}" ]]; then
+        TARGET_DIR="."
+        log "INFO" "No target specified, will auto-detect Go directories from current location"
+    fi
+    if [[ "$TARGET_DIR" != "./..." && ! -d "$TARGET_DIR" && "$TARGET_DIR" != "." ]]; then
+        error_exit "Target directory does not exist: $TARGET_DIR"
+    fi
+    if [[ "$TARGET_DIR" != "." && "$TARGET_DIR" != "./..." ]]; then
+        IS_SCOPED=true
+    fi
+}
+
 # Dependencies validation is now handled by common.sh library
 
 #######################################
-# Function to check if directory contains Go files
-#######################################
-function has_go_files {
-    local dir=$1
-    find "$dir" -name "*.go" | head -1 | wc -l
-}
-
-#######################################
-# Function to determine target pattern for Go tools
+# determine_target_pattern: Determine target pattern for Go tools
+#
+# Description:
+#   Determines the appropriate target pattern for Go tools based on the input directory
+#
+# Arguments:
+#   $1 - Base directory (optional, defaults to current directory)
+#
+# Returns:
+#   Target pattern string (to stdout)
+#
+# Usage:
+#   pattern=$(determine_target_pattern "/path/to/dir")
+#
 #######################################
 function determine_target_pattern {
     local base_dir=${1:-.}
@@ -124,221 +205,63 @@ function determine_target_pattern {
 }
 
 #######################################
-# Function to run go mod tidy
+# run_benchmark_tests: Run benchmark tests
+#
+# Description:
+#   Runs benchmark tests if they exist in the codebase
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None
+#
+# Usage:
+#   run_benchmark_tests
+#
 #######################################
-function run_go_mod_tidy {
-    echo_section "Running go mod tidy"
+function run_benchmark_tests {
+    echo_section "Running benchmark tests"
 
     if [[ "$DRY_RUN" == "true" ]]; then
-        log "INFO" "DRY-RUN: Would run 'go mod tidy'"
+        log "INFO" "DRY-RUN: Would run benchmark tests"
         return 0
     fi
 
-    # 特定ディレクトリ指定時はそのディレクトリ内に go.mod がある場合のみ実行
-    local mod_dir="."
-    if [[ "$IS_SCOPED" == "true" ]]; then
-        if [[ -f "$TARGET_DIR/go.mod" ]]; then
-            mod_dir="$TARGET_DIR"
+    # Check if there are any benchmark tests
+    local has_benchmarks
+    has_benchmarks=$(find . -name "*_test.go" -not -path "./vendor/*" -not -path "./.*" -exec grep -l "func Benchmark" {} + 2> /dev/null | head -1 || true)
+
+    if [[ -n "$has_benchmarks" ]]; then
+        log "INFO" "Running benchmark tests..."
+        if go test -bench=. -benchmem "$TARGET_PATTERN" > /dev/null 2>&1; then
+            log "INFO" "Benchmark tests completed"
+            if [[ "$VERBOSE" == "true" ]]; then
+                go test -bench=. -benchmem "$TARGET_PATTERN"
+            fi
         else
-            log "INFO" "Skipping go mod tidy (no go.mod in scoped directory: $TARGET_DIR)"
-            return 0
-        fi
-    fi
-
-    pushd "$mod_dir" > /dev/null || true
-    if go mod tidy; then
-        log "INFO" "go mod tidy completed successfully (dir=$mod_dir)"
-    else
-        log "ERROR" "go mod tidy failed (dir=$mod_dir)"
-        EXIT_CODE=1
-    fi
-    popd > /dev/null || true
-}
-
-#######################################
-# Function to run go fmt
-#######################################
-function run_go_fmt {
-    echo_section "Running go fmt"
-
-    if [[ "$DRY_RUN" == "true" ]]; then
-        log "INFO" "DRY-RUN: Would run 'go fmt $TARGET_PATTERN'"
-        return 0
-    fi
-
-    # Use go fmt instead of gofmt for better Go module support
-    if [[ "$FIX_MODE" == "true" ]]; then
-        log "INFO" "Automatically formatting files..."
-        if go fmt "$TARGET_PATTERN"; then
-            log "INFO" "Files formatted successfully"
-        else
-            log "ERROR" "go fmt failed"
-            EXIT_CODE=1
-            GO_FMT_FAILED=1
+            log "WARN" "Some benchmark tests failed"
         fi
     else
-        # Check formatting using gofmt -l to list files that are not formatted
-        # Use go list + mapfile instead of direct gofmt to avoid word splitting issues
-        # with complex package patterns and ensure proper handling of module directories
-        local fmt_output
-        # Safely build argument list from go list output to avoid word splitting
-        mapfile -t go_dirs < <(go list -f '{{.Dir}}' "$TARGET_PATTERN" 2> /dev/null || true)
-        if [[ ${#go_dirs[@]} -eq 0 ]]; then
-            fmt_output=""
-        else
-            fmt_output=$(gofmt -l "${go_dirs[@]}" 2>&1 || true)
-        fi
-        if [[ -n "$fmt_output" ]]; then
-            echo "Files that need formatting (gofmt -l):"
-            echo "$fmt_output"
-            log "WARN" "Some files need formatting. Use -f flag to auto-fix"
-            EXIT_CODE=1
-            GO_FMT_FAILED=1
-        else
-            log "INFO" "All files are properly formatted"
-        fi
+        log "INFO" "No benchmark tests found"
     fi
 }
 
 #######################################
-# Function to run go vet
-#######################################
-function run_go_vet {
-    echo_section "Running go vet"
-
-    if [[ "$DRY_RUN" == "true" ]]; then
-        log "INFO" "DRY-RUN: Would run 'go vet $TARGET_PATTERN'"
-        return 0
-    fi
-
-    if go vet "$TARGET_PATTERN"; then
-        log "INFO" "go vet passed"
-    else
-        log "ERROR" "go vet found issues"
-        EXIT_CODE=1
-        GO_VET_FAILED=1
-    fi
-}
-
-#######################################
-# Function to run go build
-#######################################
-function run_go_build {
-    echo_section "Running go build"
-
-    if [[ "$DRY_RUN" == "true" ]]; then
-        log "INFO" "DRY-RUN: Would run 'go build \"$TARGET_PATTERN\"'"
-        return 0
-    fi
-
-    # Attempt to build all packages matching the target pattern
-    if go build "$TARGET_PATTERN"; then
-        log "INFO" "go build succeeded"
-    else
-        log "ERROR" "go build failed"
-        EXIT_CODE=1
-        GO_BUILD_FAILED=1
-    fi
-}
-
-#######################################
-# Function to run golangci-lint
-#######################################
-function run_golangci_lint {
-    echo_section "Running golangci-lint"
-
-    if [[ "$DRY_RUN" == "true" ]]; then
-        log "INFO" "DRY-RUN: Would run 'golangci-lint run $TARGET_PATTERN'"
-        return 0
-    fi
-
-    local lint_args=("run")
-
-    if [[ "$FIX_MODE" == "true" ]]; then
-        lint_args+=("--fix")
-    fi
-
-    if [[ "$VERBOSE" == "true" ]]; then
-        lint_args+=("-v")
-    fi
-
-    lint_args+=("$TARGET_PATTERN")
-
-    if golangci-lint "${lint_args[@]}" 2>&1 | tee /tmp/golint_output.txt; then
-        log "INFO" "golangci-lint passed"
-        LINT_ISSUES_COUNT=0
-    else
-        log "ERROR" "golangci-lint found issues"
-        EXIT_CODE=1
-        LINT_FAILED=1
-        # Count issues
-        if [[ -f /tmp/golint_output.txt ]]; then
-            LINT_ISSUES_COUNT=$(grep -cE '^\S+\.go:' /tmp/golint_output.txt 2> /dev/null || echo 0)
-        else
-            LINT_ISSUES_COUNT=0
-        fi
-        # Ensure it's a valid number
-        if ! [[ "$LINT_ISSUES_COUNT" =~ ^[0-9]+$ ]]; then
-            LINT_ISSUES_COUNT=0
-        fi
-    fi
-    rm -f /tmp/golint_output.txt
-}
-
-#######################################
-# Function to run tests
-#######################################
-function run_tests {
-    echo_section "Running go test"
-
-    if [[ "$DRY_RUN" == "true" ]]; then
-        log "INFO" "DRY-RUN: Would run 'go test -v $TARGET_PATTERN'"
-        return 0
-    fi
-
-    local test_args=("-v")
-
-    if [[ "$VERBOSE" == "true" ]]; then
-        test_args+=("-x")
-    fi
-
-    test_args+=("$TARGET_PATTERN")
-
-    if go test "${test_args[@]}" 2>&1 | tee /tmp/gotest_output.txt; then
-        log "INFO" "All tests passed"
-        TEST_FAIL_COUNT=0
-    else
-        log "ERROR" "Some tests failed"
-        EXIT_CODE=1
-        TEST_FAILED=1
-        # Count failed tests
-        TEST_FAIL_COUNT=$(grep -c '^--- FAIL:' /tmp/gotest_output.txt || echo 0)
-    fi
-    rm -f /tmp/gotest_output.txt
-}
-
-#######################################
-# Function to run race condition tests
-#######################################
-function run_race_tests {
-    echo_section "Running race condition tests"
-
-    if [[ "$DRY_RUN" == "true" ]]; then
-        log "INFO" "DRY-RUN: Would run 'CGO_ENABLED=1 go test -race $TARGET_PATTERN'"
-        return 0
-    fi
-
-    if CGO_ENABLED=1 go test -race "$TARGET_PATTERN"; then
-        log "INFO" "Race condition tests passed"
-    else
-        log "ERROR" "Race condition tests failed"
-        EXIT_CODE=1
-        RACE_FAILED=1
-    fi
-}
-
-#######################################
-# Function to run coverage tests
+# run_coverage_tests: Run coverage tests
+#
+# Description:
+#   Runs go test with coverage analysis and checks against threshold
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (sets EXIT_CODE and COVERAGE_FAILED on failure)
+#
+# Usage:
+#   run_coverage_tests
+#
 #######################################
 function run_coverage_tests {
     echo_section "Running coverage tests"
@@ -387,7 +310,268 @@ function run_coverage_tests {
 }
 
 #######################################
-# Function to run security checks
+# run_go_build: Run go build
+#
+# Description:
+#   Runs go build to check if the code compiles successfully
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (sets EXIT_CODE and GO_BUILD_FAILED on failure)
+#
+# Usage:
+#   run_go_build
+#
+#######################################
+function run_go_build {
+    echo_section "Running go build"
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log "INFO" "DRY-RUN: Would run 'go build \"$TARGET_PATTERN\"'"
+        return 0
+    fi
+
+    # Attempt to build all packages matching the target pattern
+    if go build "$TARGET_PATTERN"; then
+        log "INFO" "go build succeeded"
+    else
+        log "ERROR" "go build failed"
+        EXIT_CODE=1
+        GO_BUILD_FAILED=1
+    fi
+}
+
+#######################################
+# has_go_files: Check if directory contains Go files
+#
+# Description:
+#   Checks if the specified directory contains any Go files
+#
+# Arguments:
+#   $1 - Directory path to check
+#
+# Returns:
+#   Number of Go files found (integer)
+#
+# Usage:
+#   count=$(has_go_files "/path/to/dir")
+#
+#######################################
+function has_go_files {
+    local dir=$1
+    find "$dir" -name "*.go" | head -1 | wc -l
+}
+
+#######################################
+# run_go_fmt: Run go fmt
+#
+# Description:
+#   Runs go fmt to format Go code or checks formatting compliance
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (sets EXIT_CODE and GO_FMT_FAILED on failure)
+#
+# Usage:
+#   run_go_fmt
+#
+#######################################
+function run_go_fmt {
+    echo_section "Running go fmt"
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log "INFO" "DRY-RUN: Would run 'go fmt $TARGET_PATTERN'"
+        return 0
+    fi
+
+    # Use go fmt instead of gofmt for better Go module support
+    if [[ "$FIX_MODE" == "true" ]]; then
+        log "INFO" "Automatically formatting files..."
+        if go fmt "$TARGET_PATTERN"; then
+            log "INFO" "Files formatted successfully"
+        else
+            log "ERROR" "go fmt failed"
+            EXIT_CODE=1
+            GO_FMT_FAILED=1
+        fi
+    else
+        # Check formatting using gofmt -l to list files that are not formatted
+        # Use go list + mapfile instead of direct gofmt to avoid word splitting issues
+        # with complex package patterns and ensure proper handling of module directories
+        local fmt_output
+        # Safely build argument list from go list output to avoid word splitting
+        mapfile -t go_dirs < <(go list -f '{{.Dir}}' "$TARGET_PATTERN" 2> /dev/null || true)
+        if [[ ${#go_dirs[@]} -eq 0 ]]; then
+            fmt_output=""
+        else
+            fmt_output=$(gofmt -l "${go_dirs[@]}" 2>&1 || true)
+        fi
+        if [[ -n "$fmt_output" ]]; then
+            echo "Files that need formatting (gofmt -l):"
+            echo "$fmt_output"
+            log "WARN" "Some files need formatting. Use -f flag to auto-fix"
+            EXIT_CODE=1
+            GO_FMT_FAILED=1
+        else
+            log "INFO" "All files are properly formatted"
+        fi
+    fi
+}
+
+#######################################
+# run_go_mod_tidy: Run go mod tidy
+#
+# Description:
+#   Runs go mod tidy to clean up the go.mod and go.sum files
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (sets EXIT_CODE on failure)
+#
+# Usage:
+#   run_go_mod_tidy
+#
+#######################################
+function run_go_mod_tidy {
+    echo_section "Running go mod tidy"
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log "INFO" "DRY-RUN: Would run 'go mod tidy'"
+        return 0
+    fi
+
+    # 特定ディレクトリ指定時はそのディレクトリ内に go.mod がある場合のみ実行
+    local mod_dir="."
+    if [[ "$IS_SCOPED" == "true" ]]; then
+        if [[ -f "$TARGET_DIR/go.mod" ]]; then
+            mod_dir="$TARGET_DIR"
+        else
+            log "INFO" "Skipping go mod tidy (no go.mod in scoped directory: $TARGET_DIR)"
+            return 0
+        fi
+    fi
+
+    pushd "$mod_dir" > /dev/null || true
+    if go mod tidy; then
+        log "INFO" "go mod tidy completed successfully (dir=$mod_dir)"
+    else
+        log "ERROR" "go mod tidy failed (dir=$mod_dir)"
+        EXIT_CODE=1
+    fi
+    popd > /dev/null || true
+}
+
+#######################################
+# run_go_vet: Run go vet
+#
+# Description:
+#   Runs go vet to check for common Go programming errors
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (sets EXIT_CODE and GO_VET_FAILED on failure)
+#
+# Usage:
+#   run_go_vet
+#
+#######################################
+function run_go_vet {
+    echo_section "Running go vet"
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log "INFO" "DRY-RUN: Would run 'go vet $TARGET_PATTERN'"
+        return 0
+    fi
+
+    if go vet "$TARGET_PATTERN"; then
+        log "INFO" "go vet passed"
+    else
+        log "ERROR" "go vet found issues"
+        EXIT_CODE=1
+        GO_VET_FAILED=1
+    fi
+}
+
+#######################################
+# run_golangci_lint: Run golangci-lint
+#
+# Description:
+#   Runs golangci-lint to perform comprehensive code linting
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (sets EXIT_CODE and LINT_FAILED on failure)
+#
+# Usage:
+#   run_golangci_lint
+#
+#######################################
+function run_golangci_lint {
+    echo_section "Running golangci-lint"
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log "INFO" "DRY-RUN: Would run 'golangci-lint run $TARGET_PATTERN'"
+        return 0
+    fi
+
+    local lint_args=("run")
+
+    if [[ "$FIX_MODE" == "true" ]]; then
+        lint_args+=("--fix")
+    fi
+
+    if [[ "$VERBOSE" == "true" ]]; then
+        lint_args+=("-v")
+    fi
+
+    lint_args+=("$TARGET_PATTERN")
+
+    if golangci-lint "${lint_args[@]}" 2>&1 | tee /tmp/golint_output.txt; then
+        log "INFO" "golangci-lint passed"
+        LINT_ISSUES_COUNT=0
+    else
+        log "ERROR" "golangci-lint found issues"
+        EXIT_CODE=1
+        LINT_FAILED=1
+        # Count issues
+        if [[ -f /tmp/golint_output.txt ]]; then
+            LINT_ISSUES_COUNT=$(grep -cE '^\S+\.go:' /tmp/golint_output.txt 2> /dev/null || echo 0)
+        else
+            LINT_ISSUES_COUNT=0
+        fi
+        # Ensure it's a valid number
+        if ! [[ "$LINT_ISSUES_COUNT" =~ ^[0-9]+$ ]]; then
+            LINT_ISSUES_COUNT=0
+        fi
+    fi
+    rm -f /tmp/golint_output.txt
+}
+
+#######################################
+# run_security_checks: Run security checks
+#
+# Description:
+#   Runs security vulnerability checks using govulncheck
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (sets EXIT_CODE and SECURITY_FAILED on failure)
+#
+# Usage:
+#   run_security_checks
+#
 #######################################
 function run_security_checks {
     echo_section "Running security checks"
@@ -419,83 +603,98 @@ function run_security_checks {
 }
 
 #######################################
-# Function to run benchmark tests (optional)
+# run_tests: Run tests
+#
+# Description:
+#   Runs go test to execute unit tests
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (sets EXIT_CODE and TEST_FAILED on failure)
+#
+# Usage:
+#   run_tests
+#
 #######################################
-function run_benchmark_tests {
-    echo_section "Running benchmark tests"
+function run_tests {
+    echo_section "Running go test"
 
     if [[ "$DRY_RUN" == "true" ]]; then
-        log "INFO" "DRY-RUN: Would run benchmark tests"
+        log "INFO" "DRY-RUN: Would run 'go test -v $TARGET_PATTERN'"
         return 0
     fi
 
-    # Check if there are any benchmark tests
-    local has_benchmarks
-    has_benchmarks=$(find . -name "*_test.go" -not -path "./vendor/*" -not -path "./.*" -exec grep -l "func Benchmark" {} + 2> /dev/null | head -1 || true)
+    local test_args=("-v")
 
-    if [[ -n "$has_benchmarks" ]]; then
-        log "INFO" "Running benchmark tests..."
-        if go test -bench=. -benchmem "$TARGET_PATTERN" > /dev/null 2>&1; then
-            log "INFO" "Benchmark tests completed"
-            if [[ "$VERBOSE" == "true" ]]; then
-                go test -bench=. -benchmem "$TARGET_PATTERN"
-            fi
-        else
-            log "WARN" "Some benchmark tests failed"
-        fi
+    if [[ "$VERBOSE" == "true" ]]; then
+        test_args+=("-x")
+    fi
+
+    test_args+=("$TARGET_PATTERN")
+
+    if go test "${test_args[@]}" 2>&1 | tee /tmp/gotest_output.txt; then
+        log "INFO" "All tests passed"
+        TEST_FAIL_COUNT=0
     else
-        log "INFO" "No benchmark tests found"
+        log "ERROR" "Some tests failed"
+        EXIT_CODE=1
+        TEST_FAILED=1
+        # Count failed tests
+        TEST_FAIL_COUNT=$(grep -c '^--- FAIL:' /tmp/gotest_output.txt || echo 0)
+    fi
+    rm -f /tmp/gotest_output.txt
+}
+
+#######################################
+# run_race_tests: Run race condition tests
+#
+# Description:
+#   Runs go test with race detection enabled
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (sets EXIT_CODE and RACE_FAILED on failure)
+#
+# Usage:
+#   run_race_tests
+#
+#######################################
+function run_race_tests {
+    echo_section "Running race condition tests"
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log "INFO" "DRY-RUN: Would run 'CGO_ENABLED=1 go test -race $TARGET_PATTERN'"
+        return 0
+    fi
+
+    if CGO_ENABLED=1 go test -race "$TARGET_PATTERN"; then
+        log "INFO" "Race condition tests passed"
+    else
+        log "ERROR" "Race condition tests failed"
+        EXIT_CODE=1
+        RACE_FAILED=1
     fi
 }
 
 #######################################
-# Parse command line arguments
-#######################################
-function parse_arguments {
-    while [[ $# -gt 0 ]]; do
-        case $1 in
-            -h | --help)
-                show_usage
-                ;;
-            -v | --verbose)
-                VERBOSE=true
-                shift
-                ;;
-            -d | --dry-run)
-                DRY_RUN=true
-                shift
-                ;;
-            -f | --fix)
-                FIX_MODE=true
-                shift
-                ;;
-            -*)
-                error_exit "Unknown option: $1"
-                ;;
-            *)
-                if [[ -z "${TARGET_DIR:-}" ]]; then
-                    TARGET_DIR="$1"
-                else
-                    error_exit "Unexpected argument: $1"
-                fi
-                shift
-                ;;
-        esac
-    done
-    if [[ -z "${TARGET_DIR:-}" ]]; then
-        TARGET_DIR="."
-        log "INFO" "No target specified, will auto-detect Go directories from current location"
-    fi
-    if [[ "$TARGET_DIR" != "./..." && ! -d "$TARGET_DIR" && "$TARGET_DIR" != "." ]]; then
-        error_exit "Target directory does not exist: $TARGET_DIR"
-    fi
-    if [[ "$TARGET_DIR" != "." && "$TARGET_DIR" != "./..." ]]; then
-        IS_SCOPED=true
-    fi
-}
-
-#######################################
-# Main process
+# main: Main execution function
+#
+# Description:
+#   Main entry point that orchestrates all code quality checks
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Returns:
+#   None (exits with appropriate status code)
+#
+# Usage:
+#   main "$@"
+#
 #######################################
 function main {
     parse_arguments "$@"

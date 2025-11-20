@@ -1,56 +1,75 @@
 #!/bin/bash
+
 #######################################
-# Description: CSV utility functions for shell scripts
-# Usage: source /path/to/scripts/lib/csv.sh
+# csv_sort: Sort CSV data properly handling quoted fields
 #
-# This library provides CSV data processing and normalization functions:
-# - CSV value normalization with empty/null handling
-# - CSV safety processing for special characters
-# - Support for preserving newlines in CSV output
-# - Quote escaping and comma handling for proper CSV format
-#######################################
-
-#######################################
-# CSV Value Normalization Functions
-#######################################
-
-#######################################
-# normalize_csv_value: Normalize and quote a value for safe CSV output
+# Description:
+#   Sorts CSV data with proper handling of quoted fields containing commas and newlines
+#
 # Arguments:
-#   $1 - value to normalize
-# Outputs:
-#   CSV-safe value, always quoted if contains comma, quote, or newline
-#   Handles PRESERVE_NEWLINES for Excel/Numbers compatibility
-#   Escapes double quotes per RFC 4180
+#   $1 - CSV data to sort
+#
+# Returns:
+#   Sorted CSV data (to stdout)
+#
+# Usage:
+#   sorted_data=$(csv_sort "$csv_data")
+#
 #######################################
-function normalize_csv_value {
-    local value="$1"
+function csv_sort {
+    local input_data="$1"
 
-    # Treat empty/null as empty string
-    if [[ -z "$value" || "$value" == "null" ]]; then
-        echo ""
-        return
-    fi
+    # For complex CSV data with quoted fields, use Python to sort properly
+    if command -v python3 > /dev/null 2>&1; then
+        printf "%b" "$input_data" | python3 -c "
+import csv
+import sys
+from io import StringIO
 
-    if [[ "${PRESERVE_NEWLINES:-false}" == "true" ]]; then
-        # Preserve newlines, only escape double quotes
-        value="${value//\"/\"\"}"
-        echo "\"$value\""
+# Read CSV data from stdin
+csv_data = sys.stdin.read()
+reader = csv.reader(StringIO(csv_data))
+rows = list(reader)
+
+# Sort by multiple columns: Region(4), Subcategory(1), Subsubcategory(2), Name(3)
+# Columns are 0-indexed, so subtract 1 from 1-indexed sort keys
+try:
+    sorted_rows = sorted(rows, key=lambda row: (
+        row[4] if len(row) > 4 else '',  # Region
+        row[1] if len(row) > 1 else '',  # Subcategory
+        row[2] if len(row) > 2 else '',  # Subsubcategory
+        row[3] if len(row) > 3 else ''   # Name
+    ))
+
+    # Write sorted CSV to stdout
+    writer = csv.writer(sys.stdout, quoting=csv.QUOTE_MINIMAL)
+    for row in sorted_rows:
+        writer.writerow(row)
+except Exception as e:
+    # Fallback: output unsorted if Python sorting fails
+    sys.stdout.write(csv_data)
+"
     else
-        # Replace newlines with literal \n for compatibility
-        value="${value//$'\n'/\\n}"
-        value="${value//\"/\"\"}"
-        echo "\"$value\""
+        # Fallback to basic sort if Python is not available
+        printf "%b" "$input_data" | sort -t, -k4,4 -k2,2 -k3,3 -k5,5
     fi
 }
 
 #######################################
-# Helper function to make values CSV-safe by removing/replacing problematic characters
-# Uses PRESERVE_NEWLINES environment variable to control newline handling
+# make_csv_safe: Make values CSV-safe by removing problematic characters
+#
+# Description:
+#   Makes values safe for CSV output by handling special characters and quoting
+#
 # Arguments:
 #   $1 - value to make CSV-safe
-# Outputs:
-#   CSV-safe value with proper quoting and escaping
+#
+# Returns:
+#   CSV-safe value with proper quoting and escaping (to stdout)
+#
+# Usage:
+#   safe_value=$(make_csv_safe "value,with,commas")
+#
 #######################################
 function make_csv_safe {
     local value=$1
@@ -106,48 +125,54 @@ function make_csv_safe {
 }
 
 #######################################
-# csv_sort: Sort CSV data properly handling quoted fields with commas and newlines
-# Arguments:
-#   $1 - CSV data to sort
-# Outputs:
-#   Sorted CSV data with proper field handling
-# Sorting order: Region(3), Subcategory(1), Subsubcategory(2), Name(4)
+# Description: CSV utility functions for shell scripts
+# Usage: source /path/to/scripts/lib/csv.sh
+#
+# This library provides CSV data processing and normalization functions:
+# - CSV value normalization with empty/null handling
+# - CSV safety processing for special characters
+# - Support for preserving newlines in CSV output
+# - Quote escaping and comma handling for proper CSV format
 #######################################
-function csv_sort {
-    local input_data="$1"
 
-    # For complex CSV data with quoted fields, use Python to sort properly
-    if command -v python3 > /dev/null 2>&1; then
-        printf "%b" "$input_data" | python3 -c "
-import csv
-import sys
-from io import StringIO
+#######################################
+# CSV Value Normalization Functions
+#######################################
 
-# Read CSV data from stdin
-csv_data = sys.stdin.read()
-reader = csv.reader(StringIO(csv_data))
-rows = list(reader)
+#######################################
+# normalize_csv_value: Normalize and quote a value for safe CSV output
+#
+# Description:
+#   Normalizes and quotes a value for safe CSV output with proper escaping
+#
+# Arguments:
+#   $1 - value to normalize
+#
+# Returns:
+#   CSV-safe value, always quoted (to stdout)
+#
+# Usage:
+#   quoted_value=$(normalize_csv_value "value with \"quotes\"")
+#
+#######################################
+function normalize_csv_value {
+    local value="$1"
+    local default_value="${2:-""}"
 
-# Sort by multiple columns: Region(3), Subcategory(1), Subsubcategory(2), Name(4)
-# Columns are 0-indexed, so subtract 1 from 1-indexed sort keys
-try:
-    sorted_rows = sorted(rows, key=lambda row: (
-        row[3] if len(row) > 3 else '',  # Region
-        row[1] if len(row) > 1 else '',  # Subcategory
-        row[2] if len(row) > 2 else '',  # Subsubcategory
-        row[4] if len(row) > 4 else ''   # Name
-    ))
+    # Treat empty/null as empty string
+    if [[ -z "$value" || "$value" == "null" ]]; then
+        echo "$default_value"
+        return
+    fi
 
-    # Write sorted CSV to stdout
-    writer = csv.writer(sys.stdout, quoting=csv.QUOTE_MINIMAL)
-    for row in sorted_rows:
-        writer.writerow(row)
-except Exception as e:
-    # Fallback: output unsorted if Python sorting fails
-    sys.stdout.write(csv_data)
-"
+    if [[ "${PRESERVE_NEWLINES:-false}" == "true" ]]; then
+        # Preserve newlines, only escape double quotes
+        value="${value//\"/\"\"}"
+        echo "\"$value\""
     else
-        # Fallback to basic sort if Python is not available
-        printf "%b" "$input_data" | sort -t, -k4,4 -k2,2 -k3,3 -k5,5
+        # Replace newlines with literal \n for compatibility
+        value="${value//$'\n'/\\n}"
+        value="${value//\"/\"\"}"
+        echo "\"$value\""
     fi
 }

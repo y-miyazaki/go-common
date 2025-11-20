@@ -1,54 +1,51 @@
 # Prompt
 
-## List
-### Review for Scripts
-あなたは、Bashスクリプトのエキスパートです。
-GitHub Copilotはレビュー時に以下の内容をチェックし、実際に動作確認も行うこと。
-以下の内容を完了後にチェックをつけた形でMarkdown形式でアウトプットすること。
-```
-- [ ] .github/instructions/scripts.instructions.mdの内容に従ってレビューを行うこと
-- [ ] コードの一貫性・規約準拠を確認すること
-  - [ ] 同一ディレクトリにあるコードも参考にして乖離がある場合は一貫性を担保したコードに修正すること
-- [ ] レビュー後、必ず下記コマンドで動作確認を行うこと
-- [ ] /workspace/scripts/validate_all_scripts.sh -v -f
-  - [ ] もし失敗した場合は、修正作業を行うこと
-```
+## Review Checklist
 
-### Review for Go
-あなたは、Goのエキスパートです。
-GitHub Copilotはレビュー時に以下の内容をチェックし、実際に動作確認も行うこと。
-以下の内容を完了後にチェックをつけた形でMarkdown形式でアウトプットすること。
-```
-- [ ] .github/instructions/go.instructions.mdの内容に従ってレビューを行うこと
-  - [ ] 同一ディレクトリにあるコードも参考にして乖離がある場合は一貫性を担保したコードに修正すること
-- [ ] コードの一貫性・規約準拠を確認すること
-- [ ] /workspace/scripts/go/check.sh -f {target directory}
-  - [ ] もし失敗した場合は、修正作業を行うこと
-```
+### Scripts
+Bashスクリプトエキスパート。レビュー・動作確認実施、Markdown形式チェックリスト出力。
 
-### Review for Terraform
-あなたは、Terraformのエキスパートです。
-GitHub Copilotはレビュー時に以下の内容をチェックし、実際に動作確認も行うこと。
-以下の内容を完了後にチェックをつけた形でMarkdown形式でアウトプットすること。
-```
-- [ ] .github/instructions/terraform.instructions.mdの内容に従ってレビューを行うこと
-- [ ] 対象ファイルおよび関連箇所の一貫性・セキュリティを確認すること
-- [ ] コードの一貫性・規約準拠を確認すること
-- [ ] export ENV=dev; terraform init -reconfigure -backend-config=terraform."${ENV}".tfbackend
-  - [ ] もし失敗した場合は、修正作業を行うこと
-- [ ] export ENV=dev; terraform plan -lock=false -var-file=terraform."${ENV}".tfvars
-  - [ ] もし失敗した場合は、修正作業を行うこと
-```
+- [ ] `.github/instructions/script.instructions.md`準拠レビュー
+- [ ] コード一貫性・規約準拠確認（同一ディレクトリコード参照、乖離修正）
+- [ ] `/workspace/scripts/validate_all_scripts.sh -v -f`実行・失敗時修正
 
-### Review for Markdown
-あなたは、GitHubのMarkdownドキュメントのエキスパートです。
-GitHub Copilotはレビュー時に以下の内容をチェックし、実際に動作確認も行うこと。
-以下の内容を完了後にチェックをつけた形でMarkdown形式でアウトプットすること。
-```
-- [ ] .github/instructions/markdown.instructions.mdの内容に従ってレビューを行うこと
-- [ ] ドキュメントの一貫性・規約準拠を確認すること
-- [ ] Markdownlintを実行し、修正可能なものは修正できていること
-- [ ] 同一種類のMarkdownは文書構成を揃えること
-- [ ] 誤字脱字があれば修正すること
-- [ ] 文章は日本語、章名は英語とする
-```
+### Go
+Goエキスパート。レビュー・動作確認実施、Markdown形式チェックリスト出力。
+
+- [ ] `.github/instructions/go.instructions.md`準拠レビュー
+- [ ] コード一貫性・規約準拠確認（同一ディレクトリコード参照、乖離修正）
+- [ ] `/workspace/scripts/go/check.sh -f {target}`実行・失敗時修正
+
+### Terraform
+Terraformエキスパート。レビュー・動作確認実施、Markdown形式チェックリスト出力。
+
+- [ ] `.github/instructions/terraform.instructions.md`準拠レビュー
+- [ ] 対象・関連箇所一貫性・セキュリティ確認
+- [ ] `export ENV=dev; terraform init -reconfigure -backend-config=terraform."${ENV}".tfbackend`実行・失敗時修正
+- [ ] `export ENV=dev; terraform plan -lock=false -var-file=terraform."${ENV}".tfvars`実行・失敗時修正
+
+### Markdown
+GitHubドキュメントエキスパート。レビュー・確認実施、Markdown形式チェックリスト出力。
+
+- [ ] `.github/instructions/markdown.instructions.md`準拠レビュー
+- [ ] 一貫性・規約準拠確認
+- [ ] Markdownlint実行・修正
+- [ ] 同種類Markdown文書構成統一
+- [ ] 誤字脱字修正
+- [ ] 文章日本語、章名英語
+
+### GitHub Actions Workflow
+GitHub Actionsエキスパート。ワークフロー検証・実施、Markdown形式チェックリスト出力。
+
+- [ ] `.github/instructions/github-actions-workflow.instructions.md`準拠レビュー
+- [ ] ワークフロー構文・セキュリティ確認
+- [ ] シークレット管理・権限最小化確認
+- [ ] 再利用可能なワークフロー活用確認
+
+### DAC (Diagram as Code)
+AWS Diagram as Codeエキスパート。図生成・検証実施、Markdown形式チェックリスト出力。
+
+- [ ] `.github/instructions/dac.instructions.md`準拠レビュー
+- [ ] YAML構文・リソース定義確認
+- [ ] 図生成コマンド実行確認
+- [ ] アーキテクチャ図の正確性確認

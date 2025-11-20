@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/bedrockruntime"
@@ -164,8 +165,7 @@ func TestAWSBedrockRepository_InvokeModelWithFileData(t *testing.T) {
 
 	modelID := "anthropic.claude-v2"
 	fileData := []byte("test image data")
-	mimeType := "image/png"
-	additionalPayload := map[string]any{"prompt": "Describe this image"}
+	payload := []byte(`{"prompt": "Describe this image"}`)
 	expectedResponse := []byte(`{"completion":"response"}`)
 
 	mockClient.On("InvokeModel", mock.Anything, mock.MatchedBy(func(input *bedrockruntime.InvokeModelInput) bool {
@@ -174,7 +174,7 @@ func TestAWSBedrockRepository_InvokeModelWithFileData(t *testing.T) {
 		Body: expectedResponse,
 	}, nil)
 
-	result, err := repo.InvokeModelWithFileData(context.Background(), modelID, fileData, mimeType, additionalPayload)
+	result, err := repo.InvokeModelWithFileData(context.Background(), modelID, fileData, payload)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedResponse, result)
@@ -187,14 +187,83 @@ func TestAWSBedrockRepository_InvokeModelWithFileData_Error(t *testing.T) {
 
 	modelID := "anthropic.claude-v2"
 	fileData := []byte("test image data")
-	mimeType := "image/png"
-	additionalPayload := map[string]any{"prompt": "Describe this image"}
+	payload := []byte(`{"prompt": "Describe this image"}`)
 
 	mockClient.On("InvokeModel", mock.Anything, mock.Anything).Return(nil, assert.AnError)
 
-	_, err := repo.InvokeModelWithFileData(context.Background(), modelID, fileData, mimeType, additionalPayload)
+	_, err := repo.InvokeModelWithFileData(context.Background(), modelID, fileData, payload)
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "invoke model with file data")
+	mockClient.AssertExpectations(t)
+}
+
+func TestAWSBedrockRepository_InvokeModelWithFile(t *testing.T) {
+	mockClient := new(MockAWSBedrockClient)
+	repo := NewAWSBedrockRepositoryWithInterface(mockClient)
+
+	// Create a temporary test file
+	tmpFile, err := os.CreateTemp("", "test-image-*.png")
+	assert.NoError(t, err)
+	defer os.Remove(tmpFile.Name())
+
+	testData := []byte("test image data")
+	_, err = tmpFile.Write(testData)
+	assert.NoError(t, err)
+	tmpFile.Close()
+
+	modelID := "anthropic.claude-v2"
+	payload := []byte(`{"prompt": "Describe this image"}`)
+	expectedResponse := []byte(`{"completion":"response"}`)
+
+	mockClient.On("InvokeModel", mock.Anything, mock.MatchedBy(func(input *bedrockruntime.InvokeModelInput) bool {
+		return *input.ModelId == modelID
+	})).Return(&bedrockruntime.InvokeModelOutput{
+		Body: expectedResponse,
+	}, nil)
+
+	result, err := repo.InvokeModelWithFile(context.Background(), modelID, tmpFile.Name(), payload)
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedResponse, result)
+	mockClient.AssertExpectations(t)
+}
+
+func TestAWSBedrockRepository_InvokeModelWithFile_FileNotFound(t *testing.T) {
+	mockClient := new(MockAWSBedrockClient)
+	repo := NewAWSBedrockRepositoryWithInterface(mockClient)
+
+	modelID := "anthropic.claude-v2"
+	payload := []byte(`{"prompt": "Describe this image"}`)
+
+	_, err := repo.InvokeModelWithFile(context.Background(), modelID, "/nonexistent/file.png", payload)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "open file")
+}
+
+func TestAWSBedrockRepository_InvokeModelWithFile_InvokeError(t *testing.T) {
+	mockClient := new(MockAWSBedrockClient)
+	repo := NewAWSBedrockRepositoryWithInterface(mockClient)
+
+	// Create a temporary test file
+	tmpFile, err := os.CreateTemp("", "test-image-*.png")
+	assert.NoError(t, err)
+	defer os.Remove(tmpFile.Name())
+
+	testData := []byte("test image data")
+	_, err = tmpFile.Write(testData)
+	assert.NoError(t, err)
+	tmpFile.Close()
+
+	modelID := "anthropic.claude-v2"
+	payload := []byte(`{"prompt": "Describe this image"}`)
+
+	mockClient.On("InvokeModel", mock.Anything, mock.Anything).Return(nil, assert.AnError)
+
+	_, err = repo.InvokeModelWithFile(context.Background(), modelID, tmpFile.Name(), payload)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "invoke model with file")
 	mockClient.AssertExpectations(t)
 }

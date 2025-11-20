@@ -37,6 +37,10 @@
 # Error handling: exit on error, unset variable, or failed pipeline
 set -euo pipefail
 
+# Secure defaults
+umask 027
+export LC_ALL=C.UTF-8
+
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export SCRIPT_DIR
@@ -75,7 +79,23 @@ SCHEMASPY_JAR=""
 JDBC_DRIVER=""
 
 #######################################
-# Display usage information
+# show_usage: Display usage information
+#
+# Description:
+#   Displays usage information for the script, including options and examples
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   None
+#
+# Usage:
+#   show_usage
+#
 #######################################
 show_usage() {
     cat << EOF
@@ -127,7 +147,37 @@ EOF
 }
 
 #######################################
-# Parse command line arguments
+# parse_arguments: Parse command line arguments
+#
+# Description:
+#   Parses command line arguments and options
+#
+# Arguments:
+#   $@ - Command line arguments
+#
+# Global Variables:
+#   VERBOSE - Enable verbose output
+#   DRY_RUN - Enable dry-run mode
+#   ENVIRONMENT - Environment name
+#   DB_TYPE - Database type
+#   DB_NAME - Database name
+#   SCHEMA_NAME - Schema name to document
+#   OUTPUT_DIR - Output directory
+#   LOCAL_PORT - Local port for port forwarding
+#   SECRET_ID - AWS Secrets Manager secret ID
+#   BASTION_ID - EC2 Bastion instance ID
+#   BASTION_TAG - EC2 tag filter for Bastion
+#   SCHEMASPY_VERSION - SchemaSpy version
+#   SSL_MODE - SSL mode for database connection
+#   DB_THREADS - Number of database threads
+#   SKIP_CLEANUP - Skip SSM session cleanup
+#
+# Returns:
+#   None
+#
+# Usage:
+#   parse_arguments "$@"
+#
 #######################################
 parse_arguments() {
     while [[ $# -gt 0 ]]; do
@@ -206,7 +256,32 @@ parse_arguments() {
 }
 
 #######################################
-# Validate required parameters
+# validate_parameters: Validate required parameters
+#
+# Description:
+#   Validates required parameters and sets default values
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   ENVIRONMENT - Environment name
+#   DB_NAME - Database name
+#   SECRET_ID - AWS Secrets Manager secret ID
+#   OUTPUT_DIR - Output directory
+#   LOCAL_PORT - Local port for port forwarding
+#   DB_TYPE - Database type
+#   SCHEMA_NAME - Schema name to document
+#   SSL_MODE - SSL mode for database connection
+#   SCHEMASPY_VERSION - SchemaSpy version
+#   DB_THREADS - Number of database threads
+#
+# Returns:
+#   None
+#
+# Usage:
+#   validate_parameters
+#
 #######################################
 validate_parameters() {
     log "INFO" "Validating parameters..."

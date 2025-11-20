@@ -28,49 +28,57 @@ runs:
     - name: Write Title
       shell: bash
       run: |
-        echo "# ${{ inputs.title }}" >> $GITHUB_STEP_SUMMARY
+        echo "# ${TITLE}" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
+      env:
+        TITLE: ${{ inputs.title }}
     - name: Write Results
       shell: bash
       run: |
         echo "## Results" >> $GITHUB_STEP_SUMMARY
-        if [ -n "${{ inputs.status }}" ]; then
-          if [ "${{ inputs.status }}" = "success" ]; then
+        if [ -n "${STATUS}" ]; then
+          if [ "${STATUS}" = "success" ]; then
             echo "- Status: ✅ success" >> $GITHUB_STEP_SUMMARY
           else
-            echo "- Status: ❌ ${{ inputs.status }}" >> $GITHUB_STEP_SUMMARY
+            echo "- Status: ❌ ${STATUS}" >> $GITHUB_STEP_SUMMARY
           fi
         else
           # Fallback: do not fail if status missing
           echo "- Status: (unknown)" >> $GITHUB_STEP_SUMMARY
         fi
         echo "" >> $GITHUB_STEP_SUMMARY
+      env:
+        STATUS: ${{ inputs.status }}
     - name: Write Parameters
       shell: bash
       run: |
-        if [ -n "${{ inputs.params }}" ]; then
+        if [ -n "${PARAMS}" ]; then
           echo "## Parameters" >> $GITHUB_STEP_SUMMARY
-          echo "${{ inputs.params }}" | sed '/^$/d' | while IFS= read -r line; do
+          echo "${PARAMS}" | sed '/^$/d' | while IFS= read -r line; do
             echo "- $line" >> $GITHUB_STEP_SUMMARY
           done
           echo "" >> $GITHUB_STEP_SUMMARY
         fi
+      env:
+        PARAMS: ${{ inputs.params }}
     - name: Write Outputs
       shell: bash
       run: |
-        if [ -n "${{ inputs.outputs }}" ]; then
+        if [ -n "${OUTPUTS}" ]; then
           echo "## Outputs" >> $GITHUB_STEP_SUMMARY
-          echo "${{ inputs.outputs }}" | sed '/^$/d' | while IFS= read -r line; do
+          echo "${OUTPUTS}" | sed '/^$/d' | while IFS= read -r line; do
             echo "- $line" >> $GITHUB_STEP_SUMMARY
           done
           echo "" >> $GITHUB_STEP_SUMMARY
         fi
+      env:
+        OUTPUTS: ${{ inputs.outputs }}
     - name: Write Artifacts
       shell: bash
       run: |
         echo "## Artifacts" >> $GITHUB_STEP_SUMMARY
-        if [ -n "${{ inputs.artifacts }}" ]; then
-          echo "${{ inputs.artifacts }}" | sed '/^$/d' | while IFS= read -r line; do
+        if [ -n "${ARTIFACTS}" ]; then
+          echo "${ARTIFACTS}" | sed '/^$/d' | while IFS= read -r line; do
             echo "- $line" >> $GITHUB_STEP_SUMMARY
           done
         else
@@ -83,3 +91,5 @@ runs:
             echo "- (none)" >> $GITHUB_STEP_SUMMARY
           fi
         fi
+      env:
+        ARTIFACTS: ${{ inputs.artifacts }}

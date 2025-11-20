@@ -68,7 +68,7 @@
   // GitHub Copilot
   // ------------------------------------------------------------
   "chat.agent.enabled": true,
-
+  "chat.agent.maxRequests": 50,
   "chat.mcp.access": "all",
   "chat.mcp.autostart": "onlyNew",
   "chat.mcp.discovery.enabled": {
@@ -321,6 +321,8 @@
   // for Shell Script
   // ------------------------------------------------------------
   "shellformat.flag": "-i 4 -ci -bn -sr",
+  "shellformat.path": "shfmt",
+  "shellformat.effectLanguages": ["shellscript", "bats"],
   "shellcheck.enable": true,
   "shellcheck.useWorkspaceRootAsCwd": true,
   "shellcheck.run": "onSave",
@@ -332,7 +334,10 @@
   "shellcheck.customArgs": ["-x -e SC1091"],
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format",
-    "editor.formatOnSave": true,
-    "editor.tabSize": 2
+    "editor.formatOnSave": true
+  },
+  "[bats]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format",
+    "editor.formatOnSave": true
   }
 }

@@ -34,6 +34,10 @@
 # Error handling: exit on error, unset variable, or failed pipeline
 set -euo pipefail
 
+# Secure defaults
+umask 027
+export LC_ALL=C.UTF-8
+
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export SCRIPT_DIR
@@ -59,12 +63,28 @@ SCHEMASPY_VERSION="7.0.2"
 INSTALL_DIR="/workspace/tmp"
 
 # JDBC driver versions
-POSTGRESQL_JDBC_VERSION="42.7.5"
-MYSQL_JDBC_VERSION="8.0.33"
-REDSHIFT_JDBC_VERSION="2.1.0.32"
+JDBC_VERSION_POSTGRESQL="42.7.5"
+JDBC_VERSION_MYSQL="8.0.33"
+JDBC_VERSION_REDSHIFT="2.1.0.32"
 
 #######################################
-# Display usage information
+# show_usage: Display usage information
+#
+# Description:
+#   Displays usage information for the script, including options and examples
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   None
+#
+# Usage:
+#   show_usage
+#
 #######################################
 show_usage() {
     cat << EOF
@@ -110,7 +130,32 @@ EOF
 }
 
 #######################################
-# Parse command line arguments
+# parse_arguments: Parse command line arguments
+#
+# Description:
+#   Parses command line arguments and options
+#
+# Arguments:
+#   $@ - Command line arguments
+#
+# Global Variables:
+#   VERBOSE - Enable verbose output
+#   DRY_RUN - Enable dry-run mode
+#   FORCE_INSTALL - Force reinstallation of components
+#   DB_TYPE - Database type to install JDBC drivers for
+#   SKIP_JAVA - Skip Java installation
+#   SKIP_GRAPHVIZ - Skip Graphviz installation
+#   SKIP_SCHEMASPY - Skip SchemaSpy download
+#   SKIP_JDBC - Skip JDBC driver download
+#   SCHEMASPY_VERSION - SchemaSpy version to download
+#   INSTALL_DIR - Installation directory
+#
+# Returns:
+#   None
+#
+# Usage:
+#   parse_arguments "$@"
+#
 #######################################
 parse_arguments() {
     while [[ $# -gt 0 ]]; do
@@ -169,7 +214,29 @@ parse_arguments() {
 }
 
 #######################################
-# Validate parameters
+# validate_parameters: Validate parameters
+#
+# Description:
+#   Validates parameters and sets default values
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   DB_TYPE - Database type
+#   INSTALL_DIR - Installation directory
+#   FORCE_INSTALL - Force reinstallation flag
+#   SKIP_JAVA - Skip Java installation flag
+#   SKIP_GRAPHVIZ - Skip Graphviz installation flag
+#   SKIP_SCHEMASPY - Skip SchemaSpy download flag
+#   SKIP_JDBC - Skip JDBC driver download flag
+#
+# Returns:
+#   None
+#
+# Usage:
+#   validate_parameters
+#
 #######################################
 validate_parameters() {
     log "INFO" "Validating parameters..."
@@ -404,14 +471,14 @@ download_postgresql_jdbc() {
         return 0
     fi
 
-    log "INFO" "Downloading PostgreSQL JDBC driver ${POSTGRESQL_JDBC_VERSION}..."
+    log "INFO" "Downloading PostgreSQL JDBC driver ${JDBC_VERSION_POSTGRESQL}..."
 
     if [ "${DRY_RUN}" = true ]; then
         log "INFO" "DRY RUN - Would download PostgreSQL JDBC driver to ${jdbc_jar}"
         return 0
     fi
 
-    local download_url="https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_JDBC_VERSION}.jar"
+    local download_url="https://jdbc.postgresql.org/download/postgresql-${JDBC_VERSION_POSTGRESQL}.jar"
 
     curl -fsSL "${download_url}" -o "${jdbc_jar}"
 
@@ -440,14 +507,14 @@ download_mysql_jdbc() {
         return 0
     fi
 
-    log "INFO" "Downloading MySQL JDBC driver ${MYSQL_JDBC_VERSION}..."
+    log "INFO" "Downloading MySQL JDBC driver ${JDBC_VERSION_MYSQL}..."
 
     if [ "${DRY_RUN}" = true ]; then
         log "INFO" "DRY RUN - Would download MySQL JDBC driver to ${jdbc_jar}"
         return 0
     fi
 
-    local download_url="https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/${MYSQL_JDBC_VERSION}/mysql-connector-j-${MYSQL_JDBC_VERSION}.jar"
+    local download_url="https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/${JDBC_VERSION_MYSQL}/mysql-connector-j-${JDBC_VERSION_MYSQL}.jar"
 
     curl -fsSL "${download_url}" -o "${jdbc_jar}"
 
@@ -474,14 +541,14 @@ download_redshift_jdbc() {
         return 0
     fi
 
-    log "INFO" "Downloading Redshift JDBC driver ${REDSHIFT_JDBC_VERSION}..."
+    log "INFO" "Downloading Redshift JDBC driver ${JDBC_VERSION_REDSHIFT}..."
 
     if [ "${DRY_RUN}" = true ]; then
         log "INFO" "DRY RUN - Would download Redshift JDBC driver to ${jdbc_jar}"
         return 0
     fi
 
-    local download_url="https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/${REDSHIFT_JDBC_VERSION}/redshift-jdbc42-${REDSHIFT_JDBC_VERSION}.jar"
+    local download_url="https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/${JDBC_VERSION_REDSHIFT}/redshift-jdbc42-${JDBC_VERSION_REDSHIFT}.jar"
 
     curl -fsSL "${download_url}" -o "${jdbc_jar}"
 
@@ -662,23 +729,23 @@ display_summary() {
     if [ "${SKIP_JDBC}" = false ]; then
         case "${DB_TYPE}" in
             pgsql)
-                log "INFO" "PostgreSQL JDBC: ${POSTGRESQL_JDBC_VERSION}"
+                log "INFO" "PostgreSQL JDBC: ${JDBC_VERSION_POSTGRESQL}"
                 log "INFO" "  Location: ${INSTALL_DIR}/pgsql-jdbc.jar"
                 ;;
             mysql)
-                log "INFO" "MySQL JDBC: ${MYSQL_JDBC_VERSION}"
+                log "INFO" "MySQL JDBC: ${JDBC_VERSION_MYSQL}"
                 log "INFO" "  Location: ${INSTALL_DIR}/mysql-jdbc.jar"
                 ;;
             redshift)
-                log "INFO" "Redshift JDBC: ${REDSHIFT_JDBC_VERSION}"
+                log "INFO" "Redshift JDBC: ${JDBC_VERSION_REDSHIFT}"
                 log "INFO" "  Location: ${INSTALL_DIR}/redshift-jdbc.jar"
                 ;;
             all)
-                log "INFO" "PostgreSQL JDBC: ${POSTGRESQL_JDBC_VERSION}"
+                log "INFO" "PostgreSQL JDBC: ${JDBC_VERSION_POSTGRESQL}"
                 log "INFO" "  Location: ${INSTALL_DIR}/pgsql-jdbc.jar"
-                log "INFO" "MySQL JDBC: ${MYSQL_JDBC_VERSION}"
+                log "INFO" "MySQL JDBC: ${JDBC_VERSION_MYSQL}"
                 log "INFO" "  Location: ${INSTALL_DIR}/mysql-jdbc.jar"
-                log "INFO" "Redshift JDBC: ${REDSHIFT_JDBC_VERSION}"
+                log "INFO" "Redshift JDBC: ${JDBC_VERSION_REDSHIFT}"
                 log "INFO" "  Location: ${INSTALL_DIR}/redshift-jdbc.jar"
                 ;;
         esac

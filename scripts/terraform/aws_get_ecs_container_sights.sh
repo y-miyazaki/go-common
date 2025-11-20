@@ -9,6 +9,10 @@
 # Error handling: exit on error, unset variable, or failed pipeline
 set -euo pipefail
 
+# Secure defaults
+umask 027
+export LC_ALL=C.UTF-8
+
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export SCRIPT_DIR
@@ -19,7 +23,20 @@ export SCRIPT_DIR
 source "${SCRIPT_DIR}/../lib/all.sh"
 
 #######################################
-# Display usage information
+# show_usage: Display script usage information
+#
+# Description:
+#   Displays usage information for the script
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (exits with status 0)
+#
+# Usage:
+#   show_usage
+#
 #######################################
 function show_usage {
     echo "Usage: $(basename "$0") [options]"
@@ -35,7 +52,20 @@ function show_usage {
 }
 
 #######################################
-# Parse command line arguments
+# parse_arguments: Parse command line arguments
+#
+# Description:
+#   Parses command line arguments and handles help option
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Returns:
+#   None (exits on error or help)
+#
+# Usage:
+#   parse_arguments "$@"
+#
 #######################################
 function parse_arguments {
     while [[ $# -gt 0 ]]; do
@@ -54,20 +84,20 @@ function parse_arguments {
 }
 
 #######################################
-# Retrieve ECS task definitions from AWS
-#######################################
-function get_task_definitions {
-    echo_section "Retrieving ECS task definitions"
-
-    if ! task_definitions=$(aws ecs list-task-definitions --output json | jq -r '.taskDefinitionArns[]'); then
-        error_exit "Failed to retrieve ECS task definitions"
-    fi
-
-    echo "$task_definitions"
-}
-
-#######################################
-# Extract unique task definition families
+# extract_unique_families: Extract unique task definition families
+#
+# Description:
+#   Processes task definition ARNs and extracts unique family names
+#
+# Arguments:
+#   $1 - Space-separated string of task definition ARNs
+#
+# Returns:
+#   Newline-separated list of unique family names
+#
+# Usage:
+#   families=$(extract_unique_families "$task_definitions")
+#
 #######################################
 function extract_unique_families {
     local task_definitions="$1"
@@ -99,7 +129,20 @@ function extract_unique_families {
 }
 
 #######################################
-# Generate Terraform configuration format output
+# generate_terraform_output: Generate Terraform configuration format output
+#
+# Description:
+#   Formats task definition families into Terraform configuration format
+#
+# Arguments:
+#   $@ - Array of task definition family names
+#
+# Returns:
+#   String containing formatted Terraform configuration items
+#
+# Usage:
+#   output=$(generate_terraform_output "${families[@]}")
+#
 #######################################
 function generate_terraform_output {
     local families=("$@")
@@ -120,7 +163,46 @@ function generate_terraform_output {
 }
 
 #######################################
-# Output the final result
+# get_task_definitions: Retrieve ECS task definitions from AWS
+#
+# Description:
+#   Retrieves all ECS task definition ARNs from AWS using AWS CLI
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   String containing space-separated task definition ARNs
+#
+# Usage:
+#   task_definitions=$(get_task_definitions)
+#
+#######################################
+function get_task_definitions {
+    echo_section "Retrieving ECS task definitions"
+
+    if ! task_definitions=$(aws ecs list-task-definitions --output json | jq -r '.taskDefinitionArns[]'); then
+        error_exit "Failed to retrieve ECS task definitions"
+    fi
+
+    echo "$task_definitions"
+}
+
+#######################################
+# output_result: Output the final result
+#
+# Description:
+#   Outputs the formatted Terraform configuration in JSON array format
+#
+# Arguments:
+#   $1 - Formatted Terraform configuration items string
+#
+# Returns:
+#   None (outputs to stdout)
+#
+# Usage:
+#   output_result "$formatted_items"
+#
 #######################################
 function output_result {
     local formatted_items="$1"
@@ -132,7 +214,20 @@ function output_result {
 }
 
 #######################################
-# Main execution function
+# main: Main execution function
+#
+# Description:
+#   Main entry point that orchestrates the ECS task definition family extraction process
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Returns:
+#   None (exits with appropriate status code)
+#
+# Usage:
+#   main "$@"
+#
 #######################################
 function main {
     # Parse arguments

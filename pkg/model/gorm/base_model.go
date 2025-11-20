@@ -1,5 +1,5 @@
-// Package model provides base database model structures using GORM.
-package model
+// Package gorm provides base database model structures using GORM.
+package gorm
 
 import (
 	"time"

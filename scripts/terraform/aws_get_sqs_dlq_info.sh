@@ -9,6 +9,10 @@
 # Error handling: exit on error, unset variable, or failed pipeline
 set -euo pipefail
 
+# Secure defaults
+umask 027
+export LC_ALL=C.UTF-8
+
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export SCRIPT_DIR
@@ -19,7 +23,23 @@ export SCRIPT_DIR
 source "${SCRIPT_DIR}/../lib/all.sh"
 
 #######################################
-# Display usage information
+# show_usage: Display script usage information
+#
+# Description:
+#   Displays usage information for the script, including options and examples
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Exits with status 0 after displaying help
+#
+# Usage:
+#   show_usage
+#
 #######################################
 function show_usage {
     echo "Usage: $(basename "$0") [options]"
@@ -35,7 +55,23 @@ function show_usage {
 }
 
 #######################################
-# Parse command line arguments
+# parse_arguments: Parse command line arguments
+#
+# Description:
+#   Parses command line arguments and options, handling help and unknown options
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Exits with error if unknown arguments are provided
+#
+# Usage:
+#   parse_arguments "$@"
+#
 #######################################
 function parse_arguments {
     while [[ $# -gt 0 ]]; do
@@ -54,7 +90,60 @@ function parse_arguments {
 }
 
 #######################################
-# Retrieve SQS queue URLs from AWS
+# generate_terraform_output: Generate Terraform configuration format output
+#
+# Description:
+#   Generates Terraform configuration format output for DLQ information
+#
+# Arguments:
+#   $@ - Array of DLQ names
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs formatted Terraform configuration items as a string
+#
+# Usage:
+#   terraform_output=$(generate_terraform_output "${dlqs[@]}")
+#
+#######################################
+function generate_terraform_output {
+    local dlqs=("$@")
+    local items=""
+
+    echo_section "Generating Terraform configuration format"
+
+    for dlq in "${dlqs[@]}"; do
+        items+="  {\n    QueueName = \"$dlq\"\n  },\n"
+    done
+
+    # Remove trailing comma if items is not empty
+    if [ -n "$items" ]; then
+        items=${items%,*}
+    fi
+
+    echo "$items"
+}
+
+#######################################
+# get_sqs_queues: Retrieve SQS queue URLs from AWS
+#
+# Description:
+#   Retrieves all SQS queue URLs from AWS using the AWS CLI and outputs them
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs queue URLs as newline-separated strings, exits with error on failure
+#
+# Usage:
+#   queue_urls=$(get_sqs_queues)
+#
 #######################################
 function get_sqs_queues {
     echo_section "Retrieving SQS queue information"
@@ -67,7 +156,51 @@ function get_sqs_queues {
 }
 
 #######################################
-# Process and extract DLQ information
+# output_result: Output the final result
+#
+# Description:
+#   Outputs the final formatted result in JSON array format
+#
+# Arguments:
+#   $1 - Formatted items string
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs the result to stdout
+#
+# Usage:
+#   output_result "$formatted_items"
+#
+#######################################
+function output_result {
+    local formatted_items="$1"
+
+    echo_section "Generating output"
+    echo "["
+    echo -e "$formatted_items"
+    echo "]"
+}
+
+#######################################
+# process_dlq_information: Process and extract DLQ information
+#
+# Description:
+#   Processes SQS queue URLs to extract Dead Letter Queue information from RedrivePolicy
+#
+# Arguments:
+#   $1 - Newline-separated string of SQS queue URLs
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs unique DLQ names as newline-separated strings
+#
+# Usage:
+#   unique_dlqs=$(process_dlq_information "$queue_urls")
+#
 #######################################
 function process_dlq_information {
     local queue_urls="$1"
@@ -108,40 +241,23 @@ function process_dlq_information {
 }
 
 #######################################
-# Generate Terraform configuration format output
-#######################################
-function generate_terraform_output {
-    local dlqs=("$@")
-    local items=""
-
-    echo_section "Generating Terraform configuration format"
-
-    for dlq in "${dlqs[@]}"; do
-        items+="  {\n    QueueName = \"$dlq\"\n  },\n"
-    done
-
-    # Remove trailing comma if items is not empty
-    if [ -n "$items" ]; then
-        items=${items%,*}
-    fi
-
-    echo "$items"
-}
-
-#######################################
-# Output the final result
-#######################################
-function output_result {
-    local formatted_items="$1"
-
-    echo_section "Generating output"
-    echo "["
-    echo -e "$formatted_items"
-    echo "]"
-}
-
-#######################################
-# Main execution function
+# main: Script entry point
+#
+# Description:
+#   Main function to execute the script logic for retrieving SQS DLQ information
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Exits with status 0 on success, non-zero on failure
+#
+# Usage:
+#   main "$@"
+#
 #######################################
 function main {
     # Parse arguments

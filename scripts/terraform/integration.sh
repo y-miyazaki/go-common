@@ -8,6 +8,10 @@
 # Error handling: exit on error, unset variable, or failed pipeline
 set -euo pipefail
 
+# Secure defaults
+umask 027
+export LC_ALL=C.UTF-8
+
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export SCRIPT_DIR
@@ -18,7 +22,23 @@ export SCRIPT_DIR
 source "${SCRIPT_DIR}/../lib/all.sh"
 
 #######################################
-# Display usage information
+# show_usage: Display script usage information
+#
+# Description:
+#   Displays usage information for the script, including required environment variables and examples
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Exits with status 1 after displaying help
+#
+# Usage:
+#   show_usage
+#
 #######################################
 function show_usage {
     show_help_header "$(basename "$0")" "Terraform integration testing (init, validate, plan)" "[directory]"
@@ -44,33 +64,29 @@ if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
 fi
 
 #######################################
-# Validate environment and prepare
+## Additional helper functions (alphabetical):
+## run_additional_checks, run_terraform_workflow, validate_and_prepare
+## Keep alphabetical order for helper functions
 #######################################
-function validate_and_prepare {
-    local dir="$1"
-
-    # Validate environment and dependencies
-    validate_terraform_env
-    validate_dependencies "terraform" "tflint" "trivy"
-
-    # Change to target directory
-    if ! cd "$dir"; then
-        error_exit "Failed to change to directory: $dir"
-    fi
-
-    log "INFO" "Starting Terraform integration testing in directory: $(pwd)"
-}
 
 #######################################
-# Run terraform workflow
-#######################################
-function run_terraform_workflow {
-    # Run Terraform workflow (plan only)
-    terraform_workflow "$ENV" "plan"
-}
-
-#######################################
-# Run additional linting and security checks
+# run_additional_checks: Run additional linting and security checks
+#
+# Description:
+#   Runs additional checks including tflint linting and trivy security scanning
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Logs warnings if issues are found but does not exit
+#
+# Usage:
+#   run_additional_checks
+#
 #######################################
 function run_additional_checks {
     echo_section "Additional Linting and Security Checks"
@@ -97,7 +113,81 @@ function run_additional_checks {
 }
 
 #######################################
-# Main execution function
+# run_terraform_workflow: Run terraform workflow
+#
+# Description:
+#   Runs the Terraform workflow for planning (without applying changes)
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   ENV - Environment for workflow
+#
+# Returns:
+#   None
+#
+# Usage:
+#   run_terraform_workflow
+#
+#######################################
+function run_terraform_workflow {
+    # Run Terraform workflow (plan only)
+    terraform_workflow "$ENV" "plan"
+}
+#######################################
+# validate_and_prepare: Validate environment and prepare
+#
+# Description:
+#   Validates Terraform environment and dependencies, then changes to target directory
+#
+# Arguments:
+#   $1 - Target directory path
+#
+# Global Variables:
+#   ENV - Environment variable
+#   TF_PLUGIN_CACHE_DIR - Terraform plugin cache directory
+#
+# Returns:
+#   Exits with error if validation fails or directory change fails
+#
+# Usage:
+#   validate_and_prepare "$dir"
+#
+#######################################
+function validate_and_prepare {
+    local dir="$1"
+
+    # Validate environment and dependencies
+    validate_terraform_env
+    validate_dependencies "terraform" "tflint" "trivy"
+
+    # Change to target directory
+    if ! cd "$dir"; then
+        error_exit "Failed to change to directory: $dir"
+    fi
+
+    log "INFO" "Starting Terraform integration testing in directory: $(pwd)"
+}
+
+#######################################
+# main: Script entry point
+#
+# Description:
+#   Main function to execute the script logic for Terraform integration testing
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Exits with status 0 on success, non-zero on failure
+#
+# Usage:
+#   main "$@"
+#
 #######################################
 function main {
     # Set target directory

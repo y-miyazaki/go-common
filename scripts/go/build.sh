@@ -15,6 +15,10 @@
 # Error handling: exit on error, unset variable, or failed pipeline
 set -euo pipefail
 
+# Secure defaults
+umask 027
+export LC_ALL=C.UTF-8
+
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export SCRIPT_DIR
@@ -35,7 +39,20 @@ VERBOSE="false"
 MIN_VERSION="1.21"
 
 #######################################
-# Display usage information
+# show_usage: Display script usage information
+#
+# Description:
+#   Displays usage information for the script, including options and examples
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (outputs to stdout)
+#
+# Usage:
+#   show_usage
+#
 #######################################
 function show_usage {
     echo "Usage: $(basename "$0") [options]"
@@ -59,7 +76,20 @@ function show_usage {
 }
 
 #######################################
-# Parse command line arguments
+# parse_arguments: Parse command line arguments
+#
+# Description:
+#   Parses command line arguments and sets global variables accordingly
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Returns:
+#   None (sets global variables DIR, BINDIR, ARCH, PARALLEL, VERBOSE)
+#
+# Usage:
+#   parse_arguments "$@"
+#
 #######################################
 function parse_arguments {
     while [[ $# -gt 0 ]]; do
@@ -107,70 +137,20 @@ function parse_arguments {
 }
 
 #######################################
-# Validate Go environment
-#######################################
-function validate_go_environment {
-    # Check Go version
-    local go_version
-    go_version=$(go version | awk '{print $3}' | sed 's/go//')
-    log "INFO" "Using Go version $go_version"
-
-    # Simple version check
-    if [[ "$(echo -e "$go_version\n$MIN_VERSION" | sort -V | head -n1)" != "$MIN_VERSION" ]]; then
-        error_exit "Go version $go_version is less than minimum required version $MIN_VERSION"
-    fi
-
-    # Set security environment variables for Go 1.20+
-    export GODEBUG=tarinsecurepath=0,zipinsecurepath=0
-    log "INFO" "Go environment validated successfully"
-}
-
-#######################################
-# Prepare build environment
-#######################################
-function prepare_build_environment {
-    echo_section "Preparing build environment"
-
-    # Download and update dependencies
-    log "INFO" "Updating Go modules..."
-    go mod download || error_exit "Failed to download Go modules"
-
-    # Clean output directories
-    log "INFO" "Cleaning output directories..."
-    rm -rf outputs/"${BINDIR}"/* 2> /dev/null || true
-    rm -rf bin/"${BINDIR}"/* 2> /dev/null || true
-
-    # Create output directories
-    log "INFO" "Creating output directories..."
-    mkdir -p bin/"${BINDIR}" || error_exit "Failed to create bin directory"
-    mkdir -p outputs/"${BINDIR}" || error_exit "Failed to create outputs directory"
-
-    log "INFO" "Build environment prepared successfully"
-}
-
-#######################################
-# Find Lambda functions to build
-#######################################
-function find_lambda_functions {
-    # Keep visual separators using echo_section (print to stdout for clarity)
-    echo_section "Finding Lambda functions"
-
-    local files
-    files=$(find "$DIR" -type f -name 'main.go')
-    local file_count
-    file_count=$(printf "%s\n" "$files" | grep -c . || echo 0)
-
-    if [[ $file_count -eq 0 ]]; then
-        error_exit "No main.go files found in $DIR"
-    fi
-
-    log "INFO" "Found $file_count Lambda functions to build"
-    # Print file paths only
-    printf "%s\n" "$files"
-}
-
-#######################################
-# Build individual Lambda function
+# build_function: Build individual Lambda function
+#
+# Description:
+#   Builds a single Go Lambda function from a main.go file
+#
+# Arguments:
+#   $1 - Path to the main.go file
+#
+# Returns:
+#   None
+#
+# Usage:
+#   build_function "path/to/main.go"
+#
 #######################################
 function build_function {
     local file=$1
@@ -201,7 +181,20 @@ function build_function {
 }
 
 #######################################
-# Build all Lambda functions
+# build_lambda_functions: Build all Lambda functions
+#
+# Description:
+#   Builds all Go Lambda functions from the provided list of main.go files
+#
+# Arguments:
+#   $1 - Newline-separated list of main.go file paths
+#
+# Returns:
+#   Number of functions built (integer)
+#
+# Usage:
+#   count=$(build_lambda_functions "$files")
+#
 #######################################
 function build_lambda_functions {
     local files="$1"
@@ -233,7 +226,122 @@ function build_lambda_functions {
 }
 
 #######################################
-# Main execution function
+# find_lambda_functions: Find Lambda functions to build
+#
+# Description:
+#   Finds all main.go files in the source directory to build Lambda functions
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   Newline-separated list of main.go file paths (to stdout)
+#
+# Usage:
+#   files=$(find_lambda_functions)
+#
+#######################################
+function find_lambda_functions {
+    # Keep visual separators using echo_section (print to stdout for clarity)
+    echo_section "Finding Lambda functions"
+
+    local files
+    files=$(find "$DIR" -type f -name 'main.go')
+    local file_count
+    file_count=$(printf "%s\n" "$files" | grep -c . || echo 0)
+
+    if [[ $file_count -eq 0 ]]; then
+        error_exit "No main.go files found in $DIR"
+    fi
+
+    log "INFO" "Found $file_count Lambda functions to build"
+    # Print file paths only
+    printf "%s\n" "$files"
+}
+
+#######################################
+# prepare_build_environment: Prepare build environment
+#
+# Description:
+#   Sets up the build environment by updating dependencies and creating output directories
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None
+#
+# Usage:
+#   prepare_build_environment
+#
+#######################################
+function prepare_build_environment {
+    echo_section "Preparing build environment"
+
+    # Download and update dependencies
+    log "INFO" "Updating Go modules..."
+    go mod download || error_exit "Failed to download Go modules"
+
+    # Clean output directories
+    log "INFO" "Cleaning output directories..."
+    rm -rf outputs/"${BINDIR}"/* 2> /dev/null || true
+    rm -rf bin/"${BINDIR}"/* 2> /dev/null || true
+
+    # Create output directories
+    log "INFO" "Creating output directories..."
+    mkdir -p bin/"${BINDIR}" || error_exit "Failed to create bin directory"
+    mkdir -p outputs/"${BINDIR}" || error_exit "Failed to create outputs directory"
+
+    log "INFO" "Build environment prepared successfully"
+}
+
+#######################################
+# validate_go_environment: Validate Go environment
+#
+# Description:
+#   Validates that Go is installed and meets minimum version requirements
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None
+#
+# Usage:
+#   validate_go_environment
+#
+#######################################
+function validate_go_environment {
+    # Check Go version
+    local go_version
+    go_version=$(go version | awk '{print $3}' | sed 's/go//')
+    log "INFO" "Using Go version $go_version"
+
+    # Simple version check
+    if [[ "$(echo -e "$go_version\n$MIN_VERSION" | sort -V | head -n1)" != "$MIN_VERSION" ]]; then
+        error_exit "Go version $go_version is less than minimum required version $MIN_VERSION"
+    fi
+
+    # Set security environment variables for Go 1.20+
+    export GODEBUG=tarinsecurepath=0,zipinsecurepath=0
+    log "INFO" "Go environment validated successfully"
+}
+
+#######################################
+# main: Main execution function
+#
+# Description:
+#   Main entry point that orchestrates the build process
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Returns:
+#   None (exits with appropriate status code)
+#
+# Usage:
+#   main "$@"
+#
 #######################################
 function main {
     local start_time

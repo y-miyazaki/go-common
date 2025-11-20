@@ -15,6 +15,10 @@
 # Error handling: exit on error, unset variable, or failed pipeline
 set -euo pipefail
 
+# Secure defaults
+umask 027
+export LC_ALL=C.UTF-8
+
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export SCRIPT_DIR
@@ -30,7 +34,23 @@ source "${SCRIPT_DIR}/../lib/all.sh"
 TARGET_DIRS=()
 
 #######################################
-# Display usage information
+# show_usage: Display script usage information
+#
+# Description:
+#   Displays usage information for the script, including options and examples
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Exits with status 0 after displaying help
+#
+# Usage:
+#   show_usage
+#
 #######################################
 function show_usage {
     show_help_header "$(basename "$0")" "Recursive Terraform validation and checking" "[options] [dir1 dir2 ...]"
@@ -47,7 +67,23 @@ function show_usage {
 }
 
 #######################################
-# Parse command line arguments
+# parse_arguments: Parse command line arguments
+#
+# Description:
+#   Parses command line arguments and collects target directories
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Global Variables:
+#   TARGET_DIRS - Array of target directories to process
+#
+# Returns:
+#   Exits with error if unknown options are provided
+#
+# Usage:
+#   parse_arguments "$@"
+#
 #######################################
 function parse_arguments {
     while [[ $# -gt 0 ]]; do
@@ -68,7 +104,23 @@ function parse_arguments {
 }
 
 #######################################
-# Check optional tools availability
+# check_optional_tools: Check optional tools availability
+#
+# Description:
+#   Checks if optional tools (tflint, terraform-docs, trivy) are available
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Logs warnings for unavailable tools
+#
+# Usage:
+#   check_optional_tools
+#
 #######################################
 function check_optional_tools {
     local optional_tools=("tflint" "terraform-docs" "trivy")
@@ -80,7 +132,23 @@ function check_optional_tools {
 }
 
 #######################################
-# Process single terraform directory
+# process_terraform_directory: Process single terraform directory
+#
+# Description:
+#   Processes a single Terraform directory with validation, linting, and documentation generation
+#
+# Arguments:
+#   $1 - Directory path to process
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Exits with error if any validation step fails
+#
+# Usage:
+#   process_terraform_directory "$dir"
+#
 #######################################
 function process_terraform_directory {
     local dir="$1"
@@ -95,10 +163,6 @@ function process_terraform_directory {
     pushd "$dir" > /dev/null || error_exit "Failed to enter directory $dir"
 
     log "INFO" "Validating in directory: $(pwd)"
-
-    # Install Terraform version (idempotent)
-    log "INFO" "Installing Terraform version..."
-    terraform_install
 
     # Step 1: Run tflint first (no init required)
     if command -v tflint &> /dev/null; then
@@ -131,7 +195,23 @@ function process_terraform_directory {
 }
 
 #######################################
-# Run recursive terraform validation
+# run_recursive_validation: Run recursive terraform validation
+#
+# Description:
+#   Runs validation on all Terraform directories found, either scoped or full workspace
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   TARGET_DIRS - Array of target directories (if scoped)
+#
+# Returns:
+#   None
+#
+# Usage:
+#   run_recursive_validation
+#
 #######################################
 function run_recursive_validation {
     echo_section "Starting recursive Terraform validation"
@@ -158,7 +238,23 @@ function run_recursive_validation {
 }
 
 #######################################
-# Run security scan
+# run_security_scan: Run security scan
+#
+# Description:
+#   Runs security scan using trivy if available
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Exits with error if security issues are found
+#
+# Usage:
+#   run_security_scan
+#
 #######################################
 function run_security_scan {
     # Run security scan with trivy
@@ -173,13 +269,29 @@ function run_security_scan {
 }
 
 #######################################
-# Main execution function
+# main: Script entry point
+#
+# Description:
+#   Main function to execute the script logic for recursive Terraform validation
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Global Variables:
+#   TARGET_DIRS - Array of target directories to process
+#
+# Returns:
+#   Exits with status 0 on success, non-zero on failure
+#
+# Usage:
+#   main "$@"
+#
 #######################################
 function main {
     parse_arguments "$@"
 
     # Validate dependencies
-    validate_dependencies "terraform" "tfenv"
+    validate_dependencies "terraform"
 
     # Check optional tools
     check_optional_tools

@@ -16,6 +16,10 @@
 # Error handling: exit on error, unset variable, or failed pipeline
 set -euo pipefail
 
+# Secure defaults
+umask 027
+export LC_ALL=C.UTF-8
+
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export SCRIPT_DIR
@@ -38,7 +42,23 @@ BUILD_CONTEXT="."
 REPOSITORY_NAME=""
 
 #######################################
-# Display usage information
+# show_usage: Display script usage information
+#
+# Description:
+#   Displays usage information for the script, including options and examples
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Exits with status 0 after displaying help
+#
+# Usage:
+#   show_usage
+#
 #######################################
 function show_usage {
     echo "Usage: $(basename "$0") [options] <repository_name>"
@@ -64,7 +84,30 @@ function show_usage {
 }
 
 #######################################
-# Parse command line arguments
+# parse_arguments: Parse command line arguments
+#
+# Description:
+#   Parses command line arguments and validates required repository name
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Global Variables:
+#   AWS_REGION - Set to specified AWS region
+#   VERBOSE - Set to true if verbose mode enabled
+#   DRY_RUN - Set to true if dry-run mode enabled
+#   DOCKER_PLATFORM - Set to specified Docker platform
+#   IMAGE_TAG - Set to specified image tag
+#   DOCKERFILE_PATH - Set to specified Dockerfile path
+#   BUILD_CONTEXT - Set to specified build context
+#   REPOSITORY_NAME - Set to specified repository name
+#
+# Returns:
+#   Exits with error if repository name is missing or unknown arguments provided
+#
+# Usage:
+#   parse_arguments "$@"
+#
 #######################################
 function parse_arguments {
     while [[ $# -gt 0 ]]; do
@@ -124,7 +167,24 @@ function parse_arguments {
 }
 
 #######################################
-# Authenticate to ECR
+# authenticate_ecr: Authenticate to ECR
+#
+# Description:
+#   Authenticates Docker to AWS ECR registry using AWS credentials
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   AWS_REGION - AWS region for ECR registry
+#   DRY_RUN - Whether to run in dry-run mode
+#
+# Returns:
+#   Outputs the ECR registry URL
+#
+# Usage:
+#   registry_url=$(authenticate_ecr)
+#
 #######################################
 function authenticate_ecr {
     local account_id
@@ -168,7 +228,28 @@ function authenticate_ecr {
 }
 
 #######################################
-# Build and tag Docker image
+# build_docker_image: Build and tag Docker image
+#
+# Description:
+#   Builds a Docker image with specified parameters and tags it for ECR
+#
+# Arguments:
+#   $1 - Repository name
+#   $2 - ECR registry URL
+#
+# Global Variables:
+#   DOCKER_PLATFORM - Docker platform to build for
+#   IMAGE_TAG - Image tag to use
+#   DOCKERFILE_PATH - Path to Dockerfile
+#   BUILD_CONTEXT - Build context path
+#   DRY_RUN - Whether to run in dry-run mode
+#
+# Returns:
+#   Outputs the full image name (registry/repository:tag)
+#
+# Usage:
+#   full_image_name=$(build_docker_image "$repo" "$registry_url")
+#
 #######################################
 function build_docker_image {
     local repository_name="$1"
@@ -203,7 +284,23 @@ function build_docker_image {
 }
 
 #######################################
-# Push Docker image to ECR
+# push_docker_image: Push Docker image to ECR
+#
+# Description:
+#   Pushes the built Docker image to AWS ECR
+#
+# Arguments:
+#   $1 - Full image name (registry/repository:tag)
+#
+# Global Variables:
+#   DRY_RUN - Whether to run in dry-run mode
+#
+# Returns:
+#   None
+#
+# Usage:
+#   push_docker_image "$full_image_name"
+#
 #######################################
 function push_docker_image {
     local full_image_name="$1"
@@ -223,7 +320,29 @@ function push_docker_image {
 }
 
 #######################################
-# Main execution function
+# main: Script entry point
+#
+# Description:
+#   Main function to execute the script logic for uploading Docker image to ECR
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Global Variables:
+#   REPOSITORY_NAME - ECR repository name
+#   AWS_REGION - AWS region
+#   DOCKER_PLATFORM - Docker platform
+#   IMAGE_TAG - Image tag
+#   DOCKERFILE_PATH - Dockerfile path
+#   BUILD_CONTEXT - Build context path
+#   DRY_RUN - Whether to run in dry-run mode
+#
+# Returns:
+#   Exits with status 0 on success, non-zero on failure
+#
+# Usage:
+#   main "$@"
+#
 #######################################
 function main {
     # Parse arguments

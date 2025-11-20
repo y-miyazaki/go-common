@@ -3,7 +3,6 @@ package repository
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -92,33 +91,10 @@ func (r *AWSBedrockRepository) Converse(ctx context.Context, modelID string, mes
 	return string(b), nil
 }
 
-// buildFilePayload creates a JSON payload with base64-encoded file data.
-func buildFilePayload(fileData []byte, mimeType string, additionalPayload map[string]any) ([]byte, error) {
-	// Encode file as base64
-	encoded := base64.StdEncoding.EncodeToString(fileData)
-
-	// Build payload with file data
-	payload := make(map[string]any)
-	for k, v := range additionalPayload {
-		payload[k] = v
-	}
-	payload["image"] = map[string]string{
-		"format": mimeType,
-		"source": encoded,
-	}
-
-	payloadBytes, err := json.Marshal(payload)
-	if err != nil {
-		return nil, fmt.Errorf("marshal payload: %w", err)
-	}
-
-	return payloadBytes, nil
-}
-
 // InvokeModelWithFile calls the Bedrock Runtime InvokeModel API with a file attachment.
-// It reads the file, encodes it as base64, and includes it in the JSON payload.
-// The file is read from the provided filePath and encoded with the specified mimeType.
-func (r *AWSBedrockRepository) InvokeModelWithFile(ctx context.Context, modelID, filePath, mimeType string, additionalPayload map[string]any) ([]byte, error) {
+// It reads the file from the provided filePath and returns the file data as bytes.
+// The caller is responsible for constructing the appropriate payload structure for their model.
+func (r *AWSBedrockRepository) InvokeModelWithFile(ctx context.Context, modelID, filePath string, payload []byte) ([]byte, error) {
 	// Read file content
 	file, err := os.Open(filepath.Clean(filePath))
 	if err != nil {
@@ -135,7 +111,7 @@ func (r *AWSBedrockRepository) InvokeModelWithFile(ctx context.Context, modelID,
 		return nil, fmt.Errorf("read file: %w", err)
 	}
 
-	result, err := r.InvokeModelWithFileData(ctx, modelID, fileData, mimeType, additionalPayload)
+	result, err := r.InvokeModelWithFileData(ctx, modelID, fileData, payload)
 	if err != nil {
 		return nil, fmt.Errorf("invoke model with file: %w", err)
 	}
@@ -144,14 +120,46 @@ func (r *AWSBedrockRepository) InvokeModelWithFile(ctx context.Context, modelID,
 }
 
 // InvokeModelWithFileData calls the Bedrock Runtime InvokeModel API with file data.
-// It encodes the provided file data as base64 and includes it in the JSON payload.
-func (r *AWSBedrockRepository) InvokeModelWithFileData(ctx context.Context, modelID string, fileData []byte, mimeType string, additionalPayload map[string]any) ([]byte, error) {
-	payloadBytes, err := buildFilePayload(fileData, mimeType, additionalPayload)
-	if err != nil {
-		return nil, fmt.Errorf("build file payload: %w", err)
-	}
+// This is a convenience wrapper that accepts fileData parameter for API clarity,
+// but the caller must encode and include the file data in the payload.
+// The fileData parameter exists to distinguish file-based operations from text-only operations.
+//
+// Example for image models (Claude 3):
+//
+//	import "encoding/base64"
+//	import "encoding/json"
+//
+//	fileData := []byte("...image bytes...")
+//	payload := map[string]any{
+//	    "anthropic_version": "bedrock-2023-05-31",
+//	    "max_tokens": 1000,
+//	    "messages": []map[string]any{
+//	        {
+//	            "role": "user",
+//	            "content": []map[string]any{
+//	                {
+//	                    "type": "image",
+//	                    "source": map[string]string{
+//	                        "type": "base64",
+//	                        "media_type": "image/png",
+//	                        "data": base64.StdEncoding.EncodeToString(fileData),
+//	                    },
+//	                },
+//	                {
+//	                    "type": "text",
+//	                    "text": "Describe this image",
+//	                },
+//	            },
+//	        },
+//	    },
+//	}
+//	payloadBytes, _ := json.Marshal(payload)
+//	result, err := repo.InvokeModelWithFileData(ctx, modelID, fileData, payloadBytes)
+func (r *AWSBedrockRepository) InvokeModelWithFileData(ctx context.Context, modelID string, fileData, payload []byte) ([]byte, error) {
+	// fileData parameter kept for API semantics; caller must include it in payload
+	_ = fileData // explicitly unused - included for method signature clarity
 
-	result, err := r.InvokeModel(ctx, modelID, payloadBytes)
+	result, err := r.InvokeModel(ctx, modelID, payload)
 	if err != nil {
 		return nil, fmt.Errorf("invoke model with file data: %w", err)
 	}
