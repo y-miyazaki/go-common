@@ -29,7 +29,7 @@ require (
 	golang.org/x/exp v0.0.0-20250813145105-42675adae3e6
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/driver/postgres v1.6.0
-	gorm.io/driver/sqlserver v1.6.1
+	gorm.io/driver/sqlserver v1.6.3
 	gorm.io/gorm v1.31.1
 	gorm.io/plugin/soft_delete v1.2.1
 )
