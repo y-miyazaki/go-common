@@ -15,14 +15,12 @@ ARG AQUA_VERSION=v2.55.1 # https://github.com/aquaproj/aqua/releases
 # x86_64
 # ARG ARCH_BASE=amd64
 # ARG ARCH_BASE2=x86_64
-# ARG ARCH_AWS_CLI=x86_64
 # ARG ARCH_SESSION_MANAGER_PLUGIN=64bit
 # ARG ARCH_KO=x86_64
 
 # arm64
 ARG ARCH_BASE=arm64
 ARG ARCH_BASE2=aarch_64
-ARG ARCH_AWS_CLI=aarch64
 ARG ARCH_SESSION_MANAGER_PLUGIN=arm64
 ARG ARCH_KO=arm64
 
@@ -64,9 +62,6 @@ RUN apt update && \
 RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -E - && \
     apt-get install -y nodejs=${NODE_VERSION}.0.0-1nodesource1
 
-# Install pre-commit
-RUN pip3 install pre-commit --break-system-packages --ignore-installed distlib
-
 # Install npm packages
 RUN npm install -g markdownlint-cli markdown-link-check cspell textlint textlint-rule-preset-ja-technical-writing textlint-rule-no-dead-link
 
@@ -86,24 +81,19 @@ USER root
 #--------------------------------------------------------------
 # AWS environment
 #--------------------------------------------------------------
-# Install AWS CLI
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-${ARCH_AWS_CLI}.zip" -o "awscliv2.zip" && \
-    unzip awscliv2.zip && \
-    ./aws/install && \
-    rm -rf awscliv2.zip
-
 # Install aws-mfa
-RUN  pip3 install --break-system-packages aws-mfa && \
+RUN pip3 install --break-system-packages aws-mfa && \
     # Install awsp
     npm install -g awsp && \
-    # echo 'alias awsp="source _awsp"' >> /home/${USER}/.bashrc && \
-    # Install aws-sam-cli
-    # curl -sSOL https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip && \
-    # unzip aws-sam-cli-linux-x86_64.zip -d sam-installation && \
-    # ./sam-installation/install && \
     # Install Session Manager Plugin
     curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_${ARCH_SESSION_MANAGER_PLUGIN}/session-manager-plugin.deb" -o "session-manager-plugin.deb" && \
     dpkg -i session-manager-plugin.deb
+
+# Install awsdac
+RUN apt update && \
+    apt -y install fonts-liberation && \
+    go install github.com/awslabs/diagram-as-code/cmd/awsdac@latest && \
+    go install github.com/awslabs/diagram-as-code/cmd/awsdac-mcp-server@latest
 
 #--------------------------------------------------------------
 # Install go related

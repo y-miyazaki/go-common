@@ -5,131 +5,128 @@ description: "AI Assistant Instructions for Terraform"
 
 # AI Assistant Instructions for Terraform
 
-**言語ポリシー**: ドキュメントは日本語、コード・コメントは英語。
-
-このリポジトリは Terraform で AWS インフラを管理するためのプロジェクトです。
-
-| Directory/File        | Purpose / Description                      |
-| --------------------- | ------------------------------------------ |
-| terraform/application | 基本セキュリティ設定・AWS アカウント初期化 |
-| terraform/base        | 基本セキュリティ設定・AWS アカウント初期化 |
-| terraform/monitor     | CloudWatch 監視・アラート・可観測性        |
-| terraform/management  | 組織管理・コンプライアンス・ガバナンス     |
-| lambda/               | サーバレス監視・自動化                     |
-| modules/              | AWS リソース共通モジュール                 |
+**言語ポリシー**: ドキュメント日本語、コード・コメント英語
 
 ## Standards
 
-### Coding Standards
-
 ### Naming Conventions
 
-命名規則は以下を参照：
-https://www.terraform-best-practices.com/naming
-
-| Component      | Rule                | Example                                   |
-| -------------- | ------------------- | ----------------------------------------- |
-| モジュール変数 | snake_case          | resource_name, is_enabled, vpc_cidr_block |
-| ファイル名     | snake_case          | main_security.tf, iam_roles.tf            |
-| AWS リソース名 | kebab-case + prefix | ${var.name_prefix}example-role            |
-| ローカル変数   | snake_case          | local_config, security_group_ids          |
-| 出力変数       | snake_case          | vpc_id, subnet_ids, security_group_id     |
-| タグ名         | PascalCase          | Environment, Project, Owner               |
+| Component       | Rule       | Example                   |
+| --------------- | ---------- | ------------------------- |
+| Resource        | snake_case | aws_s3_bucket.data_lake   |
+| Variable        | snake_case | vpc_cidr_block            |
+| Output          | snake_case | alb_dns_name              |
+| Local           | snake_case | common_tags               |
+| Module instance | snake_case | vpc_main                  |
+| File            | snake_case | main_vpc.tf, variables.tf |
 
 ### Terraform Standards
 
-以下の内容は tflint,trivy で指摘される項目以外の内容を記載する。
-
-- module の variables.tf
-  - 変数コメントは先頭に(Optional) or (Required)を明記
-  - validation チェック
-    - 仕様変更でトラブルになる可能性考慮し、特定のパラメータ値を必須とするようなチェックは行わない
-    - Required な変数で `length > 0` のようなチェックはしない
+- 構文: `terraform fmt`準拠
+- Validation: `terraform validate`成功
+- Security: `tflint`, `trivy`合格
 
 ## Guidelines
 
 ### Documentation and Comments
 
-- すべての関数・リソースは詳細な説明を含める
-- 目的・機能は冒頭で明記する
-- 複雑なロジックは詳細なコメントで説明する
-- コメント・ドキュメントは英語で記載する
-- 複雑なモジュールは使用例も記載する
-
-### Error Handling
-
-- Terraform エラーは詳細なログと共に適切に処理する
-- plan/apply 実行時のエラーは必ず原因を特定してから修正する
-- State lock エラー時は適切な解除手順を実行する
-- リソース依存関係エラーは depends_on で明示的に解決する
-
-## Testing and Validation
+- ファイルヘッダー: 目的記載
+- 複雑リソース: コメント付与
+- 全コメント英語
 
 ### Code Modification Guidelines
 
-コード修正時は以下コマンドで一括検証する：
+#### 必須手順
+
+1. `terraform fmt`フォーマット
+2. `terraform validate`検証
+3. `tflint`静的解析
+4. `trivy config`セキュリティスキャン
+
+#### Variables/Outputs
+
+- 変数名: snake_case
+- 型: 具体化（`map(any)`/`any`過度回避）
+- デフォルト値: 不要 default 削除、sentinel 値回避
+- 説明: description + (Required)/(Optional)
+- validation: 禁止パターン（`length > 0`等）不使用
+- outputs: description 必須、機密情報出力禁止
+
+#### Resources
+
+- `for_each`優先（`count`はトグル用途のみ）
+- apply 後決定値を for_each/count キー不使用
+- `depends_on`最小限（implicit dependency 優先）
+- 循環参照回避
+- `moved`ブロックでリソース再作成回避
+- deprecated 機能置換
+- コメントアウトリソース削除
+
+#### Modules
+
+- 外部モジュール: Version 固定（SHA/pseudo version 回避）
+- Module 出力活用（不要 output 無/必要 output 欠落無）
+- locals/variables/outputs 責務明確
+- 重複タグ・命名プリフィックス統一
+
+#### Versioning
+
+- `required_version`範囲プロジェクト標準準拠
+- provider version 範囲（`>= lower, < upper`）
+- 外部 module 固定バージョン
+
+#### セキュリティ必須項目
+
+- KMS 暗号化（S3/SNS/Logs/StateMachines 等）
+- IAM 最小権限（`*`最小限+理由）
+- resource_policy に`Condition`（SourceArn 等）
+- 平文シークレット禁止
+- Logging 設定適切（CloudTrail/CloudWatch Logs 等）
+- デフォルト VPC/オープン SG/パブリック S3 禁止
+- IAM ポリシー: `jsonencode`または aws_iam_policy_document 使用
+
+#### Tagging
+
+- 統一形式: `locals.tags = merge(try(data.aws_default_tags.provider.tags, {}), var.tags == null ? {} : var.tags)`
+- Name 追加: `merge(local.tags, { Name = "..." })`
+- 不要手動重複キー削除
+
+#### State & Backend
+
+- remote backend 暗号化(SSE)+DynamoDB ロック
+- backend 設定に資格情報直接記載禁止
+- workspace 不使用（方針明文化）
+- `terraform state`手動操作ドキュメント化
+
+#### tfvars
+
+- 変数名: snake_case
+- シークレット未記載（Secret Manager/SSM Parameter 誘導）
+- 環境別ファイル分離（dev/stg/qa/prd）
+- 他環境識別子混在禁止（アカウント ID/VPC ID 等）
+- 環境名 prefix 誤混在禁止
+
+### MCP Tool Usage (terraform-mcp-server)
+
+AWSCC provider 優先:
+
+1. `SearchAwsccProviderDocs`（Cloud Control API）
+2. `SearchAwsProviderDocs`（fallback）
+3. AWS-IA モジュール: `SearchSpecificAwsIaModules`
+
+## Testing and Validation
+
+### Validation Commands
 
 ```bash
-# Environment variable setup (example: dev environment)
-ENV=dev
-
-# Initialize, validate, and plan
-terraform init -reconfigure -backend-config=terraform.${ENV}.tfbackend
-terraform fmt --recursive && terraform validate
-tflint -f compact --var-file=terraform.${ENV}.tfvars
-trivy fs . --format table --config /workspace/trivy.yaml --secret-config /workspace/trivy-secret.yaml
-terraform plan -lock=false -var-file=terraform.${ENV}.tfvars
+terraform fmt -check
+terraform validate
+tflint
+trivy config .
 ```
-
-### Validation Requirements
-
-- すべての検証（fmt, validate, tflint, trivy, plan）に合格してからコード提出する
-- セキュリティスキャン結果を確認し、問題があれば修正する
 
 ## Security Guidelines
 
-### Terraform Specific Security
-
-- IAM ポリシーは最小権限で設計する
-- IAM ポリシーはヒアドキュメントは利用しない。json_encode もしくは aws_iam_policy_document を使用
-- S3 等はデフォルトで暗号化を有効化する
-- API Gateway 等は WAF・レート制限を設定する
-- モジュール・依存関係は最新バージョンを使用する
-- リソースベースポリシー・VPC セキュリティグループを適切に設定する
-
-## MCP Tools
-
-**詳細な MCP Tools の設定・使用方法は `.github/copilot-instructions.md` を参照。**
-
-### Terraform 作業特有の活用パターン
-
-**AWS リソース設計前の事前調査:**
-
-```
-# 既存リソースとの整合性確認
-aws ec2 describe-vpcs --region us-east-1
-aws rds describe-db-instances --region us-east-1
-
-# Terraform Import 用の情報収集
-aws s3api get-bucket-versioning --bucket terraform-state-bucket
-```
-
-**公式ドキュメントによるベストプラクティス確認:**
-
-```
-# AWS サービス固有の制約・要件確認
-search: "S3 bucket policy terraform cross-account access"
-
-# セキュリティ設定の公式ガイダンス参照
-url: "https://docs.aws.amazon.com/s3/latest/userguide/bucket-policies.html"
-```
-
-**プロバイダー・モジュール情報の活用:**
-
-```
-# AWS Provider 最新機能確認
-resolve: "terraform-aws-provider" → get-docs: topic="s3 bucket configuration"
-
-# Terraform モジュール構成例
-resolve: "terraform" → get-docs: topic="module composition"
-```
+- 機密情報: 環境変数・SSM Parameter Store
+- タグ統一: `locals.tags = merge(try(data.aws_default_tags.provider.tags, {}), var.tags)`
+- backend 暗号化: SSE+DynamoDB ロック

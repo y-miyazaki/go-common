@@ -50,8 +50,14 @@ on:
         required: true
 
 env:
+  DOCKER_CONTEXT: ${{ inputs.docker_context }}
+  DOCKERFILE: ${{ inputs.dockerfile }}
+  ECR_REGISTRY: ${{ inputs.ecr_registry }}
+  ECR_REPOSITORY: ${{ inputs.ecr_repository }}
   ENVIRONMENT: ${{ inputs.environment }}
   GO_PROJECT_PATH: ${{ inputs.go_path }}
+  IMAGE_TAG: ${{ inputs.image_tag }}
+  PLATFORM: ${{ inputs.platform }}
 
 jobs:
   deploy:
@@ -81,21 +87,21 @@ jobs:
       - name: Setup image metadata
         id: meta
         run: |
-          IMAGE_TAG="${{ inputs.image_tag }}"
-          if [ -z "$IMAGE_TAG" ]; then IMAGE_TAG="${GITHUB_SHA::12}"; fi
-          REGISTRY_INPUT="${{ inputs.ecr_registry }}"
+          IMAGE_TAG_VAL="${IMAGE_TAG}"
+          if [ -z "$IMAGE_TAG_VAL" ]; then IMAGE_TAG_VAL="${GITHUB_SHA::12}"; fi
+          REGISTRY_INPUT="${ECR_REGISTRY}"
           if [ -z "$REGISTRY_INPUT" ]; then REGISTRY_INPUT="${{ steps.login-ecr.outputs.registry }}"; fi
-          REPOSITORY="${{ inputs.ecr_repository }}"
-          DOCKER_CONTEXT="${{ inputs.docker_context }}"
-          if [ -z "$DOCKER_CONTEXT" ]; then DOCKER_CONTEXT="${{ env.GO_PROJECT_PATH }}"; fi
+          REPOSITORY="${ECR_REPOSITORY}"
+          DOCKER_CONTEXT_VAL="${DOCKER_CONTEXT}"
+          if [ -z "$DOCKER_CONTEXT_VAL" ]; then DOCKER_CONTEXT_VAL="${GO_PROJECT_PATH}"; fi
           # Write meta outputs in one grouped redirect to avoid multiple >> usage
           {
-            echo "image_tag=$IMAGE_TAG"
+            echo "image_tag=$IMAGE_TAG_VAL"
             echo "registry=$REGISTRY_INPUT"
             echo "repository=$REPOSITORY"
-            echo "docker_context=$DOCKER_CONTEXT"
-            echo "dockerfile_path=${{ inputs.dockerfile }}"
-            echo "platforms=${{ inputs.platform }}"
+            echo "docker_context=$DOCKER_CONTEXT_VAL"
+            echo "dockerfile_path=${DOCKERFILE}"
+            echo "platforms=${PLATFORM}"
           } >> "$GITHUB_OUTPUT"
 
       - name: Setup QEMU

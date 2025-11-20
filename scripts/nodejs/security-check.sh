@@ -7,6 +7,10 @@
 # Error handling: exit on error, unset variable, or failed pipeline
 set -euo pipefail
 
+# Secure defaults
+umask 027
+export LC_ALL=C.UTF-8
+
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export SCRIPT_DIR
@@ -17,7 +21,20 @@ export SCRIPT_DIR
 source "${SCRIPT_DIR}/../lib/all.sh"
 
 #######################################
-# Main security check function
+# main: Main security check function
+#
+# Description:
+#   Performs comprehensive Node.js security checks including package vulnerabilities and integrity
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (exits with appropriate status code)
+#
+# Usage:
+#   main
+#
 #######################################
 function main {
     log "INFO" "🔍 Starting Node.js security checks..."

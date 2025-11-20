@@ -32,6 +32,10 @@
 # Error handling: exit on error, unset variable, or failed pipeline
 set -euo pipefail
 
+# Secure defaults
+umask 027
+export LC_ALL=C.UTF-8
+
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export SCRIPT_DIR
@@ -77,7 +81,23 @@ AWS_RESOURCE_CATEGORIES=(
 )
 
 #######################################
-# Display usage information
+# show_usage: Display usage information
+#
+# Description:
+#   Displays usage information for the script, including options and examples
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   None
+#
+# Usage:
+#   show_usage
+#
 #######################################
 function show_usage {
     show_help_header "$(basename "$0")" "Generate AWS architecture diagram from AWS CLI" "[options]"
@@ -103,7 +123,28 @@ function show_usage {
 }
 
 #######################################
-# Parse command line arguments
+# parse_arguments: Parse command line arguments
+#
+# Description:
+#   Parses command line arguments and options
+#
+# Arguments:
+#   $@ - Command line arguments
+#
+# Global Variables:
+#   VERBOSE - Enable verbose output
+#   DRY_RUN - Enable dry-run mode
+#   OUTPUT_FILE - Output diagram file path
+#   AWS_REGION - AWS region to query
+#   OUTPUT_FORMAT - Output format for diagram
+#   GIT_COMMIT - Enable git commit flag
+#
+# Returns:
+#   None
+#
+# Usage:
+#   parse_arguments "$@"
+#
 #######################################
 function parse_arguments {
     while [[ $# -gt 0 ]]; do
@@ -194,8 +235,72 @@ RESOURCE_CONFIGS[dynamodb]="dynamodb|list-tables|TableName|AWS::DynamoDB::Table|
 # RESOURCE_CONFIGS[kinesis]="kinesis|list-streams|StreamName|AWS::Kinesis::Stream|true"
 
 #######################################
-# Generic resource generator for simple resources
-# Usage: generate_generic_resources resource_name data_source [output_mode]
+# generate_diagram: Generate diagram using awsdac
+#
+# Description:
+#   Generate diagram using awsdac
+#
+# Arguments:
+#   $1 - YAML file path
+#   $2 - Output file path
+#
+# Global Variables:
+#   VERBOSE - Enable verbose output
+#   OUTPUT_FORMAT - Output format
+#
+# Returns:
+#   0 on success, exits on failure
+#
+# Usage:
+#   generate_diagram "yaml_file" "out_file"
+#
+#######################################
+function generate_diagram {
+    local yaml_file=$1
+    local out_file=$2
+
+    log "INFO" "Generating diagram: $out_file from $yaml_file"
+
+    if ! command -v awsdac > /dev/null 2>&1; then
+        error_exit "awsdac command not found. Please install awsdac."
+    fi
+
+    # Use OUTPUT_FORMAT if awsdac supports format option
+    if [[ "$VERBOSE" == "true" ]]; then
+        awsdac -d "$yaml_file" -o "$out_file" --verbose || {
+            error_exit "Failed to generate diagram with awsdac"
+        }
+    else
+        awsdac -d "$yaml_file" -o "$out_file" || {
+            error_exit "Failed to generate diagram with awsdac"
+        }
+    fi
+
+    log "INFO" "Diagram successfully generated: $out_file"
+}
+
+#######################################
+# generate_generic_resources: Generic resource generator for simple resources
+#
+# Description:
+#   Generic resource generator for simple resources
+#
+# Arguments:
+#   $1 - Resource name
+#   $2 - Data source (ignored for AWS CLI mode)
+#   $3 - Output mode (optional, default: yaml)
+#
+# Global Variables:
+#   RESOURCE_CONFIGS - Associative array of resource configurations
+#   REGIONS_TO_CHECK - Array of regions to check
+#   TEMP_YAML_FILE - Temporary YAML file path
+#
+# Returns:
+#   0 on success
+#
+# Usage:
+#   generate_generic_resources "resource_name" "data_source" "output_mode"
+#
 #######################################
 function generate_generic_resources {
     local resource_name=$1
@@ -241,7 +346,7 @@ function generate_generic_resources {
                             resources=$(aws ecs list-clusters --region "$region" --query "clusterArns[]" --output json 2> /dev/null || echo '[]')
                             ;;
                         "dynamodb")
-                            resources=$(aws dynamodb list-tables --region "$region" --query "TableNames[]" --output json 2> /dev/null || echo '[]')
+                            resources=$(aws_paginate_items 'TableNames' aws dynamodb list-tables --region "$region" 2> /dev/null || echo '[]')
                             ;;
                         *)
                             # Generic command execution for other services
@@ -320,7 +425,25 @@ EOF
 }
 
 #######################################
-# Generate stack children for a given category and region
+# generate_stack_children: Generate stack children for a given category and region
+#
+# Description:
+#   Generate stack children for a given category and region
+#
+# Arguments:
+#   $1 - Category
+#   $2 - Safe region name
+#
+# Global Variables:
+#   HIERARCHICAL_CONFIGS - Associative array of hierarchical configurations
+#   RESOURCE_CONFIGS - Associative array of resource configurations
+#
+# Returns:
+#   Stack children lines
+#
+# Usage:
+#   generate_stack_children "category" "safe_region"
+#
 #######################################
 function generate_stack_children {
     local category=$1
@@ -363,119 +486,26 @@ function generate_stack_children {
 }
 
 #######################################
-# Function to initialize regions to check
-#######################################
-function initialize_regions {
-    REGIONS_TO_CHECK=("$AWS_REGION")
-    if [[ "$AWS_REGION" != "us-east-1" ]]; then
-        REGIONS_TO_CHECK+=("us-east-1")
-    fi
-    log "INFO" "Regions to check: ${REGIONS_TO_CHECK[*]}"
-}
-
-#######################################
-# Generate awsdac YAML from AWS CLI
+# generate_vpc_hierarchical_resources: Generate VPC resources hierarchically
 #
-# Design Principle: This function handles ONLY generic YAML structure generation.
-# Resource-specific logic (lambda, s3, etc.) must be implemented in dedicated
-# generate_* functions, not in this output_yaml function.
+# Description:
+#   Generate VPC resources hierarchically
 #
-# Generic components:
-# - YAML header/footer structure
-# - Region iteration and naming
-# - Generic function delegation to category-specific handlers
+# Arguments:
+#   $1 - Data source (ignored for AWS CLI mode)
+#   $2 - Output mode (optional, default: yaml)
 #
-# Prohibited in this function:
-# - Resource-specific conditional logic (if category == "lambda")
-# - Resource-specific data processing
-# - Resource-specific naming or formatting
+# Global Variables:
+#   REGIONS_TO_CHECK - Array of regions to check
+#   TEMP_YAML_FILE - Temporary YAML file path
+#
+# Returns:
+#   Stack list or complete YAML depending on output mode
+#
+# Usage:
+#   generate_vpc_hierarchical_resources "data_source" "output_mode"
+#
 #######################################
-function output_yaml {
-    log "INFO" "Generating awsdac YAML from AWS CLI"
-
-    # Generate YAML header
-    cat > "$TEMP_YAML_FILE" << EOF
-Diagram:
-  DefinitionFiles:
-    - Type: URL
-      Url: "https://raw.githubusercontent.com/awslabs/diagram-as-code/main/definitions/definition-for-aws-icons-light.yaml"
-
-  Resources:
-    Canvas:
-      Type: AWS::Diagram::Canvas
-      Direction: horizontal
-      Children:
-        - User
-        - AWSCloud
-
-    User:
-      Type: AWS::Diagram::Resource
-      Preset: User
-
-    AWSCloud:
-      Type: AWS::Diagram::Cloud
-      Direction: horizontal
-      Preset: AWSCloudNoLogo
-      Align: center
-      Children:
-EOF
-
-    # Add region children (using region names)
-    for region in "${REGIONS_TO_CHECK[@]}"; do
-        local safe_region="${region//-/_}"
-        echo "        - Region_${safe_region}"
-    done >> "$TEMP_YAML_FILE"
-
-    # Generate region definitions
-    for region in "${REGIONS_TO_CHECK[@]}"; do
-        local safe_region="${region//-/_}"
-        cat >> "$TEMP_YAML_FILE" << EOF
-
-    Region_${safe_region}:
-      Type: AWS::Region
-      Title: $region
-      Children:
-EOF
-        # Add children for each resource type that has resources in this region
-        for category in "${AWS_RESOURCE_CATEGORIES[@]}"; do
-            generate_stack_children "$category" "$safe_region"
-        done >> "$TEMP_YAML_FILE"
-    done
-
-    # Generate complete YAML (stack definitions and resources) for each category
-    for category in "${AWS_RESOURCE_CATEGORIES[@]}"; do
-        local generate_function="generate_${category}_resources"
-
-        if declare -f "$generate_function" > /dev/null; then
-            # Use custom function if exists
-            ${generate_function} "aws_cli" "yaml"
-        elif [[ -n "${HIERARCHICAL_CONFIGS[$category]:-}" ]]; then
-            # Use hierarchical function for hierarchical resources
-            generate_hierarchical_resources "$category"
-        elif [[ -n "${RESOURCE_CONFIGS[$category]:-}" ]]; then
-            # Use generic function for configured resources
-            generate_generic_resources "$category" "aws_cli" "yaml"
-        else
-            log "WARN" "No handler found for resource category: $category"
-        fi
-    done
-
-    # Generate YAML footer
-    cat >> "$TEMP_YAML_FILE" << 'EOF'
-
-  Links:
-    - Source: User
-      SourcePosition: E
-      Target: AWSCloud
-      TargetPosition: W
-      TargetArrowHead:
-        Type: Open
-      Type: straight
-EOF
-
-    log "INFO" "YAML generated: $TEMP_YAML_FILE"
-}
-
 function generate_vpc_hierarchical_resources {
     local _data_source=$1 # Ignored for AWS CLI mode
     local output_mode=${2:-"yaml"}
@@ -603,9 +633,9 @@ EOF
                                     local ec2_instances
                                     ec2_instances=$(aws ec2 describe-instances --region "$region" --filters "Name=subnet-id,Values=$subnet_id" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[]" --output json 2> /dev/null || echo '[]')
 
-                                    # Get Lambda functions in this VPC
+                                    # Get Lambda functions in this VPC (paginated)
                                     local lambda_functions
-                                    lambda_functions=$(aws lambda list-functions --region "$region" 2> /dev/null || echo '{"Functions":[]}')
+                                    lambda_functions=$(aws_paginate_items 'Functions' aws lambda list-functions --region "$region" 2> /dev/null | jq -s '{Functions: .}' 2> /dev/null || echo '{"Functions":[]}')
 
                                     local ec2_children=()
                                     local lambda_children=()
@@ -733,8 +763,23 @@ EOF
 }
 
 #######################################
-# Generate hierarchical resources with complex logic
-# Usage: generate_hierarchical_resources <resource_name>
+# generate_hierarchical_resources: Generate hierarchical resources with complex logic
+#
+# Description:
+#   Generate hierarchical resources with complex logic
+#
+# Arguments:
+#   $1 - Resource name
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   None
+#
+# Usage:
+#   generate_hierarchical_resources "resource_name"
+#
 #######################################
 generate_hierarchical_resources() {
     local resource_name="$1"
@@ -754,10 +799,23 @@ generate_hierarchical_resources() {
 }
 
 #######################################
-# Generate lambda resources hierarchically with VPC categorization
-# Usage: generate_lambda_vpc_hierarchical_resources
-# Note: VPC Lambda functions are integrated into VPC hierarchical structure
-#       No separate VPC Lambda stack is generated - functions appear within VPC hierarchy
+# generate_lambda_vpc_hierarchical_resources: Generate lambda resources hierarchically with VPC categorization
+#
+# Description:
+#   Generate lambda resources hierarchically with VPC categorization
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   None
+#
+# Usage:
+#   generate_lambda_vpc_hierarchical_resources
+#
 #######################################
 generate_lambda_vpc_hierarchical_resources() {
     log "INFO" "Lambda VPC resources integrated into VPC hierarchy (no separate stack needed)"
@@ -766,8 +824,24 @@ generate_lambda_vpc_hierarchical_resources() {
 }
 
 #######################################
-# Generate Non-VPC Lambda resources hierarchically
-# Usage: generate_lambda_nonvpc_hierarchical_resources
+# generate_lambda_nonvpc_hierarchical_resources: Generate Non-VPC Lambda resources hierarchically
+#
+# Description:
+#   Generate Non-VPC Lambda resources hierarchically
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   REGIONS_TO_CHECK - Array of regions to check
+#   TEMP_YAML_FILE - Temporary YAML file path
+#
+# Returns:
+#   None
+#
+# Usage:
+#   generate_lambda_nonvpc_hierarchical_resources
+#
 #######################################
 generate_lambda_nonvpc_hierarchical_resources() {
     log "INFO" "Generating Lambda Non-VPC resources"
@@ -775,9 +849,9 @@ generate_lambda_nonvpc_hierarchical_resources() {
     for region in "${REGIONS_TO_CHECK[@]}"; do
         local safe_region="${region//-/_}"
 
-        # Get all Lambda functions
+        # Get all Lambda functions (paginated)
         local functions_json
-        functions_json=$(aws lambda list-functions --region "$region" 2> /dev/null || echo '{"Functions":[]}')
+        functions_json=$(aws_paginate_items 'Functions' aws lambda list-functions --region "$region" 2> /dev/null | jq -s '{Functions: .}' 2> /dev/null || echo '{"Functions":[]}')
 
         # Filter Non-VPC functions
         local nonvpc_functions=()
@@ -839,8 +913,24 @@ EOF
 }
 
 #######################################
-# Generate S3 resources hierarchically
-# Usage: generate_s3_hierarchical_resources
+# generate_s3_hierarchical_resources: Generate S3 resources hierarchically
+#
+# Description:
+#   Generate S3 resources hierarchically
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   REGIONS_TO_CHECK - Array of regions to check
+#   TEMP_YAML_FILE - Temporary YAML file path
+#
+# Returns:
+#   None
+#
+# Usage:
+#   generate_s3_hierarchical_resources
+#
 #######################################
 generate_s3_hierarchical_resources() {
     log "INFO" "Generating S3 resources"
@@ -909,34 +999,159 @@ EOF
 }
 
 #######################################
-# Generate diagram using awsdac
+# initialize_regions: Function to initialize regions to check
+#
+# Description:
+#   Function to initialize regions to check
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   AWS_REGION - AWS region to query
+#   REGIONS_TO_CHECK - Array of regions to check
+#
+# Returns:
+#   None
+#
+# Usage:
+#   initialize_regions
+#
 #######################################
-function generate_diagram {
-    local yaml_file=$1
-    local out_file=$2
-
-    log "INFO" "Generating diagram: $out_file from $yaml_file"
-
-    if ! command -v awsdac > /dev/null 2>&1; then
-        error_exit "awsdac command not found. Please install awsdac."
+function initialize_regions {
+    REGIONS_TO_CHECK=("$AWS_REGION")
+    if [[ "$AWS_REGION" != "us-east-1" ]]; then
+        REGIONS_TO_CHECK+=("us-east-1")
     fi
-
-    # Use OUTPUT_FORMAT if awsdac supports format option
-    if [[ "$VERBOSE" == "true" ]]; then
-        awsdac -d "$yaml_file" -o "$out_file" --verbose || {
-            error_exit "Failed to generate diagram with awsdac"
-        }
-    else
-        awsdac -d "$yaml_file" -o "$out_file" || {
-            error_exit "Failed to generate diagram with awsdac"
-        }
-    fi
-
-    log "INFO" "Diagram successfully generated: $out_file"
+    log "INFO" "Regions to check: ${REGIONS_TO_CHECK[*]}"
 }
 
 #######################################
-# Update git repository if requested
+# output_yaml: Generate awsdac YAML from AWS CLI
+#
+# Description:
+#   Generate awsdac YAML from AWS CLI
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   TEMP_YAML_FILE - Temporary YAML file path
+#   REGIONS_TO_CHECK - Array of regions to check
+#   AWS_RESOURCE_CATEGORIES - Array of resource categories
+#
+# Returns:
+#   0 on success
+#
+# Usage:
+#   output_yaml
+#
+#######################################
+function output_yaml {
+    log "INFO" "Generating awsdac YAML from AWS CLI"
+
+    # Generate YAML header
+    cat > "$TEMP_YAML_FILE" << EOF
+Diagram:
+  DefinitionFiles:
+    - Type: URL
+      Url: "https://raw.githubusercontent.com/awslabs/diagram-as-code/main/definitions/definition-for-aws-icons-light.yaml"
+
+  Resources:
+    Canvas:
+      Type: AWS::Diagram::Canvas
+      Direction: horizontal
+      Children:
+        - User
+        - AWSCloud
+
+    User:
+      Type: AWS::Diagram::Resource
+      Preset: User
+
+    AWSCloud:
+      Type: AWS::Diagram::Cloud
+      Direction: horizontal
+      Preset: AWSCloudNoLogo
+      Align: center
+      Children:
+EOF
+
+    # Add region children (using region names)
+    for region in "${REGIONS_TO_CHECK[@]}"; do
+        local safe_region="${region//-/_}"
+        echo "        - Region_${safe_region}"
+    done >> "$TEMP_YAML_FILE"
+
+    # Generate region definitions
+    for region in "${REGIONS_TO_CHECK[@]}"; do
+        local safe_region="${region//-/_}"
+        cat >> "$TEMP_YAML_FILE" << EOF
+
+    Region_${safe_region}:
+      Type: AWS::Region
+      Title: $region
+      Children:
+EOF
+        # Add children for each resource type that has resources in this region
+        for category in "${AWS_RESOURCE_CATEGORIES[@]}"; do
+            generate_stack_children "$category" "$safe_region"
+        done >> "$TEMP_YAML_FILE"
+    done
+
+    # Generate complete YAML (stack definitions and resources) for each category
+    for category in "${AWS_RESOURCE_CATEGORIES[@]}"; do
+        local generate_function="generate_${category}_resources"
+
+        if declare -f "$generate_function" > /dev/null; then
+            # Use custom function if exists
+            ${generate_function} "aws_cli" "yaml"
+        elif [[ -n "${HIERARCHICAL_CONFIGS[$category]:-}" ]]; then
+            # Use hierarchical function for hierarchical resources
+            generate_hierarchical_resources "$category"
+        elif [[ -n "${RESOURCE_CONFIGS[$category]:-}" ]]; then
+            # Use generic function for configured resources
+            generate_generic_resources "$category" "aws_cli" "yaml"
+        else
+            log "WARN" "No handler found for resource category: $category"
+        fi
+    done
+
+    # Generate YAML footer
+    cat >> "$TEMP_YAML_FILE" << 'EOF'
+
+  Links:
+    - Source: User
+      SourcePosition: E
+      Target: AWSCloud
+      TargetPosition: W
+      TargetArrowHead:
+        Type: Open
+      Type: straight
+EOF
+
+    log "INFO" "YAML generated: $TEMP_YAML_FILE"
+}
+
+#######################################
+# update_git_repository: Update git repository if requested
+#
+# Description:
+#   Update git repository if requested
+#
+# Arguments:
+#   $1 - Diagram file path
+#
+# Global Variables:
+#   GIT_COMMIT - Enable git commit flag
+#   VERBOSE - Enable verbose output
+#
+# Returns:
+#   0 on success, exits on failure
+#
+# Usage:
+#   update_git_repository "diagram_file"
+#
 #######################################
 function update_git_repository {
     local diagram_file=$1
@@ -978,7 +1193,28 @@ function update_git_repository {
 }
 
 #######################################
-# Main execution function
+# main: Main execution function
+#
+# Description:
+#   Main execution function
+#
+# Arguments:
+#   $@ - Command line arguments
+#
+# Global Variables:
+#   DRY_RUN - Dry-run mode flag
+#   OUTPUT_FILE - Output diagram file path
+#   GIT_COMMIT - Git commit flag
+#   AWS_REGION - AWS region
+#   TEMP_YAML_FILE - Temporary YAML file path
+#   OUTPUT_FILE - Output file path
+#
+# Returns:
+#   0 on success, exits on failure
+#
+# Usage:
+#   main "$@"
+#
 #######################################
 function main {
     # Parse command line arguments

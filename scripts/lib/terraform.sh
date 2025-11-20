@@ -20,156 +20,22 @@ if ! declare -f log > /dev/null 2>&1; then
 fi
 
 #######################################
-# Function to validate Terraform environment variables
-# Arguments:
-#   $1 - Environment name (optional, uses ENV if not provided)
-# Globals:
-#   ENV - Environment name
-#   TF_PLUGIN_CACHE_DIR - Terraform plugin cache directory
-# Returns:
-#   0 on success, exits on error
-#######################################
-function validate_terraform_env {
-    local env_name="${1:-${ENV:-}}"
-
-    # Validate required environment variables
-    validate_env_vars "ENV" "TF_PLUGIN_CACHE_DIR"
-
-    # Validate dependencies
-    validate_dependencies "terraform"
-
-    # Create plugin cache directory
-    if [[ -n "${TF_PLUGIN_CACHE_DIR}" ]]; then
-        execute_command "mkdir -p '${TF_PLUGIN_CACHE_DIR}'"
-        log "INFO" "Terraform plugin cache directory: ${TF_PLUGIN_CACHE_DIR}"
-    fi
-
-    log "INFO" "Terraform environment validated for: $env_name"
-}
-
-#######################################
-# Function to initialize Terraform with backend configuration
-# Arguments:
-#   $1 - Environment name (optional, uses ENV if not provided)
-#   $2 - Additional init options (optional)
-# Globals:
-#   ENV - Environment name
-# Returns:
-#   0 on success, exits on error
-#######################################
-function terraform_init {
-    local env_name="${1:-${ENV}}"
-    local additional_options="${2:-}"
-    local backend_config="terraform.${env_name}.tfbackend"
-
-    echo_section "Terraform initialization"
-
-    # Check if backend config file exists
-    if [[ ! -f "$backend_config" ]]; then
-        error_exit "Backend configuration file not found: $backend_config"
-    fi
-
-    local init_cmd="terraform init -reconfigure -backend-config=$backend_config"
-    if [[ -n "$additional_options" ]]; then
-        init_cmd="$init_cmd $additional_options"
-    fi
-
-    if ! execute_command "$init_cmd"; then
-        error_exit "Failed to initialize Terraform"
-    fi
-
-    log "INFO" "Terraform initialized with backend config: $backend_config"
-}
-
-#######################################
-# Function to validate Terraform configuration
-# Arguments:
-#   None
-# Returns:
-#   0 on success, exits on error
-#######################################
-function terraform_validate {
-    echo_section "Terraform validation"
-
-    if ! execute_command "terraform validate"; then
-        error_exit "Terraform configuration validation failed"
-    fi
-
-    log "INFO" "Terraform configuration is valid"
-}
-
-#######################################
-# Function to format Terraform configuration files
-# Arguments:
-#   $1 - Check only mode (optional, "check" to only check formatting)
-# Returns:
-#   0 on success, 1 if formatting issues found (in check mode)
-#######################################
-function terraform_format {
-    local check_mode="${1:-}"
-
-    if [[ "$check_mode" == "check" ]]; then
-        echo_section "Terraform format check"
-        if execute_command "terraform fmt -check -diff"; then
-            log "INFO" "Terraform files are properly formatted"
-            return 0
-        else
-            log "ERROR" "Terraform files need formatting"
-            return 1
-        fi
-    else
-        echo_section "Terraform format"
-        execute_command "terraform fmt -recursive"
-        log "INFO" "Terraform files formatted"
-    fi
-}
-
-#######################################
-# Function to create Terraform plan
-# Arguments:
-#   $1 - Environment name (optional, uses ENV if not provided)
-#   $2 - Plan file path (optional, defaults to terraform.tfplan)
-#   $3 - Additional plan options (optional)
-# Globals:
-#   ENV - Environment name
-# Returns:
-#   0 on success, exits on error
-#######################################
-function terraform_plan {
-    local env_name="${1:-${ENV}}"
-    local plan_file="${2:-terraform.tfplan}"
-    local additional_options="${3:-}"
-    local var_file="terraform.${env_name}.tfvars"
-
-    echo_section "Terraform plan"
-
-    # Check if variables file exists
-    if [[ ! -f "$var_file" ]]; then
-        error_exit "Variables file not found: $var_file"
-    fi
-
-    local plan_cmd="terraform plan -out=$plan_file -var-file=$var_file"
-    if [[ -n "$additional_options" ]]; then
-        plan_cmd="$plan_cmd $additional_options"
-    fi
-
-    if ! execute_command "$plan_cmd"; then
-        error_exit "Failed to create Terraform plan"
-    fi
-
-    log "INFO" "Terraform plan created: $plan_file"
-}
-
-#######################################
-# Function to apply Terraform configuration
+# terraform_apply: Apply Terraform configuration
+#
+# Description:
+#   Applies the Terraform configuration to create or update infrastructure
+#
 # Arguments:
 #   $1 - Environment name (optional, uses ENV if not provided)
 #   $2 - Plan file path (optional, if provided, applies from plan file)
 #   $3 - Auto-approve flag (optional, "auto-approve" to skip confirmation)
-# Globals:
-#   ENV - Environment name
+#
 # Returns:
-#   0 on success, exits on error
+#   None (exits on failure)
+#
+# Usage:
+#   terraform_apply "production" "plan.tfplan" "auto-approve"
+#
 #######################################
 function terraform_apply {
     local env_name="${1:-${ENV}}"
@@ -204,14 +70,21 @@ function terraform_apply {
 }
 
 #######################################
-# Function to destroy Terraform resources
+# terraform_destroy: Destroy Terraform resources
+#
+# Description:
+#   Destroys all resources managed by the Terraform configuration
+#
 # Arguments:
 #   $1 - Environment name (optional, uses ENV if not provided)
 #   $2 - Auto-approve flag (optional, "auto-approve" to skip confirmation)
-# Globals:
-#   ENV - Environment name
+#
 # Returns:
-#   0 on success, exits on error
+#   None (exits on failure)
+#
+# Usage:
+#   terraform_destroy "staging" "auto-approve"
+#
 #######################################
 function terraform_destroy {
     local env_name="${1:-${ENV}}"
@@ -240,15 +113,219 @@ function terraform_destroy {
 }
 
 #######################################
-# Function to run complete Terraform workflow
+# terraform_get_workspace: Get current Terraform workspace
+#
+# Description:
+#   Returns the name of the currently selected Terraform workspace
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   Current workspace name (to stdout)
+#
+# Usage:
+#   current_workspace=$(terraform_get_workspace)
+#
+#######################################
+function terraform_get_workspace {
+    terraform workspace show 2> /dev/null || echo "default"
+}
+
+#######################################
+# terraform_format: Format Terraform configuration files
+#
+# Description:
+#   Formats Terraform configuration files or checks formatting compliance
+#
+# Arguments:
+#   $1 - Check only mode (optional, "check" to only check formatting)
+#
+# Returns:
+#   0 on success, 1 if formatting issues found (in check mode)
+#
+# Usage:
+#   terraform_format "check"
+#
+#######################################
+function terraform_format {
+    local check_mode="${1:-}"
+
+    if [[ "$check_mode" == "check" ]]; then
+        echo_section "Terraform format check"
+        if execute_command "terraform fmt -check -diff"; then
+            log "INFO" "Terraform files are properly formatted"
+            return 0
+        else
+            log "ERROR" "Terraform files need formatting"
+            return 1
+        fi
+    else
+        echo_section "Terraform format"
+        execute_command "terraform fmt -recursive"
+        log "INFO" "Terraform files formatted"
+    fi
+}
+
+#######################################
+# terraform_init: Initialize Terraform with backend configuration
+#
+# Description:
+#   Initializes Terraform with the specified backend configuration
+#
+# Arguments:
+#   $1 - Environment name (optional, uses ENV if not provided)
+#   $2 - Additional init options (optional)
+#
+# Returns:
+#   None (exits on failure)
+#
+# Usage:
+#   terraform_init "production" "-upgrade"
+#
+#######################################
+function terraform_init {
+    local env_name="${1:-${ENV}}"
+    local additional_options="${2:-}"
+    local backend_config="terraform.${env_name}.tfbackend"
+
+    echo_section "Terraform initialization"
+
+    # Check if backend config file exists
+    if [[ ! -f "$backend_config" ]]; then
+        error_exit "Backend configuration file not found: $backend_config"
+    fi
+
+    local init_cmd="terraform init -reconfigure -backend-config=$backend_config"
+    if [[ -n "$additional_options" ]]; then
+        init_cmd="$init_cmd $additional_options"
+    fi
+
+    if ! execute_command "$init_cmd"; then
+        error_exit "Failed to initialize Terraform"
+    fi
+
+    log "INFO" "Terraform initialized with backend config: $backend_config"
+}
+
+#######################################
+# terraform_plan: Create Terraform plan
+#
+# Description:
+#   Creates a Terraform execution plan
+#
+# Arguments:
+#   $1 - Environment name (optional, uses ENV if not provided)
+#   $2 - Plan file path (optional, defaults to terraform.tfplan)
+#   $3 - Additional plan options (optional)
+#
+# Returns:
+#   None (exits on failure)
+#
+# Usage:
+#   terraform_plan "production" "plan.tfplan" "-target=aws_instance.example"
+#
+#######################################
+function terraform_plan {
+    local env_name="${1:-${ENV}}"
+    local plan_file="${2:-terraform.tfplan}"
+    local additional_options="${3:-}"
+    local var_file="terraform.${env_name}.tfvars"
+
+    echo_section "Terraform plan"
+
+    # Check if variables file exists
+    if [[ ! -f "$var_file" ]]; then
+        error_exit "Variables file not found: $var_file"
+    fi
+
+    local plan_cmd="terraform plan -out=$plan_file -var-file=$var_file"
+    if [[ -n "$additional_options" ]]; then
+        plan_cmd="$plan_cmd $additional_options"
+    fi
+
+    if ! execute_command "$plan_cmd"; then
+        error_exit "Failed to create Terraform plan"
+    fi
+
+    log "INFO" "Terraform plan created: $plan_file"
+}
+
+#######################################
+# terraform_select_workspace: Switch Terraform workspace
+#
+# Description:
+#   Switches to the specified Terraform workspace, creating it if it doesn't exist
+#
+# Arguments:
+#   $1 - Workspace name
+#
+# Returns:
+#   None (exits on failure)
+#
+# Usage:
+#   terraform_select_workspace "development"
+#
+#######################################
+function terraform_select_workspace {
+    local workspace="$1"
+
+    if [[ -z "$workspace" ]]; then
+        error_exit "Workspace name is required"
+    fi
+
+    # Check if workspace exists, create if it doesn't
+    if ! terraform workspace select "$workspace" 2> /dev/null; then
+        log "INFO" "Creating new workspace: $workspace"
+        execute_command "terraform workspace new '$workspace'"
+    fi
+
+    log "INFO" "Switched to workspace: $workspace"
+}
+
+#######################################
+# terraform_validate: Validate Terraform configuration
+#
+# Description:
+#   Validates the Terraform configuration files
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (exits on validation failure)
+#
+# Usage:
+#   terraform_validate
+#
+#######################################
+function terraform_validate {
+    echo_section "Terraform validation"
+
+    if ! execute_command "terraform validate"; then
+        error_exit "Terraform configuration validation failed"
+    fi
+
+    log "INFO" "Terraform configuration is valid"
+}
+
+#######################################
+# terraform_workflow: Run complete Terraform workflow
+#
+# Description:
+#   Runs a complete Terraform workflow including init, validate, and specified action
+#
 # Arguments:
 #   $1 - Environment name (optional, uses ENV if not provided)
 #   $2 - Workflow type (optional: "plan", "apply", "destroy", defaults to "apply")
 #   $3 - Auto-approve flag (optional, "auto-approve" to skip confirmation)
-# Globals:
-#   ENV - Environment name
+#
 # Returns:
-#   0 on success, exits on error
+#   None (exits on failure)
+#
+# Usage:
+#   terraform_workflow "production" "apply" "auto-approve"
+#
 #######################################
 function terraform_workflow {
     local env_name="${1:-${ENV}}"
@@ -287,35 +364,35 @@ function terraform_workflow {
 }
 
 #######################################
-# Function to check Terraform workspace
-# Outputs:
-#   Current workspace name
-# Returns:
-#   0 on success
-#######################################
-function terraform_get_workspace {
-    terraform workspace show 2> /dev/null || echo "default"
-}
-
-#######################################
-# Function to switch Terraform workspace
+# validate_terraform_env: Validate Terraform environment variables
+#
+# Description:
+#   Validates required Terraform environment variables and dependencies
+#
 # Arguments:
-#   $1 - Workspace name
+#   $1 - Environment name (optional, uses ENV if not provided)
+#
 # Returns:
-#   0 on success, exits on error
+#   None (exits on validation failure)
+#
+# Usage:
+#   validate_terraform_env "production"
+#
 #######################################
-function terraform_select_workspace {
-    local workspace="$1"
+function validate_terraform_env {
+    local env_name="${1:-${ENV:-}}"
 
-    if [[ -z "$workspace" ]]; then
-        error_exit "Workspace name is required"
+    # Validate required environment variables
+    validate_env_vars "ENV" "TF_PLUGIN_CACHE_DIR"
+
+    # Validate dependencies
+    validate_dependencies "terraform"
+
+    # Create plugin cache directory
+    if [[ -n "${TF_PLUGIN_CACHE_DIR}" ]]; then
+        execute_command "mkdir -p '${TF_PLUGIN_CACHE_DIR}'"
+        log "INFO" "Terraform plugin cache directory: ${TF_PLUGIN_CACHE_DIR}"
     fi
 
-    # Check if workspace exists, create if it doesn't
-    if ! terraform workspace select "$workspace" 2> /dev/null; then
-        log "INFO" "Creating new workspace: $workspace"
-        execute_command "terraform workspace new '$workspace'"
-    fi
-
-    log "INFO" "Switched to workspace: $workspace"
+    log "INFO" "Terraform environment validated for: $env_name"
 }

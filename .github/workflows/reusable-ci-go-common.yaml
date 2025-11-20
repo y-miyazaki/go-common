@@ -158,9 +158,9 @@ jobs:
         run: |
           mkdir -p security
           # JSON report for machine processing
-          govulncheck -format=json ./... > security/govulncheck-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}.json || true
+          govulncheck -format=json ./... > "security/govulncheck-${COMPONENT}-${ENVIRONMENT}.json" || true
           # Text report for easy reading
-          govulncheck ./... > security/govulncheck-${{ env.COMPONENT }}-${{ env.ENVIRONMENT }}.txt || true
+          govulncheck ./... > "security/govulncheck-${COMPONENT}-${ENVIRONMENT}.txt" || true
 
       - name: Upload govulncheck Artifact
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0

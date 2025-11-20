@@ -8,6 +8,10 @@
 # Error handling: exit on error, unset variable, or failed pipeline
 set -euo pipefail
 
+# Secure defaults
+umask 027
+export LC_ALL=C.UTF-8
+
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export SCRIPT_DIR
@@ -18,7 +22,20 @@ export SCRIPT_DIR
 source "${SCRIPT_DIR}/../lib/all.sh"
 
 #######################################
-# Display usage information
+# show_usage: Display script usage information
+#
+# Description:
+#   Displays usage information for the script, including options and examples
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (outputs to stdout and exits)
+#
+# Usage:
+#   show_usage
+#
 #######################################
 function show_usage {
     show_help_header "$(basename "$0")" "Local testing script for Node.js Lambda modules" "[module_name]"
@@ -40,7 +57,20 @@ function show_usage {
 }
 
 #######################################
-# Validate module exists
+# validate_module: Validate module exists
+#
+# Description:
+#   Checks that the specified Node.js module directory exists
+#
+# Arguments:
+#   $1 - Module name
+#
+# Returns:
+#   None (exits on validation failure)
+#
+# Usage:
+#   validate_module "kinesis_data_firehose_cloudwatch_logs_processor"
+#
 #######################################
 function validate_module {
     local module_name="$1"
@@ -51,7 +81,21 @@ function validate_module {
 }
 
 #######################################
-# Build docker image
+# build_docker_image: Build docker image
+#
+# Description:
+#   Builds a Docker image for the specified Node.js module
+#
+# Arguments:
+#   $1 - Module name
+#   $2 - Docker image name
+#
+# Returns:
+#   None (exits on build failure)
+#
+# Usage:
+#   build_docker_image "module_name" "image_name"
+#
 #######################################
 function build_docker_image {
     local module_name="$1"
@@ -64,7 +108,20 @@ function build_docker_image {
 }
 
 #######################################
-# Run tests in docker
+# run_tests: Run tests in docker
+#
+# Description:
+#   Runs tests for the Node.js module inside a Docker container
+#
+# Arguments:
+#   $1 - Docker image name
+#
+# Returns:
+#   Test exit code (0 on success, non-zero on failure)
+#
+# Usage:
+#   run_tests "image_name"
+#
 #######################################
 function run_tests {
     local image_name="$1"
@@ -81,7 +138,20 @@ function run_tests {
 }
 
 #######################################
-# Main function
+# main: Main function
+#
+# Description:
+#   Main entry point that orchestrates the testing process for Node.js modules
+#
+# Arguments:
+#   $1 - Module name (optional, defaults to kinesis_data_firehose_cloudwatch_logs_processor)
+#
+# Returns:
+#   None (exits with test result code)
+#
+# Usage:
+#   main "module_name"
+#
 #######################################
 function main {
     local module_name="${1:-kinesis_data_firehose_cloudwatch_logs_processor}"

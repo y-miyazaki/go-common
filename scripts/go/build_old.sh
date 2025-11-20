@@ -13,6 +13,10 @@
 # Error handling: exit on error, unset variable, or failed pipeline
 set -euo pipefail
 
+# Secure defaults
+umask 027
+export LC_ALL=C.UTF-8
+
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export SCRIPT_DIR
@@ -30,7 +34,20 @@ BINDIR=""
 ARCH="amd64" # Default to amd64 for old style
 
 #######################################
-# Display usage information
+# show_usage: Display script usage information
+#
+# Description:
+#   Displays usage information for the script, including options and examples
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (outputs to stdout)
+#
+# Usage:
+#   show_usage
+#
 #######################################
 function show_usage {
     echo "Usage: $(basename "$0") [options]"
@@ -51,7 +68,20 @@ function show_usage {
 }
 
 #######################################
-# Parse command line arguments
+# parse_arguments: Parse command line arguments
+#
+# Description:
+#   Parses command line arguments and sets global variables accordingly
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Returns:
+#   None (sets global variables DIR, BINDIR, ARCH)
+#
+# Usage:
+#   parse_arguments "$@"
+#
 #######################################
 function parse_arguments {
     while [[ $# -gt 0 ]]; do
@@ -91,7 +121,20 @@ function parse_arguments {
 }
 
 #######################################
-# Prepare build environment
+# prepare_build_environment: Prepare the build environment
+#
+# Description:
+#   Sets up the build environment by updating dependencies and creating output directories
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None
+#
+# Usage:
+#   prepare_build_environment
+#
 #######################################
 function prepare_build_environment {
     echo_section "Building Go Lambda functions from $DIR to $BINDIR ($ARCH)"
@@ -112,7 +155,20 @@ function prepare_build_environment {
 }
 
 #######################################
-# Build Lambda functions
+# build_lambda_functions: Build Lambda functions
+#
+# Description:
+#   Builds Go Lambda functions from main.go files in the source directory
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   Number of functions built (integer)
+#
+# Usage:
+#   count=$(build_lambda_functions)
+#
 #######################################
 function build_lambda_functions {
     log "INFO" "Building Lambda functions..."
@@ -140,7 +196,20 @@ function build_lambda_functions {
 }
 
 #######################################
-# Main execution function
+# main: Main execution function
+#
+# Description:
+#   Main entry point that orchestrates the build process
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Returns:
+#   None (exits with appropriate status code)
+#
+# Usage:
+#   main "$@"
+#
 #######################################
 function main {
     # Parse arguments

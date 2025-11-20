@@ -7,6 +7,10 @@
 # Error handling: exit on error, unset variable, or failed pipeline
 set -euo pipefail
 
+# Secure defaults
+umask 027
+export LC_ALL=C.UTF-8
+
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export SCRIPT_DIR
@@ -23,7 +27,23 @@ VPC_ID=""
 REGION="${AWS_DEFAULT_REGION:-ap-northeast-1}"
 
 #######################################
-# Display usage information
+# show_usage: Display script usage information
+#
+# Description:
+#   Displays usage information for the script, including options and examples
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Exits with status 0 after displaying help
+#
+# Usage:
+#   show_usage
+#
 #######################################
 function show_usage {
     echo "Usage: $(basename "$0") [options]"
@@ -42,7 +62,23 @@ function show_usage {
 }
 
 #######################################
-# Parse command line arguments
+# parse_arguments: Parse command line arguments
+#
+# Description:
+#   Parses command line arguments and validates required VPC ID
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Global Variables:
+#   VPC_ID - Set to the provided VPC ID
+#
+# Returns:
+#   Exits with error if VPC ID is not provided or unknown arguments are given
+#
+# Usage:
+#   parse_arguments "$@"
+#
 #######################################
 function parse_arguments {
     while [[ $# -gt 0 ]]; do
@@ -73,31 +109,24 @@ function parse_arguments {
 }
 
 #######################################
-# Check VPC peering connections
-#######################################
-function check_vpc_peering {
-    echo_section "VPC Peering Connections"
-    if aws ec2 describe-vpc-peering-connections --region "$REGION" --filters 'Name=requester-vpc-info.vpc-id,Values='"$VPC_ID" | grep VpcPeeringConnectionId; then
-        log "INFO" "VPC peering connections found"
-    else
-        log "INFO" "No VPC peering connections found"
-    fi
-}
-
-#######################################
-# Check NAT gateways
-#######################################
-function check_nat_gateways {
-    echo_section "NAT Gateways"
-    if aws ec2 describe-nat-gateways --region "$REGION" --filter 'Name=vpc-id,Values='"$VPC_ID" | grep NatGatewayId; then
-        log "INFO" "NAT gateways found"
-    else
-        log "INFO" "No NAT gateways found"
-    fi
-}
-
-#######################################
-# Check EC2 instances
+# check_ec2_instances: Check EC2 instances
+#
+# Description:
+#   Checks for EC2 instances running in the specified VPC
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   VPC_ID - VPC ID to check
+#   REGION - AWS region to query
+#
+# Returns:
+#   Outputs EC2 instance information
+#
+# Usage:
+#   check_ec2_instances
+#
 #######################################
 function check_ec2_instances {
     echo_section "EC2 Instances"
@@ -109,19 +138,53 @@ function check_ec2_instances {
 }
 
 #######################################
-# Check VPN gateways
+# check_nat_gateways: Check NAT gateways
+#
+# Description:
+#   Checks for NAT gateways in the specified VPC
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   VPC_ID - VPC ID to check
+#   REGION - AWS region to query
+#
+# Returns:
+#   Outputs NAT gateway information
+#
+# Usage:
+#   check_nat_gateways
+#
 #######################################
-function check_vpn_gateways {
-    echo_section "VPN Gateways"
-    if aws ec2 describe-vpn-gateways --region "$REGION" --filters 'Name=attachment.vpc-id,Values='"$VPC_ID" | grep VpnGatewayId; then
-        log "INFO" "VPN gateways found"
+function check_nat_gateways {
+    echo_section "NAT Gateways"
+    if aws ec2 describe-nat-gateways --region "$REGION" --filter 'Name=vpc-id,Values='"$VPC_ID" | grep NatGatewayId; then
+        log "INFO" "NAT gateways found"
     else
-        log "INFO" "No VPN gateways found"
+        log "INFO" "No NAT gateways found"
     fi
 }
 
 #######################################
-# Check network interfaces
+# check_network_interfaces: Check network interfaces
+#
+# Description:
+#   Checks for network interfaces in the specified VPC
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   VPC_ID - VPC ID to check
+#   REGION - AWS region to query
+#
+# Returns:
+#   Outputs network interface information
+#
+# Usage:
+#   check_network_interfaces
+#
 #######################################
 function check_network_interfaces {
     echo_section "Network Interfaces"
@@ -133,7 +196,82 @@ function check_network_interfaces {
 }
 
 #######################################
-# Main execution function
+# check_vpn_gateways: Check VPN gateways
+#
+# Description:
+#   Checks for VPN gateways attached to the specified VPC
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   VPC_ID - VPC ID to check
+#   REGION - AWS region to query
+#
+# Returns:
+#   Outputs VPN gateway information
+#
+# Usage:
+#   check_vpn_gateways
+#
+#######################################
+function check_vpn_gateways {
+    echo_section "VPN Gateways"
+    if aws ec2 describe-vpn-gateways --region "$REGION" --filters 'Name=attachment.vpc-id,Values='"$VPC_ID" | grep VpnGatewayId; then
+        log "INFO" "VPN gateways found"
+    else
+        log "INFO" "No VPN gateways found"
+    fi
+}
+
+#######################################
+# check_vpc_peering: Check VPC peering connections
+#
+# Description:
+#   Checks for VPC peering connections associated with the specified VPC
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   VPC_ID - VPC ID to check
+#   REGION - AWS region to query
+#
+# Returns:
+#   Outputs VPC peering connection information
+#
+# Usage:
+#   check_vpc_peering
+#
+#######################################
+function check_vpc_peering {
+    echo_section "VPC Peering Connections"
+    if aws ec2 describe-vpc-peering-connections --region "$REGION" --filters 'Name=requester-vpc-info.vpc-id,Values='"$VPC_ID" | grep VpcPeeringConnectionId; then
+        log "INFO" "VPC peering connections found"
+    else
+        log "INFO" "No VPC peering connections found"
+    fi
+}
+
+#######################################
+# main: Script entry point
+#
+# Description:
+#   Main function to execute the script logic for retrieving VPC resource information
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Global Variables:
+#   VPC_ID - VPC ID to query
+#   REGION - AWS region to query
+#
+# Returns:
+#   Exits with status 0 on success, non-zero on failure
+#
+# Usage:
+#   main "$@"
+#
 #######################################
 function main {
     # Parse arguments

@@ -8,6 +8,9 @@
 
 set -eu
 
+# aqua lazy install
+aqua i -l
+
 # Adjust ownership (only if paths exist)
 if [ -e /home/vscode/.aws ]; then sudo chown -R "$(id -u)":"$(id -g)" /home/vscode/.aws || true; fi
 if [ -e /home/vscode/.gitconfig ]; then sudo chown -R "$(id -u)":"$(id -g)" /home/vscode/.gitconfig || true; fi
@@ -36,8 +39,5 @@ if command -v git > /dev/null 2>&1; then
         fi
     fi
 fi
-
-# aqua lazy install
-aqua i -l
 
 exit 0

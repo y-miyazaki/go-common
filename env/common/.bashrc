@@ -42,12 +42,6 @@ __bash_prompt() {
 }
 __bash_prompt
 export PROMPT_DIRTRIM=4
-# export PYENV_ROOT="/home/${USER}/.pyenv"
-# export PATH="$PYENV_ROOT/bin/:$PATH"
-# eval "$(pyenv init -)"
-# for aws
-alias awsp="source _awsp; source ~/.bashrc"
-alias awsc="eval $(aws configure export-credentials --format env)"
 
 # for terraform
 export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
@@ -57,3 +51,16 @@ alias tapply='terraform apply -auto-approve -var-file="terraform.${ENV}.tfvars"'
 
 # for aqua
 export PATH="$(aqua root-dir)/bin:$PATH"
+
+# export PYENV_ROOT="/home/${USER}/.pyenv"
+# export PATH="$PYENV_ROOT/bin/:$PATH"
+# eval "$(pyenv init -)"
+# for aws
+alias awsp="source _awsp; source ~/.bashrc"
+alias awsc='eval $(aws configure export-credentials --format env)'
+
+# for enable auto-completion
+complete -C 'aws_completer' aws
+if [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+fi

@@ -39,6 +39,10 @@
 # Error handling: exit on error, unset variable, or failed pipeline
 set -euo pipefail
 
+# Secure defaults
+umask 027
+export LC_ALL=C.UTF-8
+
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export SCRIPT_DIR
@@ -124,7 +128,23 @@ GLUE_DATA='0.9|deprecated|2022-06-01|2026-04-01|false
 5.0|available|||true'
 
 #######################################
-# Display usage information
+# show_usage: Display script usage information
+#
+# Description:
+#   Displays usage information for the script, including options and examples
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Exits with status 0 after displaying help
+#
+# Usage:
+#   show_usage
+#
 #######################################
 function show_usage {
     cat << EOF
@@ -153,7 +173,27 @@ EOF
 }
 
 #######################################
-# Parse command line arguments
+# parse_arguments: Parse command line arguments
+#
+# Description:
+#   Parses command line arguments and options, setting global variables accordingly
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Global Variables:
+#   VERBOSE - Set to true if verbose mode is enabled
+#   DRY_RUN - Set to true if dry-run mode is enabled
+#   OUTPUT_FILE - Set to specified output file path
+#   AWS_REGION - Set to specified AWS region
+#   CATEGORIES - Set to specified categories string
+#
+# Returns:
+#   Exits with error if unknown arguments are provided
+#
+# Usage:
+#   parse_arguments "$@"
+#
 #######################################
 function parse_arguments {
     while [[ $# -gt 0 ]]; do
@@ -193,38 +233,23 @@ function parse_arguments {
 }
 
 #######################################
-# Function to collect Lambda runtime versions
-#######################################
-function collect_lambda_versions {
-    local region=$1
-    local header="Category,Subcategory,Subsubcategory,Name,Region,Is_Latest,Status,Deprecation_Date,Block_Function_Create,Block_Function_Update"
-
-    # Return header if requested
-    if [[ "$region" == "header" ]]; then
-        echo "$header"
-        return 0
-    fi
-
-    local buffer=""
-
-    # Process each runtime entry from global LAMBDA_DATA
-    while IFS='|' read -r family runtime status deprecation_date block_create_date block_update_date is_latest_in_family; do
-        # Skip empty lines
-        [[ -z "$family" ]] && continue
-
-        local is_latest=""
-        if [[ "$is_latest_in_family" == "true" ]]; then
-            is_latest="Yes"
-        fi
-
-        buffer+="Lambda,Runtime,$family,$runtime,$region,$is_latest,$status,$deprecation_date,$block_create_date,$block_update_date\n"
-    done <<< "$LAMBDA_DATA"
-
-    echo "$buffer"
-}
-
-#######################################
-# Function to collect Glue versions
+# collect_glue_versions: Collect Glue versions
+#
+# Description:
+#   Collects Glue versions from predefined data and formats as CSV
+#
+# Arguments:
+#   $1 - AWS region or "header" for header output
+#
+# Global Variables:
+#   GLUE_DATA - Predefined Glue version data
+#
+# Returns:
+#   Outputs CSV formatted data or header
+#
+# Usage:
+#   collect_glue_versions "us-east-1"
+#
 #######################################
 function collect_glue_versions {
     local region=$1
@@ -255,7 +280,70 @@ function collect_glue_versions {
 }
 
 #######################################
-# Function to collect RDS engine versions
+# collect_lambda_versions: Collect Lambda runtime versions
+#
+# Description:
+#   Collects Lambda runtime versions from predefined data and formats as CSV
+#
+# Arguments:
+#   $1 - AWS region or "header" for header output
+#
+# Global Variables:
+#   LAMBDA_DATA - Predefined Lambda runtime data
+#
+# Returns:
+#   Outputs CSV formatted data or header
+#
+# Usage:
+#   collect_lambda_versions "us-east-1"
+#
+#######################################
+function collect_lambda_versions {
+    local region=$1
+    local header="Category,Subcategory,Subsubcategory,Name,Region,Is_Latest,Status,Deprecation_Date,Block_Function_Create,Block_Function_Update"
+
+    # Return header if requested
+    if [[ "$region" == "header" ]]; then
+        echo "$header"
+        return 0
+    fi
+
+    local buffer=""
+
+    # Process each runtime entry from global LAMBDA_DATA
+    while IFS='|' read -r family runtime status deprecation_date block_create_date block_update_date is_latest_in_family; do
+        # Skip empty lines
+        [[ -z "$family" ]] && continue
+
+        local is_latest=""
+        if [[ "$is_latest_in_family" == "true" ]]; then
+            is_latest="Yes"
+        fi
+
+        buffer+="Lambda,Runtime,$family,$runtime,$region,$is_latest,$status,$deprecation_date,$block_create_date,$block_update_date\n"
+    done <<< "$LAMBDA_DATA"
+
+    echo "$buffer"
+}
+
+#######################################
+# collect_rds_versions: Collect RDS engine versions
+#
+# Description:
+#   Collects RDS engine versions using AWS API and formats as CSV
+#
+# Arguments:
+#   $1 - AWS region or "header" for header output
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV formatted data or header
+#
+# Usage:
+#   collect_rds_versions "us-east-1"
+#
 #######################################
 function collect_rds_versions {
     local region=$1
@@ -307,10 +395,25 @@ function collect_rds_versions {
 }
 
 #######################################
-# Common utility functions for AWS runtime version collection
+# collect_runtime_versions: Collect runtime versions for a category
+#
+# Description:
+#   Generic function to collect runtime versions for a specific category across regions
+#
+# Arguments:
+#   $1 - Category name (lambda, glue, rds)
+#
+# Global Variables:
+#   AWS_REGION - AWS region to query
+#   NO_SORT_CATEGORIES - Categories that should not be sorted
+#
+# Returns:
+#   Calls output_csv_data to write results
+#
+# Usage:
+#   collect_runtime_versions "lambda"
+#
 #######################################
-
-# Generic function to collect AWS runtime versions across regions
 function collect_runtime_versions {
     local category=$1
 
@@ -343,7 +446,28 @@ function collect_runtime_versions {
     output_csv_data "$category" "$csv_header" "$buffer" "$sort_output"
 }
 
-# Function to output CSV data with standard formatting
+#######################################
+# output_csv_data: Output CSV data with standard formatting
+#
+# Description:
+#   Writes CSV data to the output file with proper header and data formatting, with optional sorting
+#
+# Arguments:
+#   $1 - Runtime/engine category name
+#   $2 - CSV header line
+#   $3 - CSV data buffer
+#   $4 - Whether to sort output (optional, defaults to true)
+#
+# Global Variables:
+#   OUTPUT_FILE - Path to output CSV file
+#
+# Returns:
+#   0 on success
+#
+# Usage:
+#   output_csv_data "lambda" "Runtime,Version,Count" "python3.9,3.9.0,5"
+#
+#######################################
 function output_csv_data {
     local category=$1
     local header=$2
@@ -365,7 +489,26 @@ function output_csv_data {
 }
 
 #######################################
-# Main execution function
+# main: Script entry point
+#
+# Description:
+#   Main function to execute the script logic for collecting AWS runtime versions
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Global Variables:
+#   OUTPUT_FILE - Output CSV file path
+#   AWS_REGION - AWS region to query
+#   CATEGORIES - Categories to process
+#   DRY_RUN - Whether to run in dry-run mode
+#
+# Returns:
+#   Exits with status 0 on success, non-zero on failure
+#
+# Usage:
+#   main "$@"
+#
 #######################################
 function main {
     parse_arguments "$@"

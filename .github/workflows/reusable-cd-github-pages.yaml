@@ -25,6 +25,13 @@ on:
         type: string
         default: "Select an item to view documentation"
 
+env:
+  ARTIFACTS: ${{ inputs.artifacts }}
+  INDEX_TITLE: ${{ inputs.index_title }}
+  INDEX_DESCRIPTION: ${{ inputs.index_description }}
+  RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+  WORKFLOW: ${{ github.workflow }}
+
 jobs:
   deploy-to-github-pages:
     if: ${{ github.actor != 'dependabot[bot]' }}
@@ -48,7 +55,7 @@ jobs:
         run: |
           # shellcheck disable=SC2034,SC2129
           echo "Parsing artifacts configuration..."
-          echo '${{ inputs.artifacts }}' | jq -c '.[]' > /tmp/artifacts.jsonl
+          echo "${ARTIFACTS}" | jq -c '.[]' > /tmp/artifacts.jsonl
 
           echo "Artifacts to process:"
           jq -r '.name' /tmp/artifacts.jsonl || true
@@ -60,7 +67,7 @@ jobs:
           echo "Validating artifacts configuration..."
 
           # Check if artifacts is valid JSON array
-          if ! echo '${{ inputs.artifacts }}' | jq -e 'type == "array"' > /dev/null; then
+          if ! echo "${ARTIFACTS}" | jq -e 'type == "array"' > /dev/null; then
             echo "❌ Error: artifacts input must be a JSON array"
             exit 1
           fi
@@ -228,13 +235,13 @@ jobs:
           # shellcheck disable=SC2129,SC2034
           echo "Creating unified index page with links to all items"
 
-          cat > merged-pages/index.html <<'EOF'
+          cat > merged-pages/index.html <<EOF
           <!DOCTYPE html>
           <html lang="en">
           <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>${{ inputs.index_title }}</title>
+            <title>${INDEX_TITLE}</title>
             <style>
               body {
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -309,8 +316,8 @@ jobs:
             </style>
           </head>
           <body>
-            <h1>📚 ${{ inputs.index_title }}</h1>
-            <p class="description">${{ inputs.index_description }}</p>
+            <h1>📚 ${INDEX_TITLE}</h1>
+            <p class="description">${INDEX_DESCRIPTION}</p>
             <ul>
           EOF
 
@@ -337,8 +344,8 @@ jobs:
             </ul>
             <div class="meta">
               <strong>Generated:</strong> $(date -u +"%Y-%m-%d %H:%M:%S UTC")<br>
-              <strong>Workflow:</strong> ${{ github.workflow }}<br>
-              <strong>Run:</strong> <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" target="_blank">#${{ github.run_number }}</a>
+              <strong>Workflow:</strong> ${WORKFLOW}<br>
+              <strong>Run:</strong> <a href="${RUN_URL}" target="_blank">#${{ github.run_number }}</a>
             </div>
           </body>
           </html>
@@ -352,8 +359,8 @@ jobs:
           # Write build info once using a grouped redirect to avoid multiple appends
           {
             echo "Generated at: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
-            echo "Workflow: ${{ github.workflow }}"
-            echo "Run ID: ${{ github.run_id }}"
+            echo "Workflow: ${WORKFLOW}"
+            echo "Run ID: ${RUN_URL}"
             echo "Items:"
             if [ -f /tmp/artifact-paths.txt ]; then
               while IFS='|' read -r _artifact_name display_name artifact_path; do

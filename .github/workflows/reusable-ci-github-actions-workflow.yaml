@@ -12,7 +12,7 @@ on:
       zizmor_version:
         required: false
         type: string
-        default: v1.16.3
+        default: 1.7.0
 
 env:
   AQUA_VERSION: ${{ inputs.aqua_version }}
@@ -39,4 +39,4 @@ jobs:
         run: ghalint run
       # A static analysis tool for GitHub Actions
       - name: Run zizmor
-        run: docker run -t -v .:/github ghcr.io/woodruffw/zizmor:${ZIZMOR_VERSION} /github --min-severity medium
+        run: docker run -t -v .:/github ghcr.io/woodruffw/zizmor:"${ZIZMOR_VERSION}" /github --min-severity medium

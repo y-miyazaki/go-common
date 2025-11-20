@@ -21,6 +21,10 @@
 # Error handling: exit on error, unset variable, or failed pipeline
 set -euo pipefail
 
+# Secure defaults
+umask 027
+export LC_ALL=C.UTF-8
+
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export SCRIPT_DIR
@@ -31,7 +35,23 @@ export SCRIPT_DIR
 source "${SCRIPT_DIR}/../lib/all.sh"
 
 #######################################
-# Display usage information
+# show_usage: Display script usage information
+#
+# Description:
+#   Displays usage information for the script, including required environment variables and examples
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Exits with status 1 after displaying help
+#
+# Usage:
+#   show_usage
+#
 #######################################
 function show_usage {
     show_help_header "$(basename "$0")" "Deploy Terraform configuration" "[directory]"
@@ -55,7 +75,48 @@ if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
 fi
 
 #######################################
-# Validate environment and prepare
+# run_terraform_deployment: Run terraform deployment
+#
+# Description:
+#   Runs the complete Terraform workflow for deployment with auto-approval
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   ENV - Environment for deployment
+#
+# Returns:
+#   None
+#
+# Usage:
+#   run_terraform_deployment
+#
+#######################################
+function run_terraform_deployment {
+    # Run complete Terraform workflow
+    terraform_workflow "$ENV" "apply" "auto-approve"
+}
+
+#######################################
+# validate_and_prepare: Validate environment and prepare
+#
+# Description:
+#   Validates required environment variables and dependencies, then changes to target directory
+#
+# Arguments:
+#   $1 - Target directory path
+#
+# Global Variables:
+#   ENV - Environment variable
+#   TF_PLUGIN_CACHE_DIR - Terraform plugin cache directory
+#
+# Returns:
+#   Exits with error if validation fails or directory change fails
+#
+# Usage:
+#   validate_and_prepare "$dir"
+#
 #######################################
 function validate_and_prepare {
     local dir="$1"
@@ -73,15 +134,23 @@ function validate_and_prepare {
 }
 
 #######################################
-# Run terraform deployment
-#######################################
-function run_terraform_deployment {
-    # Run complete Terraform workflow
-    terraform_workflow "$ENV" "apply" "auto-approve"
-}
-
-#######################################
-# Main execution function
+# main: Script entry point
+#
+# Description:
+#   Main function to execute the script logic for Terraform deployment
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Exits with status 0 on success, non-zero on failure
+#
+# Usage:
+#   main "$@"
+#
 #######################################
 function main {
     # Set target directory

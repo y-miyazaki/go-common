@@ -5,9 +5,6 @@ name: reusable-ci-script
 # - Performs bash syntax checks and shebang verification
 # - Does NOT call scripts/validate_all_scripts.sh directly (reference only)
 
-env:
-  SCRIPTS_DEFAULT: "scripts/*/*.sh"
-
 on:
   workflow_call:
     inputs:
@@ -32,6 +29,9 @@ on:
         type: string
         default: "0.10.0"
 
+env:
+  SCRIPT_PATH: ${{ inputs.script_path }}
+
 jobs:
   lint:
     runs-on: ubuntu-slim
@@ -52,7 +52,7 @@ jobs:
           # shellcheck disable=SC2086,SC2046
           set -euo pipefail
           # If script_path is empty, check all shell scripts in the repo
-          raw_input="${{ inputs.script_path }}"
+          raw_input="${SCRIPT_PATH}"
           if [ -z "$raw_input" ]; then
             raw_input='**/*.sh'
           fi

@@ -51,6 +51,10 @@
 # Error handling: exit on error, unset variable, or failed pipeline
 set -euo pipefail
 
+# Secure defaults
+umask 027
+export LC_ALL=C.UTF-8
+
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export SCRIPT_DIR
@@ -85,6 +89,7 @@ AWS_RESOURCE_CATEGORIES=(
     "batch"
     #    "bedrock"
     "cloudfront"
+    "cloudformation"
     "cognito"
     "cloudwatch_alarms"
     "cloudwatch_logs"
@@ -126,7 +131,20 @@ NO_SORT_CATEGORIES=(
 )
 
 #######################################
-# Display usage information
+# show_usage: Display script usage information
+#
+# Description:
+#   Displays usage information for the script, including options and examples
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (exits with status 0)
+#
+# Usage:
+#   show_usage
+#
 #######################################
 function show_usage {
     echo "Usage: $(basename "$0") [options]"
@@ -148,7 +166,7 @@ function show_usage {
     echo "  -H, --html       Generate a single interactive HTML page (index.html) in OUTPUT_DIR"
     echo ""
     echo "Available categories:"
-    echo "  acm, apigateway, batch, bedrock, cloudfront, cognito, ec2, ecr, ecs,"
+    echo "  acm, apigateway, batch, bedrock, cloudformation, cloudfront, cognito, ec2, ecr, ecs,"
     echo "  efs, elb, glue, iam, kms, lambda, quicksight, rds, redshift, route53, s3,"
     echo "  secretsmanager, sns, sqs, transferfamily, vpc, waf"
     echo ""
@@ -163,7 +181,20 @@ function show_usage {
 }
 
 #######################################
-# Parse command line arguments
+# parse_arguments: Parse command line arguments
+#
+# Description:
+#   Parses command line arguments and sets global variables accordingly
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Returns:
+#   None (sets globals such as OUTPUT_FILE, OUTPUT_DIR, AWS_REGION, etc.)
+#
+# Usage:
+#   parse_arguments "$@"
+#
 #######################################
 function parse_arguments {
     while [[ $# -gt 0 ]]; do
@@ -227,18 +258,76 @@ function parse_arguments {
 }
 
 #######################################
-# Function to initialize regions to check
+# call_collect_aws_resources: Generic function to collect AWS resources across regions
+#
+# Description:
+#   Generic function to collect AWS resources across regions
+#
+# Arguments:
+#   $1 - Resource category name
+#
+# Global Variables:
+#   REGIONS_TO_CHECK - Array of AWS regions to check
+#
+# Returns:
+#   None
+#
+# Usage:
+#   call_collect_aws_resources "ec2"
+#
 #######################################
-function initialize_regions {
-    REGIONS_TO_CHECK=("$AWS_REGION")
-    if [[ "$AWS_REGION" != "us-east-1" ]]; then
-        REGIONS_TO_CHECK+=("us-east-1")
+function call_collect_aws_resources {
+    local category=$1
+
+    log "INFO" "Collecting $category information from AWS..."
+
+    # Get header from the first call
+    local collect_function="collect_${category}_inventory"
+    if ! declare -f "$collect_function" > /dev/null; then
+        log "WARN" "Collection function $collect_function not found for category $category"
+        return 1
     fi
-    log "INFO" "Regions to check: ${REGIONS_TO_CHECK[*]}"
+
+    # Get header
+    local csv_header
+    csv_header=$($collect_function "header")
+
+    local buffer=""
+    for region in "${REGIONS_TO_CHECK[@]}"; do
+        log "INFO" "Checking $category resources in region: $region"
+        buffer+=$($collect_function "$region")
+    done
+    # Check if this category should maintain grouping structure (no sorting)
+    # Check if this category should maintain grouping structure (no sorting)
+    local sort_output="true"
+    for no_sort_category in "${NO_SORT_CATEGORIES[@]}"; do
+        if [[ "$category" == "$no_sort_category" ]]; then
+            sort_output="false"
+        fi
+    done
+
+    output_csv_data "$category" "$csv_header" "$buffer" "$sort_output"
 }
 
 #######################################
-# Function to collect ACM inventory (with categories)
+# collect_acm_inventory: Collect ACM inventory (with categories)
+#
+# Description:
+#   Collects ACM certificates for a given region and formats the data as CSV
+#   rows for inclusion in the inventory output. When called with the special
+#   argument "header" it returns only the header line.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV formatted rows to stdout; with "header" prints the header
+#
+# Usage:
+#   collect_acm_inventory "us-east-1"
 #######################################
 function collect_acm_inventory {
     local region=$1
@@ -279,7 +368,24 @@ function collect_acm_inventory {
 }
 
 #######################################
-# Function to collect API Gateway inventory (with categories)
+# collect_apigateway_inventory: Collect API Gateway inventory (with categories)
+#
+# Description:
+#   Collects API Gateway (REST & HTTP) inventories for a given region and
+#   formats them as CSV rows (including authorizers information). When called
+#   with the special argument "header" it returns only the CSV header.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV rows to stdout; prints header if called with "header"
+#
+# Usage:
+#   collect_apigateway_inventory "us-east-1"
 #######################################
 function collect_apigateway_inventory {
     local region=$1
@@ -375,7 +481,24 @@ function collect_apigateway_inventory {
 }
 
 #######################################
-# Function to collect Batch inventory (with categories)
+# collect_batch_inventory: Collect Batch inventory (with categories)
+#
+# Description:
+#   Collects AWS Batch JobQueues, Compute Environments, and JobDefinitions for
+#   a specified region and returns them as CSV formatted lines. Use
+#   "header" to output only the CSV header line.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV formatted rows to stdout; prints header if called with "header"
+#
+# Usage:
+#   collect_batch_inventory "ap-northeast-1"
 #######################################
 function collect_batch_inventory {
     local region=$1
@@ -442,7 +565,23 @@ function collect_batch_inventory {
 }
 
 #######################################
-# Function to collect Bedrock inventory (with categories)
+# collect_bedrock_inventory: Collect Bedrock inventory (with categories)
+#
+# Description:
+#   Collects AWS Bedrock foundation and custom model summaries for a given
+#   region and returns them as CSV rows.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV formatted rows to stdout; prints header if called with "header"
+#
+# Usage:
+#   collect_bedrock_inventory "us-east-1"
 #######################################
 function collect_bedrock_inventory {
     local region=$1
@@ -495,7 +634,24 @@ function collect_bedrock_inventory {
 }
 
 #######################################
-# Function to collect CloudFront inventory (with categories)
+# collect_cloudfront_inventory: Collect CloudFront inventory (with categories)
+#
+# Description:
+#   Collects CloudFront distributions for the specified region. For global
+#   services it only returns data when the region argument is us-east-1.
+#   Use "header" to return only the CSV header.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV formatted CloudFront distribution rows to stdout
+#
+# Usage:
+#   collect_cloudfront_inventory "us-east-1"
 #######################################
 function collect_cloudfront_inventory {
     local region=$1
@@ -541,13 +697,170 @@ function collect_cloudfront_inventory {
         fi
 
         buffer+="cloudfront,Distribution,,$dist_domain,Global,$dist_id,$dist_aliases,$dist_origin,$dist_price_class,$dist_waf_name,$dist_status\n"
-    done < <(aws cloudfront list-distributions | jq -c '.DistributionList.Items[]')
+    done < <(aws_paginate_items 'DistributionList.Items' aws cloudfront list-distributions --region us-east-1 || true)
 
     echo "$buffer"
 }
 
 #######################################
-# Function to collect CloudWatch Alarms inventory
+# collect_cloudformation_inventory: Collect CloudFormation inventory (with categories)
+#
+# Description:
+#   Collects CloudFormation stacks, their resources, outputs, and parameters
+#   for the specified region and returns CSV rows. Use "header" to return
+#   only the CSV header.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV rows describing CloudFormation stacks and sub-resources to stdout
+#
+# Usage:
+#   collect_cloudformation_inventory "ap-northeast-1"
+#######################################
+function collect_cloudformation_inventory {
+    local region=$1
+    local header="Category,Subcategory,Subsubcategory,Name,Region,ARN,Description,Type,Outputs,Parameters,Resources,Created Date,Last Updated Time,Stack Drift Status,Status"
+
+    # Return header if requested
+    if [[ "$region" == "header" ]]; then
+        echo "$header"
+        return 0
+    fi
+
+    local buffer=""
+
+    # Get all stacks
+    while IFS= read -r stack_summary; do
+        [[ -z "$stack_summary" ]] && continue
+        local stack_name stack_arn stack_status stack_created
+        stack_name=$(extract_jq_value "$stack_summary" '.StackName')
+        stack_arn=$(extract_jq_value "$stack_summary" '.StackId')
+        stack_status=$(extract_jq_value "$stack_summary" '.StackStatus')
+        stack_created=$(extract_jq_value "$stack_summary" '.CreationTime')
+        stack_updated=$(extract_jq_value "$stack_summary" '.LastUpdatedTime')
+
+        # Get detailed stack information for outputs and parameters
+        local stack_details stack_description
+        stack_details=$(aws cloudformation describe-stacks --stack-name "$stack_name" --region "$region" 2> /dev/null || echo '{"Stacks":[]}')
+
+        # Extract description from describe-stacks response
+        stack_description=$(normalize_csv_value "$(extract_jq_value "$stack_details" '.Stacks[0].Description')")
+        # Extract stack drift status from describe-stacks response
+        local stack_drift_status
+        stack_drift_status=$(normalize_csv_value "$(extract_jq_value "$stack_details" '.Stacks[0].DriftInformation.StackDriftStatus')" "N/A")
+        local outputs_summary=""
+        while IFS= read -r output_data; do
+            [[ -z "$output_data" ]] && continue
+            local output_key output_value
+            output_key=$(extract_jq_value "$output_data" '.OutputKey')
+            output_value=$(normalize_csv_value "$(extract_jq_value "$output_data" '.OutputValue')")
+            if [[ -n "$outputs_summary" ]]; then
+                outputs_summary+="\n"
+            fi
+            outputs_summary+="${output_key}=${output_value}"
+        done < <(echo "$stack_details" | jq -c '.Stacks[0].Outputs[]?' 2> /dev/null || true)
+        outputs_summary=$(normalize_csv_value "$outputs_summary" "N/A")
+
+        # Collect parameters
+        local parameters_summary=""
+        while IFS= read -r param_data; do
+            [[ -z "$param_data" ]] && continue
+            local param_key param_value
+            param_key=$(extract_jq_value "$param_data" '.ParameterKey')
+            param_value=$(normalize_csv_value "$(extract_jq_value "$param_data" '.ParameterValue')")
+            if [[ -n "$parameters_summary" ]]; then
+                parameters_summary+="\n"
+            fi
+            parameters_summary+="${param_key}=${param_value}"
+        done < <(echo "$stack_details" | jq -c '.Stacks[0].Parameters[]?' 2> /dev/null || true)
+        parameters_summary=$(normalize_csv_value "$parameters_summary" "N/A")
+
+        # Collect resources
+        local resources_summary=""
+        while IFS= read -r resource_data; do
+            [[ -z "$resource_data" ]] && continue
+            local logical_id resource_type
+            logical_id=$(extract_jq_value "$resource_data" '.LogicalResourceId')
+            resource_type=$(extract_jq_value "$resource_data" '.ResourceType')
+            if [[ -n "$resources_summary" ]]; then
+                resources_summary+="\n"
+            fi
+            resources_summary+="${logical_id}=${resource_type}"
+        done < <(aws cloudformation list-stack-resources --stack-name "$stack_name" --region "$region" 2> /dev/null | jq -c '.StackResourceSummaries[]?' 2> /dev/null || true)
+        resources_summary=$(normalize_csv_value "$resources_summary" "N/A")
+
+        # Stack row with all outputs, parameters, and resources
+        buffer+="cloudformation,Stack,,$stack_name,${region},$stack_arn,$stack_description,Stack,$outputs_summary,$parameters_summary,$resources_summary,$stack_created,$stack_updated,$stack_drift_status,$stack_status\n"
+
+    done < <(aws cloudformation list-stacks --region "$region" --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE ROLLBACK_COMPLETE 2> /dev/null | jq -c '.StackSummaries[]?' 2> /dev/null || true)
+
+    # Get all stack sets
+    while IFS= read -r stackset_summary; do
+        [[ -z "$stackset_summary" ]] && continue
+        local stackset_name stackset_arn stackset_status stackset_description
+        stackset_name=$(extract_jq_value "$stackset_summary" '.StackSetName')
+        stackset_arn=$(extract_jq_value "$stackset_summary" '.StackSetId')
+        stackset_status=$(extract_jq_value "$stackset_summary" '.Status')
+        stackset_description=$(normalize_csv_value "$(extract_jq_value "$stackset_summary" '.Description')")
+
+        # Get detailed stack set information for parameters
+        local stackset_details
+        stackset_details=$(aws cloudformation describe-stack-set --stack-set-name "$stackset_name" --region "$region" 2> /dev/null || echo '{}')
+
+        # Extract description from describe-stack-set response
+        stackset_description=$(normalize_csv_value "$(extract_jq_value "$stackset_details" '.StackSet.Description')")
+        # Extract stack set drift status from describe-stack-set response
+        local stackset_drift_status
+        stackset_drift_status=$(normalize_csv_value "$(extract_jq_value "$stackset_details" '.StackSet.DriftInformation.StackDriftStatus')" "N/A")
+        local parameters_summary=""
+        while IFS= read -r param_data; do
+            [[ -z "$param_data" ]] && continue
+            local param_key param_value
+            param_key=$(extract_jq_value "$param_data" '.ParameterKey')
+            param_value=$(normalize_csv_value "$(extract_jq_value "$param_data" '.ParameterValue')")
+            if [[ -n "$parameters_summary" ]]; then
+                parameters_summary+="\n"
+            fi
+            parameters_summary+="${param_key}=${param_value}"
+        done < <(echo "$stackset_details" | jq -c '.StackSet.Parameters[]?' 2> /dev/null || true)
+        parameters_summary=$(normalize_csv_value "$parameters_summary")
+
+        # Stack sets don't have outputs or resources in the same way, so leave empty
+        local outputs_summary=""
+        local resources_summary=""
+
+        # StackSet row
+        buffer+="cloudformation,StackSet,,$stackset_name,${region},$stackset_arn,$stackset_description,StackSet,$outputs_summary,$parameters_summary,$resources_summary,,,$stackset_drift_status,$stackset_status\n"
+
+    done < <(aws cloudformation list-stack-sets --region "$region" 2> /dev/null | jq -c '.Summaries[]?' 2> /dev/null || true)
+
+    echo "$buffer"
+}
+
+#######################################
+# collect_cloudwatch_alarms_inventory: Collect CloudWatch alarms inventory
+#
+# Description:
+#   Collects CloudWatch alarms (MetricAlarms and CompositeAlarms) for the
+#   target region and returns formatted CSV rows that include thresholds and
+#   other alarm metadata. Call with "header" to output only the header line.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Prints CSV rows to stdout; if region is "header" prints header only
+#
+# Usage:
+#   collect_cloudwatch_alarms_inventory "ap-northeast-1"
 #######################################
 function collect_cloudwatch_alarms_inventory {
     local region=$1
@@ -584,7 +897,24 @@ function collect_cloudwatch_alarms_inventory {
 }
 
 #######################################
-# Function to collect CloudWatch Logs inventory
+# collect_cloudwatch_logs_inventory: Collect CloudWatch Logs inventory
+#
+# Description:
+#   Retrieves CloudWatch LogGroups in the specified region and outputs CSV
+#   rows that include retention, stored bytes and other metadata. Use
+#   "header" to return the CSV header line only.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV formatted log group rows to stdout
+#
+# Usage:
+#   collect_cloudwatch_logs_inventory "ap-northeast-1"
 #######################################
 function collect_cloudwatch_logs_inventory {
     local region=$1
@@ -624,7 +954,24 @@ function collect_cloudwatch_logs_inventory {
 }
 
 #######################################
-# Function to collect Cognito inventory (with categories)
+# collect_cognito_inventory: Collect Cognito inventory (with categories)
+#
+# Description:
+#   Collects Cognito User Pools and Identity Pools for the specified region
+#   and returns CSV rows with basic information such as IDs, status, and
+#   creation time. Call with "header" to print the CSV header only.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV formatted rows to stdout; prints header if argument == "header"
+#
+# Usage:
+#   collect_cognito_inventory "ap-northeast-1"
 #######################################
 function collect_cognito_inventory {
     local region=$1
@@ -647,7 +994,7 @@ function collect_cognito_inventory {
         pool_status=$(extract_jq_value "$pool_data" '.Status')
         pool_creation_date=$(extract_jq_value "$pool_data" '.CreationDate')
         buffer+="cognito,UserPool,,$pool_name,${region},$pool_id,$pool_status,$pool_creation_date\n"
-    done < <(aws cognito-idp list-user-pools --max-results 60 --region "$region" | jq -c '.UserPools[]')
+    done < <(aws_paginate_items 'UserPools' aws cognito-idp list-user-pools --region "$region" || true)
 
     # IdentityPool - has AllowUnauthenticatedIdentities
     while IFS= read -r pool_data; do
@@ -657,13 +1004,31 @@ function collect_cognito_inventory {
         pool_name=$(extract_jq_value "$pool_data" '.IdentityPoolName')
         pool_allow_unauthenticated=$(extract_jq_value "$pool_data" '.AllowUnauthenticatedIdentities')
         buffer+="cognito,IdentityPool,,$pool_name,${region},$pool_id,,$pool_allow_unauthenticated\n"
-    done < <(aws cognito-identity list-identity-pools --max-results 60 --region "$region" | jq -c '.IdentityPools[]')
+    done < <(aws_paginate_items 'IdentityPools' aws cognito-identity list-identity-pools --region "$region" || true)
 
     echo "$buffer"
 }
 
 #######################################
-# Function to collect EC2 inventory (with categories)
+# collect_ec2_inventory: Collect EC2 inventory (with categories)
+#
+# Description:
+#   Collects EC2 instance metadata for the specified region and formats it
+#   as CSV rows. Includes instance, VPC, subnet and security group details.
+#   Use "header" to emit only the CSV header.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Writes CSV formatted EC2 rows to stdout; prints header for the special
+#   argument "header"
+#
+# Usage:
+#   collect_ec2_inventory "ap-northeast-1"
 #######################################
 function collect_ec2_inventory {
     local region=$1
@@ -684,8 +1049,8 @@ function collect_ec2_inventory {
         instance_id=$(extract_jq_value "$instance_data" '.InstanceId')
         instance_type=$(extract_jq_value "$instance_data" '.InstanceType')
         instance_image_id=$(extract_jq_value "$instance_data" '.ImageId')
-        instance_vpc_id=$(extract_jq_value "$instance_data" '.VpcId' 'N/A')
-        instance_subnet_id=$(extract_jq_value "$instance_data" '.SubnetId' 'N/A')
+        instance_vpc_id=$(extract_jq_value "$instance_data" '.VpcId')
+        instance_subnet_id=$(extract_jq_value "$instance_data" '.SubnetId')
         # Resolve VPC and Subnet to friendly names (prefer Tag 'Name'), then normalize for CSV
         instance_vpc_name=$(get_vpc_name "$instance_vpc_id" "$region" || echo "$instance_vpc_id")
         instance_vpc_name=$(normalize_csv_value "$instance_vpc_name")
@@ -700,11 +1065,29 @@ function collect_ec2_inventory {
 }
 
 #######################################
-# Function to collect DynamoDB inventory (with categories)
+# collect_dynamodb_inventory: Collect DynamoDB inventory (with categories)
+#
+# Description:
+#   Collects DynamoDB table details, Point-in-Time Recovery (PITR) info, and
+#   time-to-live (TTL) configuration for each table in the given region.
+#   Use "header" to return just the CSV header line.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV rows to stdout with primary table and backup metadata
+#
+# Usage:
+#   collect_dynamodb_inventory "ap-northeast-1"
 #######################################
 function collect_dynamodb_inventory {
     local region=$1
-    local header="Category,Subcategory,Subsubcategory,Name,Region,ARN,BillingMode,ItemCount,TableSize(Bytes),SSE,StreamEnabled,GlobalTable,PointInTimeRecovery,RecoveryPeriodInDays,EarliestRestorableDateTime,LatestRestorableDateTime,DeletionProtection,Status"
+    # Group fields by the AWS API call that produced them: describe-table -> describe-continuous-backups -> describe-time-to-live
+    local header="Category,Subcategory,Subsubcategory,Name,Region,ARN,AttributeDefinitions,BillingMode,StreamEnabled,GlobalTable,PointInTimeRecovery,RecoveryPeriodInDays,EarliestRestorableDateTime,LatestRestorableDateTime,DeletionProtection,TTL Attribute,SSE,KMS Key Name,ItemCount,TableSize(Bytes),Status"
 
     # Return header if requested
     if [[ "$region" == "header" ]]; then
@@ -717,15 +1100,18 @@ function collect_dynamodb_inventory {
     while IFS= read -r table_name; do
         [[ -z "$table_name" || "$table_name" == "null" ]] && continue
 
-        # Get detailed table information
+        # --- AWS call: describe-table (table_details) ---
+        # Get detailed table information (many fields rely on this output)
         local table_details
         table_details=$(aws dynamodb describe-table --table-name "$table_name" --region "$region" 2> /dev/null || echo '{"Table":{}}')
 
-        local table_arn table_status billing_mode item_count table_size
-        local sse_status stream_enabled global_table_version pitr_enabled deletion_protection
-        local recovery_period earliest_restorable latest_restorable
+        # Fields derived from describe-table
+        local table_arn attribute_definitions table_status billing_mode item_count table_size
+        local sse_status stream_enabled global_table_version kms_arn kms_key_name
 
         table_arn=$(extract_jq_value "$table_details" '.Table.TableArn')
+        attribute_definitions=$(extract_jq_array "$table_details" '.Table.AttributeDefinitions[]?')
+        attribute_definitions=$(normalize_csv_value "$attribute_definitions")
         table_status=$(extract_jq_value "$table_details" '.Table.TableStatus')
         billing_mode=$(extract_jq_value "$table_details" '.Table.BillingModeSummary.BillingMode' 'PROVISIONED')
         item_count=$(extract_jq_value "$table_details" '.Table.ItemCount' '0')
@@ -733,26 +1119,55 @@ function collect_dynamodb_inventory {
         sse_status=$(extract_jq_value "$table_details" '.Table.SSEDescription.Status' 'DISABLED')
         stream_enabled=$(extract_jq_value "$table_details" '.Table.StreamSpecification.StreamEnabled' 'false')
         global_table_version=$(extract_jq_value "$table_details" '.Table.GlobalTableVersion')
+        deletion_protection=$(extract_jq_value "$table_details" '.Table.DeletionProtectionEnabled' 'false')
+        # KMS Key (alias/name) is derived from describe-table; resolve alias/KeyId to a friendly name
+        # We compute it here next to the describe-table call for clarity and to reduce later coupling
+        kms_arn=$(extract_jq_value "$table_details" '.Table.SSEDescription.KMSMasterKeyArn')
+        kms_key_name=$(get_kms_name "$kms_arn" "$region" || echo "$kms_arn")
+        kms_key_name=$(normalize_csv_value "$kms_key_name")
 
+        # --- AWS call: describe-continuous-backups (pitr_details) ---
         # Get Point-in-Time Recovery status and backup information
         local pitr_details
         pitr_details=$(aws dynamodb describe-continuous-backups --table-name "$table_name" --region "$region" 2> /dev/null || echo '{"ContinuousBackupsDescription":{}}')
         pitr_enabled=$(extract_jq_value "$pitr_details" '.ContinuousBackupsDescription.PointInTimeRecoveryDescription.PointInTimeRecoveryStatus' 'DISABLED')
-        recovery_period=$(extract_jq_value "$pitr_details" '.ContinuousBackupsDescription.PointInTimeRecoveryDescription.RecoveryPeriodInDays' 'N/A')
+        recovery_period=$(extract_jq_value "$pitr_details" '.ContinuousBackupsDescription.PointInTimeRecoveryDescription.RecoveryPeriodInDays')
         earliest_restorable=$(extract_jq_value "$pitr_details" '.ContinuousBackupsDescription.PointInTimeRecoveryDescription.EarliestRestorableDateTime')
         latest_restorable=$(extract_jq_value "$pitr_details" '.ContinuousBackupsDescription.PointInTimeRecoveryDescription.LatestRestorableDateTime')
 
-        # Get Deletion Protection status
-        deletion_protection=$(extract_jq_value "$table_details" '.Table.DeletionProtectionEnabled' 'false')
+        # --- AWS call: describe-time-to-live (ttl_details) ---
+        # TTL attribute (Time To Live) - separate API to get the TTL attribute name
+        local ttl_details ttl_attribute
+        ttl_details=$(aws dynamodb describe-time-to-live --table-name "$table_name" --region "$region" 2> /dev/null || echo '{}')
+        ttl_attribute=$(extract_jq_value "$ttl_details" '.TimeToLiveDescription.AttributeName')
+        ttl_attribute=$(normalize_csv_value "$ttl_attribute")
 
-        buffer+="dynamodb,Table,,$table_name,${region},$table_arn,$billing_mode,$item_count,$table_size,$sse_status,$stream_enabled,$global_table_version,$pitr_enabled,$recovery_period,$earliest_restorable,$latest_restorable,$deletion_protection,$table_status\n"
-    done < <(aws dynamodb list-tables --region "$region" 2> /dev/null | jq -r '.TableNames[]?')
+        # Output: group all table_fields (describe-table), then pitr_fields, then ttl field
+        buffer+="dynamodb,Table,,$table_name,${region},$table_arn,${attribute_definitions},$billing_mode,$stream_enabled,$global_table_version,$pitr_enabled,$recovery_period,$earliest_restorable,$latest_restorable,$deletion_protection,${ttl_attribute},$sse_status,${kms_key_name},${item_count},$table_size,$table_status\n"
+    done < <(aws_paginate_items 'TableNames' aws dynamodb list-tables --region "$region" 2> /dev/null | jq -r '.' 2> /dev/null || true)
 
     echo "$buffer"
 }
 
 #######################################
-# Function to collect ECR inventory (with categories)
+# collect_ecr_inventory: Collect ECR inventory (with categories)
+#
+# Description:
+#   Gathers ECR repository information in the given region, such as URI,
+#   image counts, mutability, and creation date. Use "header" to print only
+#   the CSV header.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV rows to stdout; prints header when argument is "header"
+#
+# Usage:
+#   collect_ecr_inventory "ap-northeast-1"
 #######################################
 function collect_ecr_inventory {
     local region=$1
@@ -774,15 +1189,32 @@ function collect_ecr_inventory {
         repo_mutability=$(extract_jq_value "$repo_data" '.imageTagMutability')
         repo_encryption=$(extract_jq_value "$repo_data" '.encryptionConfiguration.encryptionType' 'NONE')
         repo_created=$(extract_jq_value "$repo_data" '.createdAt')
-        repo_image_count=$(extract_jq_value "$(aws ecr describe-images --repository-name "$repo_name" --region "$region" 2> /dev/null || echo '{}')" '.imageDetails | length' '0')
+        repo_image_count=$(extract_jq_value "$(aws_retry_exec aws ecr describe-images --repository-name "$repo_name" --region "$region" --output json 2> /dev/null || echo '{}')" '.imageDetails | length' '0')
         buffer+="ecr,Repository,,$repo_name,${region},$repo_uri,$repo_mutability,$repo_encryption,$repo_image_count,$repo_created\n"
-    done < <(aws ecr describe-repositories --region "$region" | jq -c '.repositories[]')
+    done < <(aws_paginate_items 'repositories' aws ecr describe-repositories --region "$region" || true)
 
     echo "$buffer"
 }
 
 #######################################
-# Function to collect ECS inventory (grouped by Cluster)
+# collect_ecs_inventory: Collect ECS inventory (grouped by Cluster)
+#
+# Description:
+#   Collects ECS clusters, services, task definitions, and scheduled tasks
+#   for the region. Output is grouped by cluster with per-service and
+#   task-definition rows. Use "header" to output the CSV header only.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Emits CSV formatted rows grouped by ECS cluster to stdout
+#
+# Usage:
+#   collect_ecs_inventory "ap-northeast-1"
 #######################################
 function collect_ecs_inventory {
     local region=$1
@@ -839,7 +1271,7 @@ function collect_ecs_inventory {
                 if [[ -n "$task_def_arn" && "$task_def_arn" != "N/A" ]]; then
                     task_def_name=$(basename "$task_def_arn" | cut -d':' -f1)
                     local task_def_details
-                    task_def_details=$(aws ecs describe-task-definition --task-definition "$task_def_name" --region "$region" --query 'taskDefinition' 2> /dev/null || echo '{}')
+                    task_def_details=$(aws_retry_exec aws ecs describe-task-definition --task-definition "$task_def_name" --region "$region" --query 'taskDefinition' --output json 2> /dev/null || echo '{}')
                     task_role_arn=$(extract_jq_value "$task_def_details" '.taskRoleArn // .executionRoleArn')
                 else
                     task_def_arn="N/A"
@@ -899,7 +1331,7 @@ function collect_ecs_inventory {
 
                     # Get task role from task definition
                     local task_def_details task_role_arn
-                    task_def_details=$(aws ecs describe-task-definition --task-definition "$service_task_def" --region "$region" --query 'taskDefinition' 2> /dev/null || echo '{}')
+                    task_def_details=$(aws_retry_exec aws ecs describe-task-definition --task-definition "$service_task_def" --region "$region" --query 'taskDefinition' --output json 2> /dev/null || echo '{}')
                     task_role_arn=$(extract_jq_value "$task_def_details" '.taskRoleArn // .executionRoleArn')
                     service_role="$task_role_arn"
                 else
@@ -942,7 +1374,7 @@ function collect_ecs_inventory {
         local task_def_details task_def_status task_role_arn task_def_cpu task_def_memory task_def_network_mode task_def_requires_attributes task_def_revision
 
         # Get detailed task definition information for the latest revision
-        task_def_details=$(aws ecs describe-task-definition --task-definition "$family_name" --region "$region" --query 'taskDefinition' 2> /dev/null || echo '{}')
+        task_def_details=$(aws_retry_exec aws ecs describe-task-definition --task-definition "$family_name" --region "$region" --query 'taskDefinition' --output json 2> /dev/null || echo '{}')
 
         if [[ "$task_def_details" != "{}" ]]; then
             task_def_status=$(extract_jq_value "$task_def_details" '.status')
@@ -996,7 +1428,24 @@ function collect_ecs_inventory {
 }
 
 #######################################
-# Function to collect EFS inventory (with categories)
+# collect_efs_inventory: Collect EFS inventory (with categories)
+#
+# Description:
+#   Retrieves EFS file systems, mount targets, and access points for the
+#   provided region and formats the results as CSV rows. Use "header" to
+#   print only the CSV header line.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Prints CSV formatted EFS rows to stdout
+#
+# Usage:
+#   collect_efs_inventory "ap-northeast-1"
 #######################################
 function collect_efs_inventory {
     local region=$1
@@ -1068,7 +1517,24 @@ function collect_efs_inventory {
 }
 
 #######################################
-# Function to collect ELB inventory (with categories)
+# collect_elb_inventory: Collect ELB inventory (with categories)
+#
+# Description:
+#   Collects ELB (ALB / NLB) and related resources (target groups, listeners)
+#   for the specified region and returns CSV lines. Use "header" to return
+#   only the CSV header.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV rows describing load balancers, target groups, listeners
+#
+# Usage:
+#   collect_elb_inventory "ap-northeast-1"
 #######################################
 function collect_elb_inventory {
     local region=$1
@@ -1153,7 +1619,24 @@ function collect_elb_inventory {
 }
 
 #######################################
-# Function to collect EventBridge inventory (with categories)
+# collect_eventbridge_inventory: Collect EventBridge inventory (with categories)
+#
+# Description:
+#   Collects EventBridge rules and EventBridge Scheduler schedules for the
+#   given region, and outputs CSV rows with schedule and target information.
+#   Use "header" to only return the CSV header.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Emits CSV formatted EventBridge rows to stdout
+#
+# Usage:
+#   collect_eventbridge_inventory "ap-northeast-1"
 #######################################
 function collect_eventbridge_inventory {
     local region=$1
@@ -1241,7 +1724,23 @@ function collect_eventbridge_inventory {
 }
 
 #######################################
-# Function to collect Glue inventory (with categories)
+# collect_glue_inventory: Collect Glue inventory (with categories)
+#
+# Description:
+#   Collects AWS Glue databases and jobs for the specified region and returns
+#   CSV formatted records. Use "header" to return only the CSV header.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV rows containing Glue database and job information
+#
+# Usage:
+#   collect_glue_inventory "ap-northeast-1"
 #######################################
 function collect_glue_inventory {
     local region=$1
@@ -1298,7 +1797,24 @@ function collect_glue_inventory {
 }
 
 #######################################
-# Function to collect IAM inventory (with categories)
+# collect_iam_inventory: Collect IAM inventory (with categories)
+#
+# Description:
+#   Retrieves IAM Roles, Users, and local Policies and returns CSV rows
+#   describing each resource. This function only runs for Global (us-east-1)
+#   context and will return nothing for other regions.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV formatted IAM rows to stdout (header if requested)
+#
+# Usage:
+#   collect_iam_inventory "us-east-1"
 #######################################
 function collect_iam_inventory {
     local region=$1
@@ -1352,7 +1868,24 @@ function collect_iam_inventory {
 }
 
 #######################################
-# Function to collect Kinesis inventory (with categories)
+# collect_kinesis_inventory: Collect Kinesis inventory (with categories)
+#
+# Description:
+#   Gathers Kinesis Streams and Firehose delivery stream details for the
+#   given region and emits CSV rows with common attributes like ARN, status
+#   and shard counts. Use "header" to output header only.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV rows to stdout describing Kinesis data streams and firehose
+#
+# Usage:
+#   collect_kinesis_inventory "ap-northeast-1"
 #######################################
 function collect_kinesis_inventory {
     local region=$1
@@ -1399,7 +1932,24 @@ function collect_kinesis_inventory {
 }
 
 #######################################
-# Function to collect KMS inventory (with categories)
+# collect_kms_inventory: Collect KMS inventory (with categories)
+#
+# Description:
+#   Collects KMS keys and related metadata for a region, including alias and
+#   key usage information, and outputs them as CSV rows. Call with
+#   "header" to return the header line.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Emits CSV rows for KMS keys to stdout
+#
+# Usage:
+#   collect_kms_inventory "ap-northeast-1"
 #######################################
 function collect_kms_inventory {
     local region=$1
@@ -1420,7 +1970,7 @@ function collect_kms_inventory {
 
         # Get detailed key information
         local key_details
-        key_details=$(aws kms describe-key --key-id "$key_id" --region "$region" 2> /dev/null || echo '{"KeyMetadata":{}}')
+        key_details=$(aws_retry_exec aws kms describe-key --key-id "$key_id" --region "$region" --output json 2> /dev/null || echo '{"KeyMetadata":{}}')
 
         key_arn=$(extract_jq_value "$key_details" '.KeyMetadata.Arn')
         key_description=$(normalize_csv_value "$(extract_jq_value "$key_details" '.KeyMetadata.Description')")
@@ -1431,7 +1981,9 @@ function collect_kms_inventory {
         key_manager=$(extract_jq_value "$key_details" '.KeyMetadata.KeyManager')
 
         # Check for aliases and use alias name if available
-        key_aliases=$(extract_jq_value "$(aws kms list-aliases --key-id "$key_id" --region "$region" 2> /dev/null || echo '{}')" '.Aliases[0].AliasName')
+        local aliases_json
+        aliases_json=$(aws_paginate_items 'Aliases' aws kms list-aliases --key-id "$key_id" --region "$region" 2> /dev/null | jq -s '{Aliases: .}' 2> /dev/null || echo '{}')
+        key_aliases=$(extract_jq_value "$aliases_json" '.Aliases[0].AliasName')
 
         if [[ -n "$key_aliases" && "$key_aliases" != "N/A" ]]; then
             key_name="$key_aliases"
@@ -1447,7 +1999,24 @@ function collect_kms_inventory {
 }
 
 #######################################
-# Function to collect Lambda inventory (with categories)
+# collect_lambda_inventory: Collect Lambda inventory (with categories)
+#
+# Description:
+#   Collects Lambda functions for the specified region and outputs CSV rows
+#   including runtime, memory, timeout, environment variables (masked), and
+#   last modified time. Use the special "header" value to return the CSV header.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Writes CSV formatted Lambda rows to stdout; prints header for "header"
+#
+# Usage:
+#   collect_lambda_inventory "ap-northeast-1"
 #######################################
 function collect_lambda_inventory {
     local region=$1
@@ -1493,13 +2062,29 @@ function collect_lambda_inventory {
         func_env_vars=$(normalize_csv_value "$func_env_vars_raw")
 
         buffer+="lambda,Function,,$func_name,${region},$func_arn,$func_role,Function,$func_runtime,$func_arch,$func_memory,$func_timeout,$func_env_vars,$func_last_modified\n"
-    done < <(aws lambda list-functions --region "$region" | jq -c '.Functions | sort_by(.FunctionName) | .[]')
+    done < <(aws_paginate_items 'Functions' aws lambda list-functions --region "$region" 2> /dev/null | jq -c -s 'sort_by(.FunctionName) | .[]')
 
     echo "$buffer"
 }
 
 #######################################
-# Function to collect QuickSight inventory (with categories)
+# collect_quicksight_inventory: Collect QuickSight inventory (with categories)
+#
+# Description:
+#   Collects QuickSight data sources and analyses for the given AWS region and
+#   outputs CSV rows. Use "header" to return only the CSV header line.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Emits CSV rows or header to stdout
+#
+# Usage:
+#   collect_quicksight_inventory "ap-northeast-1"
 #######################################
 function collect_quicksight_inventory {
     local region=$1
@@ -1537,15 +2122,32 @@ function collect_quicksight_inventory {
     echo "$buffer"
 }
 
-#######################################
-# Function to collect RDS inventory (grouped by Cluster where applicable)
+# collect_rds_inventory: Collect RDS inventory (grouped by Cluster where applicable)
 # - DBClusters are shown first with their member DBInstances as children
 # - DBInstances show Writer/Reader role when part of a cluster
 # - Standalone DBInstances (not in clusters) are listed separately
 # - Added columns: EngineLifecycleSupport, IAM_DB_Auth, Kerberos_Auth, KMS_Key, AZ, BackupRetentionPeriod
 #######################################
-#######################################
-# Function to collect RDS inventory (grouped by Cluster)
+# collect_rds_inventory: Collect RDS inventory (grouped by Cluster)
+#
+# Description:
+#   Collects RDS clusters and instances (including DB clusters with member
+#   instances) for the specified region. The function outputs CSV rows for
+#   each cluster and DB instance and includes information about engine, role,
+#   IAM DB authentication, KMS key, and backup retention. Use "header" to
+#   return only the CSV header line.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV rows for RDS clusters and instances to stdout
+#
+# Usage:
+#   collect_rds_inventory "ap-northeast-1"
 #######################################
 function collect_rds_inventory {
     local region=$1
@@ -1716,11 +2318,28 @@ function collect_rds_inventory {
 }
 
 #######################################
-# Function to collect Redshift inventory (with categories)
+# collect_redshift_inventory: Collect Redshift inventory (with categories)
+#
+# Description:
+#   Collects Redshift cluster information for the specified region and
+#   returns CSV rows with the cluster ID, status, and node type. Use
+#   "header" to return the CSV header only.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV formatted Redshift rows to stdout
+#
+# Usage:
+#   collect_redshift_inventory "ap-northeast-1"
 #######################################
 function collect_redshift_inventory {
     local region=$1
-    local header="Category,Subcategory,Subsubcategory,Name,Region,Status,Node Type"
+    local header="Category,Subcategory,Subsubcategory,Name,Region,Role ARN,Node Type,Number Of Nodes,DB Name,Endpoint,Port,Master Username,VPC,Subnet Group,Security Group,Encrypted,KMS Key Name,Publicly Accessible,Status"
 
     # Return header if requested
     if [[ "$region" == "header" ]]; then
@@ -1732,23 +2351,72 @@ function collect_redshift_inventory {
 
     while IFS= read -r cluster_data; do
         [[ -z "$cluster_data" ]] && continue
-        local cluster_id cluster_status cluster_node_type
+        local cluster_id cluster_status cluster_node_type cluster_number_of_nodes cluster_db_name cluster_endpoint cluster_port cluster_master_username cluster_role_arn cluster_vpc cluster_subnet_group cluster_encrypted cluster_kms_key cluster_security_groups cluster_publicly_accessible
         cluster_id=$(extract_jq_value "$cluster_data" '.ClusterIdentifier')
         cluster_status=$(extract_jq_value "$cluster_data" '.ClusterStatus')
         cluster_node_type=$(extract_jq_value "$cluster_data" '.NodeType')
-        buffer+="redshift,Cluster,,$cluster_id,${region},$cluster_status,$cluster_node_type\n"
+        cluster_number_of_nodes=$(extract_jq_value "$cluster_data" '.NumberOfNodes')
+        cluster_db_name=$(extract_jq_value "$cluster_data" '.DBName')
+        cluster_endpoint=$(extract_jq_value "$cluster_data" '.Endpoint.Address')
+        cluster_port=$(extract_jq_value "$cluster_data" '.Endpoint.Port')
+        cluster_master_username=$(extract_jq_value "$cluster_data" '.MasterUsername')
+        cluster_role_arn=$(extract_jq_value "$cluster_data" '.IamRoles[0].IamRoleArn')
+        cluster_vpc=$(extract_jq_value "$cluster_data" '.VpcId')
+        cluster_vpc=$(get_vpc_name "$cluster_vpc" "$region" || echo "$cluster_vpc")
+        cluster_subnet_group=$(extract_jq_value "$cluster_data" '.ClusterSubnetGroupName')
+        cluster_encrypted=$(extract_jq_value "$cluster_data" '.Encrypted')
+        cluster_kms_key=$(extract_jq_value "$cluster_data" '.KmsKeyId')
+        cluster_kms_key=$(get_kms_name "$cluster_kms_key" "$region" || echo "$cluster_kms_key")
+        cluster_security_groups=$(extract_jq_array "$cluster_data" '.VpcSecurityGroups[].VpcSecurityGroupId')
+        cluster_publicly_accessible=$(extract_jq_value "$cluster_data" '.PubliclyAccessible')
+        # Convert security group IDs to names
+        if [[ "$cluster_security_groups" != "N/A" && "$cluster_security_groups" != "\"\"" ]]; then
+            local sg_names=""
+            # Remove quotes and split by comma
+            local sg_ids
+            sg_ids=${cluster_security_groups//\"/}
+            IFS=',' read -ra sg_id_array <<< "$sg_ids"
+            for sg_id in "${sg_id_array[@]}"; do
+                sg_id=$(echo "$sg_id" | xargs) # Trim whitespace
+                if [[ -n "$sg_id" ]]; then
+                    sg_name=$(get_security_group_name "$sg_id" "$region" || echo "$sg_id")
+                    if [[ -n "$sg_names" ]]; then
+                        sg_names="$sg_names,$sg_name"
+                    else
+                        sg_names="$sg_name"
+                    fi
+                fi
+            done
+            cluster_security_groups=$(normalize_csv_value "$sg_names")
+        fi
+        buffer+="redshift,Cluster,,$cluster_id,${region},$cluster_role_arn,$cluster_node_type,$cluster_number_of_nodes,$cluster_db_name,$cluster_endpoint,$cluster_port,$cluster_master_username,$cluster_vpc,$cluster_subnet_group,$cluster_security_groups,$cluster_encrypted,$cluster_kms_key,$cluster_publicly_accessible,$cluster_status\n"
     done < <(aws redshift describe-clusters --region "$region" | jq -c '.Clusters[]')
 
     echo "$buffer"
 }
 
-#######################################
-# Function to collect Route53 inventory (with categories)
+# collect_route53_inventory: Collect Route53 inventory (grouped by HostedZone)
 # Note: TXT records may contain multiple lines (e.g., SPF, DKIM records)
 # Use --preserve-newlines option for better display in Excel/Numbers
 #######################################
-#######################################
-# Function to collect Route53 inventory (grouped by HostedZone)
+#
+# Description:
+#   Collects Route53 HostedZones and their ResourceRecordSets. For global
+#   services this function runs only in us-east-1; use the option
+#   "--preserve-newlines" to keep multi-line TXT records. Use "header" to
+#   print the CSV header.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV rows describing hosted zones and records to stdout
+#
+# Usage:
+#   collect_route53_inventory "us-east-1"
 #######################################
 function collect_route53_inventory {
     local region=$1
@@ -1830,8 +2498,25 @@ function collect_route53_inventory {
     echo "$buffer"
 }
 
-#######################################
-# Function to collect S3 inventory (with categories)
+# collect_s3_inventory: Collect S3 inventory (with categories)
+#
+# Description:
+#   Enumerates S3 buckets and collects bucket-level metadata such as
+#   encryption, versioning, public access block settings, logging and
+#   lifecycle configuration. For global service S3, this function runs only
+#   in us-east-1. Use "header" to output only the CSV header.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Prints CSV rows for each bucket to stdout; prints header for "header"
+#
+# Usage:
+#   collect_s3_inventory "us-east-1"
 # Note: Lifecycle rule names may contain multiple entries separated by semicolons
 #######################################
 function collect_s3_inventory {
@@ -1888,10 +2573,10 @@ function collect_s3_inventory {
             if [[ -n "$bucket_access_log_bucket" && "$bucket_access_log_bucket" != "N/A" ]]; then
                 bucket_access_log_arn="arn:aws:s3:::${bucket_access_log_bucket}"
             else
-                bucket_access_log_arn=""
+                bucket_access_log_arn="N/A"
             fi
         else
-            bucket_access_log_arn=""
+            bucket_access_log_arn="N/A"
         fi
         bucket_access_log_arn=$(normalize_csv_value "$bucket_access_log_arn")
 
@@ -1911,8 +2596,24 @@ function collect_s3_inventory {
     echo "$buffer"
 }
 
-#######################################
-# Function to collect Secrets Manager inventory (with categories)
+# collect_secretsmanager_inventory: Collect Secrets Manager inventory (with categories)
+#
+# Description:
+#   Lists Secrets Manager secrets in the specified region and outputs CSV
+#   rows including name, ARN, description and last-modified time. Use
+#   "header" to return only the header line.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Writes CSV formatted secrets to stdout
+#
+# Usage:
+#   collect_secretsmanager_inventory "ap-northeast-1"
 #######################################
 function collect_secretsmanager_inventory {
     local region=$1
@@ -1939,8 +2640,24 @@ function collect_secretsmanager_inventory {
     echo "$buffer"
 }
 
-#######################################
-# Function to collect SNS inventory (with categories)
+# collect_sns_inventory: Collect SNS inventory (with categories)
+#
+# Description:
+#   Enumerates SNS topics in the region and outputs topic A RN, display name,
+#   and subscription count as CSV rows. Use "header" to print only the CSV
+#   header.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Prints CSV rows for SNS topics to stdout
+#
+# Usage:
+#   collect_sns_inventory "ap-northeast-1"
 #######################################
 function collect_sns_inventory {
     local region=$1
@@ -1968,8 +2685,24 @@ function collect_sns_inventory {
     echo "$buffer"
 }
 
-#######################################
-# Function to collect SQS inventory (with categories)
+# collect_sqs_inventory: Collect SQS inventory (with categories)
+#
+# Description:
+#   Scans SQS queues in a given region and returns details such as type,
+#   visibility timeout, DLQ target ARN, message retention period and timestamps
+#   formatted as CSV rows. Use "header" to output the CSV header only.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Emits CSV rows for each SQS queue to stdout
+#
+# Usage:
+#   collect_sqs_inventory "ap-northeast-1"
 #######################################
 function collect_sqs_inventory {
     local region=$1
@@ -2034,8 +2767,24 @@ function collect_sqs_inventory {
     echo "$buffer"
 }
 
-#######################################
-# Function to collect Transfer Family inventory (with categories)
+# collect_transferfamily_inventory: Collect Transfer Family inventory (with categories)
+#
+# Description:
+#   Collects AWS Transfer Family servers and state in the specified region
+#   and outputs CSV rows containing server id, protocol and state. Use
+#   "header" to request only the CSV header.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Writes CSV rows to stdout describing Transfer Family servers
+#
+# Usage:
+#   collect_transferfamily_inventory "ap-northeast-1"
 #######################################
 function collect_transferfamily_inventory {
     local region=$1
@@ -2061,11 +2810,25 @@ function collect_transferfamily_inventory {
     echo "$buffer"
 }
 
-#######################################
-# Function to collect VPC inventory (grouped by VPC)
-#######################################
-#######################################
-# Function to collect VPC inventory (grouped by VPC)
+# collect_vpc_inventory: Collect VPC inventory (grouped by VPC)
+#
+# Description:
+#   Collects VPCs and related sub-resources (subnets, route tables, NAT
+#   gateways, internet gateways, network ACLs, security groups, endpoints)
+#   for the specified region and returns a CSV listing grouped by VPC.
+#   Use "header" to return only the CSV header.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Outputs CSV rows describing VPC and sub-resources to stdout
+#
+# Usage:
+#   collect_vpc_inventory "ap-northeast-1"
 #######################################
 function collect_vpc_inventory {
     local region=$1
@@ -2240,7 +3003,7 @@ function collect_vpc_inventory {
             ep_service=$(extract_jq_value "$ep_data" '.ServiceName')
             ep_subnets=$(extract_jq_value "$ep_data" '.SubnetIds | join("\n")')
             ep_route_tables=$(extract_jq_value "$ep_data" '.RouteTableIds | join("\n")')
-            ep_security_groups=$(extract_jq_value "$ep_data" '.Groups[]?.GroupId' 'N/A')
+            ep_security_groups=$(extract_jq_value "$ep_data" '.Groups[]?.GroupId')
             ep_security_groups=$(normalize_csv_value "$ep_security_groups")
             ep_name=$(normalize_csv_value "$(extract_jq_value "$ep_data" '.Tags[]? | select(.Key == "Name") | .Value')")
             ep_desc="Type: $ep_type\nService: $ep_service\nSubnets: $ep_subnets\nRouteTables: $ep_route_tables\nSecurityGroups: $ep_security_groups"
@@ -2266,8 +3029,24 @@ function collect_vpc_inventory {
     echo "$buffer"
 }
 
-#######################################
-# Function to collect WAF inventory (with categories)
+# collect_waf_inventory: Collect WAF inventory (with categories)
+#
+# Description:
+#   Collects WAF Web ACLs (Regional and CloudFront) and their rules,
+#   associated resources and logging configuration. Use "header" to return
+#   only the CSV header.
+#
+# Arguments:
+#   $1 - AWS region or the string "header" to request CSV header
+#
+# Global Variables:
+#   None
+#
+# Returns:
+#   Emits CSV rows that describe each WAF Web ACL and its settings
+#
+# Usage:
+#   collect_waf_inventory "ap-northeast-1"
 #######################################
 function collect_waf_inventory {
     local region=$1
@@ -2331,7 +3110,7 @@ function collect_waf_inventory {
             waf_rules_raw=$(extract_jq_value "$waf_detail" '.WebACL.Rules | map(.Name) | join("\n")' '')
 
             # Associated CloudFront distributions
-            waf_associated_raw=$(aws cloudfront list-distributions-by-web-acl-id --web-acl-id "$waf_arn" --region us-east-1 2> /dev/null | jq -r '.DistributionList.Items[]?.ARN' 2> /dev/null || true)
+            waf_associated_raw=$(aws_paginate_items 'DistributionList.Items' aws cloudfront list-distributions-by-web-acl-id --web-acl-id "$waf_arn" --region us-east-1 2> /dev/null | jq -r '.ARN' 2> /dev/null || true)
 
             # Logging configuration
             waf_logging_raw=$(aws wafv2 get-logging-configuration --resource-arn "$waf_arn" --region us-east-1 2> /dev/null | jq -r '.LoggingConfiguration.LogDestinationConfigs[]? // empty' 2> /dev/null || true)
@@ -2345,96 +3124,24 @@ function collect_waf_inventory {
 }
 
 #######################################
-# Common utility functions for AWS resource collection
-#######################################
-
-# Generic function to collect AWS resources across regions
-function collect_aws_resources {
-    local category=$1
-
-    log "INFO" "Collecting $category information from AWS..."
-
-    # Get header from the first call
-    local collect_function="collect_${category}_inventory"
-    if ! declare -f "$collect_function" > /dev/null; then
-        log "WARN" "Collection function $collect_function not found for category $category"
-        return 1
-    fi
-
-    # Get header
-    local csv_header
-    csv_header=$($collect_function "header")
-
-    local buffer=""
-    for region in "${REGIONS_TO_CHECK[@]}"; do
-        log "INFO" "Checking $category resources in region: $region"
-        buffer+=$($collect_function "$region")
-    done
-    # Check if this category should maintain grouping structure (no sorting)
-    # Check if this category should maintain grouping structure (no sorting)
-    local sort_output="true"
-    for no_sort_category in "${NO_SORT_CATEGORIES[@]}"; do
-        if [[ "$category" == "$no_sort_category" ]]; then
-            sort_output="false"
-        fi
-    done
-
-    output_csv_data "$category" "$csv_header" "$buffer" "$sort_output"
-}
-
-# Function to output CSV data with standard formatting
-function output_csv_data {
-    local category=$1
-    local header=$2
-    local buffer=$3
-    local sort_output=${4:-"$SORT_OUTPUT"} # Use explicit parameter or global setting
-
-    # Determine combined output path; MAIN sets COMBINED_OUTPUT_PATH. Fallback to OUTPUT_FILE in-place.
-    local combined_path="${COMBINED_OUTPUT_PATH:-$OUTPUT_FILE}"
-
-    if [[ -n "$buffer" ]]; then
-        # Ensure resources subdirectory exists when writing per-category files
-        mkdir -p "${OUTPUT_DIR}/resources"
-
-        # Write per-category CSV (overwrite if exists) under resources/
-        local category_file="${OUTPUT_DIR}/resources/${category}.csv"
-        {
-            echo "$header"
-            if [[ "$sort_output" == "true" ]]; then
-                csv_sort "$buffer"
-            else
-                printf "%b" "$buffer"
-            fi
-            echo ""
-        } > "$category_file"
-
-        # Append category content to combined CSV
-        cat "$category_file" >> "$combined_path"
-        log "INFO" "$category inventory written to $category_file and appended to $combined_path"
-    else
-        log "INFO" "No data for category $category; no file created"
-    fi
-}
-
-# Function to iterate through regions and collect resources
-function collect_regional_resources {
-    local category=$1
-    local collect_function=$2
-    local buffer=""
-
-    for region in "${REGIONS_TO_CHECK[@]}"; do
-        log "INFO" "Checking $category resources in region: $region"
-        buffer+=$($collect_function "$region")
-    done
-
-    echo "$buffer"
-}
-
-#######################################
-# Main execution function
-#######################################
-#######################################
-# Generate HTML index and manifest for CSV outputs
+# generate_html_index: Generate HTML index and manifest for CSV outputs
+#
+# Description:
+#   Generate a JSON manifest (files.json) and a single-page index.html
+#   that reads CSV files under ${OUTPUT_DIR}/resources and renders them.
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   OUTPUT_DIR, INDEX_TITLE, INDEX_DESCRIPTION
+#
+# Returns:
+#   None (writes files to OUTPUT_DIR)
+#
+# Usage:
+#   generate_html_index
+#
 #######################################
 function generate_html_index {
     # Description: Generate a JSON manifest (files.json) and a single-page index.html
@@ -2488,6 +3195,114 @@ EOHTML
     log "INFO" "Generated HTML index: $index_file"
 }
 
+#######################################
+# initialize_regions: Initialize regions to check
+#
+# Description:
+#   Sets REGIONS_TO_CHECK array using the configured AWS_REGION and ensures
+#   that us-east-1 is included to account for global services when needed.
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (populates global REGIONS_TO_CHECK)
+#
+# Usage:
+#   initialize_regions
+#
+#######################################
+function initialize_regions {
+    REGIONS_TO_CHECK=("$AWS_REGION")
+    if [[ "$AWS_REGION" != "us-east-1" ]]; then
+        REGIONS_TO_CHECK+=("us-east-1")
+    fi
+    log "INFO" "Regions to check: ${REGIONS_TO_CHECK[*]}"
+}
+
+#######################################
+# output_csv_data: Output CSV data with standard formatting and sorting
+#
+# Description:
+#   Writes CSV data to both per-category files and combined output file.
+#   Supports optional sorting of output data.
+#
+# Arguments:
+#   $1 - Resource category name
+#   $2 - CSV header line
+#   $3 - CSV data buffer
+#   $4 - Whether to sort output (optional, defaults to SORT_OUTPUT global)
+#
+# Global Variables:
+#   OUTPUT_DIR - Base output directory
+#   OUTPUT_FILE - Combined output filename
+#   COMBINED_OUTPUT_PATH - Path to combined CSV file
+#   SORT_OUTPUT - Global sort setting
+#
+# Returns:
+#   0 on success
+#
+# Usage:
+#   output_csv_data "ec2" "Name,Type,State" "instance1,t2.micro,running"
+#
+#######################################
+function output_csv_data {
+    local category=$1
+    local header=$2
+    local buffer=$3
+    local sort_output=${4:-"$SORT_OUTPUT"} # Use explicit parameter or global setting
+
+    # Determine combined output path; MAIN sets COMBINED_OUTPUT_PATH. Fallback to OUTPUT_FILE in-place.
+    local combined_path="${COMBINED_OUTPUT_PATH:-$OUTPUT_FILE}"
+
+    if [[ -n "$buffer" ]]; then
+        # Ensure resources subdirectory exists when writing per-category files
+        mkdir -p "${OUTPUT_DIR}/resources"
+
+        # Write per-category CSV (overwrite if exists) under resources/
+        local category_file="${OUTPUT_DIR}/resources/${category}.csv"
+        {
+            echo "$header"
+            if [[ "$sort_output" == "true" ]]; then
+                csv_sort "$buffer"
+            else
+                printf "%b" "$buffer"
+            fi
+            echo ""
+        } > "$category_file"
+
+        # Append category content to combined CSV
+        cat "$category_file" >> "$combined_path"
+        log "INFO" "$category inventory written to $category_file and appended to $combined_path"
+    else
+        log "INFO" "No data for category $category; no file created"
+    fi
+}
+
+#######################################
+# main: Main execution function for AWS resource inventory collection
+#
+# Description:
+#   Orchestrates the entire AWS resource inventory collection process,
+#   including argument parsing, validation, resource collection, and output generation.
+#
+# Arguments:
+#   $@ - Command line arguments passed to the script
+#
+# Global Variables:
+#   OUTPUT_DIR - Output directory path
+#   OUTPUT_FILE - Output filename
+#   AWS_REGION - AWS region setting
+#   CATEGORIES - Specific categories to collect
+#   HTML_MODE - Whether to generate HTML index
+#
+# Returns:
+#   0 on success, exits with error code on failure
+#
+# Usage:
+#   main "$@"
+#
+#######################################
 function main {
     # Parse arguments
     parse_arguments "$@"
@@ -2576,7 +3391,7 @@ function main {
 
     # Collect inventory for specified categories
     for resource_category in "${categories_to_process[@]}"; do
-        collect_aws_resources "$resource_category"
+        call_collect_aws_resources "$resource_category"
     done
 
     # Record end time and calculate elapsed time
@@ -2596,3 +3411,35 @@ function main {
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
     main "$@"
 fi
+
+#######################################
+# cleanup: Cleanup handler for safe teardown and resource cleanup
+#
+# Description:
+#   Performs cleanup operations when the script exits, including
+#   removal of temporary files and graceful shutdown procedures.
+#
+# Arguments:
+#   None
+#
+# Global Variables:
+#   DRY_RUN - Whether running in dry-run mode
+#
+# Returns:
+#   0 on success
+#
+# Usage:
+#   cleanup (called automatically via trap)
+#
+#######################################
+function cleanup {
+    # Placeholder for temporary resource cleanup - update if mktemp is used
+    if [[ "${DRY_RUN:-false}" == "true" ]]; then
+        log "INFO" "Exiting (dry-run); no cleanup required."
+        return 0
+    fi
+    log "INFO" "Cleanup complete"
+}
+
+# Ensure cleanup runs on exit and catches common signals
+trap cleanup EXIT INT TERM

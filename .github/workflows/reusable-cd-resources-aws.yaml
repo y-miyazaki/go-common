@@ -40,7 +40,11 @@ on:
         required: true
 
 env:
+  CATEGORIES: ${{ inputs.categories }}
   ENVIRONMENT: ${{ inputs.environment }}
+  OUTPUT_DIR: ${{ inputs.output_dir }}
+  OUTPUT_FILE: ${{ inputs.output_file }}
+  REGION: ${{ inputs.region }}
 
 jobs:
   generate-documentation:
@@ -77,10 +81,10 @@ jobs:
           set -euo pipefail
 
           # Define common output and artifact naming variables here so downstream steps reuse them
-          ARTIFACT_BASE="resources-${{ inputs.environment }}"
+          ARTIFACT_BASE="resources-${ENVIRONMENT}"
           ARTIFACT_NAME="${ARTIFACT_BASE}.zip"
-          OUTDIR="${{ inputs.output_dir }}"
-          OUTFILE="${{ inputs.output_file }}"
+          OUTDIR="${OUTPUT_DIR}"
+          OUTFILE="${OUTPUT_FILE}"
           TITLE="AWS Resources(${ENVIRONMENT})"
 
           # Write environment variables to the GitHub environment file in one grouped redirect
@@ -105,8 +109,8 @@ jobs:
         run: |
           # shellcheck disable=SC2086,SC2046
           set -euo pipefail
-          CATS="${{ inputs.categories }}"
-          REGION_ARG="${{ inputs.region }}"
+          CATS="${CATEGORIES}"
+          REGION_ARG="${REGION}"
 
           CMD=("./scripts/terraform/aws_get_resources.sh" -v -p -H -D "$OUTDIR" -o "$OUTFILE" -T "$TITLE")
           if [[ -n "$CATS" ]]; then

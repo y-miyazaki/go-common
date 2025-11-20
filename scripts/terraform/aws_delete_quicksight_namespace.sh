@@ -7,6 +7,10 @@
 # Error handling: exit on error, unset variable, or failed pipeline
 set -euo pipefail
 
+# Secure defaults
+umask 027
+export LC_ALL=C.UTF-8
+
 # Get script directory for library loading
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export SCRIPT_DIR
@@ -22,7 +26,20 @@ source "${SCRIPT_DIR}/../lib/all.sh"
 AWS_ACCOUNT_ID=""
 
 #######################################
-# Display usage information
+# show_usage: Display script usage information
+#
+# Description:
+#   Displays usage information for the script
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None (exits with status 0)
+#
+# Usage:
+#   show_usage
+#
 #######################################
 function show_usage {
     echo "Usage: $(basename "$0")"
@@ -37,7 +54,20 @@ function show_usage {
 }
 
 #######################################
-# Parse command line arguments
+# parse_arguments: Parse command line arguments
+#
+# Description:
+#   Parses command line arguments and handles help option
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Returns:
+#   None (exits on error or help)
+#
+# Usage:
+#   parse_arguments "$@"
+#
 #######################################
 function parse_arguments {
     while [[ $# -gt 0 ]]; do
@@ -56,7 +86,20 @@ function parse_arguments {
 }
 
 #######################################
-# Delete all QuickSight namespaces
+# delete_quicksight_namespaces: Delete all QuickSight namespaces
+#
+# Description:
+#   Retrieves all QuickSight namespaces for the current AWS account and deletes each one
+#
+# Arguments:
+#   None
+#
+# Returns:
+#   None
+#
+# Usage:
+#   delete_quicksight_namespaces
+#
 #######################################
 function delete_quicksight_namespaces {
     echo_section "Deleting QuickSight Namespaces"
@@ -72,7 +115,20 @@ function delete_quicksight_namespaces {
 }
 
 #######################################
-# Main execution function
+# main: Main execution function
+#
+# Description:
+#   Main entry point that orchestrates the QuickSight namespace deletion process
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
+#
+# Returns:
+#   None (exits with appropriate status code)
+#
+# Usage:
+#   main "$@"
+#
 #######################################
 function main {
     # Parse arguments
