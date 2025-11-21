@@ -25,7 +25,7 @@ require (
 	github.com/slack-go/slack v0.17.3
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
-	go.uber.org/zap v1.27.0
+	go.uber.org/zap v1.27.1
 	golang.org/x/exp v0.0.0-20250813145105-42675adae3e6
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/driver/postgres v1.6.0
