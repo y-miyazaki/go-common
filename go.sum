@@ -46,8 +46,8 @@ github.com/aws/aws-sdk-go-v2/internal/ini v1.8.4 h1:WKuaxf++XKWlHWu9ECbMlha8WOEG
 github.com/aws/aws-sdk-go-v2/internal/ini v1.8.4/go.mod h1:ZWy7j6v1vWGmPReu0iSGvRiise4YI5SkR3OHKTZ6Wuc=
 github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.14 h1:ITi7qiDSv/mSGDSWNpZ4k4Ve0DQR6Ug2SJQ8zEHoDXg=
 github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.14/go.mod h1:k1xtME53H1b6YpZt74YmwlONMWf4ecM+lut1WQLAF/U=
-github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.42.4 h1:oyP8LMWNdKMiit3F9AFtQWWQC5r1d4rI8msqHoma5+Q=
-github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.42.4/go.mod h1:5IlIRrpkIw3zc6JiEnzwyRLcUMKsAIy89/RJv0NP1zI=
+github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.44.1 h1:Ljtlda1e4EYbX+g4mpYS+P2EksOuiQa9z17L77WjR6w=
+github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.44.1/go.mod h1:7jmuCw74YOGXjdT8NO5X/4PvVW2Xoe8PwS3w5e7pflM=
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.58.9 h1:+NSIzl59vBK3g3nLUuLSb/I2F2OIucW6hX/B+NAPWDg=
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.58.9/go.mod h1:9/Q0/HtqBTLMksFse42wZjUq0jJrUuo4XlnXy/uSoeg=
 github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.57.14 h1:5NblKxf/gIiOBfQg84/b24F4bB5HlP14jiOV/+1ItZ4=
