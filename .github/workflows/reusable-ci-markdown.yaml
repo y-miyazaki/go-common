@@ -30,17 +30,18 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           fetch-depth: 0
-          persist-credentials: false
+          persist-credentials: true
 
       - name: Exec markdownlint with reviewdog (PR comments)
         if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
         uses: reviewdog/action-markdownlint@3667398db9118d7e78f7a63d10e26ce454ba5f58 # v0.26.2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-          markdownlint_flags: "README*.md"
           fail_level: error
-          filter_mode: added
+          filter_mode: file
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          level: error
+          markdownlint_flags: "README*.md"
+          reporter: github-pr-review
 
       - name: Exec markdownlint-cli2 (non-PR)
         if: github.event_name != 'pull_request'

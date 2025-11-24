@@ -34,7 +34,7 @@ env:
 
 jobs:
   lint:
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
       checks: write
@@ -44,7 +44,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
-          persist-credentials: false
+          fetch-depth: 0
+          persist-credentials: true
 
       - name: Setup Expand file list
         id: file-list
@@ -85,9 +86,11 @@ jobs:
         if: steps.file-list.outputs.no_files == 'false' && github.event_name == 'pull_request'
         uses: reviewdog/action-shfmt@d8f080930b9be5847b4f97e9f4122b81a82aaeac # v1.0.4
         with:
-          fail_on_error: true
+          filter_mode: file
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          reviewdog_flags: ${{ inputs.fail_on_warnings && '-fail-on-error' || '' }}
+          level: error
+          reporter: github-pr-review
+          reviewdog_flags: "-fail-level=${{ inputs.fail_level }} -reporter=github-pr-review"
           shfmt_flags: "-l -i 4 -ci -bn -sr"
           workdir: "."
 
@@ -95,8 +98,11 @@ jobs:
         if: steps.file-list.outputs.no_files == 'false' && github.event_name != 'pull_request'
         uses: reviewdog/action-shfmt@d8f080930b9be5847b4f97e9f4122b81a82aaeac # v1.0.4
         with:
-          fail_on_error: true
+          filter_mode: file
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          level: error
+          reporter: github-check
+          reviewdog_flags: "-fail-level=${{ inputs.fail_level }} -reporter=github-check"
           shfmt_flags: "-l -s -i 4 -ci -bn -sr"
           workdir: "."
 
@@ -105,7 +111,9 @@ jobs:
         uses: reviewdog/action-shellcheck@4c07458293ac342d477251099501a718ae5ef86e # v1.32.0
         with:
           fail_level: ${{ inputs.fail_level }}
+          filter_mode: file
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          level: error
           path: ${{ steps.file-list.outputs.files_list }}
           reporter: github-pr-review
           shellcheck_flags: "-x"
@@ -115,9 +123,10 @@ jobs:
         uses: reviewdog/action-shellcheck@4c07458293ac342d477251099501a718ae5ef86e # v1.32.0
         with:
           fail_level: ${{ inputs.fail_level }}
+          filter_mode: file
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          level: error
           path: ${{ steps.file-list.outputs.files_list }}
-          reviewdog_flags: ${{ inputs.fail_on_warnings && '-fail-on-error' || '' }}
           reporter: github-check
           shellcheck_flags: "-x"
 
