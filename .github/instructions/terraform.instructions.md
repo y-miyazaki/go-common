@@ -108,10 +108,10 @@ description: "AI Assistant Instructions for Terraform"
 
 ### MCP Tool Usage (terraform-mcp-server)
 
-AWSCC provider 優先:
+AWS provider 優先:
 
-1. `SearchAwsccProviderDocs`（Cloud Control API）
-2. `SearchAwsProviderDocs`（fallback）
+1. `SearchAwsProviderDocs`
+2. `SearchAwsccProviderDocs`（Cloud Control API）（fallback）
 3. AWS-IA モジュール: `SearchSpecificAwsIaModules`
 
 ## Testing and Validation
