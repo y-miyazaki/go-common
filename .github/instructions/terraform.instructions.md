@@ -61,6 +61,7 @@ description: "AI Assistant Instructions for Terraform"
 - `moved`ブロックでリソース再作成回避
 - deprecated 機能置換
 - コメントアウトリソース削除
+- terraform resource を使う場合、terraform repository を Fetch して調査
 
 #### Modules
 
