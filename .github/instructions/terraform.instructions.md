@@ -61,6 +61,7 @@ description: "AI Assistant Instructions for Terraform"
 - `moved`ブロックでリソース再作成回避
 - deprecated 機能置換
 - コメントアウトリソース削除
+- terraform resource を使う場合、terraform repository を Fetch して調査
 
 #### Modules
 
@@ -87,7 +88,6 @@ description: "AI Assistant Instructions for Terraform"
 
 #### Tagging
 
-- 統一形式: `locals.tags = merge(try(data.aws_default_tags.provider.tags, {}), var.tags == null ? {} : var.tags)`
 - Name 追加: `merge(local.tags, { Name = "..." })`
 - 不要手動重複キー削除
 
@@ -108,25 +108,12 @@ description: "AI Assistant Instructions for Terraform"
 
 ### MCP Tool Usage (terraform-mcp-server)
 
-AWSCC provider 優先:
+AWS provider 優先:
 
-1. `SearchAwsccProviderDocs`（Cloud Control API）
-2. `SearchAwsProviderDocs`（fallback）
+1. `SearchAwsProviderDocs`
+2. `SearchAwsccProviderDocs`（Cloud Control API）（fallback）
 3. AWS-IA モジュール: `SearchSpecificAwsIaModules`
 
 ## Testing and Validation
 
-### Validation Commands
-
-```bash
-terraform fmt -check
-terraform validate
-tflint
-trivy config .
-```
-
-## Security Guidelines
-
-- 機密情報: 環境変数・SSM Parameter Store
-- タグ統一: `locals.tags = merge(try(data.aws_default_tags.provider.tags, {}), var.tags)`
-- backend 暗号化: SSE+DynamoDB ロック
+**詳細ガイド**: [terraform-validation Skill](../skills/terraform-validation/SKILL.md) を参照（検証手順・トラブルシューティング・セキュリティチェック）

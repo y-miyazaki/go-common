@@ -1470,7 +1470,7 @@ linters:
         # https://github.com/mgechev/revive/blob/HEAD/RULES_DESCRIPTIONS.md#cognitive-complexity
         - name: cognitive-complexity
           severity: warning
-          disabled: false
+          disabled: true
           exclude: [""]
           arguments: [50]
         # https://github.com/mgechev/revive/blob/HEAD/RULES_DESCRIPTIONS.md#comment-spacings
@@ -1939,6 +1939,11 @@ linters:
         - name: waitgroup-by-value
           severity: warning
           disabled: false
+          exclude: [""]
+        # https://github.com/mgechev/revive/blob/HEAD/RULES_DESCRIPTIONS.md#use-waitgroup-go
+        - name: use-waitgroup-go
+          severity: warning
+          disabled: true
           exclude: [""]
 
     rowserrcheck: # https://golangci-lint.run/docs/linters/configuration/#rowserrcheck

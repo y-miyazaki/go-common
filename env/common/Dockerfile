@@ -1,7 +1,7 @@
 #--------------------------------------------------------------
 # base build image
 #--------------------------------------------------------------
-FROM mcr.microsoft.com/vscode/devcontainers/go:1.25
+FROM mcr.microsoft.com/vscode/devcontainers/go:1.25@sha256:ade3e38a521ce356bc5b2d55ed87b4c908e2a1b04fd921fc6b264dc5a9cdccc9
 #--------------------------------------------------------------
 # ARG
 #--------------------------------------------------------------
@@ -10,7 +10,7 @@ ARG USER=vscode
 ARG WORKDIR=/workspace
 # version(base)
 ARG NODE_VERSION=24 # https://github.com/nodejs/node/releases
-ARG AQUA_VERSION=v2.55.1 # https://github.com/aquaproj/aqua/releases
+ARG AQUA_VERSION=v2.55.2 # https://github.com/aquaproj/aqua/releases
 
 # x86_64
 # ARG ARCH_BASE=amd64
@@ -42,6 +42,11 @@ RUN mkdir -p ${WORKDIR}
 WORKDIR  ${WORKDIR}
 
 #--------------------------------------------------------------
+# for docker group access
+#--------------------------------------------------------------
+RUN groupadd -f docker && sudo usermod -aG docker vscode
+
+#--------------------------------------------------------------
 # Install minimal apt/https tooling (avoid software-properties-common)
 #--------------------------------------------------------------
 RUN apt-get update && \
@@ -63,7 +68,13 @@ RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -E - &&
     apt-get install -y nodejs=${NODE_VERSION}.0.0-1nodesource1
 
 # Install npm packages
-RUN npm install -g markdownlint-cli markdown-link-check cspell textlint textlint-rule-preset-ja-technical-writing textlint-rule-no-dead-link
+RUN npm install -g --ignore-scripts \
+    markdownlint-cli@0.46.0 \
+    markdown-link-check@3.14.2 \
+    cspell@9.3.2 \
+    textlint@15.4.0 \
+    textlint-rule-preset-ja-technical-writing@12.0.2 \
+    textlint-rule-no-dead-link@6.0.1
 
 # Install aqua
 RUN go install github.com/aquaproj/aqua/v2/cmd/aqua@${AQUA_VERSION}
@@ -82,12 +93,15 @@ USER root
 # AWS environment
 #--------------------------------------------------------------
 # Install aws-mfa
-RUN pip3 install --break-system-packages aws-mfa && \
+RUN pip3 install --break-system-packages aws-mfa==0.0.12 && \
     # Install awsp
-    npm install -g awsp && \
+    npm install -g --ignore-scripts awsp@0.2.0 && \
     # Install Session Manager Plugin
     curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_${ARCH_SESSION_MANAGER_PLUGIN}/session-manager-plugin.deb" -o "session-manager-plugin.deb" && \
-    dpkg -i session-manager-plugin.deb
+    # TODO: Add checksum verification:
+    # echo "EXPECTED_SHA256  session-manager-plugin.deb" | sha256sum -c - || exit 1
+    dpkg -i session-manager-plugin.deb && \
+    rm session-manager-plugin.deb
 
 # Install awsdac
 RUN apt update && \

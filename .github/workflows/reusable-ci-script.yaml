@@ -3,7 +3,7 @@ name: reusable-ci-script
 # Reusable workflow: lint and validate repository shell scripts
 # - Uses shellcheck and shfmt actions when available
 # - Performs bash syntax checks and shebang verification
-# - Does NOT call scripts/validate_all_scripts.sh directly (reference only)
+# - Does NOT call scripts/validate.sh directly (reference only)
 
 on:
   workflow_call:
@@ -30,11 +30,13 @@ on:
         default: "0.10.0"
 
 env:
+  FAIL_LEVEL: ${{ inputs.fail_level }}
+  FAIL_ON_WARNINGS: ${{ inputs.fail_on_warnings }}
   SCRIPT_PATH: ${{ inputs.script_path }}
 
 jobs:
   lint:
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
       checks: write
@@ -42,9 +44,17 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          fetch-depth: 0
           persist-credentials: false
+
+      - name: Configure git auth
+        if: github.event_name == 'pull_request'
+        uses: ./.github/actions/git-auth
+        with:
+          operation: configure
+          token: ${{ github.token }}
 
       - name: Setup Expand file list
         id: file-list
@@ -85,9 +95,10 @@ jobs:
         if: steps.file-list.outputs.no_files == 'false' && github.event_name == 'pull_request'
         uses: reviewdog/action-shfmt@d8f080930b9be5847b4f97e9f4122b81a82aaeac # v1.0.4
         with:
-          fail_on_error: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reviewdog_flags: ${{ inputs.fail_on_warnings && '-fail-on-error' || '' }}
+          filter_mode: file
+          github_token: ${{ github.token }}
+          level: error
+          reviewdog_flags: "-fail-level=${{ env.FAIL_LEVEL }} -reporter=github-pr-review"
           shfmt_flags: "-l -i 4 -ci -bn -sr"
           workdir: "."
 
@@ -95,8 +106,10 @@ jobs:
         if: steps.file-list.outputs.no_files == 'false' && github.event_name != 'pull_request'
         uses: reviewdog/action-shfmt@d8f080930b9be5847b4f97e9f4122b81a82aaeac # v1.0.4
         with:
-          fail_on_error: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          filter_mode: file
+          github_token: ${{ github.token }}
+          level: error
+          reviewdog_flags: "-fail-level=${{ env.FAIL_LEVEL }} -reporter=github-check"
           shfmt_flags: "-l -s -i 4 -ci -bn -sr"
           workdir: "."
 
@@ -104,8 +117,10 @@ jobs:
         if: steps.file-list.outputs.no_files == 'false' && github.event_name == 'pull_request'
         uses: reviewdog/action-shellcheck@4c07458293ac342d477251099501a718ae5ef86e # v1.32.0
         with:
-          fail_level: ${{ inputs.fail_level }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          fail_level: ${{ env.FAIL_LEVEL }}
+          filter_mode: file
+          github_token: ${{ github.token }}
+          level: error
           path: ${{ steps.file-list.outputs.files_list }}
           reporter: github-pr-review
           shellcheck_flags: "-x"
@@ -114,10 +129,11 @@ jobs:
         if: steps.file-list.outputs.no_files == 'false' && github.event_name != 'pull_request'
         uses: reviewdog/action-shellcheck@4c07458293ac342d477251099501a718ae5ef86e # v1.32.0
         with:
-          fail_level: ${{ inputs.fail_level }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          fail_level: ${{ env.FAIL_LEVEL }}
+          filter_mode: file
+          github_token: ${{ github.token }}
+          level: error
           path: ${{ steps.file-list.outputs.files_list }}
-          reviewdog_flags: ${{ inputs.fail_on_warnings && '-fail-on-error' || '' }}
           reporter: github-check
           shellcheck_flags: "-x"
 
@@ -146,8 +162,6 @@ jobs:
 
       - name: Exec Permissions check
         if: steps.file-list.outputs.no_files == 'false'
-        env:
-          FAIL_ON_WARNINGS: ${{ inputs.fail_on_warnings }}
         run: |
           # shellcheck disable=SC2086
           set -euo pipefail
@@ -169,16 +183,23 @@ jobs:
             fi
           fi
 
+      - name: Clear git auth
+        if: always() && github.event_name == 'pull_request'
+        uses: ./.github/actions/git-auth
+        with:
+          operation: clear
+          token: ${{ github.token }}
+
       - name: Summary
         if: always()
         uses: ./.github/actions/summary
         with:
-          title: "Shell Script Lint"
-          status: "${{ job.status }}"
-          params: |
-            script_path: ${{ inputs.script_path }}
-            fail_level: ${{ inputs.fail_level }}
-          outputs: |
-            files_list: ${{ steps.file-list.outputs.files_list }}
           artifacts: |
             (none)
+          outputs: |
+            files_list: ${{ steps.file-list.outputs.files_list }}
+          params: |
+            script_path: ${{ env.SCRIPT_PATH }}
+            fail_level: ${{ env.FAIL_LEVEL }}
+          status: "${{ job.status }}"
+          title: "Shell Script Lint"

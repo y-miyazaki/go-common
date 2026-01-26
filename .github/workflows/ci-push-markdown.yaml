@@ -30,11 +30,11 @@ on:
       - ".github/workflows/reusable-ci-markdown.yaml"
 
 jobs:
-  markdown-lint:
+  markdown-ci:
     uses: ./.github/workflows/reusable-ci-markdown.yaml
     with:
-      environment: "markdown"
       component: "base"
+      environment: "markdown"
     permissions:
       contents: read
       pull-requests: write

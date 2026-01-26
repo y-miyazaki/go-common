@@ -9,7 +9,7 @@ on:
       - "develop"
     paths:
       - ".github/workflows/ci-push-dev.yaml"
-      - ".github/workflows/reusable-ci-go-common.yaml"
+      - ".github/workflows/reusable-ci-go.yaml"
       - "example/**"
       - "pkg/**"
       - "go.mod"
@@ -23,7 +23,7 @@ on:
       - "develop"
     paths:
       - ".github/workflows/ci-push-dev.yaml"
-      - ".github/workflows/reusable-ci-go-common.yaml"
+      - ".github/workflows/reusable-ci-go.yaml"
       - "example/**"
       - "pkg/**"
       - "go.mod"
@@ -33,11 +33,11 @@ on:
 
 jobs:
   go-ci:
-    uses: ./.github/workflows/reusable-ci-go-common.yaml
+    uses: ./.github/workflows/reusable-ci-go.yaml
     with:
       environment: "dev"
       component: "go-common"
-      go_path: "."
+      go_project_path: "."
     permissions:
       contents: read
       id-token: write
@@ -53,7 +53,7 @@ jobs:
   #   with:
   #     environment: "dev"
   #     component: "go-common"
-  #     go_path: "."                       # used as default Docker build context
+  #     go_project_path: "."                       # used as default Docker build context
   #     ecr_repository: "your-repo-name"    # required
   #     # ecr_registry: "123456789012.dkr.ecr.ap-northeast-1.amazonaws.com"  # optional; defaults to ECR login output
   #     # docker_context: "."               # optional; defaults to go_path
