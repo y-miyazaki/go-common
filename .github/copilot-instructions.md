@@ -3,9 +3,9 @@
 ## Language and Formatting Standards
 
 - instructions,prompt ファイル
-  日本語。章名のみ英語
+  - 日本語。章名のみ英語
 - other ファイル
-  生成されるコードとコメントはすべて英語
+  - 生成されるコードとコメントはすべて英語
 
 ## Core Principles
 
