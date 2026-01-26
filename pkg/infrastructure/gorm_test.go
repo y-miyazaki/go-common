@@ -44,3 +44,11 @@ func TestDBConfig(t *testing.T) {
 	assert.Equal(t, 20, config.MaxIdleConns)
 	assert.Equal(t, 200, config.MaxOpenConns)
 }
+
+func TestGetDefaultGormConfig(t *testing.T) {
+	config := GetDefaultGormConfig()
+
+	assert.NotNil(t, config)
+	assert.True(t, config.DisableAutomaticPing)
+	assert.NotNil(t, config.NamingStrategy)
+}

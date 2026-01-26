@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap"
 )
 
 func TestGinHTTPLogger(t *testing.T) {
@@ -36,6 +37,44 @@ func TestGinHTTPLogger_ErrorStatus(t *testing.T) {
 
 	l := logger.NewLogger(logrus.New())
 	middleware := GinHTTPLogger(l, "", "")
+
+	middleware(c)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+}
+
+func TestGinHTTPZapLogger(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request, _ = http.NewRequest("GET", "/test", nil)
+	c.Request.Header.Set("X-Trace-ID", "test-trace-id")
+
+	zapConfig := &zap.Config{
+		Level:    zap.NewAtomicLevelAt(zap.InfoLevel),
+		Encoding: "json",
+	}
+	l := logger.NewZapLogger(zapConfig)
+	middleware := GinHTTPZapLogger(l, "X-Trace-ID", "X-Forwarded-For")
+
+	middleware(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+func TestGinHTTPZapLogger_ErrorStatus(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request, _ = http.NewRequest("GET", "/test", nil)
+	w.WriteHeader(http.StatusInternalServerError)
+
+	zapConfig := &zap.Config{
+		Level:    zap.NewAtomicLevelAt(zap.InfoLevel),
+		Encoding: "json",
+	}
+	l := logger.NewZapLogger(zapConfig)
+	middleware := GinHTTPZapLogger(l, "", "")
 
 	middleware(c)
 
