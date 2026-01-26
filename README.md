@@ -184,32 +184,6 @@ This section describes how to use a VS Code devcontainer to create a reproducibl
     cp -p env/example/.devcontainer/devcontainer.json .devcontainer/devcontainer.json
     ```
 
-3. Adjust devcontainer.json  
-    The following excerpt is a locally mounted configuration; update mount paths to match your environment. Replace `${env:HOME}/workspace/go-common` with your actual local path to this repository (e.g., `/Users/yourname/projects/go-common` on macOS or `C:\Users\yourname\projects\go-common` on Windows).
-
-    ```bash
-    cat .devcontainer/devcontainer.json
-    ```
-
-    ```json
-    {
-        "runArgs": [
-            "-v",
-            "${env:HOME}/workspace/go-common:/workspace",
-            "-v",
-            "${env:HOME}/workspace/go-common/env/common/.bashrc:/home/vscode/.bashrc",
-            "-v",
-            "${env:HOME}/workspace/go-common/env/common/tmp/.gitconfig:/home/vscode/.gitconfig",
-            "-v",
-            "${env:HOME}/workspace/go-common/env/common/tmp/.aws:/home/vscode/.aws",
-            "-v",
-            "${env:HOME}/workspace/go-common/env/common/gh:/home/vscode/.config/gh",
-            "-v",
-            "/var/run/docker.sock:/var/run/docker.sock"
-        ]
-    }
-    ```
-
 4. Configure .gitconfig  
     The following excerpt is a locally mounted file; update values for your name and email.
     ```bash

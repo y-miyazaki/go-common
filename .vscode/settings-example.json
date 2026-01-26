@@ -67,8 +67,16 @@
   // ------------------------------------------------------------
   // GitHub Copilot
   // ------------------------------------------------------------
+  "accessibility.signals.chatUserActionRequired": {
+    "sound": "on",
+    "announcement": "auto"
+  },
   "chat.agent.enabled": true,
-  "chat.agent.maxRequests": 50,
+  "chat.agent.maxRequests": 200,
+  "chat.agentSessionsViewLocation": "view",
+  "chat.emptyState.history.enabled": true,
+  "chat.tools.todos.showWidget": true,
+  "chat.useAgentSkills": true,
   "chat.mcp.access": "all",
   "chat.mcp.autostart": "onlyNew",
   "chat.mcp.discovery.enabled": {
@@ -79,13 +87,16 @@
   },
   "chat.tools.terminal.autoApprove": {
     "/.*/": true,
+    "curl": true,
     "rm": false,
     "git add": false,
-    "git commit": false
+    "git commit": false,
+    "git checkout": false
   },
   "editor.inlineSuggest.enabled": true,
   "github.copilot.chat.agent.autoFix": true,
   "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+  "github.copilot.chat.codesearch.enabled": true,
   "github.copilot.chat.commitMessageGeneration.instructions": [
     {
       "file": ".github/copilot-instructions.md"
@@ -103,6 +114,8 @@
     "python": true,
     "typescriptreact": true
   },
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "github.copilot.nextEditSuggestions.fixes": true,
   // ------------------------------------------------------------
   // cspell
   // ------------------------------------------------------------
@@ -222,17 +235,33 @@
   "go.testTags": null,
   "go.testTimeout": "30s",
   "go.toolsEnvVars": {
+    "PATH": "/go/bin:${env:PATH}",
+    "GOPATH": "/go",
     "GO111MODULE": "on"
   },
   "go.toolsGopath": "/go",
   "go.toolsManagement.autoUpdate": true,
   "go.toolsManagement.checkForUpdates": "proxy",
-  "go.trace.server": "off",
+  "go.trace.server": "verbose",
   "go.useLanguageServer": true,
   "go.vetFlags": [],
   "gopls": {
     "usePlaceholders": true,
-    "completeUnimported": true
+    "completeUnimported": true,
+    "staticcheck": false,
+    // "verboseOutput": true,
+    "directoryFilters": [
+      "-/workspace/.devcontainer",
+      "-/workspace/.git",
+      "-/workspace/.serena",
+      "-/workspace/.vscode",
+      "-/workspace/node_modules",
+      "-/workspace/output",
+      "-/workspace/tmp",
+      "-/workspace/vendor",
+      "-/mnt/",
+      "-/proc/"
+    ]
   },
   "[go]": {
     "editor.snippetSuggestions": "bottom",

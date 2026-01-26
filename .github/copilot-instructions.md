@@ -1,11 +1,17 @@
 # GitHub Copilot Instructions
 
-**Language Note**: This document is written in Japanese, but all generated code and comments must be in English.
+## Language and Formatting Standards
+
+- instructions,prompt ファイル
+  日本語。章名のみ英語
+- other ファイル
+  生成されるコードとコメントはすべて英語
 
 ## Core Principles
 
 - **Path-Specific Instructions の遵守（最重要）**
-  - 作業前に `.github/instructions/*.instructions.md` を `read_file` で明示的読込・確認
+  - **Chat/Agent 機能使用時**: 作業前に `.github/instructions/*.instructions.md` を `read_file` で明示的読込・確認
+  - **自動補完時**: 現在のコンテキストから最大限推測して適用
   - 対象ファイルの拡張子に応じた instructions ファイルを適用（例: `terraform.instructions.md` for .tf files）
   - 自動適用でも `read_file` で内容確認
   - 検証コマンド・コーディング規約の遵守
@@ -13,6 +19,7 @@
   - 新規作業開始時に `mcp_serena_list_memories` で利用可能なプロジェクトメモリを確認
   - 関連するメモリを `mcp_serena_read_memory` で参照し、プロジェクト知識を活用
   - 主要メモリ: project_overview, suggested_commands, style_conventions, post_task_checklist, system_utilities
+  - **Fallback**: 指定された MCP ツールが利用できない場合は、このステップをスキップし、ユーザーに手動確認が必要な旨を報告（捏造禁止）
 - 作業開始時に instructions の要点を明示
 - **統一性の維持**: 修正内容が他にも適用すべき場合は grep で検索し全体修正
 - 完了報告は全作業完了後に実施（残作業はリスト化）
@@ -38,6 +45,16 @@
 - 出力ファイル名はデフォルト維持
 - 長時間対話（10 ターン以上）時はガイドライン再確認
 - CLI は help または公式ドキュメント確認後に実行
+
+### Temporary Files Management
+
+- **一時ファイルの配置**: `/workspace/tmp/` ディレクトリ以下に作成
+  - カバレッジレポート（`*.out`, `*.html`）
+  - テスト出力ファイル
+  - ビルド成果物の一時コピー
+  - その他の検証用一時ファイル
+- **理由**: `.gitignore` で `tmp` ディレクトリ全体を除外しており、誤コミット防止
+- **例外**: プロジェクトルートに生成される特定のファイル（`go.sum` など）は対象外
 
 #### Final Checklist
 

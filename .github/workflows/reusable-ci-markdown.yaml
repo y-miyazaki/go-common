@@ -20,17 +20,24 @@ env:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
       contents: read
       pull-requests: write
     steps:
       - name: Checkout Code
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
-          persist-credentials: true
+          persist-credentials: false
+
+      - name: Configure git auth
+        if: github.event_name == 'pull_request'
+        uses: ./.github/actions/git-auth
+        with:
+          operation: configure
+          token: ${{ github.token }}
 
       - name: Exec markdownlint with reviewdog (PR comments)
         if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
@@ -38,18 +45,25 @@ jobs:
         with:
           fail_level: error
           filter_mode: file
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ github.token }}
           level: error
           markdownlint_flags: "README*.md"
           reporter: github-pr-review
 
+      - name: Clear git auth
+        if: always() && github.event_name == 'pull_request'
+        uses: ./.github/actions/git-auth
+        with:
+          operation: clear
+          token: ${{ github.token }}
+
       - name: Exec markdownlint-cli2 (non-PR)
         if: github.event_name != 'pull_request'
-        uses: DavidAnson/markdownlint-cli2-action@992badcdf24e3b8eb7e87ff9287fe931bcb00c6e # v20.0.0
+        uses: DavidAnson/markdownlint-cli2-action@07035fd053f7be764496c0f8d8f9f41f98305101 # v22.0.0
         with:
-          globs: "README*.md"
           config: ".markdownlint.yaml"
           fix: false
+          globs: "README*.md"
 
       - name: Post PR failure comment
         if: failure() && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
@@ -72,12 +86,12 @@ jobs:
         if: always()
         uses: ./.github/actions/summary
         with:
-          title: "Markdownlint"
-          status: "${{ job.status }}"
-          params: |
-            component: ${{ inputs.component }}
-            environment: ${{ inputs.environment }}
-          outputs: |
-            (none)
           artifacts: |
             (none)
+          outputs: |
+            (none)
+          params: |
+            component: ${{ env.COMPONENT }}
+            environment: ${{ env.ENVIRONMENT }}
+          status: "${{ job.status }}"
+          title: "Markdownlint"

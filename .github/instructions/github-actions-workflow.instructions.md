@@ -19,6 +19,27 @@ description: "AI Assistant Instructions for GitHub Actions Workflows"
 - `jobs.<job_id>.runs-on`: ランナー指定
 - `jobs.<job_id>.steps`: ステップリスト
 
+キー記載順序:
+
+- `inputs`, `env`, `permissions`, `with` の中のキーはアルファベット順（A-Z）で記載すること
+- 例:
+  ```yaml
+  inputs:
+    component: # a
+    environment: # e
+    go_version: # g
+  env:
+    ENVIRONMENT: ${{ inputs.environment }}
+    GO_VERSION: ${{ inputs.go_version }}
+  permissions:
+    contents: write
+    id-token: write
+  with:
+    component: arc
+    go_path: "."
+    version: ${{ inputs.version }}
+  ```
+
 ## Guidelines
 
 ### Workflow Design Patterns
@@ -96,9 +117,9 @@ Artifact:
 - name: Deploy with retry
   uses: nick-invision/retry@v3
   with:
-    timeout_minutes: 10
-    max_attempts: 3
     command: make deploy
+    max_attempts: 3
+    timeout_minutes: 10
 ```
 
 ### Performance
@@ -152,95 +173,4 @@ on:
 
 ## Testing and Validation
 
-必須検証コマンド（4 項目）:
-
-1. **actionlint**: ワークフロー構文・ベストプラクティスチェック
-2. **ghalint run**: セキュリティ・設定検証
-3. **disable-checkout-persist-credentials**: `actions/checkout` persist-credentials 設定検証
-4. **ghatm**: timeout-minutes 設定検証
-
-実行例:
-
-```bash
-# 1. actionlint実行
-actionlint .github/workflows/*.{yml,yaml}
-
-# 2. ghalint実行
-ghalint run .github/workflows/
-
-# 3. persist-credentials検証
-disable-checkout-persist-credentials .github/workflows/
-
-# 4. timeout-minutes検証
-ghatm .github/workflows/
-```
-
-検証項目:
-
-- ワークフロー構文エラー検出
-- 非推奨アクション検出
-- セキュリティ問題検出
-- `permissions`設定検証
-- シェルコマンド安全性確認
-- `persist-credentials: false`設定確認
-- `timeout-minutes`設定確認
-
-## Security Guidelines
-
-必須セキュリティ設定:
-
-### Permissions
-
-最小権限原則:
-
-```yaml
-permissions:
-  contents: read # 読取のみ
-  pull-requests: write # PR必要時のみ
-```
-
-### Secrets Management
-
-- シークレット参照: `${{ secrets.NAME }}`
-- 環境変数経由推奨（ログ漏洩防止）
-- シークレット echo 禁止
-
-### Actions Checkout
-
-persist-credentials 無効化:
-
-```yaml
-- uses: actions/checkout@v4
-  with:
-    persist-credentials: false # 必須
-```
-
-### Timeout 設定
-
-全 job・step 必須:
-
-```yaml
-jobs:
-  build:
-    timeout-minutes: 30 # job timeout
-    steps:
-      - name: Build
-        timeout-minutes: 10 # step timeout
-```
-
-### Third-party Actions
-
-- バージョン固定（commit SHA 推奨）
-- 信頼できる公式アクションのみ使用
-- 定期更新（Renovate/Dependabot）
-
-### Fork PR 制限
-
-Public repository で fork PR 実行制限:
-
-```yaml
-on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-  workflow_dispatch: # manual only for fork
-```
+**詳細ガイド**: [github-actions-validation Skill](../skills/github-actions-validation/SKILL.md) を参照（検証手順・セキュリティベストプラクティス・トラブルシューティング）

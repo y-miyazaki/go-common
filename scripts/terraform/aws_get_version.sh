@@ -1,6 +1,7 @@
 #!/bin/bash
 #######################################
 # Description: Collect AWS Lambda, Glue, and RDS available runtime/engine versions and output as CSV
+#
 # Usage: ./aws_get_version.sh [-h] [-v] [-d] [-r REGION] [-c CATEGORIES] [-o OUTPUT_FILE]
 #   options:
 #     -h, --help       Display this help message
@@ -13,7 +14,7 @@
 # Output:
 # - Generates CSV file containing available runtime/engine versions for Lambda, Glue, and RDS
 # - Marks latest versions available for each runtime/engine type
-# - CSV columns: Category,Subcategory,Subsubcategory,Name,Region,Is_Latest,Status,Deprecation_Date,EOL_Date
+# - CSV columns: Category,SubCategory,SubSubCcategory,Name,Region,Is_Latest,Status,Deprecation_Date,EOL_Date
 #
 # CSV Format Notes:
 # - Compatible with Excel, Numbers, Google Sheets
@@ -253,7 +254,7 @@ function parse_arguments {
 #######################################
 function collect_glue_versions {
     local region=$1
-    local header="Category,Subcategory,Subsubcategory,Name,Region,Is_Latest,Status,End_of_Support,End_of_Life"
+    local header="Category,SubCategory,SubSubCcategory,Name,Region,Is_Latest,Status,End_of_Support,End_of_Life"
 
     # Return header if requested
     if [[ "$region" == "header" ]]; then
@@ -300,7 +301,7 @@ function collect_glue_versions {
 #######################################
 function collect_lambda_versions {
     local region=$1
-    local header="Category,Subcategory,Subsubcategory,Name,Region,Is_Latest,Status,Deprecation_Date,Block_Function_Create,Block_Function_Update"
+    local header="Category,SubCategory,SubSubCcategory,Name,Region,Is_Latest,Status,Deprecation_Date,Block_Function_Create,Block_Function_Update"
 
     # Return header if requested
     if [[ "$region" == "header" ]]; then
@@ -347,7 +348,7 @@ function collect_lambda_versions {
 #######################################
 function collect_rds_versions {
     local region=$1
-    local header="Category,Subcategory,Subsubcategory,Name,Region,Is_Latest,Status,Deprecation_Date,EOL_Date"
+    local header="Category,SubCategory,SubSubCcategory,Name,Region,Is_Latest,Status,Deprecation_Date,EOL_Date"
 
     # Return header if requested
     if [[ "$region" == "header" ]]; then
@@ -382,7 +383,7 @@ function collect_rds_versions {
                     is_latest="Yes"
                 fi
 
-                # Use engine name as Subsubcategory, include status from AWS API
+                # Use engine name as SubSubCategory, include status from AWS API
                 # RDS versions don't have standardized deprecation dates from AWS API
                 local deprecation_date=""
                 local eol_date=""

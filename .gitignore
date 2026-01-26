@@ -1,9 +1,8 @@
-# copilot
-.copilot/**
-
 # root
+.copilot/**
 .DS_Store
-/.devcontainer/devcontainer.json
+.devcontainer/devcontainer.json
+.serena
 .vscode/**
 !.vscode/cspell.json
 !.vscode/cspell-project.txt
@@ -45,11 +44,14 @@ modules/**/.terraform.lock.hcl
 !terraform.audit.tfbackend
 
 # go
-vendor
 bin
-.serverless
 coverage
+dist
+vendor
+output
+.serverless
 cover.out
+coverage.html
 
 # node
 node_modules
@@ -57,12 +59,7 @@ outputs
 !lambda/outputs
 !nodejs/*/nodejs/node_modules
 
-# mcp
-.serena
-
 # python
 __pycache__
 .Python
 .venv
-
-output

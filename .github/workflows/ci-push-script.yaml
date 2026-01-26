@@ -1,6 +1,5 @@
+# CI workflow for shell scripts
 name: ci-push-script
-
-# CI workflow for shell scripts — caller for reusable-ci-script.yaml
 
 on:
   push:

@@ -42,7 +42,8 @@ fi
 
 # for GitHub Copilot CLI setup
 if command -v copilot > /dev/null 2>&1; then
-    cp -rp /workspace/.vscode/mcp-example-config.json "$COPILOT_BASE/config/.copilot/mcp-config.json" || true
+    if [ -d "$COPILOT_BASE/config/.copilot" ]; then
+        cp -rp /workspace/.vscode/mcp-example-config.json "$COPILOT_BASE/config/.copilot/mcp-config.json" || true
+    fi
 fi
-
 exit 0
