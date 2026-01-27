@@ -1,6 +1,6 @@
 ---
 name: github-actions-validation
-description: Use github-actions-validation/scripts/validate.sh for GitHub Actions validation. This skill provides the validation workflow only. For troubleshooting and detailed command options, see reference/.
+description: GitHub Actions workflow validation covering syntax, security, and best practices. Always use validate.sh script. For troubleshooting, see reference/.
 license: MIT
 ---
 
@@ -75,32 +75,6 @@ Before committing workflow changes:
 **Need to debug specific tool**:
 → See [reference/individual-commands.md](reference/individual-commands.md) for command options
 
-## Quick Reference
-
-### Essential Commands
-
-```bash
-# Full validation
-bash github-actions-validation/scripts/validate.sh
-
-# Specific directory
-bash github-actions-validation/scripts/validate.sh ./.github/workflows/
-```
-
-### Validation Requirements
-
-**Syntax Validation (actionlint)**:
-- Valid YAML structure
-- Correct workflow syntax
-- Valid action references
-- Proper use of expressions
-
-**Security Validation (ghalint, zizmor)**:
-- Minimal permissions
-- Secure secrets handling
-- Safe third-party action usage
-- Appropriate timeout settings
-
 ## Available Reference Documentation
 
 Detailed troubleshooting and command reference organized by topic:
@@ -108,15 +82,3 @@ Detailed troubleshooting and command reference organized by topic:
 **Troubleshooting**: Failure patterns for actionlint/ghalint/zizmor → [reference/troubleshooting.md](reference/troubleshooting.md)
 **Security**: Permissions, secrets, third-party actions → [reference/security.md](reference/security.md)
 **Individual Commands**: Command options for debugging only → [reference/individual-commands.md](reference/individual-commands.md)
-
-## Summary
-
-GitHub Actions validation ensures workflow correctness and security:
-
-1. **Always use the validation script** - Never run individual commands
-2. **Validate frequently** - Run during development, not just before commit
-3. **Fix all issues** - Don't commit with validation failures
-4. **Check security** - Pay attention to permissions and secrets
-5. **Use reference docs** - Consult reference/ for troubleshooting specific failures
-
-For detailed troubleshooting and command options, see the [reference/](reference/) directory.

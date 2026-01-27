@@ -1,6 +1,6 @@
 ---
 name: go-validation
-description: ⚠️ ALWAYS use go-validation/scripts/validate.sh for validation. Never run go fmt, go vet, golangci-lint, or go test individually. This skill provides the validation workflow only. For debugging failures, see reference/.
+description: Go code validation workflow covering formatting, linting, testing, and security. Always use validate.sh script. For troubleshooting, see reference/.
 license: MIT
 ---
 
@@ -176,41 +176,3 @@ For detailed information, see the reference documentation:
 - **[Troubleshooting Guide](reference/troubleshooting.md)** - Comprehensive error resolution
 - **[Testing Best Practices](reference/testing.md)** - Test patterns and coverage strategies
 - **[Security Best Practices](reference/security.md)** - Security guidelines and patterns
-
-## Quick Reference
-
-### Essential Commands
-
-```bash
-# Full validation
-bash go-validation/scripts/validate.sh
-
-# Specific directory
-bash go-validation/scripts/validate.sh ./pkg/mypackage/
-
-# Auto-fix
-bash go-validation/scripts/validate.sh --fix
-```
-
-### Validation Checklist
-
-Before committing:
-
-- [ ] Validation script passes
-- [ ] Test coverage ≥ 80%
-- [ ] No test failures
-- [ ] No race conditions
-- [ ] No security vulnerabilities
-
-## Summary
-
-Go validation ensures code quality through automated checks:
-
-1. **Always use the validation script** - Never run individual commands
-2. **Validate frequently** - Run during development, not just before commit
-3. **Use directory-specific validation** - Faster feedback loop
-4. **Leverage auto-fix** - Use `--fix` flag for formatting issues
-5. **Meet coverage goals** - Maintain ≥ 80% test coverage
-6. **Never commit failing code** - All checks must pass
-
-For detailed debugging and advanced topics, see the [reference documentation](reference/).

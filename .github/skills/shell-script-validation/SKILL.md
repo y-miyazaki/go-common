@@ -1,6 +1,6 @@
 ---
 name: shell-script-validation
-description: ⚠️ ALWAYS use shell-script-validation/scripts/validate.sh for validation. Never run bash -n or shellcheck individually. This skill provides the validation workflow only. For debugging failures, see reference/.
+description: Shell script validation covering syntax and static analysis. Always use validate.sh script. For troubleshooting, see reference/.
 license: MIT
 ---
 
@@ -91,6 +91,7 @@ SC2086: Quote variables to prevent word splitting
 ```
 
 **Fix**: Add quotes around variables
+
 ```bash
 # Bad
 cd $dir
@@ -101,7 +102,8 @@ cd "$dir" || exit
 
 ### Common shellcheck Issues
 
-**SC2006: Use $(...)  instead of backticks**
+**SC2006: Use $(...) instead of backticks**
+
 ```bash
 # Bad
 result=`command`
@@ -111,6 +113,7 @@ result=$(command)
 ```
 
 **SC2046: Quote command substitutions**
+
 ```bash
 # Bad
 for file in $(find . -name "*.txt"); do
@@ -120,6 +123,7 @@ find . -name "*.txt" | while read -r file; do
 ```
 
 **SC2086: Quote variables**
+
 ```bash
 # Bad
 echo $var
@@ -129,6 +133,7 @@ echo "$var"
 ```
 
 **SC2164: Use cd ... || exit**
+
 ```bash
 # Bad
 cd /some/path
@@ -199,40 +204,3 @@ For detailed information, see the reference documentation:
 - **[Individual Commands](reference/individual-commands.md)** - Detailed command usage for debugging
 - **[Troubleshooting Guide](reference/troubleshooting.md)** - Comprehensive error resolution
 - **[Script Standards](reference/standards.md)** - Project script template and conventions
-
-## Quick Reference
-
-### Essential Commands
-
-```bash
-# Full validation
-bash shell-script-validation/scripts/validate.sh
-
-# Specific script
-bash shell-script-validation/scripts/validate.sh ./script.sh
-
-# With auto-fix
-bash shell-script-validation/scripts/validate.sh -f
-```
-
-### Validation Checklist
-
-Before committing:
-
-- [ ] Validation script passes
-- [ ] Bats tests pass (if applicable)
-- [ ] Follows project script standards
-- [ ] No security issues
-
-## Summary
-
-Shell script validation ensures code quality and reliability:
-
-1. **Always use the validation script** - Never run individual commands
-2. **Validate frequently** - Run during development, not just before commit
-3. **Follow standards** - Use project template and best practices
-4. **Test with Bats** - Cover edge cases and errors (if applicable)
-5. **Ensure security** - Validate inputs and quote variables
-6. **Never commit invalid scripts** - All checks must pass
-
-For detailed debugging and advanced topics, see the [reference documentation](reference/).

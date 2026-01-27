@@ -1,6 +1,6 @@
 ---
 name: terraform-validation
-description: ⚠️ ALWAYS use terraform-validation/scripts/validate.sh for validation. Never run terraform fmt, tflint, or trivy individually. This skill provides the validation workflow only. For debugging failures, see reference/.
+description: Terraform configuration validation covering syntax, linting, and security. Always use validate.sh script. For troubleshooting, see reference/.
 license: MIT
 ---
 
@@ -174,40 +174,3 @@ For detailed information, see the reference documentation:
 - **[Individual Commands](reference/individual-commands.md)** - Detailed command usage for debugging
 - **[Troubleshooting Guide](reference/troubleshooting.md)** - Comprehensive error resolution
 - **[Security Best Practices](reference/security.md)** - Infrastructure security guidelines
-
-## Quick Reference
-
-### Essential Commands
-
-```bash
-# Full validation
-bash terraform-validation/scripts/validate.sh
-
-# Scoped validation
-bash terraform-validation/scripts/validate.sh ./terraform/module/
-
-# Auto-fix
-bash terraform-validation/scripts/validate.sh --fix
-```
-
-### Validation Checklist
-
-Before committing:
-
-- [ ] Validation script passes
-- [ ] Plan reviewed (if applicable)
-- [ ] Security requirements met
-- [ ] No critical or high severity issues
-
-## Summary
-
-Terraform validation ensures infrastructure code quality and security:
-
-1. **Always use the validation script** - Never run individual commands
-2. **Validate frequently** - Run during development, not just before commit
-3. **Fix issues promptly** - Address validation failures as they occur
-4. **Enforce security** - Scan for misconfigurations with trivy
-5. **Review plans** - Always review terraform plan before apply
-6. **Never commit failing code** - All checks must pass
-
-For detailed debugging and advanced topics, see the [reference documentation](reference/).
