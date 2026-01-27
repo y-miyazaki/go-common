@@ -2,18 +2,26 @@
 
 ## Contents
 
-- [⚠️ For Debugging Only](#️-for-debugging-only)
-- [Commands Overview](#commands-overview)
-- [1. go mod tidy](#1-go-mod-tidy)
-- [2. go fmt](#2-go-fmt)
-- [3. go vet](#3-go-vet)
-- [4. golangci-lint](#4-golangci-lint)
-- [5. go test](#5-go-test)
-- [6. govulncheck](#6-govulncheck)
-- [Coverage Analysis Commands](#coverage-analysis-commands)
-- [Additional Tools](#additional-tools)
-- [Profiling Commands](#profiling-commands)
-- [Summary](#summary)
+- [Go Validation - Individual Commands Reference](#go-validation---individual-commands-reference)
+  - [Contents](#contents)
+  - [⚠️ For Debugging Only](#️-for-debugging-only)
+  - [Commands Overview](#commands-overview)
+  - [1. go mod tidy](#1-go-mod-tidy)
+  - [2. go fmt](#2-go-fmt)
+  - [3. go vet](#3-go-vet)
+  - [4. golangci-lint](#4-golangci-lint)
+  - [5. go test](#5-go-test)
+  - [6. govulncheck](#6-govulncheck)
+  - [Coverage Analysis Commands](#coverage-analysis-commands)
+    - [Generating Coverage Reports](#generating-coverage-reports)
+    - [Coverage Modes](#coverage-modes)
+    - [Interpreting Coverage Reports](#interpreting-coverage-reports)
+  - [Additional Tools](#additional-tools)
+    - [staticcheck](#staticcheck)
+    - [gosec](#gosec)
+    - [go-critic](#go-critic)
+  - [Profiling Commands](#profiling-commands)
+  - [Summary](#summary)
 
 ## ⚠️ For Debugging Only
 
