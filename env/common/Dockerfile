@@ -6,34 +6,25 @@ FROM mcr.microsoft.com/vscode/devcontainers/go:1.25@sha256:ade3e38a521ce356bc5b2
 # ARG
 #--------------------------------------------------------------
 # default
+ARG TARGETARCH
 ARG USER=vscode
 ARG WORKDIR=/workspace
+
 # version(base)
-ARG NODE_VERSION=24 # https://github.com/nodejs/node/releases
 ARG AQUA_VERSION=v2.55.2 # https://github.com/aquaproj/aqua/releases
-
-# x86_64
-# ARG ARCH_BASE=amd64
-# ARG ARCH_BASE2=x86_64
-# ARG ARCH_SESSION_MANAGER_PLUGIN=64bit
-# ARG ARCH_KO=x86_64
-
-# arm64
-ARG ARCH_BASE=arm64
-ARG ARCH_BASE2=aarch_64
-ARG ARCH_SESSION_MANAGER_PLUGIN=arm64
-ARG ARCH_KO=arm64
+ARG AWSDAC_VERSION=v0.22.4 # https://github.com/awslabs/diagram-as-code/releases
+ARG AWSP_VERSION=0.2.0 # https://www.npmjs.com/package/awsp
+ARG AWS_MFA_VERSION=0.0.12 # https://pypi.org/project/aws-mfa/
+ARG NODE_VERSION=24 # https://github.com/nodejs/node/releases
 
 #--------------------------------------------------------------
 # ENV
 #--------------------------------------------------------------
+# go
 ENV CGO_ENABLED=0
 ENV GOOS=linux
 ENV GOPATH=/go
-# x86_64
-# ENV GOARCH=amd64
-# arm64
-ENV GOARCH=arm64
+ENV GOARCH=${TARGETARCH}
 
 #--------------------------------------------------------------
 # workdir
@@ -44,28 +35,32 @@ WORKDIR  ${WORKDIR}
 #--------------------------------------------------------------
 # for docker group access
 #--------------------------------------------------------------
-RUN groupadd -f docker && sudo usermod -aG docker vscode
+RUN groupadd -f docker && usermod -aG docker vscode
 
 #--------------------------------------------------------------
 # Install minimal apt/https tooling (avoid software-properties-common)
 #--------------------------------------------------------------
-RUN apt-get update && \
+# Remove problematic Yarn repository first
+RUN rm -f /etc/apt/sources.list.d/yarn.list && \
+    apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     ca-certificates \
     gnupg \
     dirmngr \
-    apt-transport-https \
     lsb-release
 
 #--------------------------------------------------------------
 # Install dependent packages
 #--------------------------------------------------------------
-RUN apt update && \
-    apt -y install make openssl git tar curl zip jq groff gcc bison python3 python3-dev python3-pip fish shellcheck shfmt bats
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    make openssl git tar curl zip jq groff gcc bison python3 python3-dev python3-pip fish shellcheck shfmt bats
 
 # Install Node.js
-RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -E - && \
-    apt-get install -y nodejs=${NODE_VERSION}.0.0-1nodesource1
+RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - && \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    nodejs
 
 # Install npm packages
 RUN npm install -g --ignore-scripts \
@@ -93,39 +88,45 @@ USER root
 # AWS environment
 #--------------------------------------------------------------
 # Install aws-mfa
-RUN pip3 install --break-system-packages aws-mfa==0.0.12 && \
+# aws-mfa requires system-wide install in devcontainer
+RUN pip3 install --break-system-packages aws-mfa==${AWS_MFA_VERSION} && \
     # Install awsp
-    npm install -g --ignore-scripts awsp@0.2.0 && \
-    # Install Session Manager Plugin
-    curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_${ARCH_SESSION_MANAGER_PLUGIN}/session-manager-plugin.deb" -o "session-manager-plugin.deb" && \
-    # TODO: Add checksum verification:
-    # echo "EXPECTED_SHA256  session-manager-plugin.deb" | sha256sum -c - || exit 1
+    npm install -g --ignore-scripts awsp@${AWSP_VERSION} && \
+    # Install Session Manager Plugin: choose package path by TARGETARCH
+    if [ "${TARGETARCH}" = "arm64" ] || [ "${TARGETARCH}" = "aarch64" ]; then \
+    SSM_ARCH=arm64; \
+    else \
+    # AWS uses '64bit' in the URL path for x86_64 packages
+    SSM_ARCH=64bit; \
+    fi && \
+    curl -fsSL "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_${SSM_ARCH}/session-manager-plugin.deb" -o "session-manager-plugin.deb" && \
     dpkg -i session-manager-plugin.deb && \
     rm session-manager-plugin.deb
 
 # Install awsdac
-RUN apt update && \
-    apt -y install fonts-liberation && \
-    go install github.com/awslabs/diagram-as-code/cmd/awsdac@latest && \
-    go install github.com/awslabs/diagram-as-code/cmd/awsdac-mcp-server@latest
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    fonts-liberation && \
+    go install github.com/awslabs/diagram-as-code/cmd/awsdac@${AWSDAC_VERSION} && \
+    go install github.com/awslabs/diagram-as-code/cmd/awsdac-mcp-server@${AWSDAC_VERSION}
 
 #--------------------------------------------------------------
 # Install go related
 #--------------------------------------------------------------
-    # generate mock
-RUN go install -v github.com/golang/mock/mockgen@latest && \
-    # Coverage outputs covertura format.
-    go install -v github.com/t-yuki/gocover-cobertura@latest 2>&1
+# generate mock
+RUN go install -v github.com/golang/mock/mockgen@v0.6.0
 
-RUN chown -R vscode:golang /go/pkg && \
-    chmod -R g+w /go
+#--------------------------------------------------------------
+# Fixed go owner
+#--------------------------------------------------------------
+RUN chown -R vscode:vscode /go
 
 #--------------------------------------------------------------
 # Clean up
 #--------------------------------------------------------------
 RUN rm -rf /tmp/tmp.* && \
-    apt autoremove -y && \
-    apt clean -y && \
+    apt-get autoremove -y && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT []
