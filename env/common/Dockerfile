@@ -114,7 +114,7 @@ RUN apt-get update && \
 # Install go related
 #--------------------------------------------------------------
 # generate mock
-RUN go install -v github.com/golang/mock/mockgen@v0.6.0
+RUN go install -v go.uber.org/mock/mockgen@v0.6.0
 
 #--------------------------------------------------------------
 # Fixed go owner
