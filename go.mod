@@ -7,13 +7,13 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.41.4
 	github.com/aws/aws-sdk-go-v2/config v1.32.12
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.12
-	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.22.0
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.22.8
 	github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.49.0
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.64.0
-	github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.58.0
+	github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.59.2
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.97.1
-	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.41.1
-	github.com/aws/aws-sdk-go-v2/service/sesv2 v1.59.1
+	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.41.4
+	github.com/aws/aws-sdk-go-v2/service/sesv2 v1.60.1
 	github.com/aws/aws-sdk-go-v2/service/sts v1.41.9
 	github.com/danielkov/gin-helmet/ginhelmet v1.0.2
 	github.com/fsnotify/fsnotify v1.9.0
