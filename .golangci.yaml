@@ -2880,13 +2880,13 @@ issues:
   # much better don't allow issues in new code.
   #
   # Default: false
-  new: true
+  new: false
   # Show only new issues created after the best common ancestor (merge-base against HEAD).
   # Default: ""
-  new-from-merge-base: develop
+  new-from-merge-base: ""
   # Show only new issues created after git revision `REV`.
   # Default: ""
-  new-from-rev: HEAD
+  new-from-rev: ""
   # Show only new issues created in git patch with set file path.
   # Default: ""
   new-from-patch: ""

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/y-miyazaki/go-common/pkg/context"
+	"github.com/y-miyazaki/go-common/pkg/gincontext"
 	"github.com/y-miyazaki/go-common/pkg/logger"
 
 	"github.com/gin-gonic/gin"
@@ -37,11 +37,11 @@ func GinHTTPLogger(l *logger.Logger, traceIDHeader, clientIPHeader string,
 		}
 		// get error
 		loggerWithContext := l
-		if err, err2 := context.GetGinContextError(c); err2 == nil {
+		if err, err2 := gincontext.GetGinContextError(c); err2 == nil {
 			loggerWithContext = loggerWithContext.WithError(err)
 		}
 		// get error message
-		if messages, err := context.GetGinContextErrorMessage(c); err == nil {
+		if messages, err := gincontext.GetGinContextErrorMessage(c); err == nil {
 			loggerWithContext = loggerWithContext.WithField("messages", messages)
 		}
 		if c.Writer.Status() >= http.StatusInternalServerError {
@@ -76,11 +76,11 @@ func GinHTTPZapLogger(
 			loggerWithContext = loggerWithContext.With(zap.String(traceIDHeader, c.Request.Header.Get(traceIDHeader)))
 		}
 		// get error
-		if err, err2 := context.GetGinContextError(c); err2 == nil {
+		if err, err2 := gincontext.GetGinContextError(c); err2 == nil {
 			loggerWithContext = loggerWithContext.WithError(err)
 		}
 		// get error message
-		if messages, err := context.GetGinContextErrorMessage(c); err == nil {
+		if messages, err := gincontext.GetGinContextErrorMessage(c); err == nil {
 			loggerWithContext = loggerWithContext.With(zap.String("messages", messages))
 		}
 		if c.Writer.Status() >= http.StatusInternalServerError {

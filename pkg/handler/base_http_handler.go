@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/y-miyazaki/go-common/pkg/context"
+	"github.com/y-miyazaki/go-common/pkg/gincontext"
 	"github.com/y-miyazaki/go-common/pkg/logger"
 
 	"github.com/gin-gonic/gin"
@@ -81,7 +81,7 @@ func (h *BaseHTTPHandler) ResponseStatusNotFound(c *gin.Context, messages any) {
 // ResponseStatusInternalServerError returns 500 error.
 func (h *BaseHTTPHandler) ResponseStatusInternalServerError(c *gin.Context, messages any, err error) {
 	_ = h
-	context.SetGinContextError(c, err)
-	context.SetGinContextErrorMessage(c, messages)
+	gincontext.SetGinContextError(c, err)
+	gincontext.SetGinContextErrorMessage(c, messages)
 	c.JSON(http.StatusInternalServerError, messages)
 }

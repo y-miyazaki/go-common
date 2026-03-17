@@ -1,5 +1,5 @@
-// Package context provides Gin context utility functions.
-package context
+// Package gincontext provides Gin context utility functions.
+package gincontext
 
 import (
 	"errors"
