@@ -60,23 +60,35 @@ type GormSetting struct {
 
 // NewLoggerGorm func
 func NewLoggerGorm(c *GormSetting) *Gorm {
-	var l = logrus.New()
+	l := logrus.New()
+	gormConfig := &GormConfig{LogLevel: Info}
 
-	// Log as JSON instead of the default ASCII formatter.
-	l.SetFormatter(c.Logger.Formatter)
-	// Output to stdout instead of the default stderr
-	// Can be any io.Writer, see below for File example
-	l.SetOutput(c.Logger.Out)
-	// Only log the warning severity or above.
-	l.SetLevel(c.Logger.Level)
-	return &Gorm{
-		l: l,
-		e: l.WithFields(logrus.Fields{}),
-		gormConfig: &GormConfig{
+	if c != nil && c.GormConfig != nil {
+		gormConfig = &GormConfig{
 			SlowThreshold:             c.GormConfig.SlowThreshold,
 			IgnoreRecordNotFoundError: c.GormConfig.IgnoreRecordNotFoundError,
 			LogLevel:                  c.GormConfig.LogLevel,
-		},
+		}
+	}
+
+	if c != nil && c.Logger != nil {
+		// Log as JSON instead of the default ASCII formatter.
+		if c.Logger.Formatter != nil {
+			l.SetFormatter(c.Logger.Formatter)
+		}
+		// Output to stdout instead of the default stderr
+		// Can be any io.Writer, see below for File example
+		if c.Logger.Out != nil {
+			l.SetOutput(c.Logger.Out)
+		}
+		// Only log the warning severity or above.
+		l.SetLevel(c.Logger.Level)
+	}
+
+	return &Gorm{
+		l:          l,
+		e:          l.WithFields(logrus.Fields{}),
+		gormConfig: gormConfig,
 	}
 }
 

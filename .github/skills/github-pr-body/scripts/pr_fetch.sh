@@ -91,8 +91,20 @@ function fetch_pr_metadata {
     log "INFO" "Fetching PR #$PR_NUMBER metadata from $REPOSITORY"
 
     gh pr view "$PR_NUMBER" --repo "$REPOSITORY" \
-        --json title,body,additions,deletions,files,baseRefName,headRefName,state \
+        --json title,body,additions,deletions,baseRefName,headRefName,state \
         --jq '.'
+}
+
+#######################################
+# fetch_pr_files_paginated: Fetch all PR files via GitHub API pagination
+#######################################
+function fetch_pr_files_paginated {
+    log "INFO" "Fetching all files for PR #$PR_NUMBER via paginated API"
+
+    gh api --paginate \
+        -H "Accept: application/vnd.github+json" \
+        "repos/$REPOSITORY/pulls/$PR_NUMBER/files?per_page=100" \
+        | jq -s 'add | map({path: .filename, additions: .additions, deletions: .deletions})'
 }
 
 #######################################
@@ -211,6 +223,10 @@ function main {
     local pr_metadata
     pr_metadata=$(fetch_pr_metadata)
 
+    # Fetch all PR files (avoid gh pr view files truncation on large PRs)
+    local files_json
+    files_json=$(fetch_pr_files_paginated)
+
     local pr_body
     pr_body=$(echo "$pr_metadata" | jq -r '.body // empty')
 
@@ -219,9 +235,6 @@ function main {
     template_sections=$(parse_template_sections "$pr_body")
 
     # Classify files
-    local files_json
-    files_json=$(echo "$pr_metadata" | jq '.files')
-
     local classified_files
     classified_files=$(classify_files "$files_json")
 
@@ -229,10 +242,11 @@ function main {
     local result
     result=$(echo "$pr_metadata" \
         | jq \
+            --argjson files "$files_json" \
             --argjson template "$template_sections" \
             --argjson classified "$classified_files" \
             '{
-                metadata: .,
+                metadata: (. + {files: $files}),
                 template: $template,
                 classified_files: $classified
             }')

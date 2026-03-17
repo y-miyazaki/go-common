@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"os"
 )
 
 // Level is a type that represents log levels
@@ -40,21 +41,31 @@ type SlogLogger struct {
 // NewSlogLogger creates a new SlogLogger instance with the specified configuration.
 // If cfg is nil, default configuration will be used.
 func NewSlogLogger(cfg *SlogConfig) *SlogLogger {
-	if cfg == nil {
-		panic("*logger config is required")
+	// Keep the original parameter untouched to satisfy revive.
+	conf := cfg
+	if conf == nil {
+		conf = &SlogConfig{}
+	}
+
+	if conf.Output == nil {
+		conf.Output = os.Stdout
+	}
+
+	if conf.Format == "" {
+		conf.Format = "text"
 	}
 
 	opts := &slog.HandlerOptions{
-		Level:       cfg.Level,
-		AddSource:   cfg.AddSource,
+		Level:       conf.Level,
+		AddSource:   conf.AddSource,
 		ReplaceAttr: nil, // Not used, defaults to nil
 	}
 
 	var handler slog.Handler
-	if cfg.Format == "json" {
-		handler = slog.NewJSONHandler(cfg.Output, opts)
+	if conf.Format == "json" {
+		handler = slog.NewJSONHandler(conf.Output, opts)
 	} else {
-		handler = slog.NewTextHandler(cfg.Output, opts)
+		handler = slog.NewTextHandler(conf.Output, opts)
 	}
 
 	return &SlogLogger{
@@ -114,7 +125,22 @@ func (l *SlogLogger) WithError(err error) *SlogLogger {
 
 // getTraceID retrieves trace ID from the given context.
 // Returns empty string if trace ID is not found.
-func getTraceID(_ context.Context) string { // nolint:unused
-	// Implement trace ID retrieval logic
+func getTraceID(ctx context.Context) string {
+	if ctx == nil {
+		return ""
+	}
+
+	keys := []string{"trace_id", "traceID", "request_id", "x-request-id"}
+	for _, k := range keys {
+		v := ctx.Value(k)
+		if v == nil {
+			continue
+		}
+		if s, ok := v.(string); ok {
+			return s
+		}
+		return fmt.Sprint(v)
+	}
+
 	return ""
 }
