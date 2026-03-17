@@ -2,17 +2,17 @@
 #######################################
 # Description: Fetch and parse PR metadata
 #
-# Usage: ./pr-fetch.sh <PR_NUMBER> [--repo OWNER/REPO] [--format json|yaml]
+# Usage: ./pr_fetch.sh <PR_NUMBER> [--repo OWNER/REPO] [--format json]
 #   --repo       Repository in owner/repo format (default: auto-detect from git)
-#   --format     Output format: json (default) or yaml
+#   --format     Output format: json (default)
 #   -h, --help   Display this help message
 #
 # Output: JSON with PR metadata including files, statistics, template sections
 #
 # Examples:
-#   ./pr-fetch.sh 123
-#   ./pr-fetch.sh 123 --repo owner/repo
-#   ./pr-fetch.sh 123 --format yaml
+#   ./pr_fetch.sh 123
+#   ./pr_fetch.sh 123 --repo owner/repo
+#   ./pr_fetch.sh 123 --format json
 #######################################
 
 set -euo pipefail
@@ -50,14 +50,14 @@ Arguments:
   PR_NUMBER              GitHub PR number
 
 Options:
-  --repo OWNER/REPO      Repository (default: auto-detect from git)
-  --format FORMAT        Output format: json or yaml (default: json)
-  -h, --help             Display this help message
+    --repo OWNER/REPO      Repository (default: auto-detect from git)
+    --format FORMAT        Output format: json (default: json)
+    -h, --help             Display this help message
 
 Examples:
-  $(basename "$0") 123
-  $(basename "$0") 123 --repo owner/repo
-  $(basename "$0") 123 --format yaml
+    $(basename "$0") 123
+    $(basename "$0") 123 --repo owner/repo
+    $(basename "$0") 123 --format json
 
 Output contains:
   - PR metadata (title, body, branches, statistics)
@@ -157,6 +157,7 @@ function classify_files {
             .type = "Other"
         end
     ) |
+    sort_by(.type) |
     group_by(.type) |
     map(
         {
@@ -184,6 +185,9 @@ function parse_arguments {
                 ;;
             --format)
                 OUTPUT_FORMAT="$2"
+                if [[ "$OUTPUT_FORMAT" != "json" ]]; then
+                    error_exit "Unsupported format: $OUTPUT_FORMAT (supported: json)"
+                fi
                 shift 2
                 ;;
             *)
@@ -255,9 +259,6 @@ function main {
     case "$OUTPUT_FORMAT" in
         json)
             echo "$result"
-            ;;
-        yaml)
-            echo "$result" | jq -r 'to_entries | .[] | "\(.key):\n\(.value | @json)"'
             ;;
         *)
             error_exit "Unknown format: $OUTPUT_FORMAT"
