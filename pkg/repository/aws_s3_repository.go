@@ -15,6 +15,7 @@ import (
 	// nolint:revive
 	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 )
@@ -49,26 +50,37 @@ type AWSS3PresignClientInterface interface {
 	PresignGetObject(_ context.Context, _ *s3.GetObjectInput, _ ...func(*s3.PresignOptions)) (*v4.PresignedHTTPRequest, error)
 }
 
-// AWSS3UploaderClientInterface interface for mocking S3 uploader
-// TODO: migrate to github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager when ready.
-type AWSS3UploaderClientInterface interface { //nolint:staticcheck // SA1019: manager.Uploader deprecated, migration pending
+// AWSS3UploaderClientInterface interface for mocking S3 uploader.
+//
+// Deprecated: use AWSS3TransferClientInterface instead.
+type AWSS3UploaderClientInterface interface { //nolint:staticcheck // SA1019: kept for backward compatibility
 	// Upload uploads an object to S3 using the manager uploader
-	Upload(_ context.Context, _ *s3.PutObjectInput, _ ...func(*manager.Uploader)) (*manager.UploadOutput, error) //nolint:staticcheck // SA1019: manager.Uploader deprecated, migration pending
+	Upload(_ context.Context, _ *s3.PutObjectInput, _ ...func(*manager.Uploader)) (*manager.UploadOutput, error) //nolint:staticcheck // SA1019: kept for backward compatibility
 }
 
-// AWSS3DownloaderClientInterface interface for mocking S3 downloader
-// TODO: migrate to github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager when ready.
-type AWSS3DownloaderClientInterface interface { //nolint:staticcheck // SA1019: manager.Downloader deprecated, migration pending
+// AWSS3DownloaderClientInterface interface for mocking S3 downloader.
+//
+// Deprecated: use AWSS3TransferClientInterface instead.
+type AWSS3DownloaderClientInterface interface { //nolint:staticcheck // SA1019: kept for backward compatibility
 	// Download downloads an object from S3 using the manager downloader
-	Download(_ context.Context, _ io.WriterAt, _ *s3.GetObjectInput, _ ...func(*manager.Downloader)) (int64, error) //nolint:staticcheck // SA1019: manager.Downloader deprecated, migration pending
+	Download(_ context.Context, _ io.WriterAt, _ *s3.GetObjectInput, _ ...func(*manager.Downloader)) (int64, error) //nolint:staticcheck // SA1019: kept for backward compatibility
+}
+
+// AWSS3TransferClientInterface interface for the new transfermanager client.
+type AWSS3TransferClientInterface interface {
+	// UploadObject uploads an object to S3 using the transfer manager
+	UploadObject(_ context.Context, _ *transfermanager.UploadObjectInput, _ ...func(*transfermanager.Options)) (*transfermanager.UploadObjectOutput, error)
+	// DownloadObject downloads an object from S3 using the transfer manager
+	DownloadObject(_ context.Context, _ *transfermanager.DownloadObjectInput, _ ...func(*transfermanager.Options)) (*transfermanager.DownloadObjectOutput, error)
 }
 
 // AWSS3Repository struct implements AWSS3RepositoryInterface using AWS SDK v2.
 type AWSS3Repository struct {
-	Client     AWSS3ClientInterface
-	uploader   AWSS3UploaderClientInterface
-	downloader AWSS3DownloaderClientInterface
-	presigned  AWSS3PresignClientInterface
+	Client         AWSS3ClientInterface
+	uploader       AWSS3UploaderClientInterface
+	downloader     AWSS3DownloaderClientInterface
+	presigned      AWSS3PresignClientInterface
+	transferClient AWSS3TransferClientInterface
 }
 
 // NewAWSS3Repository returns AWSS3Repository instance backed by AWS SDK v2 client.
@@ -77,21 +89,24 @@ func NewAWSS3Repository(client *s3.Client) *AWSS3Repository {
 		return &AWSS3Repository{}
 	}
 	return &AWSS3Repository{
-		Client:     client,
-		uploader:   manager.NewUploader(client),   //nolint:staticcheck // SA1019: manager.NewUploader deprecated, migration pending
-		downloader: manager.NewDownloader(client), //nolint:staticcheck // SA1019: manager.NewDownloader deprecated, migration pending
-		presigned:  s3.NewPresignClient(client),
+		Client:         client,
+		uploader:       manager.NewUploader(client),   //nolint:staticcheck // SA1019: kept for backward compatibility
+		downloader:     manager.NewDownloader(client), //nolint:staticcheck // SA1019: kept for backward compatibility
+		presigned:      s3.NewPresignClient(client),
+		transferClient: transfermanager.New(client),
 	}
 }
 
 // NewAWSS3RepositoryWithOther returns AWSS3Repository instance backed by AWS SDK v2 client.
-// TODO: migrate to github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager when ready.
-func NewAWSS3RepositoryWithOther(client *s3.Client, uploader *manager.Uploader, downloader *manager.Downloader, presigned *s3.PresignClient) *AWSS3Repository { //nolint:staticcheck // SA1019: manager.Uploader/Downloader deprecated, migration pending
+//
+// Deprecated: use NewAWSS3Repository or NewAWSS3RepositoryWithTransferClient instead.
+func NewAWSS3RepositoryWithOther(client *s3.Client, uploader *manager.Uploader, downloader *manager.Downloader, presigned *s3.PresignClient) *AWSS3Repository { //nolint:staticcheck // SA1019: kept for backward compatibility
 	return &AWSS3Repository{
-		Client:     client,
-		uploader:   uploader,
-		downloader: downloader,
-		presigned:  presigned,
+		Client:         client,
+		uploader:       uploader,
+		downloader:     downloader,
+		presigned:      presigned,
+		transferClient: transfermanager.New(client),
 	}
 }
 
@@ -102,6 +117,17 @@ func NewAWSS3RepositoryWithInterface(client AWSS3ClientInterface, uploader AWSS3
 		uploader:   uploader,
 		downloader: downloader,
 		presigned:  presigned,
+	}
+}
+
+// NewAWSS3RepositoryWithTransferClient returns AWSS3Repository instance with an injected transfer client for testing.
+func NewAWSS3RepositoryWithTransferClient(client AWSS3ClientInterface, uploader AWSS3UploaderClientInterface, downloader AWSS3DownloaderClientInterface, presigned AWSS3PresignClientInterface, transferClient AWSS3TransferClientInterface) *AWSS3Repository {
+	return &AWSS3Repository{
+		Client:         client,
+		uploader:       uploader,
+		downloader:     downloader,
+		presigned:      presigned,
+		transferClient: transferClient,
 	}
 }
 
@@ -333,6 +359,63 @@ func (r *AWSS3Repository) Download(bucket, key, filePath string) error {
 		return fmt.Errorf("s3 downloader Download: %w", err)
 	}
 	return nil
+}
+
+// UploadObject uploads a file to S3 using the transfer manager (feature/s3/transfermanager).
+func (r *AWSS3Repository) UploadObject(bucket, key, filePath string) (*transfermanager.UploadObjectOutput, error) {
+	path := filepath.Clean(filePath)
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("open file: %w", err)
+	}
+	defer func() {
+		if cErr := file.Close(); cErr != nil {
+			log.Printf("warning: failed to close file: %v", cErr)
+		}
+	}()
+
+	// Get content-type
+	buf := make([]byte, maxBufferSize)
+	_, err = file.Read(buf)
+	if err != nil {
+		return nil, fmt.Errorf("read file: %w", err)
+	}
+	contentType := http.DetectContentType(buf)
+
+	out, err := r.transferClient.UploadObject(context.Background(), &transfermanager.UploadObjectInput{
+		Bucket:      aws.String(bucket),
+		Key:         aws.String(r.normalizePath(key)),
+		Body:        file,
+		ContentType: &contentType,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("s3 transfermanager UploadObject: %w", err)
+	}
+	return out, nil
+}
+
+// DownloadObject downloads an object from S3 to a file using the transfer manager (feature/s3/transfermanager).
+func (r *AWSS3Repository) DownloadObject(bucket, key, filePath string) (*transfermanager.DownloadObjectOutput, error) {
+	path := filepath.Clean(filePath)
+	file, err := os.Create(path) //nolint:gosec // path is cleaned above
+	if err != nil {
+		return nil, fmt.Errorf("create file: %w", err)
+	}
+	defer func() {
+		if cErr := file.Close(); cErr != nil {
+			log.Printf("warning: failed to close file: %v", cErr)
+		}
+	}()
+
+	out, err := r.transferClient.DownloadObject(context.Background(), &transfermanager.DownloadObjectInput{
+		Bucket:   aws.String(bucket),
+		Key:      aws.String(r.normalizePath(key)),
+		WriterAt: file,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("s3 transfermanager DownloadObject: %w", err)
+	}
+	return out, nil
 }
 
 // normalizePath normalizes the path (removing any leading slash)

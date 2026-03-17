@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/stretchr/testify/assert"
@@ -121,6 +122,27 @@ type MockS3Downloader struct {
 func (m *MockS3Downloader) Download(ctx context.Context, w io.WriterAt, input *s3.GetObjectInput, opts ...func(*manager.Downloader)) (int64, error) {
 	args := m.Called(ctx, w, input, opts)
 	return args.Get(0).(int64), args.Error(1)
+}
+
+// MockS3TransferClient is a mock implementation of S3TransferClientInterface for testing
+type MockS3TransferClient struct {
+	mock.Mock
+}
+
+func (m *MockS3TransferClient) UploadObject(ctx context.Context, input *transfermanager.UploadObjectInput, opts ...func(*transfermanager.Options)) (*transfermanager.UploadObjectOutput, error) {
+	args := m.Called(ctx, input, opts)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*transfermanager.UploadObjectOutput), args.Error(1)
+}
+
+func (m *MockS3TransferClient) DownloadObject(ctx context.Context, input *transfermanager.DownloadObjectInput, opts ...func(*transfermanager.Options)) (*transfermanager.DownloadObjectOutput, error) {
+	args := m.Called(ctx, input, opts)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*transfermanager.DownloadObjectOutput), args.Error(1)
 }
 
 func TestNewAWSS3RepositoryWithInterface(t *testing.T) {
@@ -346,6 +368,7 @@ func TestNewAWSS3Repository(t *testing.T) {
 	assert.Nil(t, repo.uploader)
 	assert.Nil(t, repo.downloader)
 	assert.Nil(t, repo.presigned)
+	assert.Nil(t, repo.transferClient)
 }
 
 func TestAWSS3Repository_ListBuckets(t *testing.T) {
@@ -493,4 +516,60 @@ func TestAWSS3Repository_Download(t *testing.T) {
 
 	assert.NoError(t, err)
 	mockDownloader.AssertExpectations(t)
+}
+
+func TestAWSS3Repository_UploadObject(t *testing.T) {
+	mockClient := &MockS3Client{}
+	mockUploader := &MockS3Uploader{}
+	mockDownloader := &MockS3Downloader{}
+	mockPresigned := &MockS3PresignClient{}
+	mockTransfer := &MockS3TransferClient{}
+
+	repo := NewAWSS3RepositoryWithTransferClient(mockClient, mockUploader, mockDownloader, mockPresigned, mockTransfer)
+
+	expectedOutput := &transfermanager.UploadObjectOutput{}
+
+	tempFile, err := os.CreateTemp("", "test_upload_object_*")
+	assert.NoError(t, err)
+	defer os.Remove(tempFile.Name())
+
+	_, err = tempFile.WriteString("test content")
+	assert.NoError(t, err)
+	tempFile.Close()
+
+	mockTransfer.On("UploadObject", mock.Anything, mock.MatchedBy(func(input *transfermanager.UploadObjectInput) bool {
+		return *input.Bucket == "test-bucket" && *input.Key == "test-key"
+	}), mock.Anything).Return(expectedOutput, nil)
+
+	result, err := repo.UploadObject("test-bucket", "test-key", tempFile.Name())
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedOutput, result)
+	mockTransfer.AssertExpectations(t)
+}
+
+func TestAWSS3Repository_DownloadObject(t *testing.T) {
+	mockClient := &MockS3Client{}
+	mockUploader := &MockS3Uploader{}
+	mockDownloader := &MockS3Downloader{}
+	mockPresigned := &MockS3PresignClient{}
+	mockTransfer := &MockS3TransferClient{}
+
+	repo := NewAWSS3RepositoryWithTransferClient(mockClient, mockUploader, mockDownloader, mockPresigned, mockTransfer)
+
+	tempFile, err := os.CreateTemp("", "test_download_object_*")
+	assert.NoError(t, err)
+	defer os.Remove(tempFile.Name())
+	tempFile.Close()
+
+	expectedOutput := &transfermanager.DownloadObjectOutput{}
+	mockTransfer.On("DownloadObject", mock.Anything, mock.MatchedBy(func(input *transfermanager.DownloadObjectInput) bool {
+		return *input.Bucket == "test-bucket" && *input.Key == "test-key"
+	}), mock.Anything).Return(expectedOutput, nil)
+
+	result, err := repo.DownloadObject("test-bucket", "test-key", tempFile.Name())
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedOutput, result)
+	mockTransfer.AssertExpectations(t)
 }
