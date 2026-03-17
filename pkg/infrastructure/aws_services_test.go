@@ -5,6 +5,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -53,6 +54,15 @@ func TestNewAWSS3Uploader(t *testing.T) {
 
 	assert.NotNil(t, uploader)
 	assert.IsType(t, &manager.Uploader{}, uploader)
+}
+
+func TestNewAWSS3TransferClient(t *testing.T) {
+	cfg := &aws.Config{Region: "us-east-1"}
+	s3Client := NewAWSS3(cfg)
+	client := NewAWSS3TransferClient(s3Client)
+
+	assert.NotNil(t, client)
+	assert.IsType(t, &transfermanager.Client{}, client)
 }
 
 func TestNewAWSSecretsManager(t *testing.T) {
