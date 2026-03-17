@@ -3,6 +3,7 @@ package repository
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -376,11 +377,16 @@ func (r *AWSS3Repository) UploadObject(bucket, key, filePath string) (*transferm
 
 	// Get content-type
 	buf := make([]byte, maxBufferSize)
-	_, err = file.Read(buf)
-	if err != nil {
-		return nil, fmt.Errorf("read file: %w", err)
+	n, readErr := file.Read(buf)
+	if readErr != nil && !errors.Is(readErr, io.EOF) {
+		return nil, fmt.Errorf("read file: %w", readErr)
 	}
-	contentType := http.DetectContentType(buf)
+	contentType := http.DetectContentType(buf[:n])
+
+	_, err = file.Seek(0, io.SeekStart)
+	if err != nil {
+		return nil, fmt.Errorf("seek file: %w", err)
+	}
 
 	out, err := r.transferClient.UploadObject(context.Background(), &transfermanager.UploadObjectInput{
 		Bucket:      aws.String(bucket),
@@ -397,24 +403,41 @@ func (r *AWSS3Repository) UploadObject(bucket, key, filePath string) (*transferm
 // DownloadObject downloads an object from S3 to a file using the transfer manager (feature/s3/transfermanager).
 func (r *AWSS3Repository) DownloadObject(bucket, key, filePath string) (*transfermanager.DownloadObjectOutput, error) {
 	path := filepath.Clean(filePath)
-	file, err := os.Create(path) //nolint:gosec // path is cleaned above
+	tmpFile, err := os.CreateTemp(filepath.Dir(path), filepath.Base(path)+".tmp-*") //nolint:gosec // path is cleaned above
 	if err != nil {
 		return nil, fmt.Errorf("create file: %w", err)
 	}
-	defer func() {
-		if cErr := file.Close(); cErr != nil {
-			log.Printf("warning: failed to close file: %v", cErr)
-		}
-	}()
+	tmpPath := tmpFile.Name()
 
 	out, err := r.transferClient.DownloadObject(context.Background(), &transfermanager.DownloadObjectInput{
 		Bucket:   aws.String(bucket),
 		Key:      aws.String(r.normalizePath(key)),
-		WriterAt: file,
+		WriterAt: tmpFile,
 	})
 	if err != nil {
+		if cErr := tmpFile.Close(); cErr != nil {
+			log.Printf("warning: failed to close temp file: %v", cErr)
+		}
+		if rErr := os.Remove(tmpPath); rErr != nil {
+			log.Printf("warning: failed to remove temp file: %v", rErr)
+		}
 		return nil, fmt.Errorf("s3 transfermanager DownloadObject: %w", err)
 	}
+
+	if cErr := tmpFile.Close(); cErr != nil {
+		if rErr := os.Remove(tmpPath); rErr != nil {
+			log.Printf("warning: failed to remove temp file: %v", rErr)
+		}
+		return nil, fmt.Errorf("close temp file: %w", cErr)
+	}
+
+	if err = os.Rename(tmpPath, path); err != nil {
+		if rErr := os.Remove(tmpPath); rErr != nil {
+			log.Printf("warning: failed to remove temp file: %v", rErr)
+		}
+		return nil, fmt.Errorf("rename temp file: %w", err)
+	}
+
 	return out, nil
 }
 

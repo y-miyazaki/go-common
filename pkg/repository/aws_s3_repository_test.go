@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -538,13 +539,48 @@ func TestAWSS3Repository_UploadObject(t *testing.T) {
 	tempFile.Close()
 
 	mockTransfer.On("UploadObject", mock.Anything, mock.MatchedBy(func(input *transfermanager.UploadObjectInput) bool {
-		return *input.Bucket == "test-bucket" && *input.Key == "test-key"
+		if input == nil || input.Bucket == nil || input.Key == nil || input.ContentType == nil {
+			return false
+		}
+		body, readErr := io.ReadAll(input.Body)
+		if readErr != nil {
+			return false
+		}
+		return *input.Bucket == "test-bucket" &&
+			*input.Key == "test-key" &&
+			string(body) == "test content" &&
+			*input.ContentType == "text/plain; charset=utf-8"
 	}), mock.Anything).Return(expectedOutput, nil)
 
 	result, err := repo.UploadObject("test-bucket", "test-key", tempFile.Name())
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedOutput, result)
+	mockTransfer.AssertExpectations(t)
+}
+
+func TestAWSS3Repository_DownloadObject_Error_NoPartialFile(t *testing.T) {
+	mockClient := &MockS3Client{}
+	mockUploader := &MockS3Uploader{}
+	mockDownloader := &MockS3Downloader{}
+	mockPresigned := &MockS3PresignClient{}
+	mockTransfer := &MockS3TransferClient{}
+
+	repo := NewAWSS3RepositoryWithTransferClient(mockClient, mockUploader, mockDownloader, mockPresigned, mockTransfer)
+
+	tempDir := t.TempDir()
+	destinationPath := filepath.Join(tempDir, "downloaded.txt")
+
+	mockTransfer.On("DownloadObject", mock.Anything, mock.MatchedBy(func(input *transfermanager.DownloadObjectInput) bool {
+		return *input.Bucket == "test-bucket" && *input.Key == "test-key"
+	}), mock.Anything).Return(nil, errors.New("download failed"))
+
+	result, err := repo.DownloadObject("test-bucket", "test-key", destinationPath)
+
+	assert.Error(t, err)
+	assert.Nil(t, result)
+	_, statErr := os.Stat(destinationPath)
+	assert.ErrorIs(t, statErr, os.ErrNotExist)
 	mockTransfer.AssertExpectations(t)
 }
 
