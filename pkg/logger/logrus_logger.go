@@ -16,15 +16,23 @@ type Logger struct {
 
 // NewLogger returns an instance of logger
 func NewLogger(logger *logrus.Logger, cfg ...*LoggerConfig) *Logger {
-	var l = logrus.New()
+	// Keep the original parameter untouched to satisfy revive linter.
+	l := logrus.New()
+	if logger != nil {
+		l = logger
+	}
 
 	// Log as JSON instead of the default ASCII formatter.
-	l.SetFormatter(logger.Formatter)
+	if l.Formatter != nil {
+		l.SetFormatter(l.Formatter)
+	}
 	// Output to stdout instead of the default stderr
 	// Can be any io.Writer, see below for File example
-	l.SetOutput(logger.Out)
+	if l.Out != nil {
+		l.SetOutput(l.Out)
+	}
 	// Only log the warning severity or above.
-	l.SetLevel(logger.Level)
+	l.SetLevel(l.Level)
 
 	var config *LoggerConfig
 	if len(cfg) > 0 {
@@ -87,14 +95,20 @@ func (l *Logger) WithError(err error) *Logger {
 // WithContext calls WithContext function of logger entry.
 func (l *Logger) WithContext(ctx context.Context) *Logger {
 	return &Logger{
-		Entry: l.Entry.WithContext(ctx),
+		Entry:  l.Entry.WithContext(ctx),
+		Config: l.Config,
 	}
 }
 
 // WithContextValue calls WithField function of logger entry.
 func (l *Logger) WithContextValue(key string) *Logger {
+	if key == "" || l.Entry == nil || l.Entry.Context == nil {
+		return l
+	}
+
 	return &Logger{
-		Entry: l.Entry.WithField(key, l.Entry.Context.Value(key)),
+		Entry:  l.Entry.WithField(key, l.Entry.Context.Value(key)),
+		Config: l.Config,
 	}
 }
 

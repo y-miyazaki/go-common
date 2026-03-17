@@ -1,27 +1,164 @@
 ---
 name: go-validation
-description: ⚠️ ALWAYS use go-validation/scripts/validate.sh for validation. Never run go fmt, go vet, golangci-lint, or go test individually. This skill provides the validation workflow only. For debugging failures, see reference/.
+description: Go code validation workflow covering formatting, linting, testing, and security using go fmt, go vet, golangci-lint, go test, and govulncheck. Always use validate.sh script for comprehensive validation. For troubleshooting, see reference/.
 license: MIT
 ---
 
-# Go Validation
+## Purpose
+
+Validates Go source code for formatting, correctness, and security using go fmt, go vet, golangci-lint, go test, and govulncheck.
 
 This skill provides guidance for validating Go code using the comprehensive validation script.
 
 ## When to Use This Skill
 
-This skill is applicable for:
+Recommended usage:
 
-- Validating Go code before committing
-- Running comprehensive quality checks
-- Ensuring test coverage meets standards
-- Security vulnerability scanning
+- Before committing Go code changes
+- During pull request validation in CI/CD
+- After making any code modifications
+- When debugging test failures or linting issues
+- For security compliance verification before release
+- During development for fast feedback (use directory-specific validation)
 
-## ⚠️ CRITICAL: Always Use the Validation Script
+## Input Specification
 
-**DO NOT run individual commands (go fmt, go vet, golangci-lint, go test) directly.**
+This skill expects:
 
-**The validation script handles everything automatically.**
+- Go source code files (required) - `.go` files in current directory or specified path
+- Validation script (required) - `go-validation/scripts/validate.sh`
+- Optional directory path (optional) - Specific directory to validate
+- Optional flags (optional) - `--fix` for auto-formatting, `--verbose` for detailed output
+
+Format:
+
+- Go files: Valid Go source code with `.go` extension
+- Directory path: Relative or absolute path to Go code directory
+- Flags: `--fix` or `--verbose` as command-line arguments
+- Default: Validates all Go files in current directory if no path specified
+
+## Output Specification
+
+Structured validation results from five tools in execution order:
+
+- go mod tidy output: Dependency cleanup status
+- go fmt output: Formatting issues or confirmation
+- go vet output: Static analysis warnings with file paths and line numbers
+- golangci-lint output: Linting issues from 30+ linters with severity levels
+- go test output: Test results with coverage percentage and race detection results
+- govulncheck output: Security vulnerabilities with CVE identifiers
+
+Success output format:
+
+```
+✓ go mod tidy: Dependencies verified
+✓ go fmt: All files formatted
+✓ go vet: No issues found
+✓ golangci-lint: No issues found
+✓ go test: All tests passed (coverage: XX%)
+✓ govulncheck: No vulnerabilities found
+All validations passed
+```
+
+Error output format:
+
+```
+✗ go fmt: [file]: formatting required
+✗ go vet: [file]:[line]: [warning]
+✗ golangci-lint: [file]:[line]: [linter]: [issue]
+✗ go test: [test name]: FAIL
+✗ govulncheck: [vulnerability]: [CVE-XXXX-XXXX]
+Exit code: 1
+```
+
+See reference/common-output-format.md for detailed format specification and examples.
+
+## Execution Scope
+
+**How to use this skill**:
+
+- **Primary method**: Always use `scripts/validate.sh` for comprehensive validation
+- Script executes go mod tidy, go fmt, go vet, golangci-lint, go test, and govulncheck in recommended order
+- **Manual invocation**: Individual tool commands available for debugging (see reference/troubleshooting.md)
+- **Automated CI/CD**: Integrate validate.sh into CI pipeline for automated checks
+
+**What this skill does**:
+
+- Clean up and verify dependencies using go mod tidy
+- Format Go code using go fmt
+- Perform static analysis using go vet
+- Run comprehensive linting using golangci-lint (30+ linters)
+- Execute tests with race detection and coverage using go test
+- Scan for security vulnerabilities using govulncheck
+- Validate test coverage meets 80% threshold
+
+What this skill does NOT do (Out of Scope):
+
+- Modify code logic or fix bugs automatically (except formatting with --fix flag)
+- Review code design decisions (use go-review for that)
+- Execute benchmarks or performance profiling
+- Generate code or tests automatically
+- Approve or merge pull requests
+- Validate non-Go files
+- Deploy or build production binaries
+
+## Constraints
+
+Prerequisites:
+
+- Go toolchain installed (go command available in PATH)
+- golangci-lint installed and available in PATH
+- govulncheck installed and available in PATH
+- Go module initialized (go.mod file exists)
+- Validation script must be executable
+- Test files must exist for coverage validation
+
+Limitations:
+
+- Test coverage threshold is fixed at 80%
+- Race detection may slow down test execution
+- golangci-lint configuration must be present for custom rules
+- Cannot validate code that doesn't compile
+- Requires network access for govulncheck vulnerability database
+
+## Failure Behavior
+
+Error handling:
+
+- Tool not found: Output error message indicating which tool is missing, exit with code 1
+- Compilation error: go vet outputs specific error with file and line, exit with code 1
+- Test failure: go test outputs failed test name and details, exit with code 1
+- Coverage below 80%: Output coverage percentage and exit with code 1
+- Race condition detected: go test outputs race report, exit with code 1
+- Security vulnerability found: govulncheck outputs CVE details, exit with code 1
+- Multiple errors: Report all errors from all tools before exiting
+
+Error reporting format:
+
+- Each tool outputs errors to standard error
+- Exit code: 0=success, 1=validation failed
+- Error messages include file paths, line numbers, and specific issues
+- Detailed troubleshooting available in reference/troubleshooting.md
+
+## Reference Files Guide
+
+When using this skill with an agent, reference the following files via @-mention for detailed guidance:
+
+**Standard Components**:
+
+- **common-checklist.md** - Go code validation checklist
+- **common-output-format.md** - Validation result report format specification
+- **common-troubleshooting.md** - Troubleshooting guide
+- **common-individual-commands.md** - Individual command execution (go fmt/vet/lint/test/govulncheck)
+
+**Category Details**:
+
+- **category-security.md** - Security validation guide
+- **category-testing.md** - Test execution guide
+
+## Validation Script Usage
+
+**Always use the validation script. Do not run individual commands.**
 
 ### Usage
 
@@ -54,163 +191,16 @@ The validation script performs all checks in the correct order:
 
 Before considering code complete:
 
-- ✅ **All validation checks pass**
-- ✅ **Test coverage ≥ 80%**
-- ✅ **No test failures**
-- ✅ **No race conditions**
-- ✅ **No security vulnerabilities**
-
-## Validation Workflow
-
-### Before Committing
-
-1. **Make code changes** - Implement feature or fix
-2. **Run validation on changed directory** (recommended):
-   ```bash
-   bash go-validation/scripts/validate.sh ./path/to/changed/code/
-   ```
-3. **Fix any issues** - Address failures reported
-4. **Re-run validation** - Ensure all checks pass
-5. **Optional: Run full project validation**:
-   ```bash
-   bash go-validation/scripts/validate.sh
-   ```
-6. **Commit** - Only commit when validation passes
-
-## Common Failures & Quick Fixes
-
-### Formatting Errors
-
-```
-Error: go fmt check failed
-Files not formatted correctly
-```
-
-**Fix**: Auto-format with `--fix` flag
-
-```bash
-bash go-validation/scripts/validate.sh --fix
-```
-
-### go vet Errors
-
-```
-Error: go vet failed
-main.go:15: unreachable code
-```
-
-**Fix**: Read error message, correct the code issue, re-run validation
-
-### Lint Errors
-
-```
-Error: golangci-lint failed
-error: unused variable 'result'
-```
-
-**Fix**: Address linter suggestions (remove unused code, check errors, etc.)
-
-### Test Failures
-
-```
-Error: Tests failed
-Expected: 5, Got: 3
-```
-
-**Fix**: Fix test logic or implementation, ensure all tests pass
-
-### Race Conditions
-
-```
-WARNING: DATA RACE
-Read at 0x00c000102090 by goroutine 7
-```
-
-**Fix**: Add proper synchronization (mutex, channels, atomic operations)
-
-### Coverage Below 80%
-
-```
-Error: Coverage below 80%
-Current coverage: 65.4%
-```
-
-**Fix**: Write tests for uncovered code, focus on public APIs and error paths
-
-### Security Vulnerabilities
-
-```
-govulncheck: found vulnerabilities
-Vulnerability in golang.org/x/crypto
-```
-
-**Fix**: Update vulnerable dependencies to patched versions
-
-## Troubleshooting
-
-### Validation Script Not Found
-
-```bash
-# Navigate to project root
-cd /workspace
-
-# Verify script exists
-ls -la .github/skills/go-validation/scripts/validate.sh
-
-# Run with bash explicitly
-bash go-validation/scripts/validate.sh
-```
-
-### Slow Validation
-
-```bash
-# Validate only changed directory (much faster)
-bash go-validation/scripts/validate.sh ./path/to/changed/code/
-```
-
-### Need More Details
-
-For detailed information, see the reference documentation:
-
-- **[Individual Commands](reference/individual-commands.md)** - Detailed command usage for debugging
-- **[Troubleshooting Guide](reference/troubleshooting.md)** - Comprehensive error resolution
-- **[Testing Best Practices](reference/testing.md)** - Test patterns and coverage strategies
-- **[Security Best Practices](reference/security.md)** - Security guidelines and patterns
-
-## Quick Reference
-
-### Essential Commands
-
-```bash
-# Full validation
-bash go-validation/scripts/validate.sh
-
-# Specific directory
-bash go-validation/scripts/validate.sh ./pkg/mypackage/
-
-# Auto-fix
-bash go-validation/scripts/validate.sh --fix
-```
-
-### Validation Checklist
-
-Before committing:
-
-- [ ] Validation script passes
+- [ ] All validation checks pass
 - [ ] Test coverage ≥ 80%
 - [ ] No test failures
 - [ ] No race conditions
 - [ ] No security vulnerabilities
 
-## Summary
+## Workflow
 
-Go validation ensures code quality through automated checks:
-
-1. **Always use the validation script** - Never run individual commands
-2. **Validate frequently** - Run during development, not just before commit
-3. **Use directory-specific validation** - Faster feedback loop
-4. **Leverage auto-fix** - Use `--fix` flag for formatting issues
-5. **Meet coverage goals** - Maintain ≥ 80% test coverage
-6. **Never commit failing code** - All checks must pass
-
-For detailed debugging and advanced topics, see the [reference documentation](reference/).
+1. **Make changes** - Implement feature or fix
+2. **Run validation**: `bash go-validation/scripts/validate.sh ./path/to/code/`
+3. **Fix issues** - Address failures reported
+4. **Re-run validation** - Ensure all checks pass
+5. **Commit** - Only when validation passes

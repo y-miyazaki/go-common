@@ -12,24 +12,31 @@ type ZapLogger struct {
 
 // NewZapLogger returns an instance of logger
 func NewZapLogger(config *zap.Config) *ZapLogger {
+	var cfg zap.Config
+	if config == nil {
+		cfg = zap.NewProductionConfig()
+	} else {
+		cfg = *config
+	}
+
 	// Encoding
-	if config.Encoding == "" {
-		config.Encoding = "json"
+	if cfg.Encoding == "" {
+		cfg.Encoding = "json"
 	}
 
 	// OutputPaths
-	if len(config.OutputPaths) == 0 {
-		config.OutputPaths = []string{"stdout"}
+	if len(cfg.OutputPaths) == 0 {
+		cfg.OutputPaths = []string{"stdout"}
 	}
 
 	// ErrorOutputPaths
-	if len(config.ErrorOutputPaths) == 0 {
-		config.ErrorOutputPaths = []string{"stderr"}
+	if len(cfg.ErrorOutputPaths) == 0 {
+		cfg.ErrorOutputPaths = []string{"stderr"}
 	}
 
-	logger, err := config.Build()
+	logger, err := cfg.Build()
 	if err != nil {
-		panic("can't create logger from zap")
+		logger = zap.NewNop()
 	}
 	return &ZapLogger{Logger: logger}
 }

@@ -29,6 +29,7 @@
         "automatalabs.copilot-mcp",
         "github.copilot",
         "github.copilot-chat",
+        "amazonwebservices.amazon-q-vscode",
         // for Shell Script environment
         "foxundermoon.shell-format",
         "timonwong.shellcheck",
@@ -42,7 +43,6 @@
       ]
     }
   },
-
   "runArgs": [
     "-v",
     "${localWorkspaceFolder}:/workspace",
@@ -51,11 +51,9 @@
     "-v",
     "${localWorkspaceFolder}/env/common/tmp/.gitconfig:/home/vscode/.gitconfig",
     "-v",
-    "${localWorkspaceFolder}/env/common/tmp/gh:/home/vscode/.config/gh",
-    "-v",
-    "/var/run/docker.sock:/var/run/docker.sock"
+    "${localWorkspaceFolder}/env/common/tmp/gh:/home/vscode/.config/gh"
   ],
-  "postCreateCommand": "/bin/sh env/common/scripts/init.sh",
+  "postCreateCommand": "/bin/bash env/common/scripts/init.sh",
   "workspaceMount": "",
   "workspaceFolder": "/workspace",
   "overrideCommand": false,

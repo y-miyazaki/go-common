@@ -14,14 +14,12 @@ import (
 // TestNewLogger tests logger initialization
 func TestNewSlogLogger(t *testing.T) {
 	tests := []struct {
-		name      string
-		cfg       *SlogConfig
-		wantPanic bool
+		name string
+		cfg  *SlogConfig
 	}{
 		{
-			name:      "should panic with nil config",
-			cfg:       nil,
-			wantPanic: true,
+			name: "should use defaults with nil config",
+			cfg:  nil,
 		},
 		{
 			name: "should work with JSON format",
@@ -31,7 +29,6 @@ func TestNewSlogLogger(t *testing.T) {
 				Output:    os.Stdout,
 				Format:    "json",
 			},
-			wantPanic: false,
 		},
 		{
 			name: "should work with text format",
@@ -41,21 +38,13 @@ func TestNewSlogLogger(t *testing.T) {
 				Output:    os.Stdout,
 				Format:    "text",
 			},
-			wantPanic: false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.wantPanic {
-				defer func() {
-					if r := recover(); r == nil {
-						t.Error("expected panic did not occur")
-					}
-				}()
-			}
 			log := NewSlogLogger(tt.cfg)
-			if !tt.wantPanic && log == nil {
+			if log == nil {
 				t.Error("failed to create logger")
 			}
 		})

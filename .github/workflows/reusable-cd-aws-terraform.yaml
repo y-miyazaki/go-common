@@ -60,13 +60,13 @@ jobs:
           persist-credentials: false
 
       - name: Setup AWS Credentials
-        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
         with:
           aws-region: ${{ secrets.AWS_REGION }}
           role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+        uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85 # v4.0.0
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
@@ -89,14 +89,14 @@ jobs:
           echo "key=terraform-init-${ENVIRONMENT}-${COMPONENT}-${{ runner.os }}-${{ hashFiles(format('{0}/terraform.{1}.tfbackend', env.TERRAFORM_PATH, env.ENVIRONMENT), format('{0}/.terraform.lock.hcl', env.TERRAFORM_PATH), format('{0}/**/*.tf', env.TERRAFORM_PATH), 'modules/**/*.tf') }}" >> "$GITHUB_OUTPUT"
 
       - name: Cache Terraform plugin cache
-        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
           key: ${{ steps.compute-plugin-cache-key.outputs.key }}
           path: |
             ~/.terraform.d/plugin-cache
 
       - name: Cache Terraform init
-        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
           key: ${{ steps.compute-init-cache-key.outputs.key }}
           path: |
@@ -130,13 +130,13 @@ jobs:
           persist-credentials: false
 
       - name: Setup AWS Credentials
-        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
         with:
           aws-region: ${{ secrets.AWS_REGION }}
           role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+        uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85 # v4.0.0
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
@@ -148,7 +148,7 @@ jobs:
 
       - name: Restore Cache Terraform plugin cache
         id: restore-terraform-plugin-cache
-        uses: actions/cache/restore@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+        uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
           key: ${{ needs.init.outputs.tf_plugin_cache_key }}
           path: |
@@ -156,7 +156,7 @@ jobs:
 
       - name: Restore Cache Terraform init
         id: restore-terraform-init
-        uses: actions/cache/restore@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+        uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
           key: ${{ needs.init.outputs.tf_init_cache_key }}
           path: |

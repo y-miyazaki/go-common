@@ -245,7 +245,7 @@ function process_dlq_information {
 }
 
 #######################################
-# main: Script entry point
+# main: Main process
 #
 # Description:
 #   Main function to execute the script logic for retrieving SQS DLQ information
@@ -271,9 +271,7 @@ function main {
     validate_dependencies "aws" "jq"
 
     # Check AWS credentials before any AWS CLI usage
-    if ! check_aws_credentials; then
-        error_exit "AWS credentials are not set or invalid."
-    fi
+    check_aws_credentials || error_exit "AWS credentials are not set or invalid."
 
     # Log script start
     echo_section "Starting SQS DLQ information extraction"

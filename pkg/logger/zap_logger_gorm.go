@@ -48,17 +48,30 @@ type GormZapSetting struct {
 
 // NewZapLoggerGorm func
 func NewZapLoggerGorm(c *GormZapSetting) *GormZap {
-	l, err := c.Config.Build()
-	if err != nil {
-		panic("can't create logger from zap")
+	var cfg zap.Config
+	if c == nil || c.Config == nil {
+		cfg = zap.NewProductionConfig()
+	} else {
+		cfg = *c.Config
 	}
-	return &GormZap{
-		l: l,
-		gormConfig: &GormConfig{
+
+	l, err := cfg.Build()
+	if err != nil {
+		l = zap.NewNop()
+	}
+
+	gormConfig := &GormConfig{LogLevel: Info}
+	if c != nil && c.GormConfig != nil {
+		gormConfig = &GormConfig{
 			SlowThreshold:             c.GormConfig.SlowThreshold,
 			IgnoreRecordNotFoundError: c.GormConfig.IgnoreRecordNotFoundError,
 			LogLevel:                  c.GormConfig.LogLevel,
-		},
+		}
+	}
+
+	return &GormZap{
+		l:          l,
+		gormConfig: gormConfig,
 	}
 }
 

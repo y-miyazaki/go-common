@@ -115,17 +115,12 @@ function execute_command {
 
     log "DEBUG" "Executing: $*"
 
-    # Execute the command. Support two calling styles:
-    # 1) execute_command cmd arg1 arg2 ...  --> safe, runs the command directly
-    # 2) execute_command "cmd arg1 arg2"   --> common in older scripts; run via bash -lc
-    if [[ $# -eq 1 ]]; then
-        # Single-string command (may contain spaces/options) — run under bash -lc so
-        # shell parsing behaves as the caller expects.
-        bash -lc "$1"
-    else
-        # Multi-argument safe execution
-        "${@}"
+    # Execute the command in multi-argument style only to avoid injection risks.
+    if [[ $# -lt 2 ]]; then
+        error_exit "execute_command requires command and arguments as separate parameters"
     fi
+
+    "${@}"
 }
 
 #######################################
@@ -192,28 +187,6 @@ function log {
     if [[ "$level" == "ERROR" ]] || [[ "$level" == "WARN" ]] || [[ "${VERBOSE:-false}" == "true" ]]; then
         echo "[$(date +'%Y-%m-%d %H:%M:%S')] [$level] $message" >&2
     fi
-}
-#######################################
-# start_echo_section: Display section headers and capture start time
-#
-# Description:
-#   Displays formatted section header (used with end_echo_section for timing)
-#
-# Arguments:
-#   $1 - Section title
-#
-# Returns:
-#   None (outputs to stderr)
-#
-# Usage:
-#   start_echo_section "Building application"
-#
-#######################################
-function start_echo_section {
-    local title="$1"
-    echo "#--------------------------------------------------------------" >&2
-    echo "# $title" >&2
-    echo "#--------------------------------------------------------------" >&2
 }
 
 #######################################
