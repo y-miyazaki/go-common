@@ -10,7 +10,7 @@ import (
 // CombinedOutput execute exec.CommandContext and output command.
 func CombinedOutput(command string, output bool, options ...string) (string, error) { // nolint:revive // output is a valid flag parameter
 	ctx := context.Background()
-	out, err := exec.CommandContext(ctx, command, options...).CombinedOutput()
+	out, err := exec.CommandContext(ctx, command, options...).CombinedOutput() //nolint:gosec // G204: intentional - this function is designed to execute arbitrary commands
 	outputCommand := command + " "
 	for _, s := range options {
 		outputCommand = s + " "
@@ -26,7 +26,7 @@ func CombinedOutput(command string, output bool, options ...string) (string, err
 // CombinedOutputStr execute exec.CommandContext and output command.
 func CombinedOutputStr(command string, output bool) (string, error) { // nolint:revive // output is a valid flag parameter
 	ctx := context.Background()
-	out, err := exec.CommandContext(ctx, "sh", "-c", command).CombinedOutput()
+	out, err := exec.CommandContext(ctx, "sh", "-c", command).CombinedOutput() //nolint:gosec // G204: intentional - this function is designed to execute arbitrary shell commands
 	if output {
 		log.Println(command)
 		log.Println(string(out))

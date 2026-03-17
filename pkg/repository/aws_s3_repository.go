@@ -50,15 +50,17 @@ type AWSS3PresignClientInterface interface {
 }
 
 // AWSS3UploaderClientInterface interface for mocking S3 uploader
-type AWSS3UploaderClientInterface interface {
+// TODO: migrate to github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager when ready.
+type AWSS3UploaderClientInterface interface { //nolint:staticcheck // SA1019: manager.Uploader deprecated, migration pending
 	// Upload uploads an object to S3 using the manager uploader
-	Upload(_ context.Context, _ *s3.PutObjectInput, _ ...func(*manager.Uploader)) (*manager.UploadOutput, error)
+	Upload(_ context.Context, _ *s3.PutObjectInput, _ ...func(*manager.Uploader)) (*manager.UploadOutput, error) //nolint:staticcheck // SA1019: manager.Uploader deprecated, migration pending
 }
 
 // AWSS3DownloaderClientInterface interface for mocking S3 downloader
-type AWSS3DownloaderClientInterface interface {
+// TODO: migrate to github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager when ready.
+type AWSS3DownloaderClientInterface interface { //nolint:staticcheck // SA1019: manager.Downloader deprecated, migration pending
 	// Download downloads an object from S3 using the manager downloader
-	Download(_ context.Context, _ io.WriterAt, _ *s3.GetObjectInput, _ ...func(*manager.Downloader)) (int64, error)
+	Download(_ context.Context, _ io.WriterAt, _ *s3.GetObjectInput, _ ...func(*manager.Downloader)) (int64, error) //nolint:staticcheck // SA1019: manager.Downloader deprecated, migration pending
 }
 
 // AWSS3Repository struct implements AWSS3RepositoryInterface using AWS SDK v2.
@@ -76,14 +78,15 @@ func NewAWSS3Repository(client *s3.Client) *AWSS3Repository {
 	}
 	return &AWSS3Repository{
 		Client:     client,
-		uploader:   manager.NewUploader(client),
-		downloader: manager.NewDownloader(client),
+		uploader:   manager.NewUploader(client),   //nolint:staticcheck // SA1019: manager.NewUploader deprecated, migration pending
+		downloader: manager.NewDownloader(client), //nolint:staticcheck // SA1019: manager.NewDownloader deprecated, migration pending
 		presigned:  s3.NewPresignClient(client),
 	}
 }
 
 // NewAWSS3RepositoryWithOther returns AWSS3Repository instance backed by AWS SDK v2 client.
-func NewAWSS3RepositoryWithOther(client *s3.Client, uploader *manager.Uploader, downloader *manager.Downloader, presigned *s3.PresignClient) *AWSS3Repository {
+// TODO: migrate to github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager when ready.
+func NewAWSS3RepositoryWithOther(client *s3.Client, uploader *manager.Uploader, downloader *manager.Downloader, presigned *s3.PresignClient) *AWSS3Repository { //nolint:staticcheck // SA1019: manager.Uploader/Downloader deprecated, migration pending
 	return &AWSS3Repository{
 		Client:     client,
 		uploader:   uploader,
