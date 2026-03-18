@@ -252,9 +252,13 @@ function validate_markdown_files {
         else
             local file
             local link_failed=false
+            local failing_file=""
+            local failing_output=""
             for file in "${markdown_files[@]}"; do
-                if ! markdown-link-check "${file}" > /dev/null 2>&1; then
+                if ! failing_output="$(markdown-link-check "${file}" 2>&1)"; then
                     link_failed=true
+                    failing_file="${file}"
+                    echo "${failing_output}"
                     break
                 fi
             done
@@ -262,7 +266,12 @@ function validate_markdown_files {
             if [[ "${link_failed}" == true ]]; then
                 check_names+=("Markdown Links")
                 check_statuses+=("FAIL")
-                check_details+=("markdown-link-check validation failed")
+                if [[ -n "${failing_output}" ]]; then
+                    failing_output="${failing_output//$'\n'/ }"
+                    check_details+=("markdown-link-check failed for ${failing_file}: ${failing_output}")
+                else
+                    check_details+=("markdown-link-check validation failed for ${failing_file}")
+                fi
                 echo "✗ Some Markdown links are broken"
             else
                 check_names+=("Markdown Links")
