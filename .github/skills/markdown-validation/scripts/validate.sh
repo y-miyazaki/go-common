@@ -1,6 +1,6 @@
 #!/bin/bash
 #######################################
-# Description: Deterministic Markdown validation for files and directories
+# Description: Markdown validation for files and directories (syntax and links)
 #
 # Usage: ./validate.sh [PATH]
 #   arguments:
