@@ -19,6 +19,10 @@
 # Dependencies:
 # - bash (POSIX bash, /bin/bash)
 # - find (standard Unix utility)
+# - node (Node.js runtime for CLI tools)
+# - npm (Node.js package manager)
+# - markdownlint (Node.js CLI, installed via npm)
+# - markdown-link-check (Node.js CLI, installed via npm)
 #######################################
 
 set -euo pipefail
