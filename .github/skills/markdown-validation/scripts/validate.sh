@@ -5,7 +5,7 @@
 # Usage: ./validate.sh [PATH]
 #   arguments:
 #     PATH           Path to target Markdown file or directory (optional)
-#                    Default: /workspace
+#                    Default: .
 #
 # Output:
 # - Human-readable validation results (terminal output)
@@ -37,7 +37,7 @@ export SCRIPT_DIR
 # shellcheck disable=SC1091
 source "${SCRIPT_DIR}/lib/all.sh"
 
-TARGET_PATH="/workspace"
+TARGET_PATH="."
 declare -a check_names=()
 declare -a check_statuses=()
 declare -a check_details=()
