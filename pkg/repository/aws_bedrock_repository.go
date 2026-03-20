@@ -15,12 +15,12 @@ import (
 
 // AWSBedrockClientInterface defines the interface for Bedrock Runtime client operations
 type AWSBedrockClientInterface interface {
+	// Converse enables conversational interactions with models
+	Converse(_ context.Context, _ *bedrockruntime.ConverseInput, _ ...func(*bedrockruntime.Options)) (*bedrockruntime.ConverseOutput, error)
 	// InvokeModel invokes a model with the provided input
 	InvokeModel(_ context.Context, _ *bedrockruntime.InvokeModelInput, _ ...func(*bedrockruntime.Options)) (*bedrockruntime.InvokeModelOutput, error)
 	// InvokeModelWithResponseStream invokes a model with streaming response
 	InvokeModelWithResponseStream(_ context.Context, _ *bedrockruntime.InvokeModelWithResponseStreamInput, _ ...func(*bedrockruntime.Options)) (*bedrockruntime.InvokeModelWithResponseStreamOutput, error)
-	// Converse enables conversational interactions with models
-	Converse(_ context.Context, _ *bedrockruntime.ConverseInput, _ ...func(*bedrockruntime.Options)) (*bedrockruntime.ConverseOutput, error)
 }
 
 // AWSBedrockRepository struct.

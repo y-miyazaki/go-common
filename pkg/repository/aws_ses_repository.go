@@ -11,10 +11,10 @@ import (
 
 // AWSSESClientInterface defines the interface for SES client operations
 type AWSSESClientInterface interface {
-	// SendEmail sends an email using Amazon SES
-	SendEmail(_ context.Context, _ *sesv2.SendEmailInput, _ ...func(*sesv2.Options)) (*sesv2.SendEmailOutput, error)
 	// SendBulkEmail sends bulk emails using Amazon SES
 	SendBulkEmail(_ context.Context, _ *sesv2.SendBulkEmailInput, _ ...func(*sesv2.Options)) (*sesv2.SendBulkEmailOutput, error)
+	// SendEmail sends an email using Amazon SES
+	SendEmail(_ context.Context, _ *sesv2.SendEmailInput, _ ...func(*sesv2.Options)) (*sesv2.SendEmailOutput, error)
 }
 
 // AWSSESRepository struct.

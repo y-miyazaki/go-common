@@ -27,22 +27,22 @@ const (
 
 // AWSS3ClientInterface interface for mocking S3 client
 type AWSS3ClientInterface interface {
-	// GetObject retrieves an object from S3
-	GetObject(_ context.Context, _ *s3.GetObjectInput, _ ...func(*s3.Options)) (*s3.GetObjectOutput, error)
-	// PutObject uploads an object to S3
-	PutObject(_ context.Context, _ *s3.PutObjectInput, _ ...func(*s3.Options)) (*s3.PutObjectOutput, error)
-	// DeleteObject deletes an object from S3
-	DeleteObject(_ context.Context, _ *s3.DeleteObjectInput, _ ...func(*s3.Options)) (*s3.DeleteObjectOutput, error)
-	// DeleteObjects deletes multiple objects from S3
-	DeleteObjects(_ context.Context, _ *s3.DeleteObjectsInput, _ ...func(*s3.Options)) (*s3.DeleteObjectsOutput, error)
-	// ListObjectsV2 lists objects in an S3 bucket
-	ListObjectsV2(_ context.Context, _ *s3.ListObjectsV2Input, _ ...func(*s3.Options)) (*s3.ListObjectsV2Output, error)
-	// ListBuckets lists all S3 buckets
-	ListBuckets(_ context.Context, _ *s3.ListBucketsInput, _ ...func(*s3.Options)) (*s3.ListBucketsOutput, error)
 	// CreateBucket creates a new S3 bucket
 	CreateBucket(_ context.Context, _ *s3.CreateBucketInput, _ ...func(*s3.Options)) (*s3.CreateBucketOutput, error)
 	// DeleteBucket deletes an S3 bucket
 	DeleteBucket(_ context.Context, _ *s3.DeleteBucketInput, _ ...func(*s3.Options)) (*s3.DeleteBucketOutput, error)
+	// DeleteObject deletes an object from S3
+	DeleteObject(_ context.Context, _ *s3.DeleteObjectInput, _ ...func(*s3.Options)) (*s3.DeleteObjectOutput, error)
+	// DeleteObjects deletes multiple objects from S3
+	DeleteObjects(_ context.Context, _ *s3.DeleteObjectsInput, _ ...func(*s3.Options)) (*s3.DeleteObjectsOutput, error)
+	// GetObject retrieves an object from S3
+	GetObject(_ context.Context, _ *s3.GetObjectInput, _ ...func(*s3.Options)) (*s3.GetObjectOutput, error)
+	// ListBuckets lists all S3 buckets
+	ListBuckets(_ context.Context, _ *s3.ListBucketsInput, _ ...func(*s3.Options)) (*s3.ListBucketsOutput, error)
+	// ListObjectsV2 lists objects in an S3 bucket
+	ListObjectsV2(_ context.Context, _ *s3.ListObjectsV2Input, _ ...func(*s3.Options)) (*s3.ListObjectsV2Output, error)
+	// PutObject uploads an object to S3
+	PutObject(_ context.Context, _ *s3.PutObjectInput, _ ...func(*s3.Options)) (*s3.PutObjectOutput, error)
 }
 
 // AWSS3PresignClientInterface interface for mocking S3 presign client

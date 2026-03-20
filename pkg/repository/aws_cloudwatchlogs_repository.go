@@ -24,16 +24,18 @@ type AWSCloudWatchLogsClientInterface interface {
 	CreateLogGroup(_ context.Context, _ *cloudwatchlogs.CreateLogGroupInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.CreateLogGroupOutput, error)
 	// CreateLogStream creates a new log stream within the specified log group
 	CreateLogStream(_ context.Context, _ *cloudwatchlogs.CreateLogStreamInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.CreateLogStreamOutput, error)
-	// PutRetentionPolicy sets the retention policy for a log group
-	PutRetentionPolicy(_ context.Context, _ *cloudwatchlogs.PutRetentionPolicyInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.PutRetentionPolicyOutput, error)
 	// DescribeLogGroups returns log groups optionally filtered by a name prefix
 	DescribeLogGroups(_ context.Context, _ *cloudwatchlogs.DescribeLogGroupsInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.DescribeLogGroupsOutput, error)
 	// DescribeLogStreams returns log streams in a group optionally filtered by a name prefix
 	DescribeLogStreams(_ context.Context, _ *cloudwatchlogs.DescribeLogStreamsInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.DescribeLogStreamsOutput, error)
-	// PutLogEvents uploads log events to the specified log stream
-	PutLogEvents(_ context.Context, _ *cloudwatchlogs.PutLogEventsInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.PutLogEventsOutput, error)
+	// DescribeMetricFilters returns metric filters for a log group
+	DescribeMetricFilters(_ context.Context, _ *cloudwatchlogs.DescribeMetricFiltersInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.DescribeMetricFiltersOutput, error)
 	// FilterLogEvents searches log events in a log group with optional time range and filter pattern
 	FilterLogEvents(_ context.Context, _ *cloudwatchlogs.FilterLogEventsInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.FilterLogEventsOutput, error)
+	// PutLogEvents uploads log events to the specified log stream
+	PutLogEvents(_ context.Context, _ *cloudwatchlogs.PutLogEventsInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.PutLogEventsOutput, error)
+	// PutRetentionPolicy sets the retention policy for a log group
+	PutRetentionPolicy(_ context.Context, _ *cloudwatchlogs.PutRetentionPolicyInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.PutRetentionPolicyOutput, error)
 }
 
 // AWSCloudWatchLogsRepository implements AWSCloudWatchLogsRepositoryInterface backed by AWS SDK v2 client.
@@ -74,18 +76,6 @@ func (r *AWSCloudWatchLogsRepository) CreateLogStream(ctx context.Context, group
 	return out, nil
 }
 
-// PutRetentionPolicy sets the retention policy for a log group.
-func (r *AWSCloudWatchLogsRepository) PutRetentionPolicy(ctx context.Context, group string, logRetentionInDays int32) (*cloudwatchlogs.PutRetentionPolicyOutput, error) {
-	out, err := r.Client.PutRetentionPolicy(ctx, &cloudwatchlogs.PutRetentionPolicyInput{
-		LogGroupName:    aws.String(group),
-		RetentionInDays: aws.Int32(logRetentionInDays),
-	})
-	if err != nil {
-		return nil, fmt.Errorf("cloudwatchlogs PutRetentionPolicy: %w", err)
-	}
-	return out, nil
-}
-
 // DescribeLogGroups returns log groups optionally filtered by a name prefix.
 func (r *AWSCloudWatchLogsRepository) DescribeLogGroups(ctx context.Context, prefix string) (*cloudwatchlogs.DescribeLogGroupsOutput, error) {
 	in := &cloudwatchlogs.DescribeLogGroupsInput{}
@@ -112,20 +102,14 @@ func (r *AWSCloudWatchLogsRepository) DescribeLogStreams(ctx context.Context, gr
 	return out, nil
 }
 
-// PutLogEvents uploads log events to the specified log stream.
-// The sequenceToken should be provided for subsequent calls after the first PutLogEvents.
-func (r *AWSCloudWatchLogsRepository) PutLogEvents(ctx context.Context, group, stream string, events []types.InputLogEvent, sequenceToken *string) (*cloudwatchlogs.PutLogEventsOutput, error) {
-	in := &cloudwatchlogs.PutLogEventsInput{
-		LogGroupName:  aws.String(group),
-		LogStreamName: aws.String(stream),
-		LogEvents:     events,
+// DescribeMetricFilters returns metric filters for a log group.
+func (r *AWSCloudWatchLogsRepository) DescribeMetricFilters(ctx context.Context, logGroupName string) (*cloudwatchlogs.DescribeMetricFiltersOutput, error) {
+	in := &cloudwatchlogs.DescribeMetricFiltersInput{
+		LogGroupName: aws.String(logGroupName),
 	}
-	if sequenceToken != nil {
-		in.SequenceToken = sequenceToken
-	}
-	out, err := r.Client.PutLogEvents(ctx, in)
+	out, err := r.Client.DescribeMetricFilters(ctx, in)
 	if err != nil {
-		return nil, fmt.Errorf("cloudwatchlogs PutLogEvents: %w", err)
+		return nil, fmt.Errorf("cloudwatchlogs DescribeMetricFilters: %w", err)
 	}
 	return out, nil
 }
@@ -167,4 +151,34 @@ func (r *AWSCloudWatchLogsRepository) GetNextSequenceToken(ctx context.Context, 
 		return nil, ErrLogStreamNotFound
 	}
 	return streams.LogStreams[0].UploadSequenceToken, nil
+}
+
+// PutLogEvents uploads log events to the specified log stream.
+// The sequenceToken should be provided for subsequent calls after the first PutLogEvents.
+func (r *AWSCloudWatchLogsRepository) PutLogEvents(ctx context.Context, group, stream string, events []types.InputLogEvent, sequenceToken *string) (*cloudwatchlogs.PutLogEventsOutput, error) {
+	in := &cloudwatchlogs.PutLogEventsInput{
+		LogGroupName:  aws.String(group),
+		LogStreamName: aws.String(stream),
+		LogEvents:     events,
+	}
+	if sequenceToken != nil {
+		in.SequenceToken = sequenceToken
+	}
+	out, err := r.Client.PutLogEvents(ctx, in)
+	if err != nil {
+		return nil, fmt.Errorf("cloudwatchlogs PutLogEvents: %w", err)
+	}
+	return out, nil
+}
+
+// PutRetentionPolicy sets the retention policy for a log group.
+func (r *AWSCloudWatchLogsRepository) PutRetentionPolicy(ctx context.Context, group string, logRetentionInDays int32) (*cloudwatchlogs.PutRetentionPolicyOutput, error) {
+	out, err := r.Client.PutRetentionPolicy(ctx, &cloudwatchlogs.PutRetentionPolicyInput{
+		LogGroupName:    aws.String(group),
+		RetentionInDays: aws.Int32(logRetentionInDays),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cloudwatchlogs PutRetentionPolicy: %w", err)
+	}
+	return out, nil
 }

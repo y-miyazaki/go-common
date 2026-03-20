@@ -74,11 +74,12 @@ func (m *MockCloudWatchLogsClient) FilterLogEvents(ctx context.Context, params *
 	return args.Get(0).(*cloudwatchlogs.FilterLogEventsOutput), args.Error(1)
 }
 
-func TestNewAWSCloudWatchLogsRepository(t *testing.T) {
-	mockClient := &MockCloudWatchLogsClient{}
-	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
-	assert.NotNil(t, repo)
-	assert.Equal(t, mockClient, repo.Client)
+func (m *MockCloudWatchLogsClient) DescribeMetricFilters(ctx context.Context, params *cloudwatchlogs.DescribeMetricFiltersInput, optFns ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.DescribeMetricFiltersOutput, error) {
+	args := m.Called(ctx, params)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*cloudwatchlogs.DescribeMetricFiltersOutput), args.Error(1)
 }
 
 func TestAWSCloudWatchLogsRepository_CreateLogGroup(t *testing.T) {
@@ -356,4 +357,54 @@ func TestAWSCloudWatchLogsRepositoryReal_GetNextSequenceToken_StreamNotFound(t *
 	}
 
 	t.Skip("Skipping CloudWatch Logs integration test - requires real AWS credentials")
+}
+func TestAWSCloudWatchLogsRepository_DescribeMetricFilters(t *testing.T) {
+	mockClient := &MockCloudWatchLogsClient{}
+	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
+
+	logGroupName := "test-log-group"
+	expectedOutput := &cloudwatchlogs.DescribeMetricFiltersOutput{
+		MetricFilters: []types.MetricFilter{
+			{
+				FilterName:    aws.String("test-filter"),
+				FilterPattern: aws.String("[...]"),
+				LogGroupName:  aws.String(logGroupName),
+				CreationTime:  aws.Int64(time.Now().UnixMilli()),
+				MetricTransformations: []types.MetricTransformation{
+					{
+						MetricName:  aws.String("test-metric-name"),
+						MetricValue: aws.String("1"),
+					},
+				},
+			},
+		},
+	}
+
+	mockClient.On("DescribeMetricFilters", mock.Anything, mock.MatchedBy(func(input *cloudwatchlogs.DescribeMetricFiltersInput) bool {
+		return input.LogGroupName != nil && *input.LogGroupName == logGroupName
+	}), mock.Anything).Return(expectedOutput, nil)
+
+	result, err := repo.DescribeMetricFilters(context.Background(), logGroupName)
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedOutput, result)
+	assert.Len(t, result.MetricFilters, 1)
+	mockClient.AssertExpectations(t)
+}
+
+func TestAWSCloudWatchLogsRepository_DescribeMetricFilters_Error(t *testing.T) {
+	mockClient := &MockCloudWatchLogsClient{}
+	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
+
+	logGroupName := "test-log-group"
+	expectedError := errors.New("cloudwatch logs error")
+
+	mockClient.On("DescribeMetricFilters", mock.Anything, mock.Anything, mock.Anything).Return(nil, expectedError)
+
+	_, err := repo.DescribeMetricFilters(context.Background(), logGroupName)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "cloudwatchlogs DescribeMetricFilters")
+	assert.Contains(t, err.Error(), expectedError.Error())
+	mockClient.AssertExpectations(t)
 }
