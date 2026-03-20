@@ -6,11 +6,13 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager"
+	"github.com/aws/aws-sdk-go-v2/service/account"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	"github.com/aws/aws-sdk-go-v2/service/sesv2"
+	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,6 +22,14 @@ func TestNewAWSCloudWatchLogs(t *testing.T) {
 
 	assert.NotNil(t, client)
 	assert.IsType(t, &cloudwatchlogs.Client{}, client)
+}
+
+func TestNewAWSAccount(t *testing.T) {
+	cfg := &aws.Config{Region: "us-east-1"}
+	client := NewAWSAccount(cfg)
+
+	assert.NotNil(t, client)
+	assert.IsType(t, &account.Client{}, client)
 }
 
 func TestNewAWSCognito(t *testing.T) {
@@ -79,4 +89,12 @@ func TestNewAWSSES(t *testing.T) {
 
 	assert.NotNil(t, client)
 	assert.IsType(t, &sesv2.Client{}, client)
+}
+
+func TestNewAWSSTS(t *testing.T) {
+	cfg := &aws.Config{Region: "us-east-1"}
+	client := NewAWSSTS(cfg)
+
+	assert.NotNil(t, client)
+	assert.IsType(t, &sts.Client{}, client)
 }
