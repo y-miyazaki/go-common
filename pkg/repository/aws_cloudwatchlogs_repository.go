@@ -16,6 +16,14 @@ import (
 var (
 	// ErrLogStreamNotFound indicates that a requested log stream could not be found.
 	ErrLogStreamNotFound = errors.New("log stream not found")
+	// ErrDescribeLogGroupsInputNil indicates that DescribeLogGroupsInput is nil.
+	ErrDescribeLogGroupsInputNil = errors.New("DescribeLogGroupsInput cannot be nil")
+	// ErrDescribeLogStreamsInputNil indicates that DescribeLogStreamsInput is nil.
+	ErrDescribeLogStreamsInputNil = errors.New("DescribeLogStreamsInput cannot be nil")
+	// ErrDescribeMetricFiltersInputNil indicates that DescribeMetricFiltersInput is nil.
+	ErrDescribeMetricFiltersInputNil = errors.New("DescribeMetricFiltersInput cannot be nil")
+	// ErrFilterLogEventsInputNil indicates that FilterLogEventsInput is nil.
+	ErrFilterLogEventsInputNil = errors.New("FilterLogEventsInput cannot be nil")
 )
 
 // AWSCloudWatchLogsClientInterface defines the interface for CloudWatch Logs client operations
@@ -76,11 +84,10 @@ func (r *AWSCloudWatchLogsRepository) CreateLogStream(ctx context.Context, group
 	return out, nil
 }
 
-// DescribeLogGroups returns log groups optionally filtered by a name prefix.
-func (r *AWSCloudWatchLogsRepository) DescribeLogGroups(ctx context.Context, prefix string) (*cloudwatchlogs.DescribeLogGroupsOutput, error) {
-	in := &cloudwatchlogs.DescribeLogGroupsInput{}
-	if prefix != "" {
-		in.LogGroupNamePrefix = aws.String(prefix)
+// DescribeLogGroups returns log groups with the provided input parameters.
+func (r *AWSCloudWatchLogsRepository) DescribeLogGroups(ctx context.Context, in *cloudwatchlogs.DescribeLogGroupsInput) (*cloudwatchlogs.DescribeLogGroupsOutput, error) {
+	if in == nil {
+		return nil, ErrDescribeLogGroupsInputNil
 	}
 	out, err := r.Client.DescribeLogGroups(ctx, in)
 	if err != nil {
@@ -89,11 +96,10 @@ func (r *AWSCloudWatchLogsRepository) DescribeLogGroups(ctx context.Context, pre
 	return out, nil
 }
 
-// DescribeLogStreams returns log streams in a group optionally filtered by a name prefix.
-func (r *AWSCloudWatchLogsRepository) DescribeLogStreams(ctx context.Context, group, prefix string) (*cloudwatchlogs.DescribeLogStreamsOutput, error) {
-	in := &cloudwatchlogs.DescribeLogStreamsInput{LogGroupName: aws.String(group)}
-	if prefix != "" {
-		in.LogStreamNamePrefix = aws.String(prefix)
+// DescribeLogStreams returns log streams with the provided input parameters.
+func (r *AWSCloudWatchLogsRepository) DescribeLogStreams(ctx context.Context, in *cloudwatchlogs.DescribeLogStreamsInput) (*cloudwatchlogs.DescribeLogStreamsOutput, error) {
+	if in == nil {
+		return nil, ErrDescribeLogStreamsInputNil
 	}
 	out, err := r.Client.DescribeLogStreams(ctx, in)
 	if err != nil {
@@ -102,10 +108,10 @@ func (r *AWSCloudWatchLogsRepository) DescribeLogStreams(ctx context.Context, gr
 	return out, nil
 }
 
-// DescribeMetricFilters returns metric filters for a log group.
-func (r *AWSCloudWatchLogsRepository) DescribeMetricFilters(ctx context.Context, logGroupName string) (*cloudwatchlogs.DescribeMetricFiltersOutput, error) {
-	in := &cloudwatchlogs.DescribeMetricFiltersInput{
-		LogGroupName: aws.String(logGroupName),
+// DescribeMetricFilters returns metric filters with the provided input parameters.
+func (r *AWSCloudWatchLogsRepository) DescribeMetricFilters(ctx context.Context, in *cloudwatchlogs.DescribeMetricFiltersInput) (*cloudwatchlogs.DescribeMetricFiltersOutput, error) {
+	if in == nil {
+		return nil, ErrDescribeMetricFiltersInputNil
 	}
 	out, err := r.Client.DescribeMetricFilters(ctx, in)
 	if err != nil {
@@ -114,25 +120,10 @@ func (r *AWSCloudWatchLogsRepository) DescribeMetricFilters(ctx context.Context,
 	return out, nil
 }
 
-// FilterLogEvents searches log events in a log group with optional time range and filter pattern.
-func (r *AWSCloudWatchLogsRepository) FilterLogEvents(ctx context.Context, group string, startTime, endTime int64, filterPattern string, nextToken *string, limit int32) (*cloudwatchlogs.FilterLogEventsOutput, error) {
-	in := &cloudwatchlogs.FilterLogEventsInput{
-		LogGroupName: aws.String(group),
-	}
-	if startTime > 0 {
-		in.StartTime = aws.Int64(startTime)
-	}
-	if endTime > 0 {
-		in.EndTime = aws.Int64(endTime)
-	}
-	if filterPattern != "" {
-		in.FilterPattern = aws.String(filterPattern)
-	}
-	if nextToken != nil {
-		in.NextToken = nextToken
-	}
-	if limit > 0 {
-		in.Limit = aws.Int32(limit)
+// FilterLogEvents searches log events with the provided input parameters.
+func (r *AWSCloudWatchLogsRepository) FilterLogEvents(ctx context.Context, in *cloudwatchlogs.FilterLogEventsInput) (*cloudwatchlogs.FilterLogEventsOutput, error) {
+	if in == nil {
+		return nil, ErrFilterLogEventsInputNil
 	}
 	out, err := r.Client.FilterLogEvents(ctx, in)
 	if err != nil {
@@ -143,7 +134,10 @@ func (r *AWSCloudWatchLogsRepository) FilterLogEvents(ctx context.Context, group
 
 // GetNextSequenceToken retrieves the next sequence token for a log stream.
 func (r *AWSCloudWatchLogsRepository) GetNextSequenceToken(ctx context.Context, group, stream string) (*string, error) {
-	streams, err := r.DescribeLogStreams(ctx, group, stream)
+	streams, err := r.DescribeLogStreams(ctx, &cloudwatchlogs.DescribeLogStreamsInput{
+		LogGroupName:        aws.String(group),
+		LogStreamNamePrefix: aws.String(stream),
+	})
 	if err != nil {
 		return nil, fmt.Errorf("cloudwatchlogs DescribeLogStreams: %w", err)
 	}
