@@ -71,3 +71,49 @@ func TestNewConfigFileInvalidConfig(t *testing.T) {
 		NewConfigFile(setting)
 	})
 }
+
+func TestNewConfigFileInvalidFormatter(t *testing.T) {
+	dir := t.TempDir()
+	configPath := dir + "/config.yaml"
+	configContent := `
+logger:
+  formatter: xml
+  out: stdout
+  level: info
+`
+	err := os.WriteFile(configPath, []byte(configContent), 0644)
+	assert.NoError(t, err)
+
+	setting := &FileSetting{
+		ConfigPath:            dir,
+		ConfigFileName:        "config",
+		SlackOauthAccessToken: "",
+	}
+
+	assert.Panics(t, func() {
+		NewConfigFile(setting)
+	})
+}
+
+func TestNewConfigFileInvalidOut(t *testing.T) {
+	dir := t.TempDir()
+	configPath := dir + "/config.yaml"
+	configContent := `
+logger:
+  formatter: json
+  out: stderr
+  level: info
+`
+	err := os.WriteFile(configPath, []byte(configContent), 0644)
+	assert.NoError(t, err)
+
+	setting := &FileSetting{
+		ConfigPath:            dir,
+		ConfigFileName:        "config",
+		SlackOauthAccessToken: "",
+	}
+
+	assert.Panics(t, func() {
+		NewConfigFile(setting)
+	})
+}

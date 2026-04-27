@@ -110,3 +110,24 @@ func TestConvert(t *testing.T) {
 	expected := []string{"GET", "POST"}
 	assert.Equal(t, expected, result)
 }
+
+func TestGinCors_OptionsRequest_NoOptionsMethod(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	config := &GinCorsConfig{
+		AllowAllOrigins: true,
+		AllowMethods:    []string{"GET", "POST"}, // no OPTIONS
+		AllowHeaders:    []string{"Content-Type"},
+		MaxAge:          3600 * time.Second,
+	}
+	middleware := GinCors(config)
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request, _ = http.NewRequest("OPTIONS", "/test", nil)
+	c.Request.Header.Set("Origin", "http://example.com")
+
+	middleware(c)
+
+	// Without OPTIONS in AllowMethods, the response should not be 204
+	assert.NotEqual(t, http.StatusNoContent, w.Code)
+}

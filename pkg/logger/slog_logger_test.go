@@ -254,3 +254,78 @@ func TestLogger_WithContext_NoTraceID(t *testing.T) {
 		t.Errorf("trace_id mismatch: got=%v, want empty string", traceID)
 	}
 }
+
+// TestLogger_WithContext_NilContext tests getTraceID with nil context.
+func TestLogger_WithContext_NilContext(t *testing.T) {
+	buf := &bytes.Buffer{}
+
+	log := NewSlogLogger(&SlogConfig{
+		Level:     LevelInfo,
+		AddSource: false,
+		Output:    buf,
+		Format:    "json",
+	})
+
+	//nolint:staticcheck // intentionally passing nil context to test nil branch in getTraceID
+	logWithCtx := log.WithContext(nil)
+	logWithCtx.Info("test message")
+
+	var result map[string]interface{}
+	if err := json.Unmarshal(buf.Bytes(), &result); err != nil {
+		t.Fatalf("failed to parse log output: %v", err)
+	}
+
+	if traceID, exists := result["trace_id"]; !exists || traceID != "" {
+		t.Errorf("trace_id should be empty for nil context, got=%v", traceID)
+	}
+}
+
+// TestLogger_WithContext_StringTraceID tests getTraceID when context has a string trace ID.
+func TestLogger_WithContext_StringTraceID(t *testing.T) {
+	buf := &bytes.Buffer{}
+
+	log := NewSlogLogger(&SlogConfig{
+		Level:     LevelInfo,
+		AddSource: false,
+		Output:    buf,
+		Format:    "json",
+	})
+
+	ctx := context.WithValue(context.Background(), "trace_id", "abc-123") //nolint:staticcheck
+	logWithCtx := log.WithContext(ctx)
+	logWithCtx.Info("test message")
+
+	var result map[string]interface{}
+	if err := json.Unmarshal(buf.Bytes(), &result); err != nil {
+		t.Fatalf("failed to parse log output: %v", err)
+	}
+
+	if traceID := result["trace_id"]; traceID != "abc-123" {
+		t.Errorf("trace_id mismatch: got=%v, want=abc-123", traceID)
+	}
+}
+
+// TestLogger_WithContext_NonStringTraceID tests getTraceID when context has a non-string trace ID.
+func TestLogger_WithContext_NonStringTraceID(t *testing.T) {
+	buf := &bytes.Buffer{}
+
+	log := NewSlogLogger(&SlogConfig{
+		Level:     LevelInfo,
+		AddSource: false,
+		Output:    buf,
+		Format:    "json",
+	})
+
+	ctx := context.WithValue(context.Background(), "trace_id", 42) //nolint:staticcheck
+	logWithCtx := log.WithContext(ctx)
+	logWithCtx.Info("test message")
+
+	var result map[string]interface{}
+	if err := json.Unmarshal(buf.Bytes(), &result); err != nil {
+		t.Fatalf("failed to parse log output: %v", err)
+	}
+
+	if traceID := result["trace_id"]; traceID != "42" {
+		t.Errorf("trace_id mismatch: got=%v, want=42", traceID)
+	}
+}

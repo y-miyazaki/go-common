@@ -292,6 +292,14 @@ func TestGetStringFromReadCloser(t *testing.T) {
 			want:    "Hello, world!",
 			wantErr: false,
 		},
+		{
+			name: "error",
+			args: args{
+				r: &errReader{},
+			},
+			want:    "",
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

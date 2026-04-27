@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	pkgerrors "github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -107,4 +108,51 @@ func TestLogger_FatalFunctions(t *testing.T) {
 	// log.Fatalf("Test fatalf: %s", "message")
 	// log.Fatal("Test fatal")
 	// log.Fatalln("Test fatalln")
+}
+
+func TestLogger_WithError_Nil(t *testing.T) {
+	logger := &logrus.Logger{}
+	logger.Formatter = &logrus.JSONFormatter{}
+	logger.Out = os.Stdout
+	logger.Level = logrus.InfoLevel
+
+	log := NewLogger(logger)
+	result := log.WithError(nil)
+	assert.NotNil(t, result)
+}
+
+func TestLogger_WithError_StackTrace(t *testing.T) {
+	logger := &logrus.Logger{}
+	logger.Formatter = &logrus.JSONFormatter{}
+	logger.Out = os.Stdout
+	logger.Level = logrus.InfoLevel
+
+	log := NewLogger(logger)
+	// pkgerrors.New creates an error that satisfies the StackTrace() interface
+	pkgErr := pkgerrors.New("pkg error with stacktrace")
+	result := log.WithError(pkgErr)
+	assert.NotNil(t, result)
+}
+
+func TestLogger_WithContextValue_EmptyKey(t *testing.T) {
+	logger := &logrus.Logger{}
+	logger.Formatter = &logrus.JSONFormatter{}
+	logger.Out = os.Stdout
+	logger.Level = logrus.InfoLevel
+
+	log := NewLogger(logger)
+	result := log.WithContextValue("")
+	assert.NotNil(t, result)
+}
+
+func TestLogger_WithContextValue_NoContext(t *testing.T) {
+	logger := &logrus.Logger{}
+	logger.Formatter = &logrus.JSONFormatter{}
+	logger.Out = os.Stdout
+	logger.Level = logrus.InfoLevel
+
+	log := NewLogger(logger)
+	// Entry without context set — Entry.Context is nil
+	result := log.WithContextValue("someKey")
+	assert.NotNil(t, result)
 }

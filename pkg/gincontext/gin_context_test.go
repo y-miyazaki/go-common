@@ -161,6 +161,24 @@ func TestSetGinContextError(t *testing.T) {
 		})
 	}
 }
+func TestGetGinContextError_NonErrorValue(t *testing.T) {
+	c := &gin.Context{}
+	c.Set(contextKeyError, "not an error") // store non-error value
+	_, err := GetGinContextError(c)
+	if !errors.Is(err, ErrCannotGetError) {
+		t.Errorf("expected ErrCannotGetError, got: %v", err)
+	}
+}
+
+func TestGetGinContextErrorMessage_NonStringValue(t *testing.T) {
+	c := &gin.Context{}
+	c.Set(contextKeyErrorMessage, 12345) // store non-string value
+	_, err := GetGinContextErrorMessage(c)
+	if !errors.Is(err, ErrCannotGetMessage) {
+		t.Errorf("expected ErrCannotGetMessage, got: %v", err)
+	}
+}
+
 func TestSetGinContextErrorMessage(t *testing.T) {
 	c := &gin.Context{}
 	type args struct {

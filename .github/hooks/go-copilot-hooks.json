@@ -5,7 +5,7 @@
       {
         "type": "command",
         "bash": "/workspace/scripts/go/validate.sh -f",
-        "timeoutSec": 120
+        "timeoutSec": 200
       },
       {
         "type": "command",
