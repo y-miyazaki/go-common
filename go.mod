@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.15
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.22.12
 	github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager v0.1.18
-	github.com/aws/aws-sdk-go-v2/service/account v1.30.4
+	github.com/aws/aws-sdk-go-v2/service/account v1.30.6
 	github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.50.5
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.70.0
 	github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.60.1
