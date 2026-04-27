@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "hooks": {
+    "agentStop": [
+      {
+        "type": "command",
+        "bash": "/workspace/scripts/go/validate.sh -f",
+        "timeoutSec": 120
+      },
+      {
+        "type": "command",
+        "bash": "/workspace/scripts/go/clean_binaries.sh",
+        "timeoutSec": 60
+      }
+    ]
+  }
+}

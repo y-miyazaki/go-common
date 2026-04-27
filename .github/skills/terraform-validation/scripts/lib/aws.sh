@@ -10,6 +10,13 @@
 # - Resource ARN parsing utilities
 # - AWS region and account utilities
 # - AWS credentials validation (check_aws_credentials)
+#
+# Output:
+# - None (library file, sourced by other scripts)
+#
+# Design Rules:
+# - Requires common.sh to be loaded first
+# - Requires aws CLI and jq as external dependencies
 #######################################
 
 # Ensure common.sh is loaded for logging functions
@@ -31,7 +38,7 @@ fi
 #   $@ - AWS CLI command and arguments
 #
 # Returns:
-#   0 on success, 1 on error (outputs command result to stdout)
+#   0 on success, non-zero on error (outputs command result to stdout)
 #
 # Usage:
 #   result=$(aws_safe_exec aws s3 ls)

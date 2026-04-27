@@ -11,6 +11,13 @@
 # - Help/usage display functions
 # - Dependency validation
 # - Section headers for organized output
+#
+# Output:
+# - None (library file, sourced by other scripts)
+#
+# Design Rules:
+# - No external dependencies (base library)
+# - All functions must be safe to call from any script
 #######################################
 
 #######################################
@@ -209,7 +216,7 @@ function is_dry_run {
 #   $2 - Log message
 #
 # Returns:
-#   None (outputs to stderr)
+#   0 always (outputs to stderr when level matches)
 #
 # Usage:
 #   log "INFO" "Process completed successfully"
@@ -222,6 +229,7 @@ function log {
     if [[ "$level" == "ERROR" ]] || [[ "$level" == "WARN" ]] || [[ "${VERBOSE:-false}" == "true" ]]; then
         echo "[$(date +'%Y-%m-%d %H:%M:%S')] [$level] $message" >&2
     fi
+    return 0
 }
 
 #######################################
