@@ -12,7 +12,7 @@ import (
 	"github.com/y-miyazaki/go-common/pkg/utils/db"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	redis "github.com/go-redis/redis/v8"
+	redis "github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/mysql"

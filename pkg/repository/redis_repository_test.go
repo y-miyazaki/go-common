@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -350,7 +350,7 @@ func (m *MockRedisClient) SetBit(ctx context.Context, key string, offset int64, 
 	return cmd
 }
 
-func (m *MockRedisClient) SetEX(ctx context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd {
+func (m *MockRedisClient) SetEx(ctx context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd {
 	args := m.Called(ctx, key, value, expiration)
 	cmd := redis.NewStatusCmd(ctx)
 	if args.Get(0) != nil {
@@ -592,7 +592,7 @@ func (r *RedisRepositoryWithMock) SetBit(ctx context.Context, key string, offset
 
 // SetEX sets the value and expiration of a key.
 func (r *RedisRepositoryWithMock) SetEX(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
-	cmd := r.redis.SetEX(ctx, key, value, expiration)
+	cmd := r.redis.SetEx(ctx, key, value, expiration)
 	return cmd.Err()
 }
 
@@ -948,7 +948,7 @@ func TestRedisRepository_SetEX(t *testing.T) {
 	mockClient := &MockRedisClient{}
 	repo := NewRedisRepositoryWithInterface(mockClient)
 
-	mockClient.On("SetEX", mock.Anything, "test-key", "test-value", time.Hour).Return("OK", nil)
+	mockClient.On("SetEx", mock.Anything, "test-key", "test-value", time.Hour).Return("OK", nil)
 
 	err := repo.SetEX(context.Background(), "test-key", "test-value", time.Hour)
 

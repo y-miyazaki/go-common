@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	redis "github.com/go-redis/redis/v8"
+	redis "github.com/redis/go-redis/v9"
 )
 
 // RedisClientInterface defines the interface for Redis client operations
@@ -51,7 +51,7 @@ type RedisClientInterface interface {
 	// SetBit Redis `SETBIT key value offset value` command.
 	SetBit(_ context.Context, _ string, _ int64, _ int) *redis.IntCmd
 	// SetEX Redis `SETEX key value expiration` command.
-	SetEX(_ context.Context, _ string, _ any, _ time.Duration) *redis.StatusCmd
+	SetEx(_ context.Context, _ string, _ any, _ time.Duration) *redis.StatusCmd
 	// SetNX Redis `SETNX key value [expiration]` command.
 	SetNX(_ context.Context, _ string, _ any, _ time.Duration) *redis.BoolCmd
 	// SetRange Redis `SETRANGE key start end` command.
@@ -255,7 +255,7 @@ func (r *RedisRepository) SetBit(c context.Context, key string, offset int64, va
 // SetEX Redis `SETEX key value expiration` command.
 // nolint:revive // keep interface{} for Go 1.16 compatibility
 func (r *RedisRepository) SetEX(c context.Context, key string, value any, expiration time.Duration) error {
-	if err := r.Client.SetEX(c, key, value, expiration).Err(); err != nil {
+	if err := r.Client.SetEx(c, key, value, expiration).Err(); err != nil {
 		return fmt.Errorf("redis SetEX: %w", err)
 	}
 	return nil
