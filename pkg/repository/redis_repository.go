@@ -50,7 +50,7 @@ type RedisClientInterface interface {
 	Set(_ context.Context, _ string, _ any, _ time.Duration) *redis.StatusCmd
 	// SetBit Redis `SETBIT key value offset value` command.
 	SetBit(_ context.Context, _ string, _ int64, _ int) *redis.IntCmd
-	// SetEX Redis `SETEX key value expiration` command.
+	// SetEx Redis `SETEX key value expiration` command.
 	SetEx(_ context.Context, _ string, _ any, _ time.Duration) *redis.StatusCmd
 	// SetNX Redis `SETNX key value [expiration]` command.
 	SetNX(_ context.Context, _ string, _ any, _ time.Duration) *redis.BoolCmd
