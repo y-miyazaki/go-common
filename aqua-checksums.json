@@ -2311,6 +2311,36 @@
       "algorithm": "sha256"
     },
     {
+      "id": "github_release/github.com/vektra/mockery/v3.7.0/mockery_3.7.0_Darwin_arm64.tar.gz",
+      "checksum": "C0A8EA54D602C071775D1692321D385903CCC80BD2D1AE9F230539A195643D7D",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/vektra/mockery/v3.7.0/mockery_3.7.0_Darwin_x86_64.tar.gz",
+      "checksum": "36E7357FD160689A9A8AE57726E099761159845E2749BA31091589853A5A894D",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/vektra/mockery/v3.7.0/mockery_3.7.0_Linux_arm64.tar.gz",
+      "checksum": "94DAB8C6D8421630DA51FE950B4F0F1180E5BEF6022A3A5B3FE537ACACE94741",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/vektra/mockery/v3.7.0/mockery_3.7.0_Linux_x86_64.tar.gz",
+      "checksum": "5E10597D9741D7B8CDA699F044B24C9E8B51467DCE413E79516D7CD9373C2896",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/vektra/mockery/v3.7.0/mockery_3.7.0_Windows_arm64.tar.gz",
+      "checksum": "E5AA67577FD00472A32ABB2892738C601798FF50A08BAF9D85A66554CC0E2955",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/vektra/mockery/v3.7.0/mockery_3.7.0_Windows_x86_64.tar.gz",
+      "checksum": "76D524AD1740CD02ED621D90015F538FDB53CF6CD4A1AD4D289DB017FB69BD0E",
+      "algorithm": "sha256"
+    },
+    {
       "id": "github_release/github.com/zizmorcore/zizmor/v1.21.0/zizmor-aarch64-apple-darwin.tar.gz",
       "checksum": "A1CA0E0B885E9EAE616BC5B5EDE7836E9328266B67DA59B3DEFCEE01C2A3011A",
       "algorithm": "sha256"

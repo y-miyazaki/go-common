@@ -110,11 +110,6 @@ RUN apt-get update && \
     go install github.com/awslabs/diagram-as-code/cmd/awsdac@${AWSDAC_VERSION} && \
     go install github.com/awslabs/diagram-as-code/cmd/awsdac-mcp-server@${AWSDAC_VERSION}
 
-#--------------------------------------------------------------
-# Install go related
-#--------------------------------------------------------------
-# generate mock
-RUN go install -v go.uber.org/mock/mockgen@v0.6.0
 
 #--------------------------------------------------------------
 # Fixed go owner
