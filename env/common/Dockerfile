@@ -110,7 +110,6 @@ RUN apt-get update && \
     go install github.com/awslabs/diagram-as-code/cmd/awsdac@${AWSDAC_VERSION} && \
     go install github.com/awslabs/diagram-as-code/cmd/awsdac-mcp-server@${AWSDAC_VERSION}
 
-
 #--------------------------------------------------------------
 # Fixed go owner
 #--------------------------------------------------------------
