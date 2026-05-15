@@ -34,7 +34,6 @@ func NewConfigFile(setting *FileSetting) *Config {
 	viper.SetConfigType("yaml") // can viper.SetConfigType("YAML")
 	viper.AutomaticEnv()
 	err := viper.ReadInConfig() // Find and read the config file
-
 	if err != nil {
 		panic("viper can't read config.")
 	}

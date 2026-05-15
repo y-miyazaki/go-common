@@ -143,6 +143,7 @@ func (cs *GinCorsConfig) validateOrigin(origin string) bool {
 	}
 	return false
 }
+
 func (cs *GinCorsConfig) validateMethodOptions() bool {
 	for _, v := range cs.AllowMethods {
 		if v == "OPTIONS" {

@@ -2861,6 +2861,16 @@ linters:
       # Default: false
       force-short-decl-cuddling: true
 
+  # Defines a set of rules to ignore issues.
+  exclusions:
+    # Mode of the generated files analysis.
+    # Default: strict
+    generated: strict
+    # Which file paths to exclude from linting.
+    # Default: []
+    paths:
+      - "tmp/"
+
 issues:
   # Maximum issues count per one linter.
   # Set to 0 to disable.
@@ -2896,3 +2906,29 @@ issues:
   # Fix found issues (if it's supported by the linter).
   # Default: false
   fix: true
+
+formatters: # https://golangci-lint.run/docs/formatters/configuration/
+  enable:
+    - gofumpt # A stricter gofmt.
+    - goimports # Manages import grouping and ordering.
+  settings:
+    gofumpt: # https://github.com/mvdan/gofumpt
+      # Module path which contains the source code being formatted.
+      # Default: ""
+      module-path: ""
+      # Choose whether to use the extra rules.
+      # Default: false
+      extra-rules: true
+    goimports: # https://pkg.go.dev/golang.org/x/tools/cmd/goimports
+      # A list of prefixes, which, if set, checks import paths
+      # with the given prefixes are grouped after 3rd-party packages.
+      # Default: []
+      local-prefixes: []
+  exclusions:
+    # Mode of the generated files analysis.
+    # Default: lax
+    generated: strict
+    # Which file paths to exclude from formatting.
+    # Default: []
+    paths:
+      - "tmp/"

@@ -13,7 +13,7 @@ import (
 // RedisClientInterface defines the interface for Redis client operations
 type RedisClientInterface interface {
 	// Append Redis `APPEND key value` command.
-	Append(_ context.Context, _ string, _ string) *redis.IntCmd
+	Append(_ context.Context, _, _ string) *redis.IntCmd
 	// BitCount Redis `BITCOUNT key` command.
 	BitCount(_ context.Context, _ string, _ *redis.BitCount) *redis.IntCmd
 	// Decr Redis `DECR key` command.
@@ -29,7 +29,7 @@ type RedisClientInterface interface {
 	// GetBit Redis `GETBIT key start end` command.
 	GetBit(_ context.Context, _ string, _ int64) *redis.IntCmd
 	// GetRange Redis `GETRANGE key start end` command.
-	GetRange(_ context.Context, _ string, _ int64, _ int64) *redis.StringCmd
+	GetRange(_ context.Context, _ string, _, _ int64) *redis.StringCmd
 	// GetSet Redis `GETSET key` command.
 	GetSet(_ context.Context, _ string, _ any) *redis.StringCmd
 	// Incr Redis `INCR key` command.
