@@ -4,9 +4,14 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
+
+// stackTracer is an interface for errors that carry a stack trace,
+// compatible with github.com/pkg/errors.
+type stackTracer interface {
+	StackTrace() fmt.Formatter
+}
 
 // Logger struct.
 type Logger struct {
@@ -80,7 +85,7 @@ func (l *Logger) WithError(err error) *Logger {
 	if err == nil {
 		return l
 	}
-	if e, ok := err.(interface{ StackTrace() errors.StackTrace }); ok {
+	if e, ok := err.(stackTracer); ok {
 		return &Logger{
 			Entry:  l.Entry.WithField("stacktrace", fmt.Sprintf("%+v", e.StackTrace())).WithError(err),
 			Config: l.Config,

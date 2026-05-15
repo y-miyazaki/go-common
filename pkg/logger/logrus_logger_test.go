@@ -5,12 +5,41 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"runtime"
 	"testing"
 
-	pkgerrors "github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
+
+// stackFrame implements fmt.Formatter to mimic pkg/errors stack trace output.
+type stackFrame []uintptr
+
+func (s stackFrame) Format(f fmt.State, verb rune) {
+	for _, pc := range s {
+		fn := runtime.FuncForPC(pc)
+		if fn == nil {
+			continue
+		}
+		file, line := fn.FileLine(pc)
+		fmt.Fprintf(f, "\n%s\n\t%s:%d", fn.Name(), file, line)
+	}
+}
+
+// stackError is a test error that satisfies the stackTracer interface.
+type stackError struct {
+	msg   string
+	stack stackFrame
+}
+
+func (e *stackError) Error() string         { return e.msg }
+func (e *stackError) StackTrace() fmt.Formatter { return e.stack }
+
+func newStackError(msg string) error {
+	pcs := make([]uintptr, 32)
+	n := runtime.Callers(2, pcs)
+	return &stackError{msg: msg, stack: stackFrame(pcs[:n])}
+}
 
 func TestNewLogger(t *testing.T) {
 
@@ -128,8 +157,8 @@ func TestLogger_WithError_StackTrace(t *testing.T) {
 	logger.Level = logrus.InfoLevel
 
 	log := NewLogger(logger)
-	// pkgerrors.New creates an error that satisfies the StackTrace() interface
-	pkgErr := pkgerrors.New("pkg error with stacktrace")
+	// newStackError creates an error that satisfies the StackTrace() interface
+	pkgErr := newStackError("pkg error with stacktrace")
 	result := log.WithError(pkgErr)
 	assert.NotNil(t, result)
 }
