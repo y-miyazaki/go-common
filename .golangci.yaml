@@ -2909,7 +2909,7 @@ issues:
 
 formatters: # https://golangci-lint.run/docs/formatters/configuration/
   enable:
-    - gofumpt # A stricter gofmt.
+    - gofumpt # A stricter formatter.
     - goimports # Manages import grouping and ordering.
   settings:
     gofumpt: # https://github.com/mvdan/gofumpt
