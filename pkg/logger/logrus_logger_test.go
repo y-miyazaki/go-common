@@ -32,7 +32,7 @@ type stackError struct {
 	stack stackFrame
 }
 
-func (e *stackError) Error() string         { return e.msg }
+func (e *stackError) Error() string             { return e.msg }
 func (e *stackError) StackTrace() fmt.Formatter { return e.stack }
 
 func newStackError(msg string) error {
