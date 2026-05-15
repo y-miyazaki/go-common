@@ -10,7 +10,7 @@
 
 This repository provides common libraries and example applications for Go language, utilizing libraries such as AWS SDK v2, Gin, and GORM with practical samples.
 
-- Go 1.25  
+- go 1.26  
 - AWS SDK v2  
 - Gin (Web Framework)  
 - GORM (ORM)  
@@ -131,7 +131,7 @@ This section explains how to set up a local, non-containerized development works
 
 #### Requirements
 
-- Go 1.25 or higher  
+- go 1.26 or higher  
 - Git  
 - GitHub CLI (gh)  
 
