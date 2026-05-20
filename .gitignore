@@ -1,9 +1,10 @@
 # root
 .DS_Store
 .devcontainer/devcontainer.json
-.vscode
+.vscode/**
 !.vscode/cspell.json
 !.vscode/cspell-project.txt
+!.vscode/mcp.json
 !.vscode/settings-example.json
 tmp
 
@@ -11,7 +12,6 @@ tmp
 .copilot
 .kiro
 .serena
-!.vscode/mcp.json
 apm_modules/
 
 # env
