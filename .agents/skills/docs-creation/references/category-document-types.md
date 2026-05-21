@@ -1,26 +1,27 @@
-# `document_type` Mapping
+# Document Types
 
-Use this mapping to resolve `document_type` to the default target file under `docs/`.
+Use this mapping to resolve `document_type` to the default target file, template, and determine whether the document is mandatory.
 If a user provides `target_file`, prioritize that explicit path after schema validation.
 
 ## Core Types
 
-| document_type      | Default file               | Purpose                                           | Required (minimum sections)                                                  |
-| ------------------ | -------------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `specification`    | `docs/specification.md`    | Record behavioral requirements and expected flows | H1, feature/behavior sections, configuration defaults (if present)           |
-| `architecture`     | `docs/architecture.md`     | Explain system structure and boundaries           | H1, System/Component Structure section, Project Layout, Key Design Decisions |
-| `design`           | `docs/design.md`           | Describe module-level implementation design       | H1, Overview, Module Architecture, Parameters                                |
-| `design-decisions` | `docs/design-decisions.md` | Track major decisions and rejected alternatives   | H1, Decision, Rationale, Alternatives Rejected                               |
-| `troubleshooting`  | `docs/troubleshooting.md`  | Provide issue diagnostics and recovery steps      | H1, Symptoms, Root Cause, Resolution, Prevention (if applicable)             |
-| `general`          | no fixed file (ask user)   | Capture documentation outside predefined types    | H1 and purpose-aligned sections based on selected template                   |
+| document_type      | Default file               | Template file                                        | Purpose                                           | Mandatory |
+| ------------------ | -------------------------- | ---------------------------------------------------- | ------------------------------------------------- | --------- |
+| `readme`           | `README.md`                | `category-templates-common-readme.md`                | Repository entry point for humans and AI agents   | yes       |
+| `specification`    | `docs/specification.md`    | `category-templates-common-specification.md`         | Record behavioral requirements and expected flows | no        |
+| `architecture`     | `docs/architecture.md`     | `category-templates-common-architecture.md`          | Explain system structure and boundaries           | no        |
+| `design`           | `docs/design.md`           | `category-templates-common-design.md`                | Describe module-level implementation design       | no        |
+| `design-decisions` | `docs/design-decisions.md` | `category-templates-common-design-decisions.md`      | Track major decisions and rejected alternatives   | no        |
+| `troubleshooting`  | `docs/troubleshooting.md`  | `category-templates-common-troubleshooting.md`       | Provide issue diagnostics and recovery steps      | no        |
+| `general`          | (ask user)                 | `category-templates-common-general.md`               | Capture documentation outside predefined types    | no        |
 
 ## Extension Types
 
-| document_type       | Default file                | Purpose                                             | Required (minimum sections)                                 |
-| ------------------- | --------------------------- | --------------------------------------------------- | ----------------------------------------------------------- |
-| `module-catalog`    | `docs/module-catalog.md`    | Catalog modules with key inputs/outputs             | H1, at least one module entry with Purpose, Inputs, Outputs |
-| `monitoring`        | `docs/monitoring.md`        | Define alerts, dashboards, and operational runbook  | H1, Alerts, Dashboards, Runbooks                            |
-| `performance`       | `docs/performance.md`       | Record bottlenecks, benchmarks, and tuning actions  | H1, Benchmarks, Known Bottlenecks, Tuning                   |
-| `security-coverage` | `docs/security-coverage.md` | Summarize security control and service coverage     | H1, Coverage Matrix, Legend                                 |
-| `maintenance-notes` | `docs/maintenance-notes.md` | Capture periodic operations and maintenance history | H1, Periodic Tasks, Known Quirks, Change Log                |
-| `improvements`      | `docs/improvements.md`      | Track planned and completed improvement work        | H1, Backlog/Planned Items, Completed Items, Next Actions    |
+| document_type       | Default file                | Template file                                        | Purpose                                             | Mandatory |
+| ------------------- | --------------------------- | ---------------------------------------------------- | --------------------------------------------------- | --------- |
+| `module-catalog`    | `docs/module-catalog.md`    | `category-templates-common-module-catalog.md`        | Catalog modules with key inputs/outputs             | no        |
+| `monitoring`        | `docs/monitoring.md`        | `category-templates-common-monitoring.md`            | Define alerts, dashboards, and operational runbook  | no        |
+| `performance`       | `docs/performance.md`       | `category-templates-common-performance.md`           | Record bottlenecks, benchmarks, and tuning actions  | no        |
+| `security-coverage` | `docs/security-coverage.md` | `category-templates-common-security-coverage.md`     | Summarize security control and service coverage     | no        |
+| `maintenance-notes` | `docs/maintenance-notes.md` | `category-templates-common-maintenance-notes.md`     | Capture periodic operations and maintenance history | no        |
+| `improvements`      | `docs/improvements.md`      | `category-templates-common-improvements.md`          | Track planned and completed improvement work        | no        |
