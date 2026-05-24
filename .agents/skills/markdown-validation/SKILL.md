@@ -60,3 +60,4 @@ Return `## Checks Summary`, `## Checks (Failed/Deferred Only)`, and `## Issues`.
 - Prompt: `Validate Markdown files and report only failed checks.`
 - Command: `bash scripts/validate.sh ./docs/`
 - Output: per-tool results with deferred status for network-only link failures.
+

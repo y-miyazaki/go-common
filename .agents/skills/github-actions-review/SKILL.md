@@ -61,3 +61,4 @@ Return review output with `## Checks Summary`, `## Checks (Failed/Deferred Only)
 
 - Prompt: `Review workflow PR and report failed/deferred checks.`
 - Output: `## Checks Summary` + `## Checks (Failed/Deferred Only)` + `## Issues`, with each issue including file path, line, and remediation.
+

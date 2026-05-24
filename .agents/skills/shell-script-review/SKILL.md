@@ -55,3 +55,4 @@ Return structured review output with `## Checks Summary`, `## Checks (Failed/Def
 2. Confirm `shell-script-validation` results exist; if missing, request rerun and defer validator-dependent checks.
 3. Review checklist categories based on changed script paths and PR intent, then collect failed/deferred ItemIDs.
 4. Output required report sections per [references/common-output-format.md](references/common-output-format.md). Prioritize `SEC-*` findings first. Include file path, risk type, and concrete remediation for each issue.
+

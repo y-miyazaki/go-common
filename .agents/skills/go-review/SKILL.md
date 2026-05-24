@@ -56,3 +56,4 @@ Return structured review output with `## Checks Summary`, `## Checks (Failed/Def
 4. Output required report sections per [references/common-output-format.md](references/common-output-format.md). Prioritize `SEC-*` findings first. Include file path and line reference for each finding.
 5. Exclude generated files and `vendor/` from primary findings unless they introduce security-critical risk.
 6. For very large PRs (>50 changed Go files), prioritize security/correctness checks first and defer low-risk style checks if evidence is insufficient.
+

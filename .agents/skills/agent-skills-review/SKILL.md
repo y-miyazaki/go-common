@@ -84,3 +84,4 @@ metadata:
    - Impact: <scope and severity>
    - Recommendation: <specific fix>
 ```
+

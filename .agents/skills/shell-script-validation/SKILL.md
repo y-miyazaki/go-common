@@ -63,3 +63,4 @@ bash scripts/validate.sh
 bash scripts/validate.sh ./scripts/deploy.sh -v
 bash scripts/validate.sh -f
 ```
+

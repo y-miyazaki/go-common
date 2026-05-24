@@ -58,3 +58,4 @@ Always include target file list and deferred reason summary.
 5. If PR context is unavailable, run file-only review and mark PR-context checks as deferred.
 6. Verify required chapter order (Standards → Guidelines → Testing and Validation → Security Guidelines), then review checklist priorities and collect failed/deferred ItemIDs.
 7. Output required report sections per [references/common-output-format.md](references/common-output-format.md).
+
