@@ -22,7 +22,7 @@ type TestStruct3 struct {
 
 func CreateTestData() []TestStruct {
 	data := []TestStruct{}
-	for i := 0; i < 100000; i++ {
+	for range 100000 {
 		data = append(data, TestStruct{
 			Title: "testtitle",
 			Name:  "testname",

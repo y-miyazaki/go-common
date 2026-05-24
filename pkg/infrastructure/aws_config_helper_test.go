@@ -36,7 +36,7 @@ func TestAWSServiceString(t *testing.T) {
 func TestCreateHTTPClientWithLogger(t *testing.T) {
 	tests := []struct {
 		name     string
-		logger   interface{}
+		logger   any
 		expected bool
 	}{
 		{

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/slack-go/slack"
@@ -58,7 +59,7 @@ func (m *MockSlackClient) GetUsers() ([]slack.User, error) {
 	return args.Get(0).([]slack.User), args.Error(1)
 }
 
-func (m *MockSlackClient) GetChannels(private bool, options ...interface{}) ([]slack.Channel, error) {
+func (m *MockSlackClient) GetChannels(private bool, options ...any) ([]slack.Channel, error) {
 	args := m.Called(private, options)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
@@ -286,14 +287,14 @@ func TestSlackRepository_PostMessageText_LongMessage(t *testing.T) {
 	repo := NewSlackRepositoryWithInterface(mockClient, channelID)
 
 	// Create a long message (4000 characters)
-	longMessage := ""
-	for i := 0; i < 400; i++ {
-		longMessage += "This is a test message that is very long. "
+	var longMessage strings.Builder
+	for range 400 {
+		longMessage.WriteString("This is a test message that is very long. ")
 	}
 
 	mockClient.On("PostMessage", channelID, mock.Anything).Return("timestamp", "message_id", nil)
 
-	err := repo.PostMessageText(longMessage)
+	err := repo.PostMessageText(longMessage.String())
 
 	assert.NoError(t, err)
 	mockClient.AssertExpectations(t)

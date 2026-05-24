@@ -70,7 +70,7 @@ func TestHTTPHandler_HandleEnv(t *testing.T) {
 			assert.Equal(t, tt.expectedCode, w.Code)
 
 			// Parse response body
-			var response map[string]interface{}
+			var response map[string]any
 			err := json.Unmarshal(w.Body.Bytes(), &response)
 			assert.NoError(t, err)
 			assert.Equal(t, "Hello!", response["message"])

@@ -108,7 +108,7 @@ func TestLogger_LogLevels(t *testing.T) {
 			buf.Reset()
 			tt.logFunc()
 
-			var result map[string]interface{}
+			var result map[string]any
 			if err := json.Unmarshal(buf.Bytes(), &result); err != nil {
 				t.Fatalf("failed to parse log output: %v", err)
 			}
@@ -140,7 +140,7 @@ func TestLogger_WithContext(t *testing.T) {
 	logWithCtx := log.WithContext(ctx)
 	logWithCtx.Info("test message")
 
-	var result map[string]interface{}
+	var result map[string]any
 	if err := json.Unmarshal(buf.Bytes(), &result); err != nil {
 		t.Fatalf("failed to parse log output: %v", err)
 	}
@@ -166,7 +166,7 @@ func TestLogger_WithError(t *testing.T) {
 	logWithErr := log.WithError(testErr)
 	logWithErr.Error("operation failed")
 
-	var result map[string]interface{}
+	var result map[string]any
 	if err := json.Unmarshal(buf.Bytes(), &result); err != nil {
 		t.Fatalf("failed to parse log output: %v", err)
 	}
@@ -194,7 +194,7 @@ func TestLogger_With(t *testing.T) {
 	logWith := log.With("key1", "value1", "key2", "value2")
 	logWith.Info("test message")
 
-	var result map[string]interface{}
+	var result map[string]any
 	if err := json.Unmarshal(buf.Bytes(), &result); err != nil {
 		t.Fatalf("failed to parse log output: %v", err)
 	}
@@ -219,7 +219,7 @@ func TestLogger_WithError_NilError(t *testing.T) {
 	logWithErr := log.WithError(nil)
 	logWithErr.Error("operation failed")
 
-	var result map[string]interface{}
+	var result map[string]any
 	if err := json.Unmarshal(buf.Bytes(), &result); err != nil {
 		t.Fatalf("failed to parse log output: %v", err)
 	}
@@ -245,7 +245,7 @@ func TestLogger_WithContext_NoTraceID(t *testing.T) {
 	logWithCtx := log.WithContext(ctx)
 	logWithCtx.Info("test message")
 
-	var result map[string]interface{}
+	var result map[string]any
 	if err := json.Unmarshal(buf.Bytes(), &result); err != nil {
 		t.Fatalf("failed to parse log output: %v", err)
 	}
@@ -270,7 +270,7 @@ func TestLogger_WithContext_NilContext(t *testing.T) {
 	logWithCtx := log.WithContext(nil)
 	logWithCtx.Info("test message")
 
-	var result map[string]interface{}
+	var result map[string]any
 	if err := json.Unmarshal(buf.Bytes(), &result); err != nil {
 		t.Fatalf("failed to parse log output: %v", err)
 	}
@@ -295,7 +295,7 @@ func TestLogger_WithContext_StringTraceID(t *testing.T) {
 	logWithCtx := log.WithContext(ctx)
 	logWithCtx.Info("test message")
 
-	var result map[string]interface{}
+	var result map[string]any
 	if err := json.Unmarshal(buf.Bytes(), &result); err != nil {
 		t.Fatalf("failed to parse log output: %v", err)
 	}
@@ -320,7 +320,7 @@ func TestLogger_WithContext_NonStringTraceID(t *testing.T) {
 	logWithCtx := log.WithContext(ctx)
 	logWithCtx.Info("test message")
 
-	var result map[string]interface{}
+	var result map[string]any
 	if err := json.Unmarshal(buf.Bytes(), &result); err != nil {
 		t.Fatalf("failed to parse log output: %v", err)
 	}

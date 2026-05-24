@@ -2,7 +2,7 @@ package utils
 
 import (
 	"io"
-	"io/ioutil"
+
 	"strings"
 	"testing"
 )
@@ -195,7 +195,7 @@ func TestSliceUTF8AddString(t *testing.T) {
 
 func TestConvertToStringaa(t *testing.T) {
 	type args struct {
-		input interface{}
+		input any
 	}
 	testArgs := args{}
 	tests := []struct {
@@ -288,7 +288,7 @@ func TestGetStringFromReadCloser(t *testing.T) {
 		{
 			name: "test1",
 			args: args{
-				r: ioutil.NopCloser(strings.NewReader("Hello, world!")),
+				r: io.NopCloser(strings.NewReader("Hello, world!")),
 			},
 			want:    "Hello, world!",
 			wantErr: false,

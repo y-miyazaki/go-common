@@ -183,7 +183,7 @@ func TestSetGinContextErrorMessage(t *testing.T) {
 	c := &gin.Context{}
 	type args struct {
 		c       *gin.Context
-		message interface{}
+		message any
 	}
 	tests := []struct {
 		name string

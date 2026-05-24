@@ -40,7 +40,7 @@ func (m *MockRedisClient) Get(ctx context.Context, key string) *redis.StringCmd 
 	return cmd
 }
 
-func (m *MockRedisClient) Set(ctx context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd {
+func (m *MockRedisClient) Set(ctx context.Context, key string, value any, expiration time.Duration) *redis.StatusCmd {
 	args := m.Called(ctx, key, value, expiration)
 	cmd := redis.NewStatusCmd(ctx)
 	if args.Get(0) != nil {
@@ -148,7 +148,7 @@ func (m *MockRedisClient) HGet(ctx context.Context, key, field string) *redis.St
 	return cmd
 }
 
-func (m *MockRedisClient) HSet(ctx context.Context, key, field string, value interface{}) *redis.IntCmd {
+func (m *MockRedisClient) HSet(ctx context.Context, key, field string, value any) *redis.IntCmd {
 	args := m.Called(ctx, key, field, value)
 	cmd := redis.NewIntCmd(ctx)
 	if args.Get(0) != nil {
@@ -172,7 +172,7 @@ func (m *MockRedisClient) HDel(ctx context.Context, key string, fields ...string
 	return cmd
 }
 
-func (m *MockRedisClient) LPush(ctx context.Context, key string, values ...interface{}) *redis.IntCmd {
+func (m *MockRedisClient) LPush(ctx context.Context, key string, values ...any) *redis.IntCmd {
 	args := m.Called(ctx, key, values)
 	cmd := redis.NewIntCmd(ctx)
 	if args.Get(0) != nil {
@@ -208,7 +208,7 @@ func (m *MockRedisClient) BLPop(ctx context.Context, timeout time.Duration, keys
 	return cmd
 }
 
-func (m *MockRedisClient) Publish(ctx context.Context, channel string, message interface{}) *redis.IntCmd {
+func (m *MockRedisClient) Publish(ctx context.Context, channel string, message any) *redis.IntCmd {
 	args := m.Called(ctx, channel, message)
 	cmd := redis.NewIntCmd(ctx)
 	if args.Get(0) != nil {
@@ -266,7 +266,7 @@ func (m *MockRedisClient) GetRange(ctx context.Context, key string, start, end i
 	return cmd
 }
 
-func (m *MockRedisClient) GetSet(ctx context.Context, key string, value interface{}) *redis.StringCmd {
+func (m *MockRedisClient) GetSet(ctx context.Context, key string, value any) *redis.StringCmd {
 	args := m.Called(ctx, key, value)
 	cmd := redis.NewStringCmd(ctx)
 	if args.Get(0) != nil {
@@ -306,7 +306,7 @@ func (m *MockRedisClient) MGet(ctx context.Context, keys ...string) *redis.Slice
 	args := m.Called(ctx, keys)
 	cmd := redis.NewSliceCmd(ctx)
 	if args.Get(0) != nil {
-		cmd.SetVal(args.Get(0).([]interface{}))
+		cmd.SetVal(args.Get(0).([]any))
 	}
 	if args.Get(1) != nil {
 		cmd.SetErr(args.Error(1))
@@ -314,7 +314,7 @@ func (m *MockRedisClient) MGet(ctx context.Context, keys ...string) *redis.Slice
 	return cmd
 }
 
-func (m *MockRedisClient) MSet(ctx context.Context, values ...interface{}) *redis.StatusCmd {
+func (m *MockRedisClient) MSet(ctx context.Context, values ...any) *redis.StatusCmd {
 	args := m.Called(ctx, values)
 	cmd := redis.NewStatusCmd(ctx)
 	if args.Get(0) != nil {
@@ -326,7 +326,7 @@ func (m *MockRedisClient) MSet(ctx context.Context, values ...interface{}) *redi
 	return cmd
 }
 
-func (m *MockRedisClient) MSetNX(ctx context.Context, values ...interface{}) *redis.BoolCmd {
+func (m *MockRedisClient) MSetNX(ctx context.Context, values ...any) *redis.BoolCmd {
 	args := m.Called(ctx, values)
 	cmd := redis.NewBoolCmd(ctx)
 	if args.Get(0) != nil {
@@ -350,7 +350,7 @@ func (m *MockRedisClient) SetBit(ctx context.Context, key string, offset int64, 
 	return cmd
 }
 
-func (m *MockRedisClient) SetEx(ctx context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd {
+func (m *MockRedisClient) SetEx(ctx context.Context, key string, value any, expiration time.Duration) *redis.StatusCmd {
 	args := m.Called(ctx, key, value, expiration)
 	cmd := redis.NewStatusCmd(ctx)
 	if args.Get(0) != nil {
@@ -362,7 +362,7 @@ func (m *MockRedisClient) SetEx(ctx context.Context, key string, value interface
 	return cmd
 }
 
-func (m *MockRedisClient) SetNX(ctx context.Context, key string, value interface{}, expiration time.Duration) *redis.BoolCmd {
+func (m *MockRedisClient) SetNX(ctx context.Context, key string, value any, expiration time.Duration) *redis.BoolCmd {
 	args := m.Called(ctx, key, value, expiration)
 	cmd := redis.NewBoolCmd(ctx)
 	if args.Get(0) != nil {
@@ -432,7 +432,7 @@ func (r *RedisRepositoryWithMock) Get(ctx context.Context, key string) (string, 
 }
 
 // Set sets the value of a key.
-func (r *RedisRepositoryWithMock) Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
+func (r *RedisRepositoryWithMock) Set(ctx context.Context, key string, value any, expiration time.Duration) error {
 	cmd := r.redis.Set(ctx, key, value, expiration)
 	return cmd.Err()
 }
@@ -537,7 +537,7 @@ func (r *RedisRepositoryWithMock) GetRange(ctx context.Context, key string, star
 }
 
 // GetSet sets the string value of a key and return its old value.
-func (r *RedisRepositoryWithMock) GetSet(ctx context.Context, key string, value interface{}) (string, error) {
+func (r *RedisRepositoryWithMock) GetSet(ctx context.Context, key string, value any) (string, error) {
 	cmd := r.redis.GetSet(ctx, key, value)
 	if err := cmd.Err(); err != nil {
 		return "", err
@@ -558,7 +558,7 @@ func (r *RedisRepositoryWithMock) IncrByfloat(ctx context.Context, key string, v
 }
 
 // MGet returns the values of all specified keys.
-func (r *RedisRepositoryWithMock) MGet(ctx context.Context, keys ...string) ([]interface{}, error) {
+func (r *RedisRepositoryWithMock) MGet(ctx context.Context, keys ...string) ([]any, error) {
 	cmd := r.redis.MGet(ctx, keys...)
 	if err := cmd.Err(); err != nil {
 		return nil, err
@@ -567,7 +567,7 @@ func (r *RedisRepositoryWithMock) MGet(ctx context.Context, keys ...string) ([]i
 }
 
 // MSet sets the given keys to their respective values.
-func (r *RedisRepositoryWithMock) MSet(ctx context.Context, values ...interface{}) (string, error) {
+func (r *RedisRepositoryWithMock) MSet(ctx context.Context, values ...any) (string, error) {
 	cmd := r.redis.MSet(ctx, values...)
 	if err := cmd.Err(); err != nil {
 		return "", err
@@ -576,7 +576,7 @@ func (r *RedisRepositoryWithMock) MSet(ctx context.Context, values ...interface{
 }
 
 // MSetNX sets the given keys to their respective values if they do not exist.
-func (r *RedisRepositoryWithMock) MSetNX(ctx context.Context, values ...interface{}) (bool, error) {
+func (r *RedisRepositoryWithMock) MSetNX(ctx context.Context, values ...any) (bool, error) {
 	cmd := r.redis.MSetNX(ctx, values...)
 	if err := cmd.Err(); err != nil {
 		return false, err
@@ -591,13 +591,13 @@ func (r *RedisRepositoryWithMock) SetBit(ctx context.Context, key string, offset
 }
 
 // SetEX sets the value and expiration of a key.
-func (r *RedisRepositoryWithMock) SetEX(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
+func (r *RedisRepositoryWithMock) SetEX(ctx context.Context, key string, value any, expiration time.Duration) error {
 	cmd := r.redis.SetEx(ctx, key, value, expiration)
 	return cmd.Err()
 }
 
 // SetNX sets the value of a key, only if the key does not exist.
-func (r *RedisRepositoryWithMock) SetNX(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
+func (r *RedisRepositoryWithMock) SetNX(ctx context.Context, key string, value any, expiration time.Duration) error {
 	cmd := r.redis.SetNX(ctx, key, value, expiration)
 	return cmd.Err()
 }

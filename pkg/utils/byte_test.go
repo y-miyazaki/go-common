@@ -3,7 +3,7 @@ package utils
 import (
 	"errors"
 	"io"
-	"io/ioutil"
+
 	"reflect"
 	"strings"
 	"testing"
@@ -31,7 +31,7 @@ func TestGetBufferFromReadCloser(t *testing.T) {
 		{
 			name: "test1",
 			args: args{
-				r: ioutil.NopCloser(strings.NewReader("Hello, world!")),
+				r: io.NopCloser(strings.NewReader("Hello, world!")),
 			},
 			want:    []byte("Hello, world!"),
 			wantErr: false,

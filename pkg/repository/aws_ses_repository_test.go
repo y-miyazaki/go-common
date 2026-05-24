@@ -485,7 +485,7 @@ func TestAWSSESRepository_SendBulkEmail_LargeBatch(t *testing.T) {
 
 	// Create 50 entries (maximum allowed)
 	bulkEmailEntries := make([]types.BulkEmailEntry, 50)
-	for i := 0; i < 50; i++ {
+	for i := range 50 {
 		bulkEmailEntries[i] = types.BulkEmailEntry{
 			Destination: &types.Destination{
 				ToAddresses: []string{fmt.Sprintf("user%d@example.com", i)},
