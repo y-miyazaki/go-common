@@ -1,4 +1,3 @@
-// Package infrastructure provides AWS S3 integration helpers using AWS SDK v2.
 package infrastructure
 
 import (

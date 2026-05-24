@@ -1,4 +1,4 @@
-# Document Types
+## Document Types
 
 Use this mapping to resolve `document_type` to the default target file, template, and determine whether the document is mandatory.
 If a user provides `target_file`, prioritize that explicit path after schema validation.
@@ -13,7 +13,8 @@ If a user provides `target_file`, prioritize that explicit path after schema val
 | `design`           | `docs/design.md`           | `category-templates-common-design.md`                | Describe module-level implementation design       | no        |
 | `design-decisions` | `docs/design-decisions.md` | `category-templates-common-design-decisions.md`      | Track major decisions and rejected alternatives   | no        |
 | `troubleshooting`  | `docs/troubleshooting.md`  | `category-templates-common-troubleshooting.md`       | Provide issue diagnostics and recovery steps      | no        |
-| `general`          | (ask user)                 | `category-templates-common-general.md`               | Capture documentation outside predefined types    | no        |
+| `tutorial`         | `docs/tutorial.md`         | `category-templates-common-tutorial.md`              | Learning-oriented walkthrough with a single happy path | no   |
+| `general`          | (ask user)                 | `category-templates-common-general.md`               | Create new documentation outside predefined types   | no        |
 
 ## Extension Types
 
@@ -25,3 +26,15 @@ If a user provides `target_file`, prioritize that explicit path after schema val
 | `security-coverage` | `docs/security-coverage.md` | `category-templates-common-security-coverage.md`     | Summarize security control and service coverage     | no        |
 | `maintenance-notes` | `docs/maintenance-notes.md` | `category-templates-common-maintenance-notes.md`     | Capture periodic operations and maintenance history | no        |
 | `improvements`      | `docs/improvements.md`      | `category-templates-common-improvements.md`          | Track planned and completed improvement work        | no        |
+| `other`             | (use `target_file`)         | `category-templates-common-other.md`                 | Update existing documents outside predefined types  | no        |
+
+## Diataxis Mapping Guidance
+
+Use this mapping when linking tutorial next steps to existing documentation categories:
+
+| Diataxis type | Preferred `document_type` candidates |
+| ------------- | ------------------------------------ |
+| Tutorial      | `tutorial` |
+| How-To        | `troubleshooting`, `general`, `maintenance-notes`, `improvements` |
+| Reference     | `module-catalog`, `monitoring`, `performance`, `security-coverage` |
+| Explanation   | `architecture`, `design`, `design-decisions`, `specification` |

@@ -132,6 +132,7 @@ func BenchmarkMake2(b *testing.B) {
 		data = append(data, line...)
 	}
 }
+
 func BenchmarkMakeNo(b *testing.B) {
 	data := []string{}
 

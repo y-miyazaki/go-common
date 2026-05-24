@@ -5,7 +5,7 @@ Adapt structure and depth to the repository and context.
 Replace all `<placeholder>` values with actual content.
 Remove sections that do not apply rather than leaving them empty.
 
-```markdown
+````markdown
 # Troubleshooting
 
 Common operational issues, investigation workflows,
@@ -57,4 +57,4 @@ Consider:
 - Which failures are hardest to diagnose?
 - Which symptoms indicate systemic issues?
 - Which recovery actions are destructive?
-```
+````

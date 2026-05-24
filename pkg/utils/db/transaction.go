@@ -1,4 +1,3 @@
-// Package db provides database transaction utilities.
 package db
 
 import (
@@ -18,11 +17,11 @@ func TransactionGorm(db *gorm.DB, f func(db *gorm.DB) error) error {
 		return fmt.Errorf("begin transaction: %w", tx.Error)
 	}
 	// Ensure rollback is called if transaction wasn't committed
-	defer (func() {
+	defer func() {
 		if !committed {
 			tx.Rollback()
 		}
-	})()
+	}()
 	// Execute the provided function within the transaction
 	if err := f(tx); err != nil {
 		return fmt.Errorf("transaction function: %w", err)

@@ -19,7 +19,6 @@ type ToDo struct {
 }
 
 func TestNewGormLogger(t *testing.T) {
-
 	logger := &logrus.Logger{}
 	logger.Formatter = &logrus.JSONFormatter{}
 	logger.Out = os.Stdout
@@ -57,7 +56,6 @@ func TestNewGormLogger(t *testing.T) {
 }
 
 func TestNewGormLoggerSilent(t *testing.T) {
-
 	logger := &logrus.Logger{}
 	logger.Formatter = &logrus.JSONFormatter{}
 	logger.Out = os.Stdout
@@ -95,7 +93,6 @@ func TestNewGormLoggerSilent(t *testing.T) {
 }
 
 func TestNewGormLoggerSlowQuery(t *testing.T) {
-
 	logger := &logrus.Logger{}
 	logger.Formatter = &logrus.JSONFormatter{}
 	logger.Out = os.Stdout

@@ -1,0 +1,202 @@
+pkg/handler/base_http_handler.go:64:1: method "ResponseStatusBadRequest" for struct "BaseHTTPHandler" should be placed before method "ResponseZIP" (funcorder)
+func (h *BaseHTTPHandler) ResponseStatusBadRequest(c *gin.Context, messages any) {
+^
+pkg/handler/base_http_handler.go:82:1: method "ResponseStatusInternalServerError" for struct "BaseHTTPHandler" should be placed before method "ResponseStatusNotFound" (funcorder)
+func (h *BaseHTTPHandler) ResponseStatusInternalServerError(c *gin.Context, messages any, err error) {
+^
+pkg/logger/logrus_logger.go:84:1: method "WithError" for struct "Logger" should be placed before method "WithFields" (funcorder)
+func (l *Logger) WithError(err error) *Logger {
+^
+pkg/logger/logrus_logger.go:101:1: method "WithContext" for struct "Logger" should be placed before method "WithError" (funcorder)
+func (l *Logger) WithContext(ctx context.Context) *Logger {
+^
+pkg/logger/logrus_logger.go:121:1: method "Debugf" for struct "Logger" should be placed before method "WithContextValue" (funcorder)
+func (l *Logger) Debugf(format string, args ...any) {
+^
+pkg/logger/logrus_logger.go:146:1: method "Errorf" for struct "Logger" should be placed before method "Warningf" (funcorder)
+func (l *Logger) Errorf(format string, args ...any) {
+^
+pkg/logger/logrus_logger.go:161:1: method "Debug" for struct "Logger" should be placed before method "Panicf" (funcorder)
+func (l *Logger) Debug(args ...any) {
+^
+pkg/logger/logrus_logger.go:186:1: method "Error" for struct "Logger" should be placed before method "Warning" (funcorder)
+func (l *Logger) Error(args ...any) {
+^
+pkg/logger/logrus_logger.go:201:1: method "Debugln" for struct "Logger" should be placed before method "Panic" (funcorder)
+func (l *Logger) Debugln(args ...any) {
+^
+pkg/logger/logrus_logger.go:221:1: method "Warningln" for struct "Logger" should be placed before method "Warnln" (funcorder)
+func (l *Logger) Warningln(args ...any) {
+^
+pkg/logger/logrus_logger.go:226:1: method "Errorln" for struct "Logger" should be placed before method "Warningln" (funcorder)
+func (l *Logger) Errorln(args ...any) {
+^
+pkg/logger/logrus_logger_gorm.go:102:1: method "Info" for struct "Gorm" should be placed before method "LogMode" (funcorder)
+func (l *Gorm) Info(ctx context.Context, msg string, data ...any) {
+^
+pkg/logger/logrus_logger_gorm.go:116:1: method "Error" for struct "Gorm" should be placed before method "Warn" (funcorder)
+func (l *Gorm) Error(ctx context.Context, msg string, data ...any) {
+^
+pkg/logger/slog_logger.go:92:1: method "Error" for struct "SlogLogger" should be placed before method "Warn" (funcorder)
+func (l *SlogLogger) Error(msg string, args ...any) {
+^
+pkg/logger/slog_logger.go:106:1: method "With" for struct "SlogLogger" should be placed before method "WithContext" (funcorder)
+func (l *SlogLogger) With(args ...any) *SlogLogger {
+^
+pkg/logger/slog_logger_gorm.go:68:1: method "Info" for struct "GormSlog" should be placed before method "LogMode" (funcorder)
+func (l *GormSlog) Info(ctx context.Context, msg string, data ...any) {
+^
+pkg/logger/slog_logger_gorm.go:84:1: method "Error" for struct "GormSlog" should be placed before method "Warn" (funcorder)
+func (l *GormSlog) Error(ctx context.Context, msg string, data ...any) {
+^
+pkg/logger/zap_logger.go:62:1: method "Debugf" for struct "ZapLogger" should be placed before method "WithError" (funcorder)
+func (l *ZapLogger) Debugf(format string, args ...any) {
+^
+pkg/logger/zap_logger.go:77:1: method "Errorf" for struct "ZapLogger" should be placed before method "Warnf" (funcorder)
+func (l *ZapLogger) Errorf(format string, args ...any) {
+^
+pkg/logger/zap_logger.go:92:1: method "DPanicf" for struct "ZapLogger" should be placed before method "Panicf" (funcorder)
+func (l *ZapLogger) DPanicf(format string, args ...any) {
+^
+pkg/logger/zap_logger.go:112:1: method "Error" for struct "ZapLogger" should be placed before method "Warn" (funcorder)
+func (l *ZapLogger) Error(msg string, fields ...zapcore.Field) {
+^
+pkg/logger/zap_logger.go:127:1: method "DPanic" for struct "ZapLogger" should be placed before method "Panic" (funcorder)
+func (l *ZapLogger) DPanic(msg string, fields ...zapcore.Field) {
+^
+pkg/logger/zap_logger.go:147:1: method "Errorln" for struct "ZapLogger" should be placed before method "Warnln" (funcorder)
+func (l *ZapLogger) Errorln(args ...any) {
+^
+pkg/logger/zap_logger.go:162:1: method "DPanicln" for struct "ZapLogger" should be placed before method "Panicln" (funcorder)
+func (l *ZapLogger) DPanicln(args ...any) {
+^
+pkg/logger/zap_logger_gorm.go:85:1: method "Info" for struct "GormZap" should be placed before method "LogMode" (funcorder)
+func (l *GormZap) Info(_ context.Context, msg string, data ...any) { // nolint:unused
+^
+pkg/logger/zap_logger_gorm.go:99:1: method "Error" for struct "GormZap" should be placed before method "Warn" (funcorder)
+func (l *GormZap) Error(_ context.Context, msg string, data ...any) { // nolint:unused
+^
+pkg/middleware/gin_cors.go:143:1: method "validateMethodOptions" for struct "GinCorsConfig" should be placed before method "validateOrigin" (funcorder)
+func (cs *GinCorsConfig) validateMethodOptions() bool {
+^
+pkg/repository/aws_bedrock_repository.go:75:1: method "Converse" for struct "AWSBedrockRepository" should be placed before method "InvokeModelWithStream" (funcorder)
+func (r *AWSBedrockRepository) Converse(ctx context.Context, modelID string, message any) (string, error) {
+^
+pkg/repository/aws_cognito_repository.go:107:1: method "CreateUser" for struct "AWSCognitoRepository" should be placed before method "GetUser" (funcorder)
+func (r *AWSCognitoRepository) CreateUser(ctx context.Context, username, password string) error {
+^
+pkg/repository/aws_cognito_repository.go:212:1: method "ChangePassword" for struct "AWSCognitoRepository" should be placed before method "SetUserPassword" (funcorder)
+func (r *AWSCognitoRepository) ChangePassword(ctx context.Context, authorizationHeader, previousPassword, proposedPassword string) error {
+^
+pkg/repository/aws_cognito_repository.go:242:1: method "ConfirmForgotPassword" for struct "AWSCognitoRepository" should be placed before method "ResetUserPassword" (funcorder)
+func (r *AWSCognitoRepository) ConfirmForgotPassword(ctx context.Context, username, password, confirmationCode string) error {
+^
+pkg/repository/aws_cognito_repository.go:267:1: method "getAccessToken" for struct "AWSCognitoRepository" should be placed before method "getSecretHash" (funcorder)
+func (*AWSCognitoRepository) getAccessToken(authorizationHeader string) (string, error) {
+^
+pkg/repository/aws_s3_repository.go:115:1: constructor "NewAWSS3RepositoryWithInterface" for struct "AWSS3Repository" should be placed before constructor "NewAWSS3RepositoryWithOther" (funcorder)
+func NewAWSS3RepositoryWithInterface(client AWSS3ClientInterface, uploader AWSS3UploaderClientInterface, downloader AWSS3DownloaderClientInterface, presigned AWSS3PresignClientInterface) *AWSS3Repository {
+^
+pkg/repository/aws_s3_repository.go:201:1: method "DeleteObject" for struct "AWSS3Repository" should be placed before method "PutObjectText" (funcorder)
+func (r *AWSS3Repository) DeleteObject(bucket, key string) (*s3.DeleteObjectOutput, error) {
+^
+pkg/repository/aws_s3_repository.go:253:1: method "ListBuckets" for struct "AWSS3Repository" should be placed before method "ListObjectsV2" (funcorder)
+func (r *AWSS3Repository) ListBuckets() (*s3.ListBucketsOutput, error) {
+^
+pkg/repository/aws_s3_repository.go:265:1: method "CreateBucket" for struct "AWSS3Repository" should be placed before method "ListBuckets" (funcorder)
+func (r *AWSS3Repository) CreateBucket(bucket string) (*s3.CreateBucketOutput, error) {
+^
+pkg/repository/aws_s3_repository.go:343:1: method "Download" for struct "AWSS3Repository" should be placed before method "Upload" (funcorder)
+func (r *AWSS3Repository) Download(bucket, key, filePath string) error {
+^
+pkg/repository/aws_s3_repository.go:404:1: method "DownloadObject" for struct "AWSS3Repository" should be placed before method "UploadObject" (funcorder)
+func (r *AWSS3Repository) DownloadObject(bucket, key, filePath string) (*transfermanager.DownloadObjectOutput, error) {
+^
+pkg/repository/aws_ses_repository.go:73:1: method "SendHTMLEmail" for struct "AWSSESRepository" should be placed before method "SendTextEmail" (funcorder)
+func (r *AWSSESRepository) SendHTMLEmail(ctx context.Context, from string, to, replyTo []string, subject, content string) (*sesv2.SendEmailOutput, error) {
+^
+pkg/repository/aws_ses_repository.go:103:1: method "SendEmail" for struct "AWSSESRepository" should be placed before method "SendHTMLEmail" (funcorder)
+func (r *AWSSESRepository) SendEmail(ctx context.Context, from string, to, replyTo []string, subject, contentText, contentHTML string) (*sesv2.SendEmailOutput, error) {
+^
+pkg/repository/aws_ses_repository.go:139:1: method "SendBulkEmail" for struct "AWSSESRepository" should be placed before method "SendEmail" (funcorder)
+func (r *AWSSESRepository) SendBulkEmail(ctx context.Context, from string, replyTo []string, defaultTemplateData string, bulkEmailEntries []types.BulkEmailEntry) (*sesv2.SendBulkEmailOutput, error) {
+^
+pkg/repository/redis_repository.go:292:1: method "Expire" for struct "RedisRepository" should be placed before method "TTL" (funcorder)
+func (r *RedisRepository) Expire(c context.Context, key string, expiration time.Duration) (bool, error) {
+^
+pkg/repository/slack_repository.go:64:1: method "PostMessageAttachment" for struct "SlackRepository" should be placed before method "PostMessageText" (funcorder)
+func (r *SlackRepository) PostMessageAttachment(attachment *slack.Attachment) error {
+^
+pkg/infrastructure/aws_account.go:1:1: package has more than one godoc ("infrastructure") (godoclint)
+// Package infrastructure provides AWS Account integration helpers using AWS SDK v2.
+^
+pkg/infrastructure/aws_cloudwatchlogs.go:1:1: package has more than one godoc ("infrastructure") (godoclint)
+// Package infrastructure provides AWS CloudWatch Logs integration helpers using AWS SDK v2.
+^
+pkg/infrastructure/aws_cognito.go:1:1: package has more than one godoc ("infrastructure") (godoclint)
+// Package infrastructure provides AWS Cognito integration helpers using AWS SDK v2.
+^
+pkg/infrastructure/aws_config_helper.go:1:1: package has more than one godoc ("infrastructure") (godoclint)
+// Package infrastructure provides AWS infrastructure configuration utilities.
+^
+pkg/infrastructure/aws_s3.go:1:1: package has more than one godoc ("infrastructure") (godoclint)
+// Package infrastructure provides AWS S3 integration helpers using AWS SDK v2.
+^
+pkg/infrastructure/aws_secretsmanager.go:1:1: package has more than one godoc ("infrastructure") (godoclint)
+// Package infrastructure provides AWS Secrets Manager integration helpers using AWS SDK v2.
+^
+pkg/infrastructure/aws_ses.go:1:1: package has more than one godoc ("infrastructure") (godoclint)
+// Package infrastructure provides AWS SES integration helpers using AWS SDK v2.
+^
+pkg/infrastructure/aws_sts.go:1:1: package has more than one godoc ("infrastructure") (godoclint)
+// Package infrastructure provides AWS STS integration helpers using AWS SDK v2.
+^
+pkg/logger/zap_logger_gorm.go:43:1: godoc should start with symbol name ("GormZapSetting") (godoclint)
+// GormSetting sets configurations.
+^
+pkg/middleware/gin_cors.go:1:1: package has more than one godoc ("middleware") (godoclint)
+// Package middleware provides HTTP middleware components for Gin web framework.
+^
+pkg/middleware/gin_http_logger.go:1:1: package has more than one godoc ("middleware") (godoclint)
+// Package middleware provides HTTP middleware utilities for the Gin web framework.
+^
+pkg/repository/aws_bedrock_repository.go:1:1: package has more than one godoc ("repository") (godoclint)
+// Package repository provides repository implementations for various AWS services and databases.
+^
+pkg/repository/aws_cognito_repository.go:7:1: package has more than one godoc ("repository") (godoclint)
+// Package repository provides AWS SDK v2 based repository implementations.
+^
+pkg/repository/aws_secretsmanager_repository.go:1:1: package has more than one godoc ("repository") (godoclint)
+// Package repository provides repository implementations for various AWS services and databases.
+^
+pkg/repository/redis_repository.go:1:1: package has more than one godoc ("repository") (godoclint)
+// Package repository provides data access layer implementations for various services
+^
+pkg/utils/byte.go:1:1: package has more than one godoc ("utils") (godoclint)
+// utils is a meaningful package name for utility functions
+^
+pkg/utils/byte.go:1:1: package godoc should start with "Package utils " (godoclint)
+// utils is a meaningful package name for utility functions
+^
+pkg/utils/date.go:1:1: package has more than one godoc ("utils") (godoclint)
+// utils is a meaningful package name for utility functions
+^
+pkg/utils/date.go:1:1: package godoc should start with "Package utils " (godoclint)
+// utils is a meaningful package name for utility functions
+^
+pkg/utils/db/db.go:1:1: package has more than one godoc ("db") (godoclint)
+// Package db provides database utility functions for connection string generation.
+^
+pkg/utils/db/transaction.go:1:1: package has more than one godoc ("db") (godoclint)
+// Package db provides database transaction utilities.
+^
+pkg/utils/strings.go:1:1: package has more than one godoc ("utils") (godoclint)
+// utils is a meaningful package name for utility functions
+^
+pkg/utils/strings.go:1:1: package godoc should start with "Package utils " (godoclint)
+// utils is a meaningful package name for utility functions
+^
+66 issues:
+* funcorder: 43
+* godoclint: 23
+[2026-05-24 08:20:58] [ERROR] golangci-lint found issues

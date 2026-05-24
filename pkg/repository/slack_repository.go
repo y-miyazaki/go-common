@@ -45,19 +45,6 @@ func (r *SlackRepository) PostMessage(options ...slack.MsgOption) error {
 	return nil
 }
 
-// PostMessageText sends a message to a channel.
-// Message is escaped by default according to https://api.slack.com/docs/formatting
-// Use http://davestevens.github.io/slack-message-builder/ to help crafting your message.
-func (r *SlackRepository) PostMessageText(text string) error {
-	// text
-	msgOptText := slack.MsgOptionText(text, true)
-	_, _, err := r.Client.PostMessage(r.channelID, msgOptText)
-	if err != nil {
-		return fmt.Errorf("slack PostMessageText: %w", err)
-	}
-	return nil
-}
-
 // PostMessageAttachment sends a message to a channel.
 // Message is escaped by default according to https://api.slack.com/docs/formatting
 // Use http://davestevens.github.io/slack-message-builder/ to help crafting your message.
@@ -69,6 +56,19 @@ func (r *SlackRepository) PostMessageAttachment(attachment *slack.Attachment) er
 	_, _, err := r.Client.PostMessage(r.channelID, msgOptAttachments, msgOptText)
 	if err != nil {
 		return fmt.Errorf("slack PostMessageAttachment: %w", err)
+	}
+	return nil
+}
+
+// PostMessageText sends a message to a channel.
+// Message is escaped by default according to https://api.slack.com/docs/formatting
+// Use http://davestevens.github.io/slack-message-builder/ to help crafting your message.
+func (r *SlackRepository) PostMessageText(text string) error {
+	// text
+	msgOptText := slack.MsgOptionText(text, true)
+	_, _, err := r.Client.PostMessage(r.channelID, msgOptText)
+	if err != nil {
+		return fmt.Errorf("slack PostMessageText: %w", err)
 	}
 	return nil
 }

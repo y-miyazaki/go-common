@@ -1,4 +1,3 @@
-// Package infrastructure provides AWS Cognito integration helpers using AWS SDK v2.
 package infrastructure
 
 import (

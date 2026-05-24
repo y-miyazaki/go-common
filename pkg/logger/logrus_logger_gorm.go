@@ -92,10 +92,11 @@ func NewLoggerGorm(c *GormSetting) *Gorm {
 	}
 }
 
-// LogMode log mode(same logrus.level)
-func (l *Gorm) LogMode(_ logger.LogLevel) logger.Interface { // nolint:unused
-	newlogger := l
-	return newlogger
+// Error print the error level log.
+func (l *Gorm) Error(ctx context.Context, msg string, data ...any) {
+	if l.gormConfig.LogLevel >= Error {
+		l.e.WithContext(ctx).Errorf(msg, data...)
+	}
 }
 
 // Info print the info level log.
@@ -105,18 +106,10 @@ func (l *Gorm) Info(ctx context.Context, msg string, data ...any) {
 	}
 }
 
-// Warn print the warn level log.
-func (l *Gorm) Warn(ctx context.Context, msg string, data ...any) {
-	if l.gormConfig.LogLevel >= Warn {
-		l.e.WithContext(ctx).Warnf(msg, data...)
-	}
-}
-
-// Error print the error level log.
-func (l *Gorm) Error(ctx context.Context, msg string, data ...any) {
-	if l.gormConfig.LogLevel >= Error {
-		l.e.WithContext(ctx).Errorf(msg, data...)
-	}
+// LogMode log mode(same logrus.level)
+func (l *Gorm) LogMode(_ logger.LogLevel) logger.Interface { // nolint:unused
+	newlogger := l
+	return newlogger
 }
 
 // Trace print the SQL log.
@@ -151,5 +144,12 @@ func (l *Gorm) Trace(
 		entry.Info("SQL Query")
 	default:
 		// No logging for silent level
+	}
+}
+
+// Warn print the warn level log.
+func (l *Gorm) Warn(ctx context.Context, msg string, data ...any) {
+	if l.gormConfig.LogLevel >= Warn {
+		l.e.WithContext(ctx).Warnf(msg, data...)
 	}
 }

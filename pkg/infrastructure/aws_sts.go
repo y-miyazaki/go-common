@@ -1,4 +1,3 @@
-// Package infrastructure provides AWS STS integration helpers using AWS SDK v2.
 package infrastructure
 
 import (

@@ -1,4 +1,3 @@
-// Package infrastructure provides AWS SES integration helpers using AWS SDK v2.
 package infrastructure
 
 import (

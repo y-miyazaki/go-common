@@ -42,7 +42,6 @@ func newStackError(msg string) error {
 }
 
 func TestNewLogger(t *testing.T) {
-
 	logger := &logrus.Logger{}
 	logger.Formatter = &logrus.JSONFormatter{}
 	logger.Out = os.Stdout

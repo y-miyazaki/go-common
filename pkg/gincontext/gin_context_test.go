@@ -71,7 +71,6 @@ func TestGetGinContextError(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestGetGinContextErrorMessage(t *testing.T) {
@@ -161,6 +160,7 @@ func TestSetGinContextError(t *testing.T) {
 		})
 	}
 }
+
 func TestGetGinContextError_NonErrorValue(t *testing.T) {
 	c := &gin.Context{}
 	c.Set(contextKeyError, "not an error") // store non-error value

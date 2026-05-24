@@ -190,7 +190,8 @@ func main() {
 			ExposeHeaders:    []string{"Content-Length"},
 			AllowCredentials: true,
 			MaxAge:           corsMaxAgeHours * time.Hour,
-		}))
+		},
+	))
 	router.Use(ginhelmet.Default())
 	router.Use(middleware.GinHTTPLogger(log, "request-id", "test"))
 	router.GET("/healthcheck", h.HealthCheck)

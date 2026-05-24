@@ -1,4 +1,3 @@
-// Package middleware provides HTTP middleware utilities for the Gin web framework.
 package middleware
 
 import (

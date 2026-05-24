@@ -78,6 +78,11 @@ func (l *SlogLogger) Debug(msg string, args ...any) {
 	l.log.Debug(msg, args...)
 }
 
+// Error implements *logger.Error
+func (l *SlogLogger) Error(msg string, args ...any) {
+	l.log.Error(msg, args...)
+}
+
 // Info implements *logger.Info
 func (l *SlogLogger) Info(msg string, args ...any) {
 	l.log.Info(msg, args...)
@@ -88,9 +93,12 @@ func (l *SlogLogger) Warn(msg string, args ...any) {
 	l.log.Warn(msg, args...)
 }
 
-// Error implements *logger.Error
-func (l *SlogLogger) Error(msg string, args ...any) {
-	l.log.Error(msg, args...)
+// With implements *logger.With
+// It creates a new *logger with additional key-value pairs in the context
+func (l *SlogLogger) With(args ...any) *SlogLogger {
+	return &SlogLogger{
+		log: l.log.With(args...),
+	}
 }
 
 // WithContext implements *logger.WithContext
@@ -98,14 +106,6 @@ func (l *SlogLogger) Error(msg string, args ...any) {
 func (l *SlogLogger) WithContext(ctx context.Context) *SlogLogger {
 	return &SlogLogger{
 		log: l.log.With("trace_id", getTraceID(ctx)),
-	}
-}
-
-// With implements *logger.With
-// It creates a new *logger with additional key-value pairs in the context
-func (l *SlogLogger) With(args ...any) *SlogLogger {
-	return &SlogLogger{
-		log: l.log.With(args...),
 	}
 }
 

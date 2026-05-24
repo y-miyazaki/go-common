@@ -39,62 +39,22 @@ func NewAWSSESRepositoryWithInterface(c AWSSESClientInterface, configurationSetN
 	}
 }
 
-// SendTextEmail sends text email.
-func (r *AWSSESRepository) SendTextEmail(ctx context.Context, from string, to, replyTo []string, subject, content string) (*sesv2.SendEmailOutput, error) {
-	res, err := r.Client.SendEmail(ctx, &sesv2.SendEmailInput{
-		ConfigurationSetName: r.configurationSetName,
-		FromEmailAddress:     aws.String(from),
-		Destination: &types.Destination{
-			ToAddresses: to,
-		},
+// SendBulkEmail sends bulk emails.
+// Note: One or more Destination objects. All of the recipients in a Destination receive the same version of the email.
+// You can specify up to 50 Destination objects within a Destinations array.
+func (r *AWSSESRepository) SendBulkEmail(ctx context.Context, from string, replyTo []string, defaultTemplateData string, bulkEmailEntries []types.BulkEmailEntry) (*sesv2.SendBulkEmailOutput, error) {
+	res, err := r.Client.SendBulkEmail(ctx, &sesv2.SendBulkEmailInput{
+		FromEmailAddress: aws.String(from),
 		ReplyToAddresses: replyTo,
-		Content: &types.EmailContent{
-			Simple: &types.Message{
-				Body: &types.Body{
-					Text: &types.Content{
-						Charset: aws.String("UTF-8"),
-						Data:    aws.String(content),
-					},
-				},
-				Subject: &types.Content{
-					Charset: aws.String("UTF-8"),
-					Data:    aws.String(subject),
-				},
+		DefaultContent: &types.BulkEmailContent{
+			Template: &types.Template{
+				TemplateData: aws.String(defaultTemplateData),
 			},
 		},
+		BulkEmailEntries: bulkEmailEntries,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("ses SendTextEmail: %w", err)
-	}
-	return res, nil
-}
-
-// SendHTMLEmail sends HTML email.
-func (r *AWSSESRepository) SendHTMLEmail(ctx context.Context, from string, to, replyTo []string, subject, content string) (*sesv2.SendEmailOutput, error) {
-	res, err := r.Client.SendEmail(ctx, &sesv2.SendEmailInput{
-		ConfigurationSetName: r.configurationSetName,
-		FromEmailAddress:     aws.String(from),
-		Destination: &types.Destination{
-			ToAddresses: to,
-		},
-		ReplyToAddresses: replyTo,
-		Content: &types.EmailContent{
-			Simple: &types.Message{
-				Body: &types.Body{
-					Html: &types.Content{
-						Charset: aws.String("UTF-8"),
-						Data:    aws.String(content),
-					},
-				},
-				Subject: &types.Content{
-					Charset: aws.String("UTF-8"),
-					Data:    aws.String(subject),
-				},
-			},
-		},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("ses SendHTMLEmail: %w", err)
+		return nil, fmt.Errorf("ses SendBulkEmail: %w", err)
 	}
 	return res, nil
 }
@@ -133,22 +93,62 @@ func (r *AWSSESRepository) SendEmail(ctx context.Context, from string, to, reply
 	return res, nil
 }
 
-// SendBulkEmail sends bulk emails.
-// Note: One or more Destination objects. All of the recipients in a Destination receive the same version of the email.
-// You can specify up to 50 Destination objects within a Destinations array.
-func (r *AWSSESRepository) SendBulkEmail(ctx context.Context, from string, replyTo []string, defaultTemplateData string, bulkEmailEntries []types.BulkEmailEntry) (*sesv2.SendBulkEmailOutput, error) {
-	res, err := r.Client.SendBulkEmail(ctx, &sesv2.SendBulkEmailInput{
-		FromEmailAddress: aws.String(from),
+// SendHTMLEmail sends HTML email.
+func (r *AWSSESRepository) SendHTMLEmail(ctx context.Context, from string, to, replyTo []string, subject, content string) (*sesv2.SendEmailOutput, error) {
+	res, err := r.Client.SendEmail(ctx, &sesv2.SendEmailInput{
+		ConfigurationSetName: r.configurationSetName,
+		FromEmailAddress:     aws.String(from),
+		Destination: &types.Destination{
+			ToAddresses: to,
+		},
 		ReplyToAddresses: replyTo,
-		DefaultContent: &types.BulkEmailContent{
-			Template: &types.Template{
-				TemplateData: aws.String(defaultTemplateData),
+		Content: &types.EmailContent{
+			Simple: &types.Message{
+				Body: &types.Body{
+					Html: &types.Content{
+						Charset: aws.String("UTF-8"),
+						Data:    aws.String(content),
+					},
+				},
+				Subject: &types.Content{
+					Charset: aws.String("UTF-8"),
+					Data:    aws.String(subject),
+				},
 			},
 		},
-		BulkEmailEntries: bulkEmailEntries,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("ses SendBulkEmail: %w", err)
+		return nil, fmt.Errorf("ses SendHTMLEmail: %w", err)
+	}
+	return res, nil
+}
+
+// SendTextEmail sends text email.
+func (r *AWSSESRepository) SendTextEmail(ctx context.Context, from string, to, replyTo []string, subject, content string) (*sesv2.SendEmailOutput, error) {
+	res, err := r.Client.SendEmail(ctx, &sesv2.SendEmailInput{
+		ConfigurationSetName: r.configurationSetName,
+		FromEmailAddress:     aws.String(from),
+		Destination: &types.Destination{
+			ToAddresses: to,
+		},
+		ReplyToAddresses: replyTo,
+		Content: &types.EmailContent{
+			Simple: &types.Message{
+				Body: &types.Body{
+					Text: &types.Content{
+						Charset: aws.String("UTF-8"),
+						Data:    aws.String(content),
+					},
+				},
+				Subject: &types.Content{
+					Charset: aws.String("UTF-8"),
+					Data:    aws.String(subject),
+				},
+			},
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("ses SendTextEmail: %w", err)
 	}
 	return res, nil
 }

@@ -3,6 +3,7 @@ package middleware
 
 import (
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -132,23 +133,13 @@ func convert(s []string, c converter) []string {
 	return out
 }
 
+func (cs *GinCorsConfig) validateMethodOptions() bool {
+	return slices.Contains(cs.AllowMethods, "OPTIONS")
+}
+
 func (cs *GinCorsConfig) validateOrigin(origin string) bool {
 	if cs.AllowAllOrigins {
 		return true
 	}
-	for _, v := range cs.AllowOrigins {
-		if v == origin {
-			return true
-		}
-	}
-	return false
-}
-
-func (cs *GinCorsConfig) validateMethodOptions() bool {
-	for _, v := range cs.AllowMethods {
-		if v == "OPTIONS" {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(cs.AllowOrigins, origin)
 }

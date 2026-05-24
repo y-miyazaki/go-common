@@ -4,7 +4,6 @@
 // allowlist comments. To avoid false positives from static secret scanners during validation, mark
 // the file as intentional for secret references.
 
-// Package repository provides AWS SDK v2 based repository implementations.
 package repository
 
 import (
@@ -91,16 +90,36 @@ func NewAWSCognitoRepositoryWithInterface(c AWSCognitoIdentityProviderClientInte
 	}
 }
 
-// GetUser gets a user information from Cognito.
-func (r *AWSCognitoRepository) GetUser(ctx context.Context, username string) (*cognitoidentityprovider.AdminGetUserOutput, error) {
-	res, err := r.Client.AdminGetUser(ctx, &cognitoidentityprovider.AdminGetUserInput{
-		UserPoolId: aws.String(r.userPoolID),
-		Username:   aws.String(username),
+// ChangePassword changes the password of the user.
+func (r *AWSCognitoRepository) ChangePassword(ctx context.Context, authorizationHeader, previousPassword, proposedPassword string) error {
+	accessToken, err := r.getAccessToken(authorizationHeader)
+	if err != nil {
+		return fmt.Errorf("cognito getAccessToken: %w", err)
+	}
+
+	_, err = r.Client.ChangePassword(ctx, &cognitoidentityprovider.ChangePasswordInput{
+		PreviousPassword: aws.String(previousPassword),
+		ProposedPassword: aws.String(proposedPassword),
+		AccessToken:      aws.String(accessToken),
 	})
 	if err != nil {
-		return nil, fmt.Errorf("cognito AdminGetUser: %w", err)
+		return fmt.Errorf("cognito ChangePassword: %w", err)
 	}
-	return res, nil
+	return nil
+}
+
+// ConfirmForgotPassword allows a user to enter a confirmation code to reset a forgotten password.
+func (r *AWSCognitoRepository) ConfirmForgotPassword(ctx context.Context, username, password, confirmationCode string) error {
+	_, err := r.Client.ConfirmForgotPassword(ctx, &cognitoidentityprovider.ConfirmForgotPasswordInput{
+		ClientId:         aws.String(r.userPoolClientID),
+		Username:         aws.String(username),
+		Password:         aws.String(password),
+		ConfirmationCode: aws.String(confirmationCode),
+	})
+	if err != nil {
+		return fmt.Errorf("cognito ConfirmForgotPassword: %w", err)
+	}
+	return nil
 }
 
 // CreateUser creates a new user for Cognito user pool.
@@ -135,6 +154,18 @@ func (r *AWSCognitoRepository) DeleteUser(ctx context.Context, username string) 
 		return fmt.Errorf("cognito AdminDeleteUser: %w", err)
 	}
 	return nil
+}
+
+// GetUser gets a user information from Cognito.
+func (r *AWSCognitoRepository) GetUser(ctx context.Context, username string) (*cognitoidentityprovider.AdminGetUserOutput, error) {
+	res, err := r.Client.AdminGetUser(ctx, &cognitoidentityprovider.AdminGetUserInput{
+		UserPoolId: aws.String(r.userPoolID),
+		Username:   aws.String(username),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cognito AdminGetUser: %w", err)
+	}
+	return res, nil
 }
 
 // Login logs to Cognito.
@@ -193,6 +224,18 @@ func (r *AWSCognitoRepository) RefreshToken(ctx context.Context, refreshToken, u
 	}, nil
 }
 
+// ResetUserPassword resets the specified user's password in a user pool as an administrator. Works on any user.
+func (r *AWSCognitoRepository) ResetUserPassword(ctx context.Context, username string) error {
+	_, err := r.Client.AdminResetUserPassword(ctx, &cognitoidentityprovider.AdminResetUserPasswordInput{
+		UserPoolId: aws.String(r.userPoolID),
+		Username:   aws.String(username),
+	})
+	if err != nil {
+		return fmt.Errorf("cognito AdminResetUserPassword: %w", err)
+	}
+	return nil
+}
+
 // SetUserPassword sets the password of the user.
 func (r *AWSCognitoRepository) SetUserPassword(ctx context.Context, username, password string, permanent bool) error {
 	_, err := r.Client.AdminSetUserPassword(ctx, &cognitoidentityprovider.AdminSetUserPasswordInput{
@@ -208,62 +251,7 @@ func (r *AWSCognitoRepository) SetUserPassword(ctx context.Context, username, pa
 	return nil
 }
 
-// ChangePassword changes the password of the user.
-func (r *AWSCognitoRepository) ChangePassword(ctx context.Context, authorizationHeader, previousPassword, proposedPassword string) error {
-	accessToken, err := r.getAccessToken(authorizationHeader)
-	if err != nil {
-		return fmt.Errorf("cognito getAccessToken: %w", err)
-	}
-
-	_, err = r.Client.ChangePassword(ctx, &cognitoidentityprovider.ChangePasswordInput{
-		PreviousPassword: aws.String(previousPassword),
-		ProposedPassword: aws.String(proposedPassword),
-		AccessToken:      aws.String(accessToken),
-	})
-	if err != nil {
-		return fmt.Errorf("cognito ChangePassword: %w", err)
-	}
-	return nil
-}
-
-// ResetUserPassword resets the specified user's password in a user pool as an administrator. Works on any user.
-func (r *AWSCognitoRepository) ResetUserPassword(ctx context.Context, username string) error {
-	_, err := r.Client.AdminResetUserPassword(ctx, &cognitoidentityprovider.AdminResetUserPasswordInput{
-		UserPoolId: aws.String(r.userPoolID),
-		Username:   aws.String(username),
-	})
-	if err != nil {
-		return fmt.Errorf("cognito AdminResetUserPassword: %w", err)
-	}
-	return nil
-}
-
-// ConfirmForgotPassword allows a user to enter a confirmation code to reset a forgotten password.
-func (r *AWSCognitoRepository) ConfirmForgotPassword(ctx context.Context, username, password, confirmationCode string) error {
-	_, err := r.Client.ConfirmForgotPassword(ctx, &cognitoidentityprovider.ConfirmForgotPasswordInput{
-		ClientId:         aws.String(r.userPoolClientID),
-		Username:         aws.String(username),
-		Password:         aws.String(password),
-		ConfirmationCode: aws.String(confirmationCode),
-	})
-	if err != nil {
-		return fmt.Errorf("cognito ConfirmForgotPassword: %w", err)
-	}
-	return nil
-}
-
-// getSecretHash gets the secret hash.
-func (r *AWSCognitoRepository) getSecretHash(username string) string {
-	mac := hmac.New(sha256.New, []byte(r.userPoolClientSecret))
-	if _, err := mac.Write([]byte(username + r.userPoolClientID)); err != nil {
-		// If HMAC write fails, return empty string so callers will fail fast.
-		return ""
-	}
-
-	return base64.StdEncoding.EncodeToString(mac.Sum(nil))
-}
-
-// getSecretHash gets the access token.
+// getAccessToken gets the access token.
 func (*AWSCognitoRepository) getAccessToken(authorizationHeader string) (string, error) {
 	if authorizationHeader == "" {
 		return "", ErrAWSCognitoAccessTokenNotFound
@@ -276,4 +264,15 @@ func (*AWSCognitoRepository) getAccessToken(authorizationHeader string) (string,
 		return stringArr[1], nil
 	}
 	return "", fmt.Errorf("%w", ErrAWSCognitoAccessTokenFormatNotSupported)
+}
+
+// getSecretHash gets the secret hash.
+func (r *AWSCognitoRepository) getSecretHash(username string) string {
+	mac := hmac.New(sha256.New, []byte(r.userPoolClientSecret))
+	if _, err := mac.Write([]byte(username + r.userPoolClientID)); err != nil {
+		// If HMAC write fails, return empty string so callers will fail fast.
+		return ""
+	}
+
+	return base64.StdEncoding.EncodeToString(mac.Sum(nil))
 }

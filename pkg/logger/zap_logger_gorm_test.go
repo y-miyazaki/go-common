@@ -76,7 +76,6 @@ func TestNewZapGormLogger(t *testing.T) {
 }
 
 func TestNewZapGormLoggerSilent(t *testing.T) {
-
 	level := zap.NewAtomicLevel()
 	level.SetLevel(zapcore.InfoLevel)
 
@@ -136,7 +135,6 @@ func TestNewZapGormLoggerSilent(t *testing.T) {
 }
 
 func TestNewZapGormLoggerSlowQuery(t *testing.T) {
-
 	level := zap.NewAtomicLevel()
 	level.SetLevel(zapcore.InfoLevel)
 

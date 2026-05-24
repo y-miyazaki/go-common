@@ -1,4 +1,3 @@
-// Package repository provides repository implementations for various AWS services and databases.
 package repository
 
 import (
@@ -41,36 +40,6 @@ func NewAWSBedrockRepositoryWithInterface(c AWSBedrockClientInterface) *AWSBedro
 	return &AWSBedrockRepository{Client: c}
 }
 
-// InvokeModel calls the Bedrock Runtime InvokeModel API for the specified modelID with JSON payload.
-// It returns the raw response body as bytes.
-func (r *AWSBedrockRepository) InvokeModel(ctx context.Context, modelID string, payload []byte) ([]byte, error) {
-	in := &bedrockruntime.InvokeModelInput{
-		ModelId:     aws.String(modelID),
-		ContentType: aws.String("application/json"),
-		Body:        payload,
-	}
-	out, err := r.Client.InvokeModel(ctx, in)
-	if err != nil {
-		return nil, fmt.Errorf("invoke model: %w", err)
-	}
-	// out.Body is []byte
-	return out.Body, nil
-}
-
-// InvokeModelWithStream calls the streaming variant and returns the SDK output for callers that need streaming.
-func (r *AWSBedrockRepository) InvokeModelWithStream(ctx context.Context, modelID string, payload []byte) (*bedrockruntime.InvokeModelWithResponseStreamOutput, error) {
-	in := &bedrockruntime.InvokeModelWithResponseStreamInput{
-		ModelId:     aws.String(modelID),
-		ContentType: aws.String("application/json"),
-		Body:        payload,
-	}
-	out, err := r.Client.InvokeModelWithResponseStream(ctx, in)
-	if err != nil {
-		return nil, fmt.Errorf("invoke model with stream: %w", err)
-	}
-	return out, nil
-}
-
 // Converse wraps the Converse API for conversation-based models. It returns extracted text when possible.
 func (r *AWSBedrockRepository) Converse(ctx context.Context, modelID string, message any) (string, error) {
 	// For convenience, marshal message to JSON and pass as Message Content per docs.
@@ -89,6 +58,22 @@ func (r *AWSBedrockRepository) Converse(ctx context.Context, modelID string, mes
 		return "", fmt.Errorf("converse: %w", err)
 	}
 	return string(b), nil
+}
+
+// InvokeModel calls the Bedrock Runtime InvokeModel API for the specified modelID with JSON payload.
+// It returns the raw response body as bytes.
+func (r *AWSBedrockRepository) InvokeModel(ctx context.Context, modelID string, payload []byte) ([]byte, error) {
+	in := &bedrockruntime.InvokeModelInput{
+		ModelId:     aws.String(modelID),
+		ContentType: aws.String("application/json"),
+		Body:        payload,
+	}
+	out, err := r.Client.InvokeModel(ctx, in)
+	if err != nil {
+		return nil, fmt.Errorf("invoke model: %w", err)
+	}
+	// out.Body is []byte
+	return out.Body, nil
 }
 
 // InvokeModelWithFile calls the Bedrock Runtime InvokeModel API with a file attachment.
@@ -165,4 +150,18 @@ func (r *AWSBedrockRepository) InvokeModelWithFileData(ctx context.Context, mode
 	}
 
 	return result, nil
+}
+
+// InvokeModelWithStream calls the streaming variant and returns the SDK output for callers that need streaming.
+func (r *AWSBedrockRepository) InvokeModelWithStream(ctx context.Context, modelID string, payload []byte) (*bedrockruntime.InvokeModelWithResponseStreamOutput, error) {
+	in := &bedrockruntime.InvokeModelWithResponseStreamInput{
+		ModelId:     aws.String(modelID),
+		ContentType: aws.String("application/json"),
+		Body:        payload,
+	}
+	out, err := r.Client.InvokeModelWithResponseStream(ctx, in)
+	if err != nil {
+		return nil, fmt.Errorf("invoke model with stream: %w", err)
+	}
+	return out, nil
 }

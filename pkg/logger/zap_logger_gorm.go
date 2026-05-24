@@ -40,7 +40,7 @@ type GormZap struct {
 	gormConfig *GormConfig
 }
 
-// GormSetting sets configurations.
+// GormZapSetting sets configurations.
 type GormZapSetting struct {
 	Config     *zap.Config
 	GormConfig *GormConfig
@@ -75,10 +75,11 @@ func NewZapLoggerGorm(c *GormZapSetting) *GormZap {
 	}
 }
 
-// LogMode log mode(same logrus.level)
-func (l *GormZap) LogMode(_ logger.LogLevel) logger.Interface { // nolint:unused
-	newlogger := l
-	return newlogger
+// Error print the error level log.
+func (l *GormZap) Error(_ context.Context, msg string, data ...any) { // nolint:unused
+	if l.gormConfig.LogLevel >= Error {
+		l.l.Sugar().Errorf(msg, data...)
+	}
 }
 
 // Info print the info level log.
@@ -88,18 +89,10 @@ func (l *GormZap) Info(_ context.Context, msg string, data ...any) { // nolint:u
 	}
 }
 
-// Warn print the warn level log.
-func (l *GormZap) Warn(_ context.Context, msg string, data ...any) { // nolint:unused
-	if l.gormConfig.LogLevel >= Warn {
-		l.l.Sugar().Warnf(msg, data...)
-	}
-}
-
-// Error print the error level log.
-func (l *GormZap) Error(_ context.Context, msg string, data ...any) { // nolint:unused
-	if l.gormConfig.LogLevel >= Error {
-		l.l.Sugar().Errorf(msg, data...)
-	}
+// LogMode log mode(same logrus.level)
+func (l *GormZap) LogMode(_ logger.LogLevel) logger.Interface { // nolint:unused
+	newlogger := l
+	return newlogger
 }
 
 // Trace print the SQL log.
@@ -134,5 +127,12 @@ func (l *GormZap) Trace(
 		entry.Info("SQL Query")
 	default:
 		// No logging for silent level
+	}
+}
+
+// Warn print the warn level log.
+func (l *GormZap) Warn(_ context.Context, msg string, data ...any) { // nolint:unused
+	if l.gormConfig.LogLevel >= Warn {
+		l.l.Sugar().Warnf(msg, data...)
 	}
 }

@@ -106,7 +106,8 @@ func NewConfig(setting *Setting) *Config {
 		config.SlackClient = infrastructure.NewSlack(
 			&infrastructure.SlackConfig{
 				OauthAccessToken: setting.SlackOauthAccessToken,
-			})
+			},
+		)
 	}
 	return config
 }

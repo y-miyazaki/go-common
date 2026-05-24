@@ -65,15 +65,3 @@ Structured PR output:
 4. If full-body mode is selected, generate template-aligned content from validated context (PR metadata, changed file list, and template-required section headings); if baseline mode is selected, skip to Step 6.
 5. If full-body mode is selected, apply full body with `pr_body.sh --body-file <FILE>`.
 6. Confirm success by fetching PR body and verifying required sections are present for the selected mode.
-
-## Error Handling and Troubleshooting
-
-- If `pr_fetch.sh` fails, stop and return command output with auth/repository guidance.
-- If PR is not found, return `status: failed` with PR number and repository.
-- If full-body file generation fails, keep baseline update only, mark full-body step as deferred, and return `status: success` with warning.
-- If template is missing or malformed, apply baseline-only mode, return deferred reason for template-dependent sections, and return `status: success` with warning.
-
-## Best Practices
-
-- Always start with `pr_fetch.sh`, then `pr_body.sh`
-- Avoid individual `gh` commands unless debugging.

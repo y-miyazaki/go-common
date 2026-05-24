@@ -1,4 +1,3 @@
-// Package repository provides repository implementations for various AWS services and databases.
 package repository
 
 import (

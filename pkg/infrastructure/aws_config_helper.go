@@ -1,4 +1,4 @@
-// Package infrastructure provides AWS infrastructure configuration utilities.
+// Package infrastructure provides infrastructure integration helpers using AWS SDK v2.
 package infrastructure
 
 import (
@@ -90,9 +90,11 @@ func createAWSConfig(params *AWSConfigParams, httpClient *http.Client) (aws.Conf
 
 	// Add credentials if required
 	if params.UseCredentials {
-		configOptions = append(configOptions,
+		configOptions = append(
+			configOptions,
 			config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
-				params.Key, params.Secret, params.SessionToken)),
+				params.Key, params.Secret, params.SessionToken,
+			)),
 		)
 	}
 

@@ -18,7 +18,7 @@ logger:
   out: stdout
   level: info
 `
-	err := os.WriteFile(configPath, []byte(configContent), 0644)
+	err := os.WriteFile(configPath, []byte(configContent), 0o644)
 	assert.NoError(t, err)
 
 	setting := &FileSetting{
@@ -44,7 +44,7 @@ logger:
   out: stdout
   level: debug
 `
-	err := os.WriteFile(configPath, []byte(configContent), 0644)
+	err := os.WriteFile(configPath, []byte(configContent), 0o644)
 	assert.NoError(t, err)
 
 	setting := &FileSetting{
@@ -81,7 +81,7 @@ logger:
   out: stdout
   level: info
 `
-	err := os.WriteFile(configPath, []byte(configContent), 0644)
+	err := os.WriteFile(configPath, []byte(configContent), 0o644)
 	assert.NoError(t, err)
 
 	setting := &FileSetting{
@@ -104,7 +104,7 @@ logger:
   out: stderr
   level: info
 `
-	err := os.WriteFile(configPath, []byte(configContent), 0644)
+	err := os.WriteFile(configPath, []byte(configContent), 0o644)
 	assert.NoError(t, err)
 
 	setting := &FileSetting{

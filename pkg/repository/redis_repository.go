@@ -135,6 +135,15 @@ func (r *RedisRepository) Exists(c context.Context, keys ...string) (int64, erro
 	return res, nil
 }
 
+// Expire Redis `EXPIRE key seconds` command.
+func (r *RedisRepository) Expire(c context.Context, key string, expiration time.Duration) (bool, error) {
+	res, err := r.Client.Expire(c, key, expiration).Result()
+	if err != nil {
+		return false, fmt.Errorf("redis Expire: %w", err)
+	}
+	return res, nil
+}
+
 // Get Redis `GET key` command.
 func (r *RedisRepository) Get(c context.Context, key string) (string, error) {
 	res, err := r.Client.Get(c, key).Result()
@@ -279,29 +288,20 @@ func (r *RedisRepository) SetRange(c context.Context, key string, offset int64, 
 	return res, nil
 }
 
-// TTL Redis `TTL key` command.
-func (r *RedisRepository) TTL(c context.Context, key string) (time.Duration, error) {
-	res, err := r.Client.TTL(c, key).Result()
-	if err != nil {
-		return 0, fmt.Errorf("redis TTL: %w", err)
-	}
-	return res, nil
-}
-
-// Expire Redis `EXPIRE key seconds` command.
-func (r *RedisRepository) Expire(c context.Context, key string, expiration time.Duration) (bool, error) {
-	res, err := r.Client.Expire(c, key, expiration).Result()
-	if err != nil {
-		return false, fmt.Errorf("redis Expire: %w", err)
-	}
-	return res, nil
-}
-
 // StrLen Redis `STRLEN key` command.
 func (r *RedisRepository) StrLen(c context.Context, key string) (int64, error) {
 	res, err := r.Client.StrLen(c, key).Result()
 	if err != nil {
 		return 0, fmt.Errorf("redis StrLen: %w", err)
+	}
+	return res, nil
+}
+
+// TTL Redis `TTL key` command.
+func (r *RedisRepository) TTL(c context.Context, key string) (time.Duration, error) {
+	res, err := r.Client.TTL(c, key).Result()
+	if err != nil {
+		return 0, fmt.Errorf("redis TTL: %w", err)
 	}
 	return res, nil
 }

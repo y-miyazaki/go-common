@@ -1,4 +1,3 @@
-// Package infrastructure provides AWS CloudWatch Logs integration helpers using AWS SDK v2.
 package infrastructure
 
 import (

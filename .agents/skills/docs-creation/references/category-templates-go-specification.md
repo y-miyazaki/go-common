@@ -1,39 +1,7 @@
-## Go Template Variants
+## Go Specification Template Variant
 
-Language-specific template variants. Use when the Go profile is detected.
-
-These templates define:
-- required reasoning coverage
-- runtime and package design expectations
-- operational and concurrency considerations
-- API and compatibility expectations
-- anti-pattern avoidance guidance
-
-Do not treat templates as rigid prose generators.
-Use them as structured documentation guidance and review rubrics.
-
-Use these variants when Go profile is detected and Terraform profile is not detected.
-
-## Coverage Matrix (Go Profile)
-
-Use the template source below for each `document_type`:
-
-| `document_type`     | Template Source                                                                                     |
-| ------------------- | --------------------------------------------------------------------------------------------------- |
-| `specification`     | `specification_go` in this file (overrides `references/category-templates-common-specification.md`) |
-| `architecture`      | `references/category-templates-common-architecture.md`                                              |
-| `design`            | `references/category-templates-common-design.md`                                                    |
-| `design-decisions`  | `references/category-templates-common-design-decisions.md`                                          |
-| `troubleshooting`   | `references/category-templates-common-troubleshooting.md`                                           |
-| `general`           | `references/category-templates-common-general.md`                                                   |
-| `module-catalog`    | `references/category-templates-common-module-catalog.md`                                            |
-| `monitoring`        | `references/category-templates-common-monitoring.md`                                                |
-| `performance`       | `references/category-templates-common-performance.md`                                               |
-| `security-coverage` | `references/category-templates-common-security-coverage.md`                                         |
-| `maintenance-notes` | `references/category-templates-common-maintenance-notes.md`                                         |
-| `improvements`      | `references/category-templates-common-improvements.md`                                              |
-
----
+This file provides a profile-specific override for `document_type=specification`.
+For other `document_type` values, use the corresponding `category-templates-common-*.md` templates.
 
 ## specification_go
 

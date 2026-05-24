@@ -27,6 +27,32 @@ func (h *BaseHTTPHandler) ResponseCSV(c *gin.Context, statusCode int, fileName s
 	c.Data(statusCode, "text/csv", data)
 }
 
+// ResponseStatusBadRequest returns 400 error.
+func (h *BaseHTTPHandler) ResponseStatusBadRequest(c *gin.Context, messages any) {
+	_ = h
+	c.JSON(http.StatusBadRequest, messages)
+}
+
+// ResponseStatusForbidden returns 403 error.
+func (h *BaseHTTPHandler) ResponseStatusForbidden(c *gin.Context, messages any) {
+	_ = h
+	c.JSON(http.StatusForbidden, messages)
+}
+
+// ResponseStatusInternalServerError returns 500 error.
+func (h *BaseHTTPHandler) ResponseStatusInternalServerError(c *gin.Context, messages any, err error) {
+	_ = h
+	gincontext.SetGinContextError(c, err)
+	gincontext.SetGinContextErrorMessage(c, messages)
+	c.JSON(http.StatusInternalServerError, messages)
+}
+
+// ResponseStatusNotFound returns 404 error.
+func (h *BaseHTTPHandler) ResponseStatusNotFound(c *gin.Context, messages any) {
+	_ = h
+	c.JSON(http.StatusNotFound, messages)
+}
+
 // ResponseZIP responses zip data.
 func (h *BaseHTTPHandler) ResponseZIP(c *gin.Context, statusCode int, fileName string, mapContentFile map[string]bytes.Buffer) error {
 	// reference receiver to satisfy linters when receiver is unused
@@ -58,30 +84,4 @@ func (h *BaseHTTPHandler) ResponseZIP(c *gin.Context, statusCode int, fileName s
 		}
 	}
 	return nil
-}
-
-// ResponseStatusBadRequest returns 400 error.
-func (h *BaseHTTPHandler) ResponseStatusBadRequest(c *gin.Context, messages any) {
-	_ = h
-	c.JSON(http.StatusBadRequest, messages)
-}
-
-// ResponseStatusForbidden returns 403 error.
-func (h *BaseHTTPHandler) ResponseStatusForbidden(c *gin.Context, messages any) {
-	_ = h
-	c.JSON(http.StatusForbidden, messages)
-}
-
-// ResponseStatusNotFound returns 404 error.
-func (h *BaseHTTPHandler) ResponseStatusNotFound(c *gin.Context, messages any) {
-	_ = h
-	c.JSON(http.StatusNotFound, messages)
-}
-
-// ResponseStatusInternalServerError returns 500 error.
-func (h *BaseHTTPHandler) ResponseStatusInternalServerError(c *gin.Context, messages any, err error) {
-	_ = h
-	gincontext.SetGinContextError(c, err)
-	gincontext.SetGinContextErrorMessage(c, messages)
-	c.JSON(http.StatusInternalServerError, messages)
 }

@@ -1,6 +1,4 @@
-// utils is a meaningful package name for utility functions
-// nolint:revive
-package utils
+package utils // nolint:revive
 
 import (
 	"bytes"

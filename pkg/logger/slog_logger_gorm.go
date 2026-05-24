@@ -57,11 +57,12 @@ func NewSlogLoggerGorm(c *GormSlogSetting) *GormSlog {
 	}
 }
 
-// LogMode log mode.
-func (l *GormSlog) LogMode(level logger.LogLevel) logger.Interface {
-	// Keep the signature stable, but avoid unused-param lint failures.
-	_ = level
-	return l
+// Error print the error level log.
+func (l *GormSlog) Error(ctx context.Context, msg string, data ...any) {
+	_ = ctx
+	if l.gormConfig.LogLevel >= Error {
+		l.l.Error(fmt.Sprintf(msg, data...))
+	}
 }
 
 // Info print the info level log.
@@ -72,20 +73,11 @@ func (l *GormSlog) Info(ctx context.Context, msg string, data ...any) {
 	}
 }
 
-// Warn print the warn level log.
-func (l *GormSlog) Warn(ctx context.Context, msg string, data ...any) {
-	_ = ctx
-	if l.gormConfig.LogLevel >= Warn {
-		l.l.Warn(fmt.Sprintf(msg, data...))
-	}
-}
-
-// Error print the error level log.
-func (l *GormSlog) Error(ctx context.Context, msg string, data ...any) {
-	_ = ctx
-	if l.gormConfig.LogLevel >= Error {
-		l.l.Error(fmt.Sprintf(msg, data...))
-	}
+// LogMode log mode.
+func (l *GormSlog) LogMode(level logger.LogLevel) logger.Interface {
+	// Keep the signature stable, but avoid unused-param lint failures.
+	_ = level
+	return l
 }
 
 // Trace print the SQL log.
@@ -123,5 +115,13 @@ func (l *GormSlog) Trace(
 		l.l.Info("SQL Query", attrs...)
 	default:
 		// No logging for silent level
+	}
+}
+
+// Warn print the warn level log.
+func (l *GormSlog) Warn(ctx context.Context, msg string, data ...any) {
+	_ = ctx
+	if l.gormConfig.LogLevel >= Warn {
+		l.l.Warn(fmt.Sprintf(msg, data...))
 	}
 }

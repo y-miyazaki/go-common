@@ -50,9 +50,166 @@ func NewLogger(logger *logrus.Logger, cfg ...*LoggerConfig) *Logger {
 	}
 }
 
+// Debug outputs debug level log.
+func (l *Logger) Debug(args ...any) {
+	l.Entry.Debug(args...)
+}
+
+// Debugf outputs debug level log.
+func (l *Logger) Debugf(format string, args ...any) {
+	l.Entry.Debugf(format, args...)
+}
+
+// Debugln outputs debug level log.
+func (l *Logger) Debugln(args ...any) {
+	l.Entry.Debugln(args...)
+}
+
+// Error outputs error level log.
+func (l *Logger) Error(args ...any) {
+	l.Entry.Error(args...)
+}
+
+// Errorf outputs error level log.
+func (l *Logger) Errorf(format string, args ...any) {
+	l.Entry.Errorf(format, args...)
+}
+
+// Errorln outputs error level log.
+func (l *Logger) Errorln(args ...any) {
+	l.Entry.Errorln(args...)
+}
+
+// Fatal outputs fatal level log.
+func (l *Logger) Fatal(args ...any) {
+	l.Entry.Fatal(args...)
+}
+
+// Fatalf outputs fatal level log.
+func (l *Logger) Fatalf(format string, args ...any) {
+	l.Entry.Fatalf(format, args...)
+}
+
+// Fatalln outputs fatal level log.
+func (l *Logger) Fatalln(args ...any) {
+	l.Entry.Fatalln(args...)
+}
+
 // GetEntry gets *logrus.Entry.
 func (l *Logger) GetEntry() *logrus.Entry {
 	return l.Entry
+}
+
+// Info outputs info level log.
+func (l *Logger) Info(args ...any) {
+	l.Entry.Info(args...)
+}
+
+// Infof outputs info level log.
+func (l *Logger) Infof(format string, args ...any) {
+	l.Entry.Infof(format, args...)
+}
+
+// Infoln outputs info level log.
+func (l *Logger) Infoln(args ...any) {
+	l.Entry.Infoln(args...)
+}
+
+// Panic outputs panic log.
+func (l *Logger) Panic(args ...any) {
+	l.Entry.Panic(args...)
+}
+
+// Panicf outputs panic log.
+func (l *Logger) Panicf(format string, args ...any) {
+	l.Entry.Panicf(format, args...)
+}
+
+// Panicln outputs panic log.
+func (l *Logger) Panicln(args ...any) {
+	l.Entry.Panicln(args...)
+}
+
+// Print outputs printf.
+func (l *Logger) Print(args ...any) {
+	l.Entry.Print(args...)
+}
+
+// Printf outputs printf.
+func (l *Logger) Printf(format string, args ...any) {
+	l.Entry.Printf(format, args...)
+}
+
+// Println outputs printf.
+func (l *Logger) Println(args ...any) {
+	l.Entry.Println(args...)
+}
+
+// Warn outputs warn level log.
+func (l *Logger) Warn(args ...any) {
+	l.Entry.Warn(args...)
+}
+
+// Warnf outputs warn level log.
+func (l *Logger) Warnf(format string, args ...any) {
+	l.Entry.Warnf(format, args...)
+}
+
+// Warning outputs warn level log.
+func (l *Logger) Warning(args ...any) {
+	l.Entry.Warning(args...)
+}
+
+// Warningf outputs warn level log.
+func (l *Logger) Warningf(format string, args ...any) {
+	l.Entry.Warningf(format, args...)
+}
+
+// Warningln outputs warn level log.
+func (l *Logger) Warningln(args ...any) {
+	l.Entry.Warningln(args...)
+}
+
+// Warnln outputs warn level log.
+func (l *Logger) Warnln(args ...any) {
+	l.Entry.Warnln(args...)
+}
+
+// WithContext calls WithContext function of logger entry.
+func (l *Logger) WithContext(ctx context.Context) *Logger {
+	return &Logger{
+		Entry:  l.Entry.WithContext(ctx),
+		Config: l.Config,
+	}
+}
+
+// WithContextValue calls WithField function of logger entry.
+func (l *Logger) WithContextValue(key string) *Logger {
+	if key == "" || l.Entry == nil || l.Entry.Context == nil {
+		return l
+	}
+
+	return &Logger{
+		Entry:  l.Entry.WithField(key, l.Entry.Context.Value(key)),
+		Config: l.Config,
+	}
+}
+
+// WithError calls WithError function of logger entry.
+func (l *Logger) WithError(err error) *Logger {
+	if err == nil {
+		return l
+	}
+	if e, ok := err.(stackTracer); ok {
+		return &Logger{
+			Entry:  l.Entry.WithField("stacktrace", fmt.Sprintf("%+v", e.StackTrace())).WithError(err),
+			Config: l.Config,
+		}
+	}
+	return &Logger{
+		Entry:  l.Entry.WithError(err),
+		Config: l.Config,
+	}
 }
 
 // WithField attaches a field to the logger.
@@ -76,163 +233,4 @@ func (l *Logger) WithFields(fields logrus.Fields) *Logger {
 		Entry:  l.Entry.WithFields(SanitizeFields(fields, l.Config)),
 		Config: l.Config,
 	}
-}
-
-// ... existing code ...
-
-// WithError calls WithError function of logger entry.
-func (l *Logger) WithError(err error) *Logger {
-	if err == nil {
-		return l
-	}
-	if e, ok := err.(stackTracer); ok {
-		return &Logger{
-			Entry:  l.Entry.WithField("stacktrace", fmt.Sprintf("%+v", e.StackTrace())).WithError(err),
-			Config: l.Config,
-		}
-	}
-	return &Logger{
-		Entry:  l.Entry.WithError(err),
-		Config: l.Config,
-	}
-}
-
-// WithContext calls WithContext function of logger entry.
-func (l *Logger) WithContext(ctx context.Context) *Logger {
-	return &Logger{
-		Entry:  l.Entry.WithContext(ctx),
-		Config: l.Config,
-	}
-}
-
-// WithContextValue calls WithField function of logger entry.
-func (l *Logger) WithContextValue(key string) *Logger {
-	if key == "" || l.Entry == nil || l.Entry.Context == nil {
-		return l
-	}
-
-	return &Logger{
-		Entry:  l.Entry.WithField(key, l.Entry.Context.Value(key)),
-		Config: l.Config,
-	}
-}
-
-// Debugf outputs debug level log.
-func (l *Logger) Debugf(format string, args ...any) {
-	l.Entry.Debugf(format, args...)
-}
-
-// Infof outputs info level log.
-func (l *Logger) Infof(format string, args ...any) {
-	l.Entry.Infof(format, args...)
-}
-
-// Printf outputs printf.
-func (l *Logger) Printf(format string, args ...any) {
-	l.Entry.Printf(format, args...)
-}
-
-// Warnf outputs warn level log.
-func (l *Logger) Warnf(format string, args ...any) {
-	l.Entry.Warnf(format, args...)
-}
-
-// Warningf outputs warn level log.
-func (l *Logger) Warningf(format string, args ...any) {
-	l.Entry.Warningf(format, args...)
-}
-
-// Errorf outputs error level log.
-func (l *Logger) Errorf(format string, args ...any) {
-	l.Entry.Errorf(format, args...)
-}
-
-// Fatalf outputs fatal level log.
-func (l *Logger) Fatalf(format string, args ...any) {
-	l.Entry.Fatalf(format, args...)
-}
-
-// Panicf outputs panic log.
-func (l *Logger) Panicf(format string, args ...any) {
-	l.Entry.Panicf(format, args...)
-}
-
-// Debug outputs debug level log.
-func (l *Logger) Debug(args ...any) {
-	l.Entry.Debug(args...)
-}
-
-// Info outputs info level log.
-func (l *Logger) Info(args ...any) {
-	l.Entry.Info(args...)
-}
-
-// Print outputs printf.
-func (l *Logger) Print(args ...any) {
-	l.Entry.Print(args...)
-}
-
-// Warn outputs warn level log.
-func (l *Logger) Warn(args ...any) {
-	l.Entry.Warn(args...)
-}
-
-// Warning outputs warn level log.
-func (l *Logger) Warning(args ...any) {
-	l.Entry.Warning(args...)
-}
-
-// Error outputs error level log.
-func (l *Logger) Error(args ...any) {
-	l.Entry.Error(args...)
-}
-
-// Fatal outputs fatal level log.
-func (l *Logger) Fatal(args ...any) {
-	l.Entry.Fatal(args...)
-}
-
-// Panic outputs panic log.
-func (l *Logger) Panic(args ...any) {
-	l.Entry.Panic(args...)
-}
-
-// Debugln outputs debug level log.
-func (l *Logger) Debugln(args ...any) {
-	l.Entry.Debugln(args...)
-}
-
-// Infoln outputs info level log.
-func (l *Logger) Infoln(args ...any) {
-	l.Entry.Infoln(args...)
-}
-
-// Println outputs printf.
-func (l *Logger) Println(args ...any) {
-	l.Entry.Println(args...)
-}
-
-// Warnln outputs warn level log.
-func (l *Logger) Warnln(args ...any) {
-	l.Entry.Warnln(args...)
-}
-
-// Warningln outputs warn level log.
-func (l *Logger) Warningln(args ...any) {
-	l.Entry.Warningln(args...)
-}
-
-// Errorln outputs error level log.
-func (l *Logger) Errorln(args ...any) {
-	l.Entry.Errorln(args...)
-}
-
-// Fatalln outputs fatal level log.
-func (l *Logger) Fatalln(args ...any) {
-	l.Entry.Fatalln(args...)
-}
-
-// Panicln outputs panic log.
-func (l *Logger) Panicln(args ...any) {
-	l.Entry.Panicln(args...)
 }
