@@ -67,7 +67,7 @@ aqua = "2.59.0"
 "aqua:go-delve/delve" = "1.26.3"        # debugger
 "aqua:go-swagger/go-swagger" = "0.33.2" # API documentation generator
 # Use go backend for go_install-type packages (aqua backend does not support these).
-"go:golang.org/x/tools/gopls" = "0.21.1"                                # Go language server
+"go:golang.org/x/tools/gopls" = "v0.22.0"                                # Go language server
 "go:golang.org/x/vuln/cmd/govulncheck" = "1.3.0"                        # vulnerability scanner
 "aqua:golangci/golangci-lint" = "2.12.2"                                # linter
 "aqua:goreleaser/goreleaser" = "2.15.4"                                 # release automation
