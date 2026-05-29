@@ -32,7 +32,7 @@ func GinHTTPLogger(l *logger.Logger, traceIDHeader, clientIPHeader string,
 			"userAgent": c.Request.UserAgent(),
 		}
 		if traceIDHeader != "" {
-			fields[traceIDHeader] = c.Request.Header.Get(traceIDHeader)
+			fields[traceIDHeader] = logger.SanitizeValue(traceIDHeader, c.Request.Header.Get(traceIDHeader))
 		}
 		// get error
 		loggerWithContext := l
@@ -72,7 +72,7 @@ func GinHTTPZapLogger(
 		)
 
 		if traceIDHeader != "" {
-			loggerWithContext = loggerWithContext.With(zap.String(traceIDHeader, c.Request.Header.Get(traceIDHeader)))
+			loggerWithContext = loggerWithContext.With(zap.String(traceIDHeader, logger.SanitizeValue(traceIDHeader, c.Request.Header.Get(traceIDHeader))))
 		}
 		// get error
 		if err, err2 := gincontext.GetGinContextError(c); err2 == nil {

@@ -69,3 +69,53 @@ func TestLogrusLogger_WithFieldRedaction_DefaultAndAllow(t *testing.T) {
 		t.Fatalf("expected api_key to be preserved when AllowSensitive=true, got %#v", v)
 	}
 }
+
+func TestIsSensitiveValue(t *testing.T) {
+	tests := []struct {
+		value string
+		want  bool
+	}{
+		{"Bearer eyJhbGciOiJIUzI1NiJ9", true},
+		{"bearer abc123", true},
+		{"Basic dXNlcjpwYXNz", true},
+		{"token abc123", true},
+		{"some-trace-id-12345", false},
+		{"192.168.1.1", false},
+		{"", false},
+	}
+	for _, tc := range tests {
+		if got := isSensitiveValue(tc.value); got != tc.want {
+			t.Fatalf("isSensitiveValue(%q) = %v; want %v", tc.value, got, tc.want)
+		}
+	}
+}
+
+func TestSanitizeValue(t *testing.T) {
+	tests := []struct {
+		key, value, want string
+	}{
+		{"authorization", "Bearer xyz", "[REDACTED]"},
+		{"X-Trace-ID", "Bearer sneaky", "[REDACTED]"},
+		{"X-Trace-ID", "abc-123-def", "abc-123-def"},
+		{"cookie", "session=abc", "[REDACTED]"},
+	}
+	for _, tc := range tests {
+		if got := SanitizeValue(tc.key, tc.value); got != tc.want {
+			t.Fatalf("SanitizeValue(%q, %q) = %q; want %q", tc.key, tc.value, got, tc.want)
+		}
+	}
+}
+
+func TestSanitizeFields_RedactsSensitiveValues(t *testing.T) {
+	fields := logrus.Fields{
+		"X-Trace-ID": "Bearer eyJhbGciOiJIUzI1NiJ9",
+		"request_id": "abc-123",
+	}
+	got := SanitizeFields(fields, nil)
+	if got["X-Trace-ID"] != "[REDACTED]" {
+		t.Fatalf("expected sensitive value to be redacted, got %v", got["X-Trace-ID"])
+	}
+	if got["request_id"] != "abc-123" {
+		t.Fatalf("expected safe value to be preserved, got %v", got["request_id"])
+	}
+}

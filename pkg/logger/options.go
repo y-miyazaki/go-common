@@ -40,7 +40,8 @@ func isSensitiveKey(key string) bool {
 
 // SanitizeFields returns a copy of fields where sensitive keys are redacted
 // according to the provided config. If cfg.AllowSensitive is true, fields
-// are returned unchanged.
+// are returned unchanged. Values that match sensitive patterns (e.g., Bearer
+// tokens) are also redacted regardless of key name.
 func SanitizeFields(fields logrus.Fields, cfg *LoggerConfig) logrus.Fields {
 	cfgLocal := defaultConfig(cfg)
 	if cfgLocal.AllowSensitive || fields == nil {
@@ -52,7 +53,28 @@ func SanitizeFields(fields logrus.Fields, cfg *LoggerConfig) logrus.Fields {
 			out[k] = "[REDACTED]"
 			continue
 		}
+		if s, ok := v.(string); ok && isSensitiveValue(s) {
+			out[k] = "[REDACTED]"
+			continue
+		}
 		out[k] = v
 	}
 	return out
+}
+
+// isSensitiveValue checks whether a value looks like it contains sensitive
+// data such as a Bearer token or a basic auth credential.
+func isSensitiveValue(value string) bool {
+	v := strings.ToLower(strings.TrimSpace(value))
+	return strings.HasPrefix(v, "bearer ") || strings.HasPrefix(v, "basic ") || strings.HasPrefix(v, "token ")
+}
+
+// SanitizeValue returns "[REDACTED]" if the key is sensitive or the value
+// matches a sensitive pattern; otherwise it returns the value unchanged.
+// Use this to sanitize individual header values before logging.
+func SanitizeValue(key, value string) string {
+	if isSensitiveKey(key) || isSensitiveValue(value) {
+		return "[REDACTED]"
+	}
+	return value
 }
