@@ -2,147 +2,82 @@
 
 Templates are guidance and review rubrics, not rigid prose generators.
 Adapt structure and depth to the repository and context.
-Replace all `<placeholder>` values with actual content.
-Remove sections that do not apply rather than leaving them empty.
+Remove sections that cannot be populated with concrete information.
 
 ````markdown
 # <Repository Name>
 
-<One to three sentences describing the repository purpose and intended operational scope.>
+<!-- Answer: What does this repository do? In 1-3 sentences. Source: read package config, main entry point, existing description. -->
 
 README is the repository entry point for humans and AI assistants.
 
 Focus on:
-- repository identification
+- repository identification and purpose
 - quick operational entry points
 - high-level navigation
 - contributor guidance
-- links to deeper documentation
-
-Deprioritize:
-- deep architectural explanations
-- exhaustive configuration references
-- large troubleshooting sections
-- implementation-specific details
-- duplicated documentation
 
 Avoid:
-- duplicating `docs/`
+- duplicating docs/ content
 - embedding large generated tables
-- storing operational runbooks
-- documenting every module/package/resource
-- excessive badge-only sections without operational value
+- exhaustive configuration references
+- implementation-specific details
 
 ## Status
 
-| Item              | Value                            |
-| ----------------- | -------------------------------- |
-| Lifecycle         | <experimental/stable/deprecated> |
-| Primary Stack     | <Go/Terraform/etc>               |
-| Deployment Target | <AWS/Kubernetes/etc>             |
+<!-- Answer: What is the maturity and primary stack? Source: read package config, CI status. -->
 
-Document:
-- operational maturity
-- intended usage scope
-- important limitations if applicable
+| Item              | Value |
+| ----------------- | ----- |
+| Lifecycle         |       |
+| Primary Stack     |       |
+| Deployment Target |       |
 
 ## Repository Purpose
 
-Describe:
-- what this repository manages
-- who operates or consumes it
-- intended operational boundaries
-- primary use cases
-
-Avoid:
-- implementation-level explanations
-- detailed architecture descriptions
+<!-- Answer: What does this repo manage? Who operates it? What are the boundaries? Source: read top-level structure and package description. -->
 
 ## Quick Start
 
+<!-- Answer: What are the 3-5 commands to get started? Source: read Makefile, scripts/, CI setup steps. -->
+
 ### Prerequisites
 
-- <required tool>
-- <required tool>
+<!-- list from devcontainer, Dockerfile, or CI setup -->
 
 ### Common Commands
 
 ```sh
-<setup/build/test/deploy commands>
+# from Makefile or scripts/
 ```
-
-Focus on:
-- common contributor/operator workflows
-- minimal onboarding friction
 
 ## Repository Structure
 
-| Path     | Purpose   |
-| -------- | --------- |
-| `<path>` | <purpose> |
-| `<path>` | <purpose> |
+<!-- Answer: What are the major directories and their purpose? Source: read top-level directory listing. -->
 
-Document:
-- major ownership boundaries
-- important entrypoint directories
-- where to find deeper documentation
-
-Avoid:
-- exhaustive directory trees
-- documenting every internal directory
+| Path     | Purpose |
+| -------- | ------- |
 
 ## Documentation Index
 
-| Document                   | Purpose                     |
-| -------------------------- | --------------------------- |
-| `docs/index.md`            | Documentation catalog       |
-| `docs/architecture.md`     | System architecture         |
-| `docs/design-decisions.md` | Architectural rationale     |
-| `docs/troubleshooting.md`  | Operational troubleshooting |
+<!-- Answer: What docs exist and where? Source: read docs/ directory. -->
 
-Focus on:
-- discoverability
-- navigation
-- operational relevance
-
-## Operational Notes (Optional)
-
-Document only:
-- critical operational assumptions
-- deployment constraints
-- environment limitations
-- important warnings
-
-Move detailed operational procedures into:
-- runbooks
-- troubleshooting documents
-- architecture/design documents
+| Document                              | Purpose                     |
+| ------------------------------------- | --------------------------- |
+| `docs/index.md`                       | Documentation catalog       |
+| `docs/explanation/architecture.md`    | System architecture         |
+| `docs/explanation/design-decisions.md` | Architectural rationale     |
+| `docs/how-to/troubleshooting.md`      | Operational troubleshooting |
 
 ## Contribution Guidance
 
-Reference:
-- `CONTRIBUTING.md`
-- `AGENTS.md`
-- `docs/index.md`
-
-Document:
-- contribution entry points
-- repository conventions
-- important review expectations
-
-## Related Repositories or Services (Optional)
-
-| Repository/Service | Purpose        |
-| ------------------ | -------------- |
-| `<name>`           | <relationship> |
+<!-- Answer: How do people contribute? Source: read CONTRIBUTING.md, AGENTS.md, PR templates. -->
 
 ## Decision Prompts
 
 Consider:
-- Can a new contributor understand repository purpose quickly?
-- Are common workflows discoverable within minutes?
+- Can a new contributor understand repository purpose within 2 minutes?
+- Are common workflows discoverable?
 - Are deep details delegated to specialized docs?
-- Is documentation navigation obvious?
-- Are operationally critical constraints visible?
-- Does README avoid becoming a duplicate of `docs/`?
+- Does README avoid becoming a duplicate of docs/?
 ````

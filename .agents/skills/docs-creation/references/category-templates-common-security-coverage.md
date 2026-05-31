@@ -2,59 +2,41 @@
 
 Templates are guidance and review rubrics, not rigid prose generators.
 Adapt structure and depth to the repository and context.
-Replace all `<placeholder>` values with actual content.
-Remove sections that do not apply rather than leaving them empty.
+Remove sections that cannot be populated with concrete information.
 
 ```markdown
 # Security Coverage
 
-Documents implemented, partial, and intentionally excluded
-security controls within <project>.
+<!-- Answer: What security controls are implemented? Source: read IAM policies, encryption configs, security scanning CI steps. -->
 
 Focus on:
-- security boundaries
-- ownership
-- enforcement mechanisms
-- intentional exclusions
+- security boundaries and enforcement mechanisms
+- ownership of each control
+- intentional exclusions with rationale
 
 Avoid:
-- vague "secured" statements
+- vague "secured" statements without specifics
 - undocumented trust assumptions
+- generic security checklists
 
 ## Coverage Matrix
 
-| Control/Service | Status                         | Owner   | Notes   |
-| --------------- | ------------------------------ | ------- | ------- |
-| <control>       | <implemented/partial/excluded> | <owner> | <notes> |
+<!-- Answer: What controls exist and what is their status? Source: read IaC security resources, policy configs. -->
+
+| Control/Service | Status | Owner | Notes |
+| --------------- | ------ | ----- | ----- |
 
 ## Security Boundaries
 
-Document:
-- trust boundaries
-- privileged components
-- externally exposed interfaces
-- secret handling assumptions
+<!-- Answer: What are the trust boundaries? What is externally exposed? Source: read network configs, API gateways, auth middleware. -->
 
 ## Known Gaps and Exclusions
 
-Document:
-- intentionally unsupported controls
-- operational constraints
-- accepted risks
+<!-- Answer: What is intentionally not covered? Why? Source: read security review notes, risk acceptance docs. -->
 
 ## Validation and Enforcement
 
-Document:
-- policy enforcement tools
-- scanning/linting
-- audit expectations
-- review requirements
-
-## Legend
-
-- implemented — control active and managed by this repository
-- partial — control partially implemented; gaps noted
-- excluded — intentionally out of scope; reason noted
+<!-- Answer: How are controls verified? Source: read security scanning CI steps, policy-as-code configs. -->
 
 ## Decision Prompts
 

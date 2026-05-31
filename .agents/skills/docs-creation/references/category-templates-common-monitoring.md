@@ -2,57 +2,41 @@
 
 Templates are guidance and review rubrics, not rigid prose generators.
 Adapt structure and depth to the repository and context.
-Replace all `<placeholder>` values with actual content.
-Remove sections that do not apply rather than leaving them empty.
+Remove sections that cannot be populated with concrete information.
 
 ```markdown
 # Monitoring
 
-Monitoring, alerting, diagnostics, and operational visibility guidance
-for <project>.
+<!-- Answer: What needs to be monitored? What are the critical signals? Source: read alerting configs, CloudWatch/Prometheus definitions, health checks. -->
 
 Focus on:
-- operational visibility
-- actionable alerts
-- ownership and escalation
+- operational visibility and actionable alerts
+- ownership and escalation paths
 - incident investigation support
 
 Avoid:
 - dashboards without operational purpose
 - noisy non-actionable alerts
+- generic monitoring advice
 
 ## Monitoring Strategy
 
-Describe:
-- critical signals
-- SLO/SLA assumptions
-- incident detection goals
+<!-- Answer: What are the critical signals? What SLOs exist? Source: read service definitions, SLA docs. -->
 
 ## Alerts
 
-| Alert | Trigger | Severity | Owner  | Runbook |
-| ----- | ------- | -------- | ------ | ------- |
-| <A>   | <cond>  | <level>  | <team> | <link>  |
+<!-- Answer: What alerts exist? What action does each require? Source: read alerting config files. -->
 
-Document:
-- why alert matters
-- expected operator action
-- escalation expectations
+| Alert | Trigger | Severity | Owner | Runbook |
+| ----- | ------- | -------- | ----- | ------- |
 
 ## Dashboards
 
-Describe:
-- dashboard purpose
-- intended audience
-- operational usage
+<!-- Answer: What dashboards exist and for whom? Source: read dashboard definitions or IaC. -->
 
 ## Runbooks
 
-### <Alert or Failure Scenario>
-
-1. <investigation step>
-2. <validation step>
-3. <mitigation step>
+<!-- Answer: What are the step-by-step responses to each alert? Source: read incident history, recovery scripts. -->
 
 ## Decision Prompts
 

@@ -2,56 +2,50 @@
 
 Templates are guidance and review rubrics, not rigid prose generators.
 Adapt structure and depth to the repository and context.
-Replace all `<placeholder>` values with actual content.
-Remove sections that do not apply rather than leaving them empty.
+Remove sections that cannot be populated with concrete information.
 
 ```markdown
 # Design Decisions
 
-Records major technical and operational decisions to preserve rationale
-and prevent repeated re-investigation.
+<!-- Answer: What major decisions does this document record? Source: read git log, PR descriptions, existing ADRs. -->
 
 Focus on:
 - why a decision exists
-- tradeoffs
-- rejected alternatives
+- tradeoffs accepted
+- rejected alternatives with reasons
 - long-term operational implications
 
 Avoid:
 - obvious decisions requiring no rationale
 - implementation-only details without architectural impact
+- decisions already documented elsewhere
 
 ## <Decision Title>
 
+<!-- Use a descriptive title that captures the choice made. -->
+
 ### Context
 
-<What problem or constraint existed?>
+<!-- Answer: What problem or constraint existed? What triggered this decision? Source: read related issues, PRs, or incident reports. -->
 
 ### Decision
 
-<What was chosen?>
+<!-- Answer: What was chosen? State the decision clearly in 1-2 sentences. -->
 
 ### Rationale
 
-Explain:
-- why this approach was selected
-- operational or architectural benefits
-- constraints influencing the decision
+<!-- Answer: Why this approach over alternatives? What constraints influenced it? Source: read discussion threads, review comments. -->
 
 ### Alternatives Rejected
 
+<!-- Answer: What else was considered? Why was it rejected? -->
+
 | Alternative | Reason Rejected |
 | ----------- | --------------- |
-| <A>         | <reason>        |
-| <B>         | <reason>        |
 
 ### Consequences
 
-Document:
-- tradeoffs
-- future limitations
-- migration implications
-- operational impact
+<!-- Answer: What tradeoffs were accepted? What future limitations does this create? -->
 
 ## Decision Prompts
 

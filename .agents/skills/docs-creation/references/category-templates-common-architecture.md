@@ -2,70 +2,50 @@
 
 Templates are guidance and review rubrics, not rigid prose generators.
 Adapt structure and depth to the repository and context.
-Replace all `<placeholder>` values with actual content.
-Remove sections that do not apply rather than leaving them empty.
+Remove sections that cannot be populated with concrete information.
 
 ```markdown
 # Architecture Overview
 
-This document provides structural and operational context for <project>.
+<!-- Answer: What does this system do and why does this document exist? Source: README, main entry point. -->
 
 Focus on:
-- system boundaries
-- ownership relationships
-- runtime topology
-- dependency flow
-- operational responsibilities
+- system boundaries and ownership
+- runtime topology and data flow
+- dependency relationships
+- operational constraints
 
 Avoid:
-- low-level implementation details
+- low-level implementation details (use design.md)
 - directory listings without explanation
+- generic descriptions that apply to any system
 
 ## System Overview
 
-Describe:
-- major components
-- interaction patterns
-- trust boundaries
-- deployment topology
-- external dependencies
+<!-- Answer: What are the 3-5 major components? How do they communicate? What are the trust boundaries? Source: read main package/module structure and entry points. -->
 
-## Structural Layout
+## Component Responsibilities
 
-### <Component or Domain>
+<!-- Answer: What does each component own? What are the boundaries between them? Source: read top-level directories, interfaces, and exported APIs. -->
 
-| Item | Responsibility |
-| ---- | -------------- |
-| <A>  | <role>         |
-| <B>  | <role>         |
+| Component | Responsibility | Owns |
+| --------- | -------------- | ---- |
 
-Document:
-- ownership boundaries
-- communication paths
-- lifecycle relationships
+## Data and Control Flow
 
-## Runtime and Operational Topology
+<!-- Answer: How does data move through the system? What triggers processing? Source: read main handlers, event sources, and storage layers. -->
 
-Describe:
-- runtime dependencies
-- scaling boundaries
-- network or service relationships
-- operational segregation
+## Runtime Topology
+
+<!-- Answer: How is this deployed? What are the scaling boundaries? What depends on what at runtime? Source: read deployment configs, Dockerfiles, CI/CD. -->
 
 ## Architectural Constraints
 
-Document:
-- intentional limitations
-- coupling constraints
-- compatibility requirements
-- operational assumptions
+<!-- Answer: What intentional limitations exist? Why? What would break if they were violated? Source: read config constraints, version pins, compatibility notes. -->
 
-## Key Design Decisions
+## Key Decisions
 
-Reference:
-- ADRs
-- design-decisions.md
-- security or operational rationale
+<!-- Reference design-decisions.md for full rationale. List only the decisions that affect system structure. -->
 
 ## Decision Prompts
 

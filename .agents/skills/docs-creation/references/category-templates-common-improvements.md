@@ -2,55 +2,47 @@
 
 Templates are guidance and review rubrics, not rigid prose generators.
 Adapt structure and depth to the repository and context.
-Replace all `<placeholder>` values with actual content.
-Remove sections that do not apply rather than leaving them empty.
+Remove sections that cannot be populated with concrete information.
 
 ```markdown
 # Improvements
 
-Tracks planned, ongoing, and completed improvements for <project>.
+<!-- Answer: What improvements are planned or completed? Source: read issues, project boards, recent PRs, tech debt comments. -->
 
 Focus on:
-- operational impact
+- operational impact and risk reduction
 - architectural improvements
-- technical debt reduction
-- risk reduction
+- technical debt with concrete consequences
 
 Avoid:
-- vague wishlist items
+- vague wishlist items without justification
 - low-context task lists
+- items that belong in an issue tracker
 
 ## Improvement Priorities
 
-Document:
-- current operational pain points
-- architectural limitations
-- maintenance burden
-- scaling or security concerns
+<!-- Answer: What are the current pain points? Source: read recent incidents, performance issues, developer friction points. -->
 
 ## Planned Improvements
 
-| Title | Priority          | Impact   | Status                |
-| ----- | ----------------- | -------- | --------------------- |
-| <A>   | <high/medium/low> | <impact> | <planned/in-progress> |
+<!-- Answer: What is being worked on or planned? Source: read open issues, project roadmap. -->
 
-Document:
-- expected benefits
-- migration risks
-- dependencies
-- rollout considerations
+| Title | Priority | Impact | Status |
+| ----- | -------- | ------ | ------ |
 
 ## Completed Improvements
 
-| Date       | Improvement | Operational Outcome |
-| ---------- | ----------- | ------------------- |
-| YYYY-MM-DD | <change>    | <result>            |
+<!-- Answer: What was recently improved? What was the outcome? Source: read recent merged PRs, changelog. -->
 
-## Deferred or Rejected Improvements (Optional)
+| Date | Improvement | Outcome |
+| ---- | ----------- | ------- |
 
-| Proposal | Reason Deferred/Rejected |
-| -------- | ------------------------ |
-| <idea>   | <reason>                 |
+## Deferred or Rejected (Optional)
+
+<!-- Answer: What was considered but not pursued? Why? -->
+
+| Proposal | Reason |
+| -------- | ------ |
 
 ## Decision Prompts
 

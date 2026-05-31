@@ -2,62 +2,46 @@
 
 Templates are guidance and review rubrics, not rigid prose generators.
 Adapt structure and depth to the repository and context.
-Replace all `<placeholder>` values with actual content.
-Remove sections that do not apply rather than leaving them empty.
+Remove sections that cannot be populated with concrete information.
 
 ```markdown
 # Performance
 
-Performance expectations, bottlenecks, scaling behavior,
-and optimization guidance for <project>.
+<!-- Answer: What are the performance-critical paths? Source: read benchmarks, profiling results, resource configs. -->
 
 Focus on:
-- operational bottlenecks
-- scaling boundaries
+- operational bottlenecks and scaling boundaries
 - latency/throughput constraints
 - resource-sensitive behavior
+- measured data over speculation
 
 Avoid:
 - micro-optimizations without operational relevance
 - benchmark numbers without context
+- generic performance advice
 
 ## Performance Goals
 
-Document:
-- latency expectations
-- throughput expectations
-- scaling assumptions
-- resource constraints
+<!-- Answer: What are the latency/throughput/resource targets? Source: read SLOs, load test configs, capacity planning docs. -->
 
 ## Known Bottlenecks
+
+<!-- Answer: What are the current bottlenecks? What is their impact? Source: read profiling results, incident reports. -->
 
 ### <Bottleneck>
 
 #### Impact
 
-<Operational or user impact>
-
 #### Cause
-
-<Root cause or limitation>
 
 #### Mitigation
 
-<Current or planned mitigation>
-
-## Resource Characteristics
-
-Document:
-- memory-sensitive operations
-- CPU-intensive paths
-- I/O bottlenecks
-- concurrency limitations
-
 ## Tuning Guidance
 
-| Parameter | Impact   | Tradeoff   |
-| --------- | -------- | ---------- |
-| <param>   | <effect> | <tradeoff> |
+<!-- Answer: What parameters affect performance? What are the tradeoffs? Source: read config files, resource limits. -->
+
+| Parameter | Impact | Tradeoff |
+| --------- | ------ | -------- |
 
 ## Decision Prompts
 

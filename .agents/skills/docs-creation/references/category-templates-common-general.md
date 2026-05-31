@@ -2,51 +2,38 @@
 
 Templates are guidance and review rubrics, not rigid prose generators.
 Adapt structure and depth to the repository and context.
-Replace all `<placeholder>` values with actual content.
-Remove sections that do not apply rather than leaving them empty.
+Remove sections that cannot be populated with concrete information.
 
 ```markdown
 # <Document Title>
 
-<Describe the purpose, intended audience, and scope of this document.>
+<!-- Answer: What is this document about? Who is the audience? Why does it exist? Source: read related source files and user request. -->
 
 Focus on:
-- clarity
-- operational usefulness
+- clarity and operational usefulness
 - ownership and context
 - maintainability
 
 Avoid:
 - shallow filler sections
-- duplicated information
+- duplicated information from other docs
 - undocumented assumptions
 
 ## Overview
 
-<High-level summary.>
+<!-- Answer: What is the high-level summary? What does the reader need to know first? -->
 
 ## Context
 
-<Relevant architectural, operational, or organizational context.>
+<!-- Answer: What architectural, operational, or organizational context is relevant? Source: read related docs, architecture.md, team structure. -->
 
-## Main Content
+## <Main Content Sections>
 
-### <Section>
-
-<Content>
-
-### <Section>
-
-<Content>
-
-## Operational or Usage Notes (Optional)
-
-<Document operational caveats, assumptions, or usage constraints.>
+<!-- Structure based on the document's purpose. Each section should answer a specific question. -->
 
 ## Related Documents (Optional)
 
-- <related doc>
-- <related doc>
+<!-- Answer: What other docs should the reader consult? Source: read docs/index.md. -->
 
 ## Decision Prompts
 

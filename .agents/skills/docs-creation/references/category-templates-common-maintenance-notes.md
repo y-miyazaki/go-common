@@ -2,59 +2,37 @@
 
 Templates are guidance and review rubrics, not rigid prose generators.
 Adapt structure and depth to the repository and context.
-Replace all `<placeholder>` values with actual content.
-Remove sections that do not apply rather than leaving them empty.
+Remove sections that cannot be populated with concrete information.
 
 ```markdown
 # Maintenance Notes
 
-Operational maintenance procedures, recurring tasks,
-and long-term maintenance considerations for <project>.
+<!-- Answer: What recurring maintenance does this project require? Source: read CI schedules, dependency update configs, operational runbooks. -->
 
 Focus on:
-- operational continuity
-- recurring maintenance
+- operational continuity and recurring tasks
 - lifecycle management
-- operational quirks
+- operational quirks and tribal knowledge
 
 Avoid:
-- temporary issue tracking
+- temporary issue tracking (use issue tracker)
 - undocumented operational assumptions
+- tasks that should be automated instead of documented
 
 ## Recurring Tasks
 
-| Task | Frequency | Owner  | Notes   |
-| ---- | --------- | ------ | ------- |
-| <A>  | <freq>    | <team> | <notes> |
+<!-- Answer: What must be done periodically? By whom? Source: read cron jobs, Renovate/Dependabot config, scheduled workflows. -->
 
-Document:
-- prerequisites
-- operational risks
-- rollback expectations
+| Task | Frequency | Owner | Notes |
+| ---- | --------- | ----- | ----- |
 
 ## Known Operational Quirks
 
-### <Issue>
-
-Describe:
-- trigger conditions
-- operational impact
-- workaround
-- escalation guidance
+<!-- Answer: What non-obvious behaviors exist? What workarounds are needed? Source: read comments in config, incident postmortems. -->
 
 ## Lifecycle Considerations
 
-Document:
-- upgrade expectations
-- deprecation concerns
-- dependency maintenance
-- operational freeze constraints
-
-## Change History (Optional)
-
-| Date       | Change   | Notes   |
-| ---------- | -------- | ------- |
-| YYYY-MM-DD | <change> | <notes> |
+<!-- Answer: What upgrade/deprecation concerns exist? Source: read version constraints, EOL notices, migration plans. -->
 
 ## Decision Prompts
 

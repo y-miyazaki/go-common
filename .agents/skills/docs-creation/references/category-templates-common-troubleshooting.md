@@ -2,54 +2,54 @@
 
 Templates are guidance and review rubrics, not rigid prose generators.
 Adapt structure and depth to the repository and context.
-Replace all `<placeholder>` values with actual content.
-Remove sections that do not apply rather than leaving them empty.
+Remove sections that cannot be populated with concrete information.
 
 ````markdown
 # Troubleshooting
 
-Common operational issues, investigation workflows,
-and recovery guidance for <project>.
+<!-- Answer: What are the most common failure modes? Source: read CI logs, error handling code, existing issues. -->
 
 Focus on:
-- symptom-driven diagnosis
-- operational recovery
-- root-cause guidance
+- symptom-driven diagnosis (what the user sees first)
+- concrete investigation commands
+- verified recovery steps
 
 Avoid:
-- shallow "restart and retry" guidance
-- undocumented assumptions
+- shallow "restart and retry" guidance without diagnosis
+- undocumented assumptions about environment
+- generic advice not specific to this project
 
 ## <Symptom or Error Message>
 
+<!-- Use the actual error message or observable symptom as the heading. -->
+
 ### Symptoms
 
-- <observable behavior>
+<!-- Answer: What does the user observe? What log output or behavior indicates this issue? -->
 
 ### Likely Causes
 
-- <cause>
-- <cause>
+<!-- Answer: What are the 2-3 most common causes? Source: read error handling code paths that produce this symptom. -->
 
 ### Investigation
 
+<!-- Answer: What commands reveal the root cause? Source: read diagnostic tooling, health checks, log locations. -->
+
 ```sh
-<commands or investigation steps>
+# concrete investigation commands
 ```
 
 ### Resolution
 
+<!-- Answer: What specific steps fix each cause? Are any destructive? Source: read recovery scripts, migration tools. -->
+
 ```sh
-<resolution steps>
+# concrete resolution steps
 ```
 
 ### Prevention (Optional)
 
-<How to reduce recurrence>
-
-### Escalation Notes (Optional)
-
-<When to escalate or involve another team>
+<!-- Answer: How to reduce recurrence? Source: read CI checks, validation scripts, monitoring. -->
 
 ## Decision Prompts
 
