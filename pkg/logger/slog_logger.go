@@ -9,9 +9,6 @@ import (
 	"os"
 )
 
-// Level is a type that represents log levels
-type Level = slog.Level
-
 // Available log levels
 const (
 	LevelDebug = slog.LevelDebug // Debug level for detailed information
@@ -19,6 +16,9 @@ const (
 	LevelWarn  = slog.LevelWarn  // Warn level for warning messages
 	LevelError = slog.LevelError // Error level for error conditions
 )
+
+// Level is a type that represents log levels
+type Level = slog.Level
 
 // SlogConfig defines the configuration options for the *logger
 // nolint:govet

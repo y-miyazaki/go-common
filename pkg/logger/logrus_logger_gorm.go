@@ -9,19 +9,6 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-// Interface Gorm Logger interface.
-// nolint:iface,revive,unused
-type Interface interface {
-	LogMode(level logger.LogLevel) Interface
-	Info(ctx context.Context, msg string, data ...any)
-	Warn(ctx context.Context, msg string, data ...any)
-	Error(ctx context.Context, msg string, data ...any)
-	Trace(ctx context.Context, begin time.Time, fc func() (sql string, rowsAffected int64), err error)
-}
-
-// LogLevel log level.
-type LogLevel int
-
 const (
 	// Silent silent log level
 	Silent LogLevel = iota + 1
@@ -32,6 +19,19 @@ const (
 	// Info info log level
 	Info
 )
+
+// LogLevel log level.
+type LogLevel int
+
+// Interface Gorm Logger interface.
+// nolint:iface,revive,unused
+type Interface interface {
+	LogMode(level logger.LogLevel) Interface
+	Info(ctx context.Context, msg string, data ...any)
+	Warn(ctx context.Context, msg string, data ...any)
+	Error(ctx context.Context, msg string, data ...any)
+	Trace(ctx context.Context, begin time.Time, fc func() (sql string, rowsAffected int64), err error)
+}
 
 // GormConfig set configurations.
 type GormConfig struct {

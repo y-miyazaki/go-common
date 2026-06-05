@@ -17,17 +17,14 @@ const (
 	HTTPStatusCodeDivisor = 100
 	// HTTPClientErrorThreshold is the minimum status code for client/server errors (4xx, 5xx)
 	HTTPClientErrorThreshold = 4
-)
-
-// HTTPLoggerType defines the transport type.
-type HTTPLoggerType string
-
-const (
 	// HTTPLoggerTypeExternal defines the external type.
 	HTTPLoggerTypeExternal HTTPLoggerType = "external"
 	// HTTPLoggerTypeInternal defines the internal type.
 	HTTPLoggerTypeInternal HTTPLoggerType = "internal"
 )
+
+// HTTPLoggerType defines the transport type.
+type HTTPLoggerType string
 
 // HTTPLogger struct.
 type HTTPLogger struct {

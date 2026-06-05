@@ -14,9 +14,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 )
 
-// AWSService represents AWS service types
-type AWSService int
-
 const (
 	// AWSServiceCloudWatchLogs represents CloudWatch Logs service
 	AWSServiceCloudWatchLogs AWSService = iota
@@ -29,6 +26,20 @@ const (
 	// AWSServiceSecretsManager represents Secrets Manager service
 	AWSServiceSecretsManager
 )
+
+// AWSService represents AWS service types
+type AWSService int
+
+// AWSConfigParams holds parameters for AWS configuration
+type AWSConfigParams struct {
+	Key            string
+	Secret         string
+	SessionToken   string
+	Region         string
+	Endpoint       string
+	Service        AWSService
+	UseCredentials bool
+}
 
 // String returns the string representation of the AWS service
 func (s AWSService) String() string {
@@ -46,17 +57,6 @@ func (s AWSService) String() string {
 	default:
 		return "unknown"
 	}
-}
-
-// AWSConfigParams holds parameters for AWS configuration
-type AWSConfigParams struct {
-	Key            string
-	Secret         string
-	SessionToken   string
-	Region         string
-	Endpoint       string
-	Service        AWSService
-	UseCredentials bool
 }
 
 // createHTTPClientWithLogger creates HTTP client with appropriate logger transport
