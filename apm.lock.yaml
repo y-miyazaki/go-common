@@ -1,19 +1,19 @@
 lockfile_version: '1'
-generated_at: '2026-06-02T05:46:04.911034+00:00'
+generated_at: '2026-06-05T04:01:51.557502+00:00'
 apm_version: 0.14.0
 dependencies:
 - repo_url: y-miyazaki/config
   host: github.com
-  resolved_commit: b04c30428b9382bf5d453226aafe6c78dfe028b4
-  resolved_ref: v1.1.24
+  resolved_commit: a2eb06e242820ab92be1976087dc3a9321fa4349
+  resolved_ref: v1.1.25
   virtual_path: .apm/packages/aws
   is_virtual: true
   package_type: apm_package
   content_hash: sha256:e79bc9c3b1d62b34e939720f4f6a93d362dc79f1f2398de6a52107d723e82e03
 - repo_url: y-miyazaki/config
   host: github.com
-  resolved_commit: b04c30428b9382bf5d453226aafe6c78dfe028b4
-  resolved_ref: v1.1.24
+  resolved_commit: a2eb06e242820ab92be1976087dc3a9321fa4349
+  resolved_ref: v1.1.25
   virtual_path: .apm/packages/common
   is_virtual: true
   package_type: apm_package
@@ -49,8 +49,8 @@ dependencies:
   content_hash: sha256:2d0a052a7c8f85810b1b4ceee8112cbc12aefa8fd7700d7eee5e0d03bd0b659a
 - repo_url: y-miyazaki/config
   host: github.com
-  resolved_commit: b04c30428b9382bf5d453226aafe6c78dfe028b4
-  resolved_ref: v1.1.24
+  resolved_commit: a2eb06e242820ab92be1976087dc3a9321fa4349
+  resolved_ref: v1.1.25
   virtual_path: .apm/packages/go
   is_virtual: true
   package_type: apm_package
@@ -61,12 +61,12 @@ dependencies:
   - .github/instructions/go.instructions.md
   deployed_file_hashes:
     .github/hooks/go-golangci-lint.json: sha256:5023d21f574b5478520b3308b50d9207c813e42f9a0e38cbcc906db9c0955462
-    .github/instructions/go.instructions.md: sha256:d941102daef01ede943c3837318d1d6b23340a2008252468e4e123450f038de6
-  content_hash: sha256:201d709b425587283dbc61cd42c9619de2a00129788f5530891a5fcec358f2ee
+    .github/instructions/go.instructions.md: sha256:e51bd95a7fb1cef5c32ab54a48cd354452d5c7da0acc7a622ea332ce01c137a2
+  content_hash: sha256:3739bdd1256291d6b3e72da92ece68ffb3be1295c5f1db4b1bae3da5a08d0c52
 - repo_url: y-miyazaki/config
   host: github.com
-  resolved_commit: b04c30428b9382bf5d453226aafe6c78dfe028b4
-  resolved_ref: v1.1.24
+  resolved_commit: a2eb06e242820ab92be1976087dc3a9321fa4349
+  resolved_ref: v1.1.25
   virtual_path: .apm/packages/shell-script
   is_virtual: true
   package_type: apm_package
