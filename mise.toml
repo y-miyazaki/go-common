@@ -111,7 +111,7 @@ aqua = "v2.59.1"
 ], install_env = { NPM_CONFIG_IGNORE_SCRIPTS = "true" } } # AWS profile switcher
 
 # AI agent tools
-"github:microsoft/apm" = "v0.16.0"               # agent package manager
+"github:microsoft/apm" = "v0.16.1"               # agent package manager
 "github:microsoft/waza" = "0.33.0"              # agent skill evaluator
 "github:yvgude/lean-ctx" = "v3.6.26"            # context optimizer
 "github:DeusData/codebase-memory-mcp" = "0.6.1" # codebase memory MCP server
