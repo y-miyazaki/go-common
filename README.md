@@ -5,7 +5,7 @@
 ![Apache-2.0](https://custom-icon-badges.herokuapp.com/badge/license-Apache%202.0-8BB80A.svg?logo=law&logoColor=white)
 [![Go Report Card](https://goreportcard.com/badge/github.com/y-miyazaki/go-common)](https://goreportcard.com/report/github.com/y-miyazaki/go-common)
 [![GitHub release](https://img.shields.io/github/release/y-miyazaki/go-common.svg)](https://github.com/y-miyazaki/go-common/releases/latest)
-[![ci-push-dev](https://github.com/y-miyazaki/go-common/actions/workflows/ci-push-dev.yaml/badge.svg)](https://github.com/y-miyazaki/go-common/actions/workflows/ci-push-dev.yaml)
+[![on-ci-push-go](https://github.com/y-miyazaki/go-common/actions/workflows/on-ci-push-go.yaml/badge.svg)](https://github.com/y-miyazaki/go-common/actions/workflows/on-ci-push-go.yaml)
 [![Codecov](https://codecov.io/gh/y-miyazaki/go-common/branch/develop/graph/badge.svg)](https://codecov.io/gh/y-miyazaki/go-common)
 
 This repository provides common libraries and example applications for Go language, utilizing libraries such as AWS SDK v2, Gin, and GORM with practical samples.
