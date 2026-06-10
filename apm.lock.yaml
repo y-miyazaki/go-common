@@ -1,19 +1,19 @@
 lockfile_version: '1'
-generated_at: '2026-06-08T07:58:13.972540+00:00'
+generated_at: '2026-06-10T10:11:50.600255+00:00'
 apm_version: 0.14.0
 dependencies:
 - repo_url: y-miyazaki/config
   host: github.com
-  resolved_commit: 7448092c8cc878883da82c07daa5dec3e31aee4b
-  resolved_ref: v1.1.31
+  resolved_commit: d32b6abcf2517608932d2e831617d6661b738ab1
+  resolved_ref: v1.1.33
   virtual_path: .apm/packages/aws
   is_virtual: true
   package_type: apm_package
   content_hash: sha256:e79bc9c3b1d62b34e939720f4f6a93d362dc79f1f2398de6a52107d723e82e03
 - repo_url: y-miyazaki/config
   host: github.com
-  resolved_commit: 7448092c8cc878883da82c07daa5dec3e31aee4b
-  resolved_ref: v1.1.31
+  resolved_commit: d32b6abcf2517608932d2e831617d6661b738ab1
+  resolved_ref: v1.1.33
   virtual_path: .apm/packages/common
   is_virtual: true
   package_type: apm_package
@@ -59,8 +59,8 @@ dependencies:
   content_hash: sha256:b1ff472e7b346df43d4764570c57152b11feddc49b03bd7c9b99a584ceb77c5a
 - repo_url: y-miyazaki/config
   host: github.com
-  resolved_commit: 7448092c8cc878883da82c07daa5dec3e31aee4b
-  resolved_ref: v1.1.31
+  resolved_commit: d32b6abcf2517608932d2e831617d6661b738ab1
+  resolved_ref: v1.1.33
   virtual_path: .apm/packages/go
   is_virtual: true
   package_type: apm_package
@@ -77,8 +77,8 @@ dependencies:
   content_hash: sha256:8f7a6f57d12757991fb3b35a6e6db8a53985cc8a1f3eb1dd84d8cea6b4fdf7ae
 - repo_url: y-miyazaki/config
   host: github.com
-  resolved_commit: 7448092c8cc878883da82c07daa5dec3e31aee4b
-  resolved_ref: v1.1.31
+  resolved_commit: d32b6abcf2517608932d2e831617d6661b738ab1
+  resolved_ref: v1.1.33
   virtual_path: .apm/packages/shell-script
   is_virtual: true
   package_type: apm_package
