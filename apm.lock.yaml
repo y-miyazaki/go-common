@@ -1,19 +1,19 @@
 lockfile_version: '1'
-generated_at: '2026-06-14T12:45:52.727422+00:00'
+generated_at: '2026-06-20T04:55:25.056150+00:00'
 apm_version: 0.14.0
 dependencies:
 - repo_url: y-miyazaki/config
   host: github.com
-  resolved_commit: cd498a0b7d7d69468d24398fa39daa87c767f76a
-  resolved_ref: v1.1.37
+  resolved_commit: e1ced6afd5437a71c901afb6b080746cba196aa9
+  resolved_ref: v1.2.0
   virtual_path: .apm/packages/aws
   is_virtual: true
   package_type: apm_package
   content_hash: sha256:2908905e050d4ae61c5e87efa25152acad706fd3b3fb52eba25f54b57aa751c1
 - repo_url: y-miyazaki/config
   host: github.com
-  resolved_commit: cd498a0b7d7d69468d24398fa39daa87c767f76a
-  resolved_ref: v1.1.37
+  resolved_commit: e1ced6afd5437a71c901afb6b080746cba196aa9
+  resolved_ref: v1.2.0
   virtual_path: .apm/packages/common
   is_virtual: true
   package_type: apm_package
@@ -25,78 +25,175 @@ dependencies:
   - .agents/skills/github-pr-body
   - .agents/skills/instructions-review
   - .agents/skills/markdown-validation
-  - .github/hooks/common-github-actions-actionlint.json
-  - .github/hooks/common-github-actions-ghalint.json
-  - .github/hooks/common-github-actions-zizmor.json
-  - .github/hooks/common-lean-ctx.json
-  - .github/hooks/common-markdown-link-check.json
-  - .github/hooks/common-markdownlint-cli2.json
-  - .github/hooks/scripts/common/scripts/actionlint.sh
-  - .github/hooks/scripts/common/scripts/ghalint.sh
-  - .github/hooks/scripts/common/scripts/markdown_link_check.sh
-  - .github/hooks/scripts/common/scripts/markdownlint_cli2.sh
-  - .github/hooks/scripts/common/scripts/zizmor.sh
+  - .claude/rules/agent-skills.md
+  - .claude/rules/github-actions-workflow.md
+  - .claude/rules/instructions.md
+  - .claude/rules/markdown.md
+  - .claude/skills/agent-skills-review
+  - .claude/skills/docs-creation
+  - .claude/skills/github-actions-review
+  - .claude/skills/github-actions-validation
+  - .claude/skills/github-pr-body
+  - .claude/skills/instructions-review
+  - .claude/skills/markdown-validation
+  - .cursor/rules/agent-skills.mdc
+  - .cursor/rules/github-actions-workflow.mdc
+  - .cursor/rules/instructions.mdc
+  - .cursor/rules/markdown.mdc
   - .github/instructions/agent-skills.instructions.md
   - .github/instructions/github-actions-workflow.instructions.md
   - .github/instructions/instructions.instructions.md
   - .github/instructions/markdown.instructions.md
   deployed_file_hashes:
-    .github/hooks/common-github-actions-actionlint.json: sha256:2068e936e6b60276ac05a30d8f812042d88967a983eb957bfe84dfe4016d057a
-    .github/hooks/common-github-actions-ghalint.json: sha256:dfd51d918de7e0fc3dcef00df925e364cf90eeb2c7e7ee12e3d9ebe2d9464fd7
-    .github/hooks/common-github-actions-zizmor.json: sha256:f1b72425236bf9c4391112cad4f73e93625a53953cc3295fca3c6b0478d05e76
-    .github/hooks/common-lean-ctx.json: sha256:e7850720c6989c31fedddf4b85595874a01cf7260f3d00264218ec1a94ddb244
-    .github/hooks/common-markdown-link-check.json: sha256:fb39bb97ce7f86df058b87ab55fa10044be8f722732c1759252a706095d23dc1
-    .github/hooks/common-markdownlint-cli2.json: sha256:c327458a9ebe053644a7f8e05dc50633200cffea13690b0773eff723348202bf
-    .github/hooks/scripts/common/scripts/actionlint.sh: sha256:71832905e459cef0a8aee0e0416d655ff69d9fb1a78624a822a04b9a950f7c5a
-    .github/hooks/scripts/common/scripts/ghalint.sh: sha256:8487d51ca5c1e497b5d84e4eea2abe10fbaea62db2e705c40e46d72f2b2a9932
-    .github/hooks/scripts/common/scripts/markdown_link_check.sh: sha256:e2777627f8c36732928101919cd3be7dda34ba08877e3a4fc81d086b402e7a38
-    .github/hooks/scripts/common/scripts/markdownlint_cli2.sh: sha256:8d7288d49b50f53deefecf6273e74dca9db131a8d7055d89d21c2e5305b1121d
-    .github/hooks/scripts/common/scripts/zizmor.sh: sha256:f0f541d98759f7d287745a52fcf6cfd29335cfe3b4c1a299ee3b7f88bca8994b
+    .claude/rules/agent-skills.md: sha256:2ab75f488d3f7eb87270070bb30154ca858ccb729ca31632f7d61bd847772276
+    .claude/rules/github-actions-workflow.md: sha256:dccbc57d8e2c54d3e9c6e108401fde9aab1f47f993956c398b98cbb86c8c9663
+    .claude/rules/instructions.md: sha256:ad2c8809ec7a6e5c0e55a44e817a1c7e56790d1a409aeb5f78b32bcf4d4cd1da
+    .claude/rules/markdown.md: sha256:23cd098eca6491deefba11869ba9a2b394e5e0e6714e30932b69bed937861c59
+    .cursor/rules/agent-skills.mdc: sha256:b1b20cfdb16d1946c5e00c07ad1d0c907aa27cfe751f953d18b4c709d3881615
+    .cursor/rules/github-actions-workflow.mdc: sha256:98b9e4e442ff08956259dbfc32687b821c684ce11984352de27da4af9aece212
+    .cursor/rules/instructions.mdc: sha256:6629a458c0a5212cee4b4413449e11edaaa96fe2e70de430eb7acc0d4fefd478
+    .cursor/rules/markdown.mdc: sha256:902555585ceac62f556772e5252e14e83646c78b274bd7326bd3f08468e42fcf
     .github/instructions/agent-skills.instructions.md: sha256:ea9c6af427e4f927940924e32e307da7cb8bf265afa4b2f939eaa233dc451182
     .github/instructions/github-actions-workflow.instructions.md: sha256:1ee01b48b75a3c9d8f8a85e8aae3d8d5c7f1f1056c5063b1c408419fa855df85
-    .github/instructions/instructions.instructions.md: sha256:343784c153e77cae5eb1d031de4f11d07655c6bd91ae39da1773d4e97becfe60
+    .github/instructions/instructions.instructions.md: sha256:bd998158182b939ab9b07774732f4d54916bfa82e6463e6cdb2e07021eb18eea
     .github/instructions/markdown.instructions.md: sha256:fa7f8346e8c81c05854cb22ee86f3ac9e97a46127148db942c74f922f576a773
-  content_hash: sha256:110fa38216aba3de33ea2961e68bcb78e9af6459eb0514fb77e921c5a341d2be
+  content_hash: sha256:af3499ac6d2739219a9f5f9babb4973713d04e2da9dd3f6202ec2c8436b316fd
 - repo_url: y-miyazaki/config
   host: github.com
-  resolved_commit: cd498a0b7d7d69468d24398fa39daa87c767f76a
-  resolved_ref: v1.1.37
+  resolved_commit: e1ced6afd5437a71c901afb6b080746cba196aa9
+  resolved_ref: v1.2.0
+  virtual_path: .apm/packages/common-hooks-claude
+  is_virtual: true
+  package_type: apm_package
+  deployed_files:
+  - .claude/hooks/common-hooks-claude/scripts/actionlint.sh
+  - .claude/hooks/common-hooks-claude/scripts/ghalint.sh
+  - .claude/hooks/common-hooks-claude/scripts/markdown_link_check.sh
+  - .claude/hooks/common-hooks-claude/scripts/markdownlint_cli2.sh
+  - .claude/hooks/common-hooks-claude/scripts/zizmor.sh
+  - .cursor/hooks/common-hooks-claude/scripts/actionlint.sh
+  - .cursor/hooks/common-hooks-claude/scripts/ghalint.sh
+  - .cursor/hooks/common-hooks-claude/scripts/markdown_link_check.sh
+  - .cursor/hooks/common-hooks-claude/scripts/markdownlint_cli2.sh
+  - .cursor/hooks/common-hooks-claude/scripts/zizmor.sh
+  - .github/hooks/common-hooks-claude-github-actions-actionlint.json
+  - .github/hooks/common-hooks-claude-github-actions-ghalint.json
+  - .github/hooks/common-hooks-claude-github-actions-zizmor.json
+  - .github/hooks/common-hooks-claude-lean-ctx.json
+  - .github/hooks/common-hooks-claude-markdown-link-check.json
+  - .github/hooks/common-hooks-claude-markdownlint-cli2.json
+  - .github/hooks/scripts/common-hooks-claude/scripts/actionlint.sh
+  - .github/hooks/scripts/common-hooks-claude/scripts/ghalint.sh
+  - .github/hooks/scripts/common-hooks-claude/scripts/markdown_link_check.sh
+  - .github/hooks/scripts/common-hooks-claude/scripts/markdownlint_cli2.sh
+  - .github/hooks/scripts/common-hooks-claude/scripts/zizmor.sh
+  deployed_file_hashes:
+    .claude/hooks/common-hooks-claude/scripts/actionlint.sh: sha256:5806edde4040449bbcae63e4c13158531828d3cfdbba8ab601d3458e6d41fa74
+    .claude/hooks/common-hooks-claude/scripts/ghalint.sh: sha256:d1c4dd16f8530ead642857aee0c7284117a42527763089a72bd81c79e53c126c
+    .claude/hooks/common-hooks-claude/scripts/markdown_link_check.sh: sha256:47cf05c5304bc3ed6fffbfa1babe1df4890d8681d83bbef6e26ff671537999b1
+    .claude/hooks/common-hooks-claude/scripts/markdownlint_cli2.sh: sha256:a2ae41c8b6370e8aaaade993717e53f493e434590887c46ca05fca172ed238b5
+    .claude/hooks/common-hooks-claude/scripts/zizmor.sh: sha256:4e2aa8d804c54a95b0290e81bfe899f434fd1754218248ac0e7058d795dff5e1
+    .cursor/hooks/common-hooks-claude/scripts/actionlint.sh: sha256:5806edde4040449bbcae63e4c13158531828d3cfdbba8ab601d3458e6d41fa74
+    .cursor/hooks/common-hooks-claude/scripts/ghalint.sh: sha256:d1c4dd16f8530ead642857aee0c7284117a42527763089a72bd81c79e53c126c
+    .cursor/hooks/common-hooks-claude/scripts/markdown_link_check.sh: sha256:47cf05c5304bc3ed6fffbfa1babe1df4890d8681d83bbef6e26ff671537999b1
+    .cursor/hooks/common-hooks-claude/scripts/markdownlint_cli2.sh: sha256:a2ae41c8b6370e8aaaade993717e53f493e434590887c46ca05fca172ed238b5
+    .cursor/hooks/common-hooks-claude/scripts/zizmor.sh: sha256:4e2aa8d804c54a95b0290e81bfe899f434fd1754218248ac0e7058d795dff5e1
+    .github/hooks/common-hooks-claude-github-actions-actionlint.json: sha256:f4e5de0bbcd6e87fabe4e3a46a4c217c73e4a93b2450dff8c9e8195495585f60
+    .github/hooks/common-hooks-claude-github-actions-ghalint.json: sha256:8230e80cd916b18f10cf7575f746b094794ed80da5855c05eb67e061728dc3e5
+    .github/hooks/common-hooks-claude-github-actions-zizmor.json: sha256:71f61e7052bb2abce44df248e40f71437a62537661654e4967d358e82a6d010f
+    .github/hooks/common-hooks-claude-lean-ctx.json: sha256:2ed395e9ca7d72c95ad9b6daca8ba22e7d4d7cbcc5f8ad77039e2a5091852f2b
+    .github/hooks/common-hooks-claude-markdown-link-check.json: sha256:9f24f74defc0283d4c861dae0bf0fc7202126c44dfef649bfe1ad9df62e2e9c8
+    .github/hooks/common-hooks-claude-markdownlint-cli2.json: sha256:a49c50dc993f10e77d5897982691288e80873f284a63a0503c9406abe42d2f4f
+    .github/hooks/scripts/common-hooks-claude/scripts/actionlint.sh: sha256:5806edde4040449bbcae63e4c13158531828d3cfdbba8ab601d3458e6d41fa74
+    .github/hooks/scripts/common-hooks-claude/scripts/ghalint.sh: sha256:d1c4dd16f8530ead642857aee0c7284117a42527763089a72bd81c79e53c126c
+    .github/hooks/scripts/common-hooks-claude/scripts/markdown_link_check.sh: sha256:47cf05c5304bc3ed6fffbfa1babe1df4890d8681d83bbef6e26ff671537999b1
+    .github/hooks/scripts/common-hooks-claude/scripts/markdownlint_cli2.sh: sha256:a2ae41c8b6370e8aaaade993717e53f493e434590887c46ca05fca172ed238b5
+    .github/hooks/scripts/common-hooks-claude/scripts/zizmor.sh: sha256:4e2aa8d804c54a95b0290e81bfe899f434fd1754218248ac0e7058d795dff5e1
+  content_hash: sha256:6e28776e8d761e27dcdd683f1dffe8c0e0cf0c256e55e658b2f04a0bba460951
+- repo_url: y-miyazaki/config
+  host: github.com
+  resolved_commit: e1ced6afd5437a71c901afb6b080746cba196aa9
+  resolved_ref: v1.2.0
   virtual_path: .apm/packages/go
   is_virtual: true
   package_type: apm_package
   deployed_files:
   - .agents/skills/go-review
   - .agents/skills/go-validation
-  - .github/hooks/go-golangci-lint.json
-  - .github/hooks/scripts/go/scripts/golangci_lint.sh
+  - .claude/rules/go.md
+  - .claude/skills/go-review
+  - .claude/skills/go-validation
+  - .cursor/rules/go.mdc
   - .github/instructions/go.instructions.md
   deployed_file_hashes:
-    .github/hooks/go-golangci-lint.json: sha256:ca22a5418f86ac6515b439f675c0b98c3d663cddc5579257995471a2a6078d21
-    .github/hooks/scripts/go/scripts/golangci_lint.sh: sha256:884226ecdabfc7ecc987fe4e6171240f4dbf4227d61a06b98f1868728ba2480c
+    .claude/rules/go.md: sha256:304a7d37d5264d447fe5ef3dd18da31afb065197e5a19e48a934a1d2d19e2d68
+    .cursor/rules/go.mdc: sha256:4199cdb28d19a041e510f7b5b9d24ccf8bf173126f40d1c4ed4e58b27042a9a3
     .github/instructions/go.instructions.md: sha256:a5d2c45b51b403729febfb062c3ce2ae9746780043f1e65006378bccaeb146c9
-  content_hash: sha256:b6a8fd61911deb55eed4850dc05d079a5a64a54ef53e003fac8f3c468acf3980
+  content_hash: sha256:7e3ddbb738e86057684887ba8fd57324461c96aeac3d5077f791adc61cf3d447
 - repo_url: y-miyazaki/config
   host: github.com
-  resolved_commit: cd498a0b7d7d69468d24398fa39daa87c767f76a
-  resolved_ref: v1.1.37
+  resolved_commit: e1ced6afd5437a71c901afb6b080746cba196aa9
+  resolved_ref: v1.2.0
+  virtual_path: .apm/packages/go-hooks-claude
+  is_virtual: true
+  package_type: apm_package
+  deployed_files:
+  - .claude/hooks/go-hooks-claude/scripts/golangci_lint.sh
+  - .cursor/hooks/go-hooks-claude/scripts/golangci_lint.sh
+  - .github/hooks/go-hooks-claude-golangci-lint.json
+  - .github/hooks/scripts/go-hooks-claude/scripts/golangci_lint.sh
+  deployed_file_hashes:
+    .claude/hooks/go-hooks-claude/scripts/golangci_lint.sh: sha256:43f72f9e122dff16ef333b918b4755698203c6b27da928fa1e743db9653686b0
+    .cursor/hooks/go-hooks-claude/scripts/golangci_lint.sh: sha256:43f72f9e122dff16ef333b918b4755698203c6b27da928fa1e743db9653686b0
+    .github/hooks/go-hooks-claude-golangci-lint.json: sha256:60367301771ad8b04a7becaaf234711877b3582e8c714b1eada0a36b9f2fbad5
+    .github/hooks/scripts/go-hooks-claude/scripts/golangci_lint.sh: sha256:43f72f9e122dff16ef333b918b4755698203c6b27da928fa1e743db9653686b0
+  content_hash: sha256:a2215908e55dacf39c3f9a1c8d53b1bfa432f1a66f43c1035914d118a7b486ac
+- repo_url: y-miyazaki/config
+  host: github.com
+  resolved_commit: e1ced6afd5437a71c901afb6b080746cba196aa9
+  resolved_ref: v1.2.0
   virtual_path: .apm/packages/shell-script
   is_virtual: true
   package_type: apm_package
   deployed_files:
   - .agents/skills/shell-script-review
   - .agents/skills/shell-script-validation
-  - .github/hooks/scripts/shell-script/scripts/shellcheck.sh
-  - .github/hooks/scripts/shell-script/scripts/shfmt.sh
-  - .github/hooks/shell-script-shellcheck.json
-  - .github/hooks/shell-script-shfmt.json
+  - .claude/rules/shell-script.md
+  - .claude/skills/shell-script-review
+  - .claude/skills/shell-script-validation
+  - .cursor/rules/shell-script.mdc
   - .github/instructions/shell-script.instructions.md
   deployed_file_hashes:
-    .github/hooks/scripts/shell-script/scripts/shellcheck.sh: sha256:f6010e973e22ef3493c2bfb572b16a2dd50fab3326ef04580e5aef3ab07ddbcf
-    .github/hooks/scripts/shell-script/scripts/shfmt.sh: sha256:99a30020d4d29c4cedecf76d05d8becf85284758a7b4834695de02775856e819
-    .github/hooks/shell-script-shellcheck.json: sha256:f41996681f91a2ee708a16be8661aebc614d4d955cef97c3cb49325cce723a81
-    .github/hooks/shell-script-shfmt.json: sha256:f6e957ad363f8b3b8507e131e8a8ffe1399fde864bcf95bf00d060afc4c8ac2e
+    .claude/rules/shell-script.md: sha256:27b185f1042f36a87124f8fafd211191465ba4934881689685e03d9fac6641e1
+    .cursor/rules/shell-script.mdc: sha256:ce761cd07d149eff1cd76bf856c78993c2e8cb98ba394b4e7a291da8d291e36b
     .github/instructions/shell-script.instructions.md: sha256:55cd85eb429d2ca7af192054bd468151fbf84382a4fe1cf9f5b55fcaf6892d4a
-  content_hash: sha256:6527cb43a09b5eb76369c42dba4c768b80e82d6e363c6ff42cd4daaa35bfc493
+  content_hash: sha256:ab241322df8bd45b39594ca019a963e99fc39f40f4184ca404a7661666ac8bf1
+- repo_url: y-miyazaki/config
+  host: github.com
+  resolved_commit: e1ced6afd5437a71c901afb6b080746cba196aa9
+  resolved_ref: v1.2.0
+  virtual_path: .apm/packages/shell-script-hooks-claude
+  is_virtual: true
+  package_type: apm_package
+  deployed_files:
+  - .claude/hooks/shell-script-hooks-claude/scripts/shellcheck.sh
+  - .claude/hooks/shell-script-hooks-claude/scripts/shfmt.sh
+  - .cursor/hooks/shell-script-hooks-claude/scripts/shellcheck.sh
+  - .cursor/hooks/shell-script-hooks-claude/scripts/shfmt.sh
+  - .github/hooks/scripts/shell-script-hooks-claude/scripts/shellcheck.sh
+  - .github/hooks/scripts/shell-script-hooks-claude/scripts/shfmt.sh
+  - .github/hooks/shell-script-hooks-claude-shellcheck.json
+  - .github/hooks/shell-script-hooks-claude-shfmt.json
+  deployed_file_hashes:
+    .claude/hooks/shell-script-hooks-claude/scripts/shellcheck.sh: sha256:f3e493014ae9e9e2b99f60b03186f5814a063bf0660bda3f6038cea747b6f3a3
+    .claude/hooks/shell-script-hooks-claude/scripts/shfmt.sh: sha256:3605c4c0c9153f351fca3ac626addbd9c79c27bc3de9085e62c135c0c7bbb0a1
+    .cursor/hooks/shell-script-hooks-claude/scripts/shellcheck.sh: sha256:f3e493014ae9e9e2b99f60b03186f5814a063bf0660bda3f6038cea747b6f3a3
+    .cursor/hooks/shell-script-hooks-claude/scripts/shfmt.sh: sha256:3605c4c0c9153f351fca3ac626addbd9c79c27bc3de9085e62c135c0c7bbb0a1
+    .github/hooks/scripts/shell-script-hooks-claude/scripts/shellcheck.sh: sha256:f3e493014ae9e9e2b99f60b03186f5814a063bf0660bda3f6038cea747b6f3a3
+    .github/hooks/scripts/shell-script-hooks-claude/scripts/shfmt.sh: sha256:3605c4c0c9153f351fca3ac626addbd9c79c27bc3de9085e62c135c0c7bbb0a1
+    .github/hooks/shell-script-hooks-claude-shellcheck.json: sha256:adb0e3a5b8968f97ae4e96f30f2388551ca8ce27e20ab95621fc5d743da98782
+    .github/hooks/shell-script-hooks-claude-shfmt.json: sha256:42642a39e31ed7ad692adfe58d66cfa900e336fdfcd41ecfb4857d65368b653f
+  content_hash: sha256:dd63e4348708a8b24aa3dc5159105fcfde46619d4430a819bd75d6ec79654a98
 mcp_servers:
 - aws-documentation-mcp-server
 - aws-knowledge-mcp-server
