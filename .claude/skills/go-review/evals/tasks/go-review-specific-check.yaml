@@ -1,0 +1,24 @@
+id: go-review-specific-check-001
+name: go-review detects specific violation
+description: 'Validate that go-review detects Go code without error wrapping and reports
+  correct ItemID.
+
+  '
+tags:
+- quality
+- specific-check
+- edge-case
+inputs:
+  prompt: 'Use go-review. Assume the target has Go code without error wrapping. Report
+    ERR-01 as failed in ## Checks (Failed/Deferred Only) and include evidence in ##
+    Checks Summary, ## Issues.'
+  context:
+    target: SKILL.md
+expected:
+  output_contains:
+  - '## Checks Summary'
+  - '## Checks (Failed/Deferred Only)'
+  - ERR-01
+  - '## Issues'
+  outcomes:
+  - type: task_completed

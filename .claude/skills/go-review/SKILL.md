@@ -91,3 +91,8 @@ Severity priority for Issues section ordering: `SEC-*` > `CON-*` > `ERR-*` > all
 | `common-checklist.md` unavailable | Fatal | Stop, report missing dependency |
 | `common-output-format.md` unavailable | Recoverable | Use inline output contract above |
 | PR contains only generated/vendor files | Recoverable | Report "no reviewable Go source" and stop |
+
+### Examples
+
+- Prompt: `Review Go code changes for design and correctness`
+- Result: Structured report with per-file checks, failed items with severity/fix suggestions.
