@@ -147,7 +147,7 @@ paths:
 - ERR-01 (MUST): Appropriate Error Wrapping
   - Check: Are errors wrapped with fmt.Errorf("%w", err) and context information included?
 - ERR-02 (SHOULD): Appropriate Custom Error Definition
-  - Check: Are sentinel errors defined and custom errors compatible with errors.Is/As?
+  - Check: Are sentinel errors defined with distinct semantics, not reused across unrelated failure modes? Are custom errors compatible with errors.Is/As?
 - ERR-03 (SHOULD): Avoid and Recover from Panics
   - Check: Are panics only for fatal errors and defer+recover implemented?
 - ERR-04 (SHOULD): Appropriate Error Log Information
@@ -167,7 +167,7 @@ paths:
 - FUNC-01 (SHOULD): Appropriate Function Splitting
   - Check: Are there no multiple responsibilities or mixed business/infrastructure layers in single functions?
 - FUNC-02 (SHOULD): Appropriate Argument Design
-  - Check: Are there no excessive positional arguments or bool argument overuse, and are options handled appropriately?
+  - Check: Are there no excessive positional arguments (5+) or bool argument overuse, and are options structs or functional options used for 4+ optional params?
 - FUNC-03 (SHOULD): Return Value Design
   - Check: Are named returns minimized, error placed last, and multiple returns appropriate?
 - FUNC-04 (SHOULD): Recommend Pure Functions
@@ -179,7 +179,7 @@ paths:
 - FUNC-07 (SHOULD): Appropriate Initialization Functions
   - Check: Do New functions implement error handling and validation?
 - FUNC-08 (SHOULD): Leverage Higher-Order Functions
-  - Check: Are callbacks and function pointers appropriately utilized?
+  - Check: Are callbacks and function pointers used to eliminate code duplication or enable extensibility without interface overhead?
 - FUNC-09 (SHOULD): Appropriate Generics Usage
   - Check: Are type abstraction boundaries explicit and are generic constraints minimal but sufficient?
 - FUNC-10 (SHOULD): Comprehensive Function Documentation
@@ -245,7 +245,7 @@ paths:
 - TEST-01 (SHOULD): Table-Driven Tests
   - Check: Are []struct format table-driven tests, subtests, and edge cases covered?
 - TEST-02 (SHOULD): testify Usage and Test Design
-  - Check: Are assert/require appropriately used, testable API designed, and time/rand injected?
+  - Check: Are assert for non-fatal and require for fatal checks used, testable API designed, and time/rand injected?
 - TEST-03 (SHOULD): Appropriate Mock Usage
   - Check: Are gomock/testify mock used, interfaces segregated, and dependency injection present?
 - TEST-04 (SHOULD): Separate Test Helpers

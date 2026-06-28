@@ -8,7 +8,7 @@ Fix: []struct format table-driven, use subtests, cover edge cases
 
 **TEST-02 (SHOULD): testify Usage and Test Design**
 
-Check: Are assert/require appropriately used, testable API designed, and time/rand injected?
+Check: Are assert for non-fatal and require for fatal checks used, testable API designed, and time/rand injected?
 Why: Excessive testify dependency, untestable APIs, and direct time/randomness usage increase external dependencies, unstable tests
 Fix: Decide testify dependency project policy, consider testability, inject time.Now/rand interfaces
 

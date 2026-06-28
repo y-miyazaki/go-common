@@ -8,7 +8,7 @@ Fix: Apply single responsibility principle, separate layers, extract helper func
 
 **FUNC-02 (SHOULD): Appropriate Argument Design**
 
-Check: Are there no excessive positional arguments or bool argument overuse, and are options handled appropriately?
+Check: Are there no excessive positional arguments (5+) or bool argument overuse, and are options structs or functional options used for 4+ optional params?
 Why: Too many arguments and bool overuse cause caller misuse, difficult extension
 Fix: Use Functional Options Pattern, convert to struct arguments
 
@@ -44,7 +44,7 @@ Fix: Return error from NewXxx(), implement validation, separate Must functions
 
 **FUNC-08 (SHOULD): Leverage Higher-Order Functions**
 
-Check: Are callbacks and function pointers appropriately utilized?
+Check: Are callbacks and function pointers used to eliminate code duplication or enable extensibility without interface overhead?
 Why: Unused callbacks reduce extensibility, duplicate code, lack flexibility
 Fix: Apply strategy pattern, Functional Options, leverage callbacks
 
