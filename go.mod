@@ -21,7 +21,7 @@ require (
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/gin-contrib/cors v1.7.7
 	github.com/gin-gonic/gin v1.12.0
-	github.com/redis/go-redis/v9 v9.20.1
+	github.com/redis/go-redis/v9 v9.21.0
 	github.com/rivo/uniseg v0.4.7
 	github.com/sirupsen/logrus v1.9.4
 	github.com/slack-go/slack v0.26.0
