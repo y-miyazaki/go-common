@@ -11,7 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager v0.2.11
 	github.com/aws/aws-sdk-go-v2/service/account v1.32.4
 	github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.54.0
-	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.77.0
+	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.78.0
 	github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.62.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.104.0
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.42.3
