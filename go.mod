@@ -12,7 +12,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/account v1.32.6
 	github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.54.2
 	github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.78.2
-	github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.62.2
+	github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.63.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.104.2
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.42.5
 	github.com/aws/aws-sdk-go-v2/service/sesv2 v1.62.6
