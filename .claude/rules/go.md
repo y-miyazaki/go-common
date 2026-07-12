@@ -13,11 +13,11 @@ paths:
 
 ### Naming Conventions
 
-| Component | Rule       | Example          |
-| --------- | ---------- | ---------------- |
-| Interface (single-method) | -er suffix  | Reader, Closer   |
-| Interface (multi-method)  | role name   | UserRepository   |
-| File name | snake_case | event_handler.go |
+| Component                 | Rule       | Example          |
+| ------------------------- | ---------- | ---------------- |
+| Interface (single-method) | -er suffix | Reader, Closer   |
+| Interface (multi-method)  | role name  | UserRepository   |
+| File name                 | snake_case | event_handler.go |
 
 ### Core Go Conventions
 
@@ -40,6 +40,7 @@ paths:
 ## Guidelines
 
 ### Architecture (ARCH)
+
 - ARCH-01 (SHOULD): Layer Separation
   - Check: Are handler/usecase/repository separated and business/infrastructure layers separated?
 - ARCH-02 (SHOULD): Dependency Injection
@@ -62,6 +63,7 @@ paths:
   - Check: Are boundaries clear, loosely coupled, highly cohesive, and public APIs minimized?
 
 ### Code Standards (CODE)
+
 - CODE-01 (MUST): Appropriate Interface Design
   - Check: Are interfaces kept small (1-3 methods) and defined on the consumer side?
 - CODE-02 (SHOULD): API/Package Boundary Design
@@ -82,6 +84,7 @@ paths:
   - Check: Are naked returns (bare return statements with named return values) avoided in functions longer than ~10 lines?
 
 ### Concurrency (CON)
+
 - CON-01 (SHOULD): Avoid goroutine Leaks
   - Check: Do goroutines terminate properly and monitor context.Done()?
 - CON-02 (SHOULD): Clarify channel close Responsibility
@@ -96,6 +99,7 @@ paths:
   - Check: Is go test -race executed and shared memory protected with sync?
 
 ### Context Handling (CTX)
+
 - CTX-01 (MUST): Accept context in public APIs
   - Check: Do public functions and methods accept context.Context as first argument?
 - CTX-02 (SHOULD): Avoid context lifecycle ambiguity
@@ -106,6 +110,7 @@ paths:
   - Check: Is cancel from WithCancel/WithTimeout called with defer?
 
 ### Dependencies (DEP)
+
 - DEP-01 (SHOULD): Explicit Direct Dependencies
   - Check: Are direct dependencies explicitly in go.mod, versions pinned, and regularly updated?
 - DEP-02 (SHOULD): Dependency Update Strategy
@@ -122,6 +127,7 @@ paths:
   - Check: Are go-licenses utilized, license lists generated, and compatibility verified?
 
 ### Documentation (DOC)
+
 - DOC-01 (SHOULD): Package Documentation Exists
   - Check: Are package doc comments, package purpose, and usage documented?
 - DOC-02 (MUST): godoc for Public Functions
@@ -144,6 +150,7 @@ paths:
   - Check: Are Keep a Changelog format, semantic versioning, and breaking changes documented?
 
 ### Error Handling (ERR)
+
 - ERR-01 (MUST): Appropriate Error Wrapping
   - Check: Are errors wrapped with fmt.Errorf("%w", err) and context information included?
 - ERR-02 (SHOULD): Appropriate Custom Error Definition
@@ -164,6 +171,7 @@ paths:
   - Check: Are there no internal implementation exposure, external stack trace disclosure, or SQL statement exposure?
 
 ### Function Design (FUNC)
+
 - FUNC-01 (SHOULD): Appropriate Function Splitting
   - Check: Are there no multiple responsibilities or mixed business/infrastructure layers in single functions?
 - FUNC-02 (SHOULD): Appropriate Argument Design
@@ -186,6 +194,7 @@ paths:
   - Check: Do all public functions have godoc with argument and return value descriptions?
 
 ### Global / Base (G)
+
 - G-01 (SHOULD): No Hardcoded Secrets
   - Check: Are API keys, passwords, and tokens not embedded in source code?
 - G-02 (SHOULD): Appropriate Function Signatures
@@ -202,6 +211,7 @@ paths:
   - Check: Are slices and maps copied when accepting from or returning to external callers?
 
 ### Performance (PERF)
+
 - PERF-01 (SHOULD): Memory Optimization
   - Check: Are slice capacity pre-allocated, map initial capacity specified, and sync.Pool utilized?
 - PERF-02 (SHOULD): CPU Optimization
@@ -224,6 +234,7 @@ paths:
   - Check: Are critical paths identified, high-frequency processing optimized, and before/after measured?
 
 ### Security (SEC)
+
 - SEC-01 (SHOULD): Input Validation
   - Check: Are input validation, prepared statements, and sanitization implemented?
 - SEC-02 (SHOULD): Output Sanitization
@@ -242,6 +253,7 @@ paths:
   - Check: Are OWASP Top 10 addressed, Security Headers set, and CSP configured?
 
 ### Testing (TEST)
+
 - TEST-01 (SHOULD): Table-Driven Tests
   - Check: Are []struct format table-driven tests, subtests, and edge cases covered?
 - TEST-02 (SHOULD): testify Usage and Test Design
@@ -265,7 +277,6 @@ paths:
 
 - After changes, prioritize running validate.sh from go-validation skill.
 - Use individual commands (gofumpt/go vet/go test/golangci-lint) only for debugging.
-
 
 ## Testing and Validation
 

@@ -28,7 +28,7 @@ Fix: Separate testing_test.go, common helper functions, fixture management
 
 Check: Are Benchmark functions, benchstat comparisons, and CI integration present?
 Why: Undetectable performance regressions and unclear optimization effects cause performance degradation
-Fix: Benchmark functions in *_test.go, benchstat comparison, CI integration
+Fix: Benchmark functions in \*\_test.go, benchstat comparison, CI integration
 
 **TEST-06 (SHOULD): Separate Integration Tests**
 

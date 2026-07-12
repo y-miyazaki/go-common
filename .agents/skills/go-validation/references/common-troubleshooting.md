@@ -55,6 +55,7 @@ go: example.com/pkg v1.0.0 requires example.com/dep v2.0.0, but go.mod has v1.0.
 ```
 
 **Solutions**:
+
 1. Update dependency: `go get example.com/dep@v2.0.0`
 2. Update all dependencies: `go get -u ./...`
 3. Check for conflicting requirements in go.mod
@@ -67,6 +68,7 @@ verifying checksum failed
 ```
 
 **Solutions**:
+
 1. Delete go.sum and regenerate: `rm go.sum && go mod tidy`
 2. Verify with: `go mod verify`
 3. Check for manual edits to go.sum
@@ -78,6 +80,7 @@ replacement module without version must be directory path
 ```
 
 **Solutions**:
+
 1. Use absolute or relative path: `replace example.com/pkg => ./local/pkg`
 2. Or specify version: `replace example.com/pkg => example.com/pkg v1.0.0`
 
@@ -90,6 +93,7 @@ parse error: expected '}', found 'EOF'
 ```
 
 **Solutions**:
+
 1. Check for syntax errors
 2. Ensure all braces are closed
 3. Run `go build` to see detailed error
@@ -102,6 +106,7 @@ permission denied
 ```
 
 **Solutions**:
+
 1. Check file permissions: `ls -la`
 2. Fix with: `chmod 644 *.go`
 
@@ -114,6 +119,7 @@ Printf format %d has arg value of wrong type string
 ```
 
 **Solutions**:
+
 1. Fix format specifier:
    - `%d` for int
    - `%s` for string
@@ -129,12 +135,14 @@ declaration of "err" shadows declaration at line 10
 ```
 
 **Solutions**:
+
 1. Rename inner variable
 2. Use different variable name
 3. Remove unnecessary redeclaration
 4. Consider scope restructuring
 
 **Example fix**:
+
 ```go
 // Bad
 err := doSomething()
@@ -165,6 +173,7 @@ unreachable code
 ```
 
 **Solutions**:
+
 1. Remove code after return/panic
 2. Fix conditional logic
 3. Check for missing else branches
@@ -178,6 +187,7 @@ variable 'result' is unused (ineffassign)
 ```
 
 **Solutions**:
+
 1. Use the variable
 2. Remove unused variable
 3. Use `_` if intentionally unused: `_, err := someFunc()`
@@ -189,13 +199,17 @@ Error return value is not checked (errcheck)
 ```
 
 **Solutions**:
+
 1. Check error:
+
 ```go
 if err := someFunc(); err != nil {
     return fmt.Errorf("failed to do something: %w", err)
 }
 ```
+
 2. Explicitly ignore with comment:
+
 ```go
 _ = file.Close() // Best effort close
 ```
@@ -207,6 +221,7 @@ consider using strings.Builder (ineffassign)
 ```
 
 **Solutions**:
+
 ```go
 // Bad
 result := ""
@@ -229,6 +244,7 @@ cognitive complexity 32 of func `ProcessData` is high (gocognit)
 ```
 
 **Solutions**:
+
 1. Extract methods to separate functions
 2. Use early returns to reduce nesting
 3. Apply table-driven patterns
@@ -241,6 +257,7 @@ mnd: Magic number: 3600 (gomnd)
 ```
 
 **Solutions**:
+
 ```go
 // Bad
 timeout := time.Duration(3600) * time.Second
@@ -260,6 +277,7 @@ Actual: 3
 ```
 
 **Solutions**:
+
 1. Review test expectations
 2. Fix implementation
 3. Add debug output: `t.Logf("value: %v", value)`
@@ -272,7 +290,9 @@ Test case "negative input" failed
 ```
 
 **Solutions**:
+
 1. Use `t.Run()` for subtests:
+
 ```go
 for _, tt := range tests {
     t.Run(tt.name, func(t *testing.T) {
@@ -283,6 +303,7 @@ for _, tt := range tests {
     })
 }
 ```
+
 2. Add more descriptive test names
 3. Review specific test case data
 
@@ -293,6 +314,7 @@ panic: test timed out after 10m0s
 ```
 
 **Solutions**:
+
 1. Increase timeout: `go test -timeout 30m`
 2. Review for infinite loops
 3. Check for deadlocks
@@ -315,6 +337,7 @@ Previous write at 0x00c0001020a0 by goroutine 6:
 **Solutions**:
 
 1. **Use mutex protection**:
+
 ```go
 type SafeCounter struct {
     mu    sync.Mutex
@@ -335,6 +358,7 @@ func (c *SafeCounter) Value() int {
 ```
 
 2. **Use channels for communication**:
+
 ```go
 // Instead of shared variable
 type Server struct {
@@ -355,6 +379,7 @@ func (s *Server) worker() {
 ```
 
 3. **Use sync/atomic for simple counters**:
+
 ```go
 type Counter struct {
     value atomic.Int64
@@ -378,6 +403,7 @@ fatal error: concurrent map writes
 **Solutions**:
 
 1. **Use sync.Map**:
+
 ```go
 var cache sync.Map
 
@@ -394,6 +420,7 @@ cache.Delete("key")
 ```
 
 2. **Protect map with mutex**:
+
 ```go
 type SafeMap struct {
     mu sync.RWMutex
@@ -415,6 +442,7 @@ func (m *SafeMap) Get(key string) (interface{}, bool) {
 ```
 
 3. **Use channels to serialize access**:
+
 ```go
 type MapOp struct {
     op    string // "set" or "get"
@@ -448,17 +476,20 @@ FAIL: Coverage below 80%
 **Solutions**:
 
 1. **Identify uncovered code**:
+
 ```bash
 go test -coverprofile=/tmp/coverage.out ./...
 go tool cover -html=/tmp/coverage.out
 ```
 
 2. **Write tests for uncovered functions**:
+
    - Focus on public APIs first
    - Test error paths
    - Test edge cases
 
 3. **Check coverage per package**:
+
 ```bash
 go test -cover ./... | grep -v "no test files"
 ```
@@ -470,6 +501,7 @@ no Go files in current directory
 ```
 
 **Solutions**:
+
 1. Navigate to correct directory
 2. Run from project root: `go test -cover ./...`
 3. Specify package path explicitly
@@ -485,6 +517,7 @@ Fixed in: golang.org/x/crypto@v0.1.0
 ```
 
 **Solutions**:
+
 1. Update vulnerable package: `go get golang.org/x/crypto@latest`
 2. Check for patch version: `go list -m -versions golang.org/x/crypto`
 3. Update go.mod and run: `go mod tidy`
@@ -497,9 +530,11 @@ golang.org/x/crypto@v0.0.0 (indirect)
 ```
 
 **Solutions**:
+
 1. Find dependency path: `go mod graph | grep x/crypto`
 2. Update direct dependency that pulls in vulnerable package
 3. Use `replace` directive if needed:
+
 ```go
 replace golang.org/x/crypto => golang.org/x/crypto v0.1.0
 ```
@@ -511,6 +546,7 @@ No fix available for CVE-2024-5678
 ```
 
 **Solutions**:
+
 1. Consider alternative packages
 2. Document accepted risk in security.md
 3. Monitor for updates
@@ -525,6 +561,7 @@ bash: scripts/validate.sh: No such file or directory
 ```
 
 **Solutions**:
+
 ```bash
 # Navigate to the go-validation skill directory
 cd <agent-root>/skills/go-validation
@@ -543,6 +580,7 @@ permission denied: scripts/validate.sh
 ```
 
 **Solutions**:
+
 ```bash
 # Make executable
 chmod +x scripts/validate.sh
@@ -558,10 +596,13 @@ line 42: golangci-lint: command not found
 ```
 
 **Solutions**:
+
 1. Install missing tool:
+
 ```bash
 go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 ```
+
 2. Verify installation: `which golangci-lint`
 3. Add to PATH if needed
 

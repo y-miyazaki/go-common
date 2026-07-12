@@ -22,12 +22,15 @@ Minimal inline contract (used if reference file is unavailable):
 
 ```markdown
 ## Checks Summary
+
 - Total: <n>, Passed: <n>, Failed: <n>, Deferred: <n>
 
 ## Checks (Failed/Deferred Only)
+
 | ItemID | Status | Evidence | Fix |
 
 ## Issues
+
 1. <ItemID>: <title>
    - File: <path>#L<line>
    - Problem: <specific>
@@ -75,22 +78,22 @@ Minimal inline contract (used if reference file is unavailable):
 
 ### Severity and Status Rules
 
-| Status | When to use |
-|---|---|
-| Failed | Finding is confirmed from source code with concrete evidence (file + line) |
+| Status   | When to use                                                                                                                  |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Failed   | Finding is confirmed from source code with concrete evidence (file + line)                                                   |
 | Deferred | Check cannot be evaluated — validation output missing, file too large to fully analyze, or ambiguous without runtime context |
-| Passed | Check evaluated and no issue found (counted in summary only) |
+| Passed   | Check evaluated and no issue found (counted in summary only)                                                                 |
 
 Severity priority for Issues section ordering: `SEC-*` > `CON-*` > `ERR-*` > all others.
 
 ### Error Handling
 
-| Condition | Severity | Action |
-|---|---|---|
-| `go-validation` output missing | Recoverable | Defer validator-dependent checks, review design/security checks that don't require tool output |
-| `common-checklist.md` unavailable | Fatal | Stop, report missing dependency |
-| `common-output-format.md` unavailable | Recoverable | Use inline output contract above |
-| PR contains only generated/vendor files | Recoverable | Report "no reviewable Go source" and stop |
+| Condition                               | Severity    | Action                                                                                         |
+| --------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------- |
+| `go-validation` output missing          | Recoverable | Defer validator-dependent checks, review design/security checks that don't require tool output |
+| `common-checklist.md` unavailable       | Fatal       | Stop, report missing dependency                                                                |
+| `common-output-format.md` unavailable   | Recoverable | Use inline output contract above                                                               |
+| PR contains only generated/vendor files | Recoverable | Report "no reviewable Go source" and stop                                                      |
 
 ### Examples
 

@@ -63,4 +63,3 @@ Structured validation results in fixed tool order.
 - Prompt: `Validate Go checks and report summary, tool results, and error details.`
 - Command: `bash scripts/validate.sh ./test/go/ --verbose`
 - Output: `## Checks Summary` with per-tool pass/fail and coverage value.
-

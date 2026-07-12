@@ -42,6 +42,7 @@ This guide provides security best practices for Go code that complement the vali
 ### Understanding govulncheck
 
 `govulncheck` scans for known vulnerabilities in:
+
 - Direct dependencies
 - Indirect dependencies
 - Standard library
@@ -528,6 +529,7 @@ Before committing code, ensure:
 ## Summary
 
 Security is a critical aspect of Go development. Follow these practices:
+
 1. Validate and sanitize all input
 2. Use context for timeouts and cancellation
 3. Don't expose sensitive information in errors

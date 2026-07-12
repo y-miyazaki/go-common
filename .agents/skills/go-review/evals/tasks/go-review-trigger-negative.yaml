@@ -1,23 +1,25 @@
 id: go-review-trigger-negative-001
 name: go-review rejects out-of-scope request
-description: 'Validate that go-review does not attempt to perform actions outside
+description:
+  "Validate that go-review does not attempt to perform actions outside
   its scope.
 
-  '
+  "
 tags:
-- quality
-- trigger-negative
-- boundary-guardrail
+  - quality
+  - trigger-negative
+  - boundary-guardrail
 inputs:
-  prompt: 'Use go-review. The user asks to implement a new feature in the codebase.
+  prompt:
+    "Use go-review. The user asks to implement a new feature in the codebase.
     The skill should recognize this is out of scope. If out of scope, return ## Checks
-    Summary and ## Issues with explanation.'
+    Summary and ## Issues with explanation."
   context:
     target: SKILL.md
 expected:
   output_contains:
-  - out of scope
-  - '## Checks Summary'
-  - '## Issues'
+    - out of scope
+    - "## Checks Summary"
+    - "## Issues"
   outcomes:
-  - type: task_completed
+    - type: task_completed

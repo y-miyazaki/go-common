@@ -309,6 +309,7 @@ func TestWithMock(t *testing.T) {
 ### Improving Coverage
 
 1. **Test all public APIs**:
+
 ```go
 // Ensure all exported functions have tests
 func TestPublicAPI(t *testing.T) {
@@ -329,6 +330,7 @@ func TestPublicAPI(t *testing.T) {
 ```
 
 2. **Test error paths**:
+
 ```go
 func TestErrorHandling(t *testing.T) {
     tests := []struct {
@@ -372,6 +374,7 @@ func TestErrorHandling(t *testing.T) {
 ```
 
 3. **Test edge cases**:
+
 ```go
 func TestEdgeCases(t *testing.T) {
     tests := []struct {
@@ -617,6 +620,7 @@ func TestHTTPHandler(t *testing.T) {
 ## Summary
 
 Effective Go testing requires:
+
 - Clear test structure (AAA pattern)
 - Table-driven tests for multiple scenarios
 - Proper use of helpers and cleanup

@@ -38,6 +38,17 @@
       "hooks": [
         {
           "type": "command",
+          "command": ".claude/hooks/common-hooks-claude/scripts/gitleaks.sh",
+          "timeout": 60
+        }
+      ],
+      "_apm_source": "common-hooks-claude"
+    },
+    {
+      "matcher": "",
+      "hooks": [
+        {
+          "type": "command",
           "command": ".claude/hooks/common-hooks-claude/scripts/markdown_link_check.sh",
           "timeout": 240
         }
@@ -65,17 +76,6 @@
         }
       ],
       "_apm_source": "go-hooks-claude"
-    },
-    {
-      "matcher": "",
-      "hooks": [
-        {
-          "type": "command",
-          "command": ".claude/hooks/common-hooks-claude/scripts/gitleaks.sh",
-          "timeout": 60
-        }
-      ],
-      "_apm_source": "common-hooks-claude"
     },
     {
       "matcher": "",
