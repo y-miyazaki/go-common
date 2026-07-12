@@ -52,8 +52,8 @@ github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.54.2 h1:qmKlhMqcFouMkrntK
 github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.54.2/go.mod h1:RRUdkfdYMMT5wzMXS7pZ6JvsrW1e9XqJgKQq2ie3rIk=
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.78.2 h1:ZjXtLXEc6i34HW44ktr26b7HfkMZGSHa45URCfnYQt4=
 github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs v1.78.2/go.mod h1:h1Iw2nkdpmAUJaa89RvX3cg/HGLgdSkCWpMNgKvBSHA=
-github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.62.2 h1:nHMxk/8p8VqYXvLtEpx4RB7yBun0uI+a8SNxQdZyCHI=
-github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.62.2/go.mod h1:a5X5qds6BTk0qIdRdN7iQVk6NdcMMF60OSyQzO/bjao=
+github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.63.0 h1:rAUq6pouWpW1Tl2QtReLFCqODOgM3cWBHl5jbJeOags=
+github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.63.0/go.mod h1:a5X5qds6BTk0qIdRdN7iQVk6NdcMMF60OSyQzO/bjao=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.13 h1:mbRIur/BiHK6SKPjoBIXSE/hJ6g6JGRLuxQy1jGjlN4=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.13/go.mod h1:ITg9em2KbJx1s0y4aqRX5OYWG6HBZ5TVR//OdpEZ2CQ=
 github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.23 h1:9Fjh6fi/U5JEStVZijmaMpUwE/gvBJj7x2B/PjbO9To=
