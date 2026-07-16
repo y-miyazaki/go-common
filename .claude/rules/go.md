@@ -254,6 +254,8 @@ paths:
 
 ### Testing (TEST)
 
+- TEST-00 (MUST): Add Tests With Behavior Changes
+  - Check: When adding or materially changing exported behavior, are corresponding `*_test.go` files added or updated in the same change?
 - TEST-01 (SHOULD): Table-Driven Tests
   - Check: Are []struct format table-driven tests, subtests, and edge cases covered?
 - TEST-02 (SHOULD): testify Usage and Test Design
@@ -275,6 +277,7 @@ paths:
 
 ### Code Modification Guidelines
 
+- When adding or changing behavior, add or update *_test.go files in the same change.
 - After changes, prioritize running validate.sh from go-validation skill.
 - Use individual commands (gofumpt/go vet/go test/golangci-lint) only for debugging.
 

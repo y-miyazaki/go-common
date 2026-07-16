@@ -125,6 +125,7 @@
 
 ## Testing (TEST)
 
+- TEST-00 (MUST): Add Tests With Behavior Changes
 - TEST-01 (SHOULD): Table-Driven Tests
 - TEST-02 (SHOULD): testify Usage and Test Design
 - TEST-03 (SHOULD): Appropriate Mock Usage
