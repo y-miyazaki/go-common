@@ -21,7 +21,7 @@ export LC_ALL=C.UTF-8
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Load common libraries - ALWAYS use this pattern
+# Load all-in-one library
 # shellcheck source=./lib/all.sh
 # shellcheck disable=SC1091
 source "${SCRIPT_DIR}/lib/all.sh"
@@ -63,11 +63,14 @@ COVERAGE_PERCENT=""
 # Arguments:
 #   None
 #
-# Global Variables:
+# Globals:
 #   None
 #
+# Outputs:
+#   Writes to stdout
+#
 # Returns:
-#   None (outputs to stdout)
+#   None
 #
 # Usage:
 #   show_usage
@@ -109,7 +112,10 @@ EOF
 # Arguments:
 #   $@ - All command line arguments passed to the script
 #
-# Global Variables:
+# Globals:
+#   None
+#
+# Outputs:
 #   None
 #
 # Returns:
@@ -173,11 +179,14 @@ function parse_arguments {
 # Arguments:
 #   $1 - Base directory (optional, defaults to current directory)
 #
-# Global Variables:
+# Globals:
 #   None
 #
+# Outputs:
+#   Target pattern string to stdout
+#
 # Returns:
-#   Target pattern string (to stdout)
+#   0 on success
 #
 # Usage:
 #   pattern=$(determine_target_pattern "/path/to/dir")
@@ -223,7 +232,10 @@ function determine_target_pattern {
 # Arguments:
 #   None
 #
-# Global Variables:
+# Globals:
+#   None
+#
+# Outputs:
 #   None
 #
 # Returns:
@@ -269,7 +281,10 @@ function run_benchmark_tests {
 # Arguments:
 #   None
 #
-# Global Variables:
+# Globals:
+#   None
+#
+# Outputs:
 #   None
 #
 # Returns:
@@ -337,7 +352,10 @@ function run_coverage_tests {
 # Arguments:
 #   None
 #
-# Global Variables:
+# Globals:
+#   None
+#
+# Outputs:
 #   None
 #
 # Returns:
@@ -374,7 +392,10 @@ function run_go_build {
 # Arguments:
 #   $1 - Directory path to check
 #
-# Global Variables:
+# Globals:
+#   None
+#
+# Outputs:
 #   None
 #
 # Returns:
@@ -398,7 +419,10 @@ function has_go_files {
 # Arguments:
 #   None
 #
-# Global Variables:
+# Globals:
+#   None
+#
+# Outputs:
 #   None
 #
 # Returns:
@@ -450,7 +474,10 @@ function run_go_mod_tidy {
 # Arguments:
 #   None
 #
-# Global Variables:
+# Globals:
+#   None
+#
+# Outputs:
 #   None
 #
 # Returns:
@@ -519,7 +546,10 @@ function run_golangci_lint {
 # Arguments:
 #   None
 #
-# Global Variables:
+# Globals:
+#   None
+#
+# Outputs:
 #   None
 #
 # Returns:
@@ -567,7 +597,10 @@ function run_security_checks {
 # Arguments:
 #   None
 #
-# Global Variables:
+# Globals:
+#   None
+#
+# Outputs:
 #   None
 #
 # Returns:
@@ -624,7 +657,10 @@ function run_tests {
 # Arguments:
 #   None
 #
-# Global Variables:
+# Globals:
+#   None
+#
+# Outputs:
 #   None
 #
 # Returns:
@@ -660,7 +696,10 @@ function run_race_tests {
 # Arguments:
 #   $@ - All command line arguments passed to the script
 #
-# Global Variables:
+# Globals:
+#   None
+#
+# Outputs:
 #   None
 #
 # Returns:

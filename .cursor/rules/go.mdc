@@ -278,32 +278,15 @@ globs: "**/*.go"
 ### Code Modification Guidelines
 
 - When adding or changing behavior, add or update *_test.go files in the same change.
-- After changes, prioritize running validate.sh from go-validation skill.
-- Use individual commands (gofumpt/go vet/go test/golangci-lint) only for debugging.
 
 ## Testing and Validation
 
-Operational rules:
+Operational notes:
 
-- Target at least 80% test coverage and verify with `go test -cover`.
-- Separate integration tests from regular tests by using `//go:build integration`.
+- Target at least 80% test coverage when verifying behavior changes.
+- Separate integration tests with `//go:build integration`.
 
-**Entry point (recommended)**:
-
-```bash
-bash <agent-root>/skills/go-validation/scripts/validate.sh
-```
-
-**Individual execution (debugging)**:
-
-```bash
-gofumpt -l ./...
-go vet ./...
-golangci-lint run ./...
-go test -race -cover ./...
-```
-
-**Detailed guide**: See go-validation skill SKILL.md.
+On-demand validation: see go-validation skill SKILL.md.
 
 ## Security Guidelines
 
