@@ -6,7 +6,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: y-miyazaki
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 ## Input
@@ -45,10 +45,10 @@ Structured validation results in fixed tool order.
 
 - [common-checklist.md](references/common-checklist.md) (always read)
 - [common-output-format.md](references/common-output-format.md) (always read)
-- [common-troubleshooting.md](references/common-troubleshooting.md) - Read when checks fail unexpectedly.
-- [common-individual-commands.md](references/common-individual-commands.md) - Read when debugging one tool directly.
-- [category-security.md](references/category-security.md) - Read when govulncheck reports vulnerabilities.
-- [category-testing.md](references/category-testing.md) - Read when tests fail or coverage drops.
+- [common-troubleshooting.md](references/common-troubleshooting.md) (read on failure)
+- [common-individual-commands.md](references/common-individual-commands.md) (read on failure)
+- [category-security.md](references/category-security.md) (read on failure)
+- [category-testing.md](references/category-testing.md) (read on failure)
 
 ## Workflow
 
@@ -57,6 +57,17 @@ Structured validation results in fixed tool order.
 3. Use `--verbose` to collect tool-level diagnostics.
 4. Use `--fix` only for formatting issues, then review diffs.
 5. Retry at most 2 times after fixes; if checks still fail, return blocking failures and stop.
+
+### Error Handling
+
+| Condition                              | Severity    | Action                                                              |
+| -------------------------------------- | ----------- | ------------------------------------------------------------------- |
+| `scripts/validate.sh` missing          | Fatal       | Stop; report missing script                                         |
+| No Go files under target path          | Info        | Report no reviewable Go code; stop                                  |
+| Single tool fails, others succeed      | Recoverable | Report passing tools; defer failed tool with exit status            |
+| All tools fail                         | Fatal       | Return `status: failed` with per-tool stderr summaries              |
+| `common-checklist.md` unavailable      | Fatal       | Stop; report missing dependency                                     |
+| `common-output-format.md` unavailable  | Recoverable | Use inline output contract                                          |
 
 ### Examples
 

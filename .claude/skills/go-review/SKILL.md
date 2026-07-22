@@ -6,7 +6,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: y-miyazaki
-  version: "1.1.0"
+  version: "1.1.2"
 ---
 
 ## Input
@@ -61,17 +61,25 @@ Minimal inline contract (used if reference file is unavailable):
 
 - [common-checklist.md](references/common-checklist.md) (always read)
 - [common-output-format.md](references/common-output-format.md) (always read)
-- [category-global.md](references/category-global.md), [category-concurrency.md](references/category-concurrency.md), [category-error-handling.md](references/category-error-handling.md), [category-security.md](references/category-security.md) - Read when reviewing overall quality, concurrency, error handling, or security.
-- [category-architecture.md](references/category-architecture.md), [category-code-standards.md](references/category-code-standards.md), [category-context.md](references/category-context.md), [category-dependencies.md](references/category-dependencies.md) - Read when reviewing architecture, code standards, context usage, or dependencies.
-- [category-documentation.md](references/category-documentation.md), [category-function-design.md](references/category-function-design.md), [category-performance.md](references/category-performance.md), [category-testing.md](references/category-testing.md) - Read when reviewing documentation, function design, performance, or tests.
-- When uncertain which categories apply, default to reading: category-security, category-concurrency, category-error-handling, and category-global (the highest-risk categories). Read others only if the changeset touches relevant areas.
-- [common-troubleshooting.md](references/common-troubleshooting.md) - Read on failure or when evidence is unavailable
+- [common-troubleshooting.md](references/common-troubleshooting.md) (read on failure)
+- [category-global.md](references/category-global.md) (always read)
+- [category-security.md](references/category-security.md) (always read)
+- [category-concurrency.md](references/category-concurrency.md) (always read)
+- [category-error-handling.md](references/category-error-handling.md) (always read)
+- [category-architecture.md](references/category-architecture.md) (always read)
+- [category-code-standards.md](references/category-code-standards.md) (always read)
+- [category-context.md](references/category-context.md) (always read)
+- [category-dependencies.md](references/category-dependencies.md) (always read)
+- [category-documentation.md](references/category-documentation.md) (always read)
+- [category-function-design.md](references/category-function-design.md) (always read)
+- [category-performance.md](references/category-performance.md) (always read)
+- [category-testing.md](references/category-testing.md) (always read)
 
 ## Workflow
 
 1. Read PR context and change intent.
 2. Confirm `go-validation` results exist. If missing, inform the user that validation should run first, then proceed with a partial review: evaluate design, security, and concurrency checks (which do not require tool output) and defer lint/test/vuln-dependent checks (mark as `Deferred` with reason "validation evidence unavailable").
-3. Review relevant checklist categories and collect failed/deferred ItemIDs.
+3. Review relevant checklist categories and collect failed/deferred ItemIDs. When uncertain which categories apply, prioritize category-security, category-concurrency, category-error-handling, and category-global first; read other category files when the changeset touches those areas.
 4. Output required report sections per [references/common-output-format.md](references/common-output-format.md). Prioritize `SEC-*` findings first. Include file path and line reference for each finding.
 5. Exclude generated files and `vendor/` from primary findings unless they introduce security-critical risk.
 6. For very large PRs (>50 changed Go files), prioritize security/correctness checks first and defer low-risk style checks if evidence is insufficient.

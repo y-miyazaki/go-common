@@ -60,10 +60,10 @@ COVERAGE_PERCENT=""
 # Description:
 #   Displays usage information for the script, including options and examples
 #
-# Arguments:
+# Globals:
 #   None
 #
-# Globals:
+# Arguments:
 #   None
 #
 # Outputs:
@@ -109,11 +109,11 @@ EOF
 # Description:
 #   Parses command line arguments and sets global variables accordingly
 #
-# Arguments:
-#   $@ - All command line arguments passed to the script
-#
 # Globals:
 #   None
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
 #
 # Outputs:
 #   None
@@ -176,11 +176,11 @@ function parse_arguments {
 # Description:
 #   Determines the appropriate target pattern for Go tools based on the input directory
 #
-# Arguments:
-#   $1 - Base directory (optional, defaults to current directory)
-#
 # Globals:
 #   None
+#
+# Arguments:
+#   $1 - Base directory (optional, defaults to current directory)
 #
 # Outputs:
 #   Target pattern string to stdout
@@ -229,10 +229,10 @@ function determine_target_pattern {
 # Description:
 #   Runs benchmark tests if they exist in the codebase
 #
-# Arguments:
+# Globals:
 #   None
 #
-# Globals:
+# Arguments:
 #   None
 #
 # Outputs:
@@ -278,10 +278,10 @@ function run_benchmark_tests {
 # Description:
 #   Runs go test with coverage analysis and checks against threshold
 #
-# Arguments:
+# Globals:
 #   None
 #
-# Globals:
+# Arguments:
 #   None
 #
 # Outputs:
@@ -349,10 +349,10 @@ function run_coverage_tests {
 # Description:
 #   Runs go build to check if the code compiles successfully
 #
-# Arguments:
+# Globals:
 #   None
 #
-# Globals:
+# Arguments:
 #   None
 #
 # Outputs:
@@ -389,11 +389,11 @@ function run_go_build {
 # Description:
 #   Checks if the specified directory contains any Go files
 #
-# Arguments:
-#   $1 - Directory path to check
-#
 # Globals:
 #   None
+#
+# Arguments:
+#   $1 - Directory path to check
 #
 # Outputs:
 #   None
@@ -416,10 +416,10 @@ function has_go_files {
 # Description:
 #   Runs go mod tidy to clean up the go.mod and go.sum files
 #
-# Arguments:
+# Globals:
 #   None
 #
-# Globals:
+# Arguments:
 #   None
 #
 # Outputs:
@@ -471,10 +471,10 @@ function run_go_mod_tidy {
 # Description:
 #   Runs golangci-lint to perform comprehensive code linting
 #
-# Arguments:
+# Globals:
 #   None
 #
-# Globals:
+# Arguments:
 #   None
 #
 # Outputs:
@@ -543,10 +543,10 @@ function run_golangci_lint {
 # Description:
 #   Runs security vulnerability checks using govulncheck
 #
-# Arguments:
+# Globals:
 #   None
 #
-# Globals:
+# Arguments:
 #   None
 #
 # Outputs:
@@ -594,10 +594,10 @@ function run_security_checks {
 # Description:
 #   Runs go test to execute unit tests
 #
-# Arguments:
+# Globals:
 #   None
 #
-# Globals:
+# Arguments:
 #   None
 #
 # Outputs:
@@ -654,10 +654,10 @@ function run_tests {
 # Description:
 #   Runs go test with race detection enabled
 #
-# Arguments:
+# Globals:
 #   None
 #
-# Globals:
+# Arguments:
 #   None
 #
 # Outputs:
@@ -693,11 +693,11 @@ function run_race_tests {
 # Description:
 #   Main entry point that orchestrates all code quality checks
 #
-# Arguments:
-#   $@ - All command line arguments passed to the script
-#
 # Globals:
 #   None
+#
+# Arguments:
+#   $@ - All command line arguments passed to the script
 #
 # Outputs:
 #   None
