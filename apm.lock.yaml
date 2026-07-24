@@ -1,12 +1,12 @@
 lockfile_version: '1'
-generated_at: '2026-07-24T11:40:05.407536+00:00'
+generated_at: '2026-07-24T12:46:20.265687+00:00'
 apm_version: 0.24.1
 dependencies:
 - repo_url: y-miyazaki/config
   name: config-aws
   host: github.com
-  resolved_commit: 8b07b501759bbe4716c759dfdbd914d4d5ebbdc3
-  resolved_ref: v1.8.59
+  resolved_commit: 10f7147e1b7e3f4349d655f7ef6e3f20c314846c
+  resolved_ref: v1.8.61
   version: 1.0.0
   virtual_path: .apm/packages/aws
   is_virtual: true
@@ -16,8 +16,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-common
   host: github.com
-  resolved_commit: 8b07b501759bbe4716c759dfdbd914d4d5ebbdc3
-  resolved_ref: v1.8.59
+  resolved_commit: 10f7147e1b7e3f4349d655f7ef6e3f20c314846c
+  resolved_ref: v1.8.61
   version: 1.0.0
   virtual_path: .apm/packages/common
   is_virtual: true
@@ -1401,8 +1401,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: common-hooks-claude
   host: github.com
-  resolved_commit: 8b07b501759bbe4716c759dfdbd914d4d5ebbdc3
-  resolved_ref: v1.8.59
+  resolved_commit: 10f7147e1b7e3f4349d655f7ef6e3f20c314846c
+  resolved_ref: v1.8.61
   version: 1.0.0
   virtual_path: .apm/packages/common-hooks-claude
   is_virtual: true
@@ -1438,8 +1438,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-go
   host: github.com
-  resolved_commit: 8b07b501759bbe4716c759dfdbd914d4d5ebbdc3
-  resolved_ref: v1.8.59
+  resolved_commit: 10f7147e1b7e3f4349d655f7ef6e3f20c314846c
+  resolved_ref: v1.8.61
   version: 1.0.0
   virtual_path: .apm/packages/go
   is_virtual: true
@@ -1671,8 +1671,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: go-hooks-claude
   host: github.com
-  resolved_commit: 8b07b501759bbe4716c759dfdbd914d4d5ebbdc3
-  resolved_ref: v1.8.59
+  resolved_commit: 10f7147e1b7e3f4349d655f7ef6e3f20c314846c
+  resolved_ref: v1.8.61
   version: 1.0.0
   virtual_path: .apm/packages/go-hooks-claude
   is_virtual: true
@@ -1688,8 +1688,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-shell-script
   host: github.com
-  resolved_commit: 8b07b501759bbe4716c759dfdbd914d4d5ebbdc3
-  resolved_ref: v1.8.59
+  resolved_commit: 10f7147e1b7e3f4349d655f7ef6e3f20c314846c
+  resolved_ref: v1.8.61
   version: 1.0.0
   virtual_path: .apm/packages/shell-script
   is_virtual: true
@@ -1937,8 +1937,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: shell-script-hooks-claude
   host: github.com
-  resolved_commit: 8b07b501759bbe4716c759dfdbd914d4d5ebbdc3
-  resolved_ref: v1.8.59
+  resolved_commit: 10f7147e1b7e3f4349d655f7ef6e3f20c314846c
+  resolved_ref: v1.8.61
   version: 1.0.0
   virtual_path: .apm/packages/shell-script-hooks-claude
   is_virtual: true
