@@ -16,7 +16,7 @@ on:
       - "go.mod"
       - "go.sum"
       - ".golangci.yaml"
-        pull_request:
+  pull_request:
     branches:
       - "main"
       - "master"
@@ -30,7 +30,7 @@ on:
       - "go.mod"
       - "go.sum"
       - ".golangci.yaml"
-      
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

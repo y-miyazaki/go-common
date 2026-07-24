@@ -42,7 +42,7 @@ func TestHTTPLogger_RoundTrip_Error(t *testing.T) {
 	l := logger.NewLogger(logrus.New())
 	transport := NewTransportHTTPLogger(l, HTTPLoggerTypeExternal).(*HTTPLogger)
 
-	req, _ := http.NewRequest("GET", "http://invalid-url", nil)
+	req, _ := http.NewRequest("GET", "https://invalid-url", nil)
 	_, err := transport.RoundTrip(req)
 
 	assert.Error(t, err)
@@ -93,7 +93,7 @@ func TestHTTPZapLogger_RoundTrip_Error(t *testing.T) {
 	l := logger.NewZapLogger(zapConfig)
 	transport := NewTransportHTTPZapLogger(l, HTTPLoggerTypeExternal).(*HTTPZapLogger)
 
-	req, _ := http.NewRequest("GET", "http://invalid-url", nil)
+	req, _ := http.NewRequest("GET", "https://invalid-url", nil)
 	_, err := transport.RoundTrip(req)
 
 	assert.Error(t, err)
@@ -145,7 +145,7 @@ func TestHTTPSlogLogger_RoundTrip_Error(t *testing.T) {
 	l := logger.NewSlogLogger(config)
 	transport := NewTransportHTTPSlogLogger(l, HTTPLoggerTypeExternal).(*HTTPSlogLogger)
 
-	req, _ := http.NewRequest("GET", "http://invalid-url", nil)
+	req, _ := http.NewRequest("GET", "https://invalid-url", nil)
 	_, err := transport.RoundTrip(req)
 
 	assert.Error(t, err)

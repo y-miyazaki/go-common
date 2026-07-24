@@ -94,7 +94,7 @@ jobs:
       pr_enabled: true
       pr_exclude: fork,draft,label:no-loop
       pr_include_bots: ""
-      pr_title: "fix(ci): automated CI repair (loop-ci-sweeper)"
+      pr_title: "chore(ci-sweeper): automated CI repair (loop-ci-sweeper)"
       prompt_instructions: |
         Fix the failing CI checks identified in the detection result.
         Classify flakes and infra/env failures as Watch — do not edit code for those.
