@@ -1,12 +1,12 @@
 lockfile_version: '1'
-generated_at: '2026-07-24T09:02:42.884716+00:00'
+generated_at: '2026-07-24T11:40:05.407536+00:00'
 apm_version: 0.24.1
 dependencies:
 - repo_url: y-miyazaki/config
   name: config-aws
   host: github.com
-  resolved_commit: 00d6e7a9346341b5fc6318893ff71b80b670fd62
-  resolved_ref: v1.8.58
+  resolved_commit: 8b07b501759bbe4716c759dfdbd914d4d5ebbdc3
+  resolved_ref: v1.8.59
   version: 1.0.0
   virtual_path: .apm/packages/aws
   is_virtual: true
@@ -16,8 +16,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-common
   host: github.com
-  resolved_commit: 00d6e7a9346341b5fc6318893ff71b80b670fd62
-  resolved_ref: v1.8.58
+  resolved_commit: 8b07b501759bbe4716c759dfdbd914d4d5ebbdc3
+  resolved_ref: v1.8.59
   version: 1.0.0
   virtual_path: .apm/packages/common
   is_virtual: true
@@ -1396,13 +1396,13 @@ dependencies:
     .cursor/rules/github-actions-workflow.mdc: sha256:db7b654240b111aa018ff6dfd0ffdb8f1d94dcc782e8ff53c96d2ea00ecb582c
     .cursor/rules/instructions.mdc: sha256:5815065b1cc769da56ffb608a907e533de81aafd46bbe25c7f557a19ec88d29e
     .cursor/rules/markdown.mdc: sha256:f3e35af3484e3fcc468dff2c0ea158d4a855edf110c52ea2deae4f4abc4732b2
-  content_hash: sha256:4e10ebeef2c47204c4e2976c65f24745e35e170872e2e26190129b3efe3d464a
+  content_hash: sha256:0f34dda8dc13f64e5501642ce7a22a83f9a06fc5967f2a0d554f2c2d178cd680
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: common-hooks-claude
   host: github.com
-  resolved_commit: 00d6e7a9346341b5fc6318893ff71b80b670fd62
-  resolved_ref: v1.8.58
+  resolved_commit: 8b07b501759bbe4716c759dfdbd914d4d5ebbdc3
+  resolved_ref: v1.8.59
   version: 1.0.0
   virtual_path: .apm/packages/common-hooks-claude
   is_virtual: true
@@ -1438,8 +1438,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-go
   host: github.com
-  resolved_commit: 00d6e7a9346341b5fc6318893ff71b80b670fd62
-  resolved_ref: v1.8.58
+  resolved_commit: 8b07b501759bbe4716c759dfdbd914d4d5ebbdc3
+  resolved_ref: v1.8.59
   version: 1.0.0
   virtual_path: .apm/packages/go
   is_virtual: true
@@ -1671,8 +1671,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: go-hooks-claude
   host: github.com
-  resolved_commit: 00d6e7a9346341b5fc6318893ff71b80b670fd62
-  resolved_ref: v1.8.58
+  resolved_commit: 8b07b501759bbe4716c759dfdbd914d4d5ebbdc3
+  resolved_ref: v1.8.59
   version: 1.0.0
   virtual_path: .apm/packages/go-hooks-claude
   is_virtual: true
@@ -1688,8 +1688,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-shell-script
   host: github.com
-  resolved_commit: 00d6e7a9346341b5fc6318893ff71b80b670fd62
-  resolved_ref: v1.8.58
+  resolved_commit: 8b07b501759bbe4716c759dfdbd914d4d5ebbdc3
+  resolved_ref: v1.8.59
   version: 1.0.0
   virtual_path: .apm/packages/shell-script
   is_virtual: true
@@ -1937,8 +1937,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: shell-script-hooks-claude
   host: github.com
-  resolved_commit: 00d6e7a9346341b5fc6318893ff71b80b670fd62
-  resolved_ref: v1.8.58
+  resolved_commit: 8b07b501759bbe4716c759dfdbd914d4d5ebbdc3
+  resolved_ref: v1.8.59
   version: 1.0.0
   virtual_path: .apm/packages/shell-script-hooks-claude
   is_virtual: true
@@ -2006,7 +2006,7 @@ mcp_configs:
     transport: stdio
     args:
     - -y
-    - '@upstash/context7-mcp@3.2.3'
+    - '@upstash/context7-mcp@3.2.4'
     registry: false
     command: npx
   fetch:
