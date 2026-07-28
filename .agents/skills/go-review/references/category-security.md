@@ -1,49 +1,31 @@
 ## Security (SEC)
 
-**SEC-01 (SHOULD): Input Validation**
+**SEC-01 (SHOULD): Validate inputs; ban string-concat SQL**
 
 Check: Are input validation, prepared statements, and sanitization implemented?
 Why: Unvalidated input and SQL string concatenation enable SQL injection, XSS attacks, data tampering
 Fix: Mandatory prepared statements, implement validation, implement sanitization
 
-**SEC-02 (SHOULD): Output Sanitization**
+**SEC-02 (SHOULD): Escape/sanitize outputs for HTML/JSON/CRLF sinks**
 
 Check: Are HTML escaping, JSON injection prevention, and CRLF injection prevention present?
 Why: Missing escaping causes XSS vulnerabilities, response tampering, session hijacking
 Fix: Use html/template, context-appropriate escaping for output
 
-**SEC-03 (SHOULD): Appropriate Encryption**
-
-Check: Are TLS 1.2+, AES-256-GCM, and crypto/rand used?
-Why: Plaintext communication and weak encryption enable eavesdropping, MITM attacks, data leakage
-Fix: Mandatory TLS 1.2+, use AES-256-GCM, use crypto/rand
-
-**SEC-04 (SHOULD): Authentication and Authorization Implementation**
+**SEC-03 (SHOULD): Authenticate endpoints; verify JWT; enforce RBAC**
 
 Check: Are all endpoints authenticated, JWT signature verified, and RBAC implemented?
 Why: Skipped authentication and insufficient verification enable unauthorized access, privilege escalation, data leakage
 Fix: Mandatory authentication for all endpoints, JWT signature verification, RBAC implementation
 
-**SEC-05 (SHOULD): Rate Limiting and DOS Prevention**
-
-Check: Are rate limiters, timeout settings, and request size limits present?
-Why: Missing request limits enable DOS attacks, service outages, resource exhaustion
-Fix: Implement rate limiter, set timeouts, limit request sizes
-
-**SEC-06 (SHOULD): Log Security**
+**SEC-04 (SHOULD): Mask passwords/tokens in logs**
 
 Check: Are sensitive information masking functions and password/token masking present?
 Why: Logging passwords and tokens causes credential leakage, GDPR violations
 Fix: Implement sensitive information masking functions, structured logging, log rotation
 
-**SEC-07 (SHOULD): Secure Defaults**
+**SEC-05 (SHOULD): Least privilege; no production debug; explicit CORS**
 
 Check: Are least privilege principle, production debug disabled, and explicit CORS settings present?
 Why: Insecure defaults cause security breaches, increased attack success rate
 Fix: Least privilege principle, disable production debug, explicit CORS settings
-
-**SEC-08 (SHOULD): OWASP Compliance**
-
-Check: Are OWASP Top 10 addressed, Security Headers set, and CSP configured?
-Why: OWASP non-compliance leaves known vulnerabilities, increases attack risk
-Fix: Check OWASP Top 10, set Security Headers, regular assessments

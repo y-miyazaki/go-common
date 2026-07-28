@@ -17,7 +17,7 @@ metadata:
 
 ## Output Specification
 
-Return structured Markdown in accordance with [references/common-output-format.md](references/common-output-format.md).
+Return structured Markdown in accordance with [references/common-output-format.md](references/common-output-format.md). That file is the source of truth for the output contract.
 
 Structured validation results in fixed tool order.
 
@@ -60,17 +60,17 @@ Structured validation results in fixed tool order.
 
 ### Error Handling
 
-| Condition                             | Severity    | Action                                                   |
-| ------------------------------------- | ----------- | -------------------------------------------------------- |
-| `scripts/validate.sh` missing         | Fatal       | Stop; report missing script                              |
-| No Go files under target path         | Info        | Report no reviewable Go code; stop                       |
-| Single tool fails, others succeed     | Recoverable | Report passing tools; defer failed tool with exit status |
-| All tools fail                        | Fatal       | Return `status: failed` with per-tool stderr summaries   |
-| `common-checklist.md` unavailable     | Fatal       | Stop; report missing dependency                          |
-| `common-output-format.md` unavailable | Recoverable | Use inline output contract                               |
+| Condition                             | Severity    | Action                                                                                                |
+| ------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------- |
+| `scripts/validate.sh` missing         | Fatal       | Stop; report missing script                                                                           |
+| No Go files under target path         | Info        | Report no reviewable Go code; stop                                                                    |
+| Single tool fails, others succeed     | Recoverable | Report passing tools; defer failed tool with exit status                                              |
+| All tools fail                        | Fatal       | Return `status: failed` with per-tool stderr summaries                                                |
+| `common-checklist.md` unavailable     | Fatal       | Stop; report missing dependency                                                                       |
+| `common-output-format.md` unavailable | Recoverable | Note missing file; emit `## Checks Summary`, `## Checks (Failed/Deferred Only)`, and `## Issues` only |
 
 ### Examples
 
-- Prompt: `Validate Go checks and report summary, tool results, and error details.`
-- Command: `bash scripts/validate.sh ./test/go/ --verbose`
-- Output: `## Checks Summary` with per-tool pass/fail and coverage value.
+- Prompt: `Validate Go formatting, lint, tests, and vulnerabilities`
+- Command: `bash scripts/validate.sh --verbose`
+- Result: Structured report per [references/common-output-format.md](references/common-output-format.md) (per-tool pass/fail).

@@ -2,136 +2,77 @@
 
 ## Architecture (ARCH)
 
-- ARCH-01 (SHOULD): Layer Separation
-- ARCH-02 (SHOULD): Dependency Injection
-- ARCH-03 (SHOULD): Domain Logic Isolation
-- ARCH-04 (SHOULD): SOLID Principles
-- ARCH-05 (SHOULD): Appropriate Package Structure
-- ARCH-06 (SHOULD): Unified Configuration Management
-- ARCH-07 (SHOULD): Unified Log Management
-- ARCH-08 (SHOULD): Unified Error Management
-- ARCH-09 (SHOULD): External Integration Abstraction
-- ARCH-10 (SHOULD): Module Design
+- ARCH-01 (SHOULD): Separate handler/usecase/repository from infrastructure
+- ARCH-02 (SHOULD): Inject deps via constructor interfaces (not package globals)
+- ARCH-03 (SHOULD): Keep domain logic free of DB/HTTP/API concerns
+- ARCH-04 (SHOULD): Avoid circular deps; use standard layout and internal/
+- ARCH-05 (SHOULD): Abstract external integrations behind consumer interfaces
 
 ## Code Standards (CODE)
 
-- CODE-01 (MUST): Appropriate Interface Design
-- CODE-02 (SHOULD): API/Package Boundary Design
-- CODE-03 (SHOULD): Appropriate Struct Design
-- CODE-04 (SHOULD): Safe Type Assertions
-- CODE-05 (SHOULD): Appropriate defer Usage
-- CODE-06 (SHOULD): Appropriate slice/map Operations
-- CODE-07 (SHOULD): Error String Format
-- CODE-08 (SHOULD): Import Grouping
-- CODE-09 (SHOULD): Avoid Naked Returns in Long Functions
+- CODE-01 (MUST): Keep interfaces small (1-3 methods) on the consumer side
+- CODE-02 (SHOULD): Minimize exported API surface; hide internals with internal/
+- CODE-03 (SHOULD): Unexport invariant fields and mutexes; split oversized structs
 
 ## Concurrency (CON)
 
-- CON-01 (SHOULD): Avoid goroutine Leaks
-- CON-02 (SHOULD): Clarify channel close Responsibility
-- CON-03 (SHOULD): Appropriate buffered/unbuffered channel Selection
-- CON-04 (SHOULD): Appropriate sync primitives Usage
-- CON-05 (SHOULD): for+goroutine Variable Capture Issue
-- CON-06 (SHOULD): data race Detection and Prevention
+- CON-01 (SHOULD): Ensure goroutines exit (watch context.Done / completion)
+- CON-02 (SHOULD): Only the sender closes a channel (once)
+- CON-03 (SHOULD): Define lock/completion ownership for shared state
 
 ## Context Handling (CTX)
 
-- CTX-01 (MUST): Accept context in public APIs
-- CTX-02 (SHOULD): Avoid context lifecycle ambiguity
-- CTX-03 (SHOULD): Propagate context to goroutines
-- CTX-04 (SHOULD): Appropriate cancel Invocation
+- CTX-01 (MUST): Exported I/O APIs take context.Context as first param
+- CTX-02 (SHOULD): Do not store ambiguous request-scoped contexts
+- CTX-03 (SHOULD): Pass context into goroutines that do I/O or wait
+- CTX-04 (SHOULD): Call cancel promptly; do not leak derived contexts
 
 ## Dependencies (DEP)
 
-- DEP-01 (SHOULD): Explicit Direct Dependencies
-- DEP-02 (SHOULD): Dependency Update Strategy
-- DEP-03 (SHOULD): vendor Management (Only When Necessary)
-- DEP-04 (SHOULD): Prioritize Standard Library
-- DEP-05 (SHOULD): AWS SDK Version Management
-- DEP-06 (SHOULD): Separate Development Dependencies
-- DEP-07 (SHOULD): License Compatibility
+- DEP-01 (SHOULD): List direct deps in go.mod with pinned versions
 
 ## Documentation (DOC)
 
-- DOC-01 (SHOULD): Package Documentation Exists
-- DOC-02 (MUST): godoc for Public Functions
-- DOC-03 (SHOULD): Complex Logic Comments
-- DOC-04 (SHOULD): Struct Field Comments
-- DOC-05 (SHOULD): Constant and Variable Descriptions
-- DOC-06 (SHOULD): English Comment Consistency
-- DOC-07 (SHOULD): README.md Maintenance
-- DOC-08 (SHOULD): API Specification (OpenAPI)
-- DOC-09 (SHOULD): Operations Documentation
-- DOC-10 (SHOULD): CHANGELOG
+- DOC-01 (SHOULD): Package has a doc comment stating purpose
+- DOC-02 (MUST): Public APIs have godoc covering args/returns/errors
+- DOC-03 (SHOULD): Comments are consistently English
 
 ## Error Handling (ERR)
 
-- ERR-01 (MUST): Appropriate Error Wrapping
-- ERR-02 (SHOULD): Appropriate Custom Error Definition
-- ERR-03 (SHOULD): Avoid and Recover from Panics
-- ERR-04 (SHOULD): Appropriate Error Log Information
-- ERR-05 (SHOULD): Error Propagation to Upper Layers
-- ERR-06 (SHOULD): Error Handling Strategy
-- ERR-07 (SHOULD): External Dependency Error Handling
-- ERR-08 (SHOULD): Validation Errors
-- ERR-09 (SHOULD): Error Message Security
+- ERR-01 (MUST): Wrap errors with fmt.Errorf %w and context
+- ERR-02 (SHOULD): Use distinct sentinel/custom errors per failure mode
+- ERR-03 (SHOULD): Panic only for fatal bugs; recover at boundaries
+- ERR-04 (SHOULD): Timeouts/retries and classify external errors
+- ERR-05 (SHOULD): Do not leak internals in user-facing error messages
+- ERR-06 (MUST): Never discard errors with _ unless commented
 
 ## Function Design (FUNC)
 
-- FUNC-01 (SHOULD): Appropriate Function Splitting
-- FUNC-02 (SHOULD): Appropriate Argument Design
-- FUNC-03 (SHOULD): Return Value Design
-- FUNC-04 (SHOULD): Recommend Pure Functions
-- FUNC-05 (SHOULD): Appropriate Receiver Design
-- FUNC-06 (SHOULD): Method Set Design
-- FUNC-07 (SHOULD): Appropriate Initialization Functions
-- FUNC-08 (SHOULD): Leverage Higher-Order Functions
-- FUNC-09 (SHOULD): Appropriate Generics Usage
-- FUNC-10 (SHOULD): Comprehensive Function Documentation
+- FUNC-01 (SHOULD): Split mixed-responsibility or multi-layer functions
+- FUNC-02 (SHOULD): Unify pointer vs value receivers; avoid large values
+- FUNC-03 (SHOULD): Keep generic constraints minimal and locally scoped
 
 ## Global / Base (G)
 
-- G-01 (SHOULD): No Hardcoded Secrets
-- G-02 (SHOULD): Appropriate Function Signatures
-- G-03 (SHOULD): Leverage Standard Library
-- G-04 (SHOULD): Appropriate Log Levels
-- G-05 (SHOULD): Restrict init() Complexity
-- G-06 (SHOULD): Zero Value Design
-- G-07 (SHOULD): Defensive Copy at Boundaries
-
-## Performance (PERF)
-
-- PERF-01 (SHOULD): Memory Optimization
-- PERF-02 (SHOULD): CPU Optimization
-- PERF-03 (SHOULD): I/O Optimization
-- PERF-04 (SHOULD): Appropriate Data Structure Selection
-- PERF-05 (SHOULD): GC Consideration
-- PERF-06 (SHOULD): String Processing Optimization
-- PERF-07 (SHOULD): Parallel Processing Optimization
-- PERF-08 (SHOULD): Caching Strategy
-- PERF-09 (SHOULD): Leverage pprof
-- PERF-10 (SHOULD): Hot Path Optimization
+- G-01 (SHOULD): No API keys/passwords/tokens in source
+- G-02 (SHOULD): Keep init() free of I/O, panics, and heavy side effects
+- G-03 (SHOULD): Prefer types whose zero value is usable
+- G-04 (SHOULD): Copy slices/maps at API boundaries
 
 ## Security (SEC)
 
-- SEC-01 (SHOULD): Input Validation
-- SEC-02 (SHOULD): Output Sanitization
-- SEC-03 (SHOULD): Appropriate Encryption
-- SEC-04 (SHOULD): Authentication and Authorization Implementation
-- SEC-05 (SHOULD): Rate Limiting and DOS Prevention
-- SEC-06 (SHOULD): Log Security
-- SEC-07 (SHOULD): Secure Defaults
-- SEC-08 (SHOULD): OWASP Compliance
+- SEC-01 (SHOULD): Validate inputs; ban string-concat SQL
+- SEC-02 (SHOULD): Escape/sanitize outputs for HTML/JSON/CRLF sinks
+- SEC-03 (SHOULD): Authenticate endpoints; verify JWT; enforce RBAC
+- SEC-04 (SHOULD): Mask passwords/tokens in logs
+- SEC-05 (SHOULD): Least privilege; no production debug; explicit CORS
 
 ## Testing (TEST)
 
-- TEST-00 (MUST): Add Tests With Behavior Changes
-- TEST-01 (SHOULD): Table-Driven Tests
-- TEST-02 (SHOULD): testify Usage and Test Design
-- TEST-03 (SHOULD): Appropriate Mock Usage
-- TEST-04 (SHOULD): Separate Test Helpers
-- TEST-05 (SHOULD): Benchmark Tests
-- TEST-06 (SHOULD): Separate Integration Tests
-- TEST-07 (SHOULD): Test Data Management
-- TEST-08 (SHOULD): Efficient Test Parallel Execution
-- TEST-09 (SHOULD): Use t.Helper() in Test Helpers
+- TEST-00 (MUST): Add/update *_test.go in the same change as behavior
+- TEST-01 (SHOULD): Prefer table-driven tests with subtests and edges
+- TEST-02 (SHOULD): Use assert vs require correctly; inject time/rand
+- TEST-03 (SHOULD): Mock external deps through consumer interfaces
+- TEST-04 (SHOULD): Share helpers/fixtures outside production packages
+- TEST-05 (SHOULD): Isolate integration tests with build tags
+- TEST-06 (SHOULD): Call t.Helper() first in test helpers

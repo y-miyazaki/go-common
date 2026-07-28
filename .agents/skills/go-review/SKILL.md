@@ -1,12 +1,12 @@
 ---
 name: go-review
 description: >-
-  Review Go code for security, correctness, performance, and maintainability.
+  Review Go code for security, correctness, and maintainability.
   Use when reviewing Go PRs requiring judgment beyond automated checks.
 license: Apache-2.0
 metadata:
   author: y-miyazaki
-  version: "1.1.2"
+  version: "1.2.0"
 ---
 
 ## Input
@@ -16,26 +16,7 @@ metadata:
 
 ## Output Specification
 
-Return structured Markdown in accordance with [references/common-output-format.md](references/common-output-format.md).
-
-Minimal inline contract (used if reference file is unavailable):
-
-```markdown
-## Checks Summary
-
-- Total: <n>, Passed: <n>, Failed: <n>, Deferred: <n>
-
-## Checks (Failed/Deferred Only)
-
-| ItemID | Status | Evidence | Fix |
-
-## Issues
-
-1. <ItemID>: <title>
-   - File: <path>#L<line>
-   - Problem: <specific>
-   - Recommendation: <fix>
-```
+Return structured Markdown in accordance with [references/common-output-format.md](references/common-output-format.md). That file is the source of truth for the output contract.
 
 ## Execution Scope
 
@@ -72,14 +53,13 @@ Minimal inline contract (used if reference file is unavailable):
 - [category-dependencies.md](references/category-dependencies.md) (always read)
 - [category-documentation.md](references/category-documentation.md) (always read)
 - [category-function-design.md](references/category-function-design.md) (always read)
-- [category-performance.md](references/category-performance.md) (always read)
 - [category-testing.md](references/category-testing.md) (always read)
 
 ## Workflow
 
 1. Read PR context and change intent.
 2. Confirm `go-validation` results exist. If missing, inform the user that validation should run first, then proceed with a partial review: evaluate design, security, and concurrency checks (which do not require tool output) and defer lint/test/vuln-dependent checks (mark as `Deferred` with reason "validation evidence unavailable").
-3. Review relevant checklist categories and collect failed/deferred ItemIDs. When uncertain which categories apply, prioritize category-security, category-concurrency, category-error-handling, and category-global first; read other category files when the changeset touches those areas.
+3. Apply the full review checklist and collect failed/deferred ItemIDs.
 4. Output required report sections per [references/common-output-format.md](references/common-output-format.md). Prioritize `SEC-*` findings first. Include file path and line reference for each finding.
 5. Exclude generated files and `vendor/` from primary findings unless they introduce security-critical risk.
 6. For very large PRs (>50 changed Go files), prioritize security/correctness checks first and defer low-risk style checks if evidence is insufficient.
@@ -96,14 +76,14 @@ Severity priority for Issues section ordering: `SEC-*` > `CON-*` > `ERR-*` > all
 
 ### Error Handling
 
-| Condition                               | Severity    | Action                                                                                         |
-| --------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------- |
-| `go-validation` output missing          | Recoverable | Defer validator-dependent checks, review design/security checks that don't require tool output |
-| `common-checklist.md` unavailable       | Fatal       | Stop, report missing dependency                                                                |
-| `common-output-format.md` unavailable   | Recoverable | Use inline output contract above                                                               |
-| PR contains only generated/vendor files | Recoverable | Report "no reviewable Go source" and stop                                                      |
+| Condition                               | Severity    | Action                                                                                                |
+| --------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------- |
+| `go-validation` output missing          | Recoverable | Defer validator-dependent checks, review design/security checks that don't require tool output        |
+| `common-checklist.md` unavailable       | Fatal       | Stop, report missing dependency                                                                       |
+| `common-output-format.md` unavailable   | Recoverable | Note missing file; emit `## Checks Summary`, `## Checks (Failed/Deferred Only)`, and `## Issues` only |
+| PR contains only generated/vendor files | Recoverable | Report "no reviewable Go source" and stop                                                             |
 
 ### Examples
 
 - Prompt: `Review Go code changes for design and correctness`
-- Result: Structured report with per-file checks, failed items with severity/fix suggestions.
+- Result: Structured report per [references/common-output-format.md](references/common-output-format.md); prioritize `SEC-*` findings.
