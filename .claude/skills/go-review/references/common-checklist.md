@@ -1,7 +1,6 @@
 # Go Review Checklist
 
 ## Architecture (ARCH)
-
 - ARCH-01 (SHOULD): Separate handler/usecase/repository from infrastructure
 - ARCH-02 (SHOULD): Inject deps via constructor interfaces (not package globals)
 - ARCH-03 (SHOULD): Keep domain logic free of DB/HTTP/API concerns
@@ -9,36 +8,30 @@
 - ARCH-05 (SHOULD): Abstract external integrations behind consumer interfaces
 
 ## Code Standards (CODE)
-
 - CODE-01 (MUST): Keep interfaces small (1-3 methods) on the consumer side
 - CODE-02 (SHOULD): Minimize exported API surface; hide internals with internal/
 - CODE-03 (SHOULD): Unexport invariant fields and mutexes; split oversized structs
 
 ## Concurrency (CON)
-
 - CON-01 (SHOULD): Ensure goroutines exit (watch context.Done / completion)
 - CON-02 (SHOULD): Only the sender closes a channel (once)
 - CON-03 (SHOULD): Define lock/completion ownership for shared state
 
 ## Context Handling (CTX)
-
 - CTX-01 (MUST): Exported I/O APIs take context.Context as first param
 - CTX-02 (SHOULD): Do not store ambiguous request-scoped contexts
 - CTX-03 (SHOULD): Pass context into goroutines that do I/O or wait
 - CTX-04 (SHOULD): Call cancel promptly; do not leak derived contexts
 
 ## Dependencies (DEP)
-
 - DEP-01 (SHOULD): List direct deps in go.mod with pinned versions
 
 ## Documentation (DOC)
-
 - DOC-01 (SHOULD): Package has a doc comment stating purpose
 - DOC-02 (MUST): Public APIs have godoc covering args/returns/errors
 - DOC-03 (SHOULD): Comments are consistently English
 
 ## Error Handling (ERR)
-
 - ERR-01 (MUST): Wrap errors with fmt.Errorf %w and context
 - ERR-02 (SHOULD): Use distinct sentinel/custom errors per failure mode
 - ERR-03 (SHOULD): Panic only for fatal bugs; recover at boundaries
@@ -47,20 +40,17 @@
 - ERR-06 (MUST): Never discard errors with _ unless commented
 
 ## Function Design (FUNC)
-
 - FUNC-01 (SHOULD): Split mixed-responsibility or multi-layer functions
 - FUNC-02 (SHOULD): Unify pointer vs value receivers; avoid large values
 - FUNC-03 (SHOULD): Keep generic constraints minimal and locally scoped
 
 ## Global / Base (G)
-
 - G-01 (SHOULD): No API keys/passwords/tokens in source
 - G-02 (SHOULD): Keep init() free of I/O, panics, and heavy side effects
 - G-03 (SHOULD): Prefer types whose zero value is usable
 - G-04 (SHOULD): Copy slices/maps at API boundaries
 
 ## Security (SEC)
-
 - SEC-01 (SHOULD): Validate inputs; ban string-concat SQL
 - SEC-02 (SHOULD): Escape/sanitize outputs for HTML/JSON/CRLF sinks
 - SEC-03 (SHOULD): Authenticate endpoints; verify JWT; enforce RBAC
@@ -68,8 +58,6 @@
 - SEC-05 (SHOULD): Least privilege; no production debug; explicit CORS
 
 ## Testing (TEST)
-
-- TEST-00 (MUST): Add/update *_test.go in the same change as behavior
 - TEST-01 (SHOULD): Prefer table-driven tests with subtests and edges
 - TEST-02 (SHOULD): Use assert vs require correctly; inject time/rand
 - TEST-03 (SHOULD): Mock external deps through consumer interfaces
