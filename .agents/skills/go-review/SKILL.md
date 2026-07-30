@@ -6,13 +6,13 @@ description: >-
 license: Apache-2.0
 metadata:
   author: y-miyazaki
-  version: "1.2.0"
+  version: "1.2.1"
 ---
 
 ## Input
 
 - Go files in PR or changeset (required)
-- PR context: diff, commit messages, and `go-validation` output (required for PR review; for ad-hoc file review without PR, skip step 2 and evaluate all applicable checks directly)
+- PR context: diff and commit messages (recommended for PR review; for ad-hoc file review without PR, evaluate all applicable checks directly)
 
 ## Output Specification
 
@@ -22,19 +22,18 @@ Return structured Markdown in accordance with [references/common-output-format.m
 
 - Systematically apply review checklist from [references/common-checklist.md](references/common-checklist.md)
 - Focus on checks requiring human/AI judgment (design, concurrency, security patterns)
-- **Do not run go-validation or execute gofumpt/go vet/golangci-lint/go test/govulncheck**
 - Do not modify code files or approve/merge PRs
 
 ### USE FOR:
 
-- review Go PRs where `.go` files are in the changeset (validation output may or may not exist)
+- review Go PRs where `.go` files are in the changeset
 - assess design, security, and concurrency risks not covered by static checks
 - perform risk-focused review on multi-package changes
 - ad-hoc review of Go source files outside a PR context
 
 ### DO NOT USE FOR:
 
-- run formatting/lint/test/vulnerability command pipelines (use go-validation)
+- run formatting/lint/test/vulnerability command pipelines (`gofumpt`, `go vet`, `golangci-lint`, `go test`, `govulncheck`)
 - implement code fixes directly
 - changesets containing only non-Go files (e.g., docs-only, CI config-only)
 
@@ -58,19 +57,18 @@ Return structured Markdown in accordance with [references/common-output-format.m
 ## Workflow
 
 1. Read PR context and change intent.
-2. Confirm `go-validation` results exist. If missing, inform the user that validation should run first, then proceed with a partial review: evaluate design, security, and concurrency checks (which do not require tool output) and defer lint/test/vuln-dependent checks (mark as `Deferred` with reason "validation evidence unavailable").
-3. Apply the full review checklist and collect failed/deferred ItemIDs.
-4. Output required report sections per [references/common-output-format.md](references/common-output-format.md). Prioritize `SEC-*` findings first. Include file path and line reference for each finding.
-5. Exclude generated files and `vendor/` from primary findings unless they introduce security-critical risk.
-6. For very large PRs (>50 changed Go files), prioritize security/correctness checks first and defer low-risk style checks if evidence is insufficient.
+2. Apply the full review checklist and collect failed/deferred ItemIDs.
+3. Output required report sections per [references/common-output-format.md](references/common-output-format.md). Prioritize `SEC-*` findings first. Include file path and line reference for each finding.
+4. Exclude generated files and `vendor/` from primary findings unless they introduce security-critical risk.
+5. For very large PRs (>50 changed Go files), prioritize security/correctness checks first and defer low-risk style checks if evidence is insufficient.
 
 ### Severity and Status Rules
 
-| Status   | When to use                                                                                                                  |
-| -------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| Failed   | Finding is confirmed from source code with concrete evidence (file + line)                                                   |
-| Deferred | Check cannot be evaluated — validation output missing, file too large to fully analyze, or ambiguous without runtime context |
-| Passed   | Check evaluated and no issue found (counted in summary only)                                                                 |
+| Status   | When to use                                                                                       |
+| -------- | ------------------------------------------------------------------------------------------------- |
+| Failed   | Finding is confirmed from source code with concrete evidence (file + line)                        |
+| Deferred | Check cannot be evaluated — file too large to fully analyze, or ambiguous without runtime context |
+| Passed   | Check evaluated and no issue found (counted in summary only)                                      |
 
 Severity priority for Issues section ordering: `SEC-*` > `CON-*` > `ERR-*` > all others.
 
@@ -78,7 +76,6 @@ Severity priority for Issues section ordering: `SEC-*` > `CON-*` > `ERR-*` > all
 
 | Condition                               | Severity    | Action                                                                                                |
 | --------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------- |
-| `go-validation` output missing          | Recoverable | Defer validator-dependent checks, review design/security checks that don't require tool output        |
 | `common-checklist.md` unavailable       | Fatal       | Stop, report missing dependency                                                                       |
 | `common-output-format.md` unavailable   | Recoverable | Note missing file; emit `## Checks Summary`, `## Checks (Failed/Deferred Only)`, and `## Issues` only |
 | PR contains only generated/vendor files | Recoverable | Report "no reviewable Go source" and stop                                                             |

@@ -15,6 +15,7 @@ metadata:
 - Validation script (required): `scripts/validate.sh` (run from the go-validation skill directory)
 - `--fix` (optional)
 - `--verbose` (optional)
+
 ## Output Specification
 
 Return structured Markdown in accordance with [references/common-output-format.md](references/common-output-format.md). That file is the source of truth for the output contract.
@@ -25,7 +26,6 @@ Structured validation results in fixed tool order.
 
 - **Always use `scripts/validate.sh`** for comprehensive validation. Do not run individual commands.
 - Individual commands are for debugging only (see [references/common-individual-commands.md](references/common-individual-commands.md)).
-- **Do not review code design decisions** (use go-review).
 - **Do not modify source files** except `--fix` formatting.
 - **Do not create or delete files**.
 
@@ -37,7 +37,7 @@ Structured validation results in fixed tool order.
 
 ### DO NOT USE FOR:
 
-- perform architecture or design reviews (use `go-review`)
+- perform architecture or design reviews
 - generate new source code as a primary task
 - validate non-Go projects
 
