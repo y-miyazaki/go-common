@@ -1,4 +1,4 @@
-## Code Standards (CODE)
+# Code Standards (CODE)
 
 **CODE-01 (MUST): Keep interfaces small (1-3 methods) on the consumer side**
 

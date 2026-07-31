@@ -1,6 +1,6 @@
-## Go Validation - Individual Commands Reference
+# Go Validation - Individual Commands Reference
 
-### Contents
+## Contents
 
 - [Go Validation - Individual Commands Reference](#go-validation---individual-commands-reference)
   - [Contents](#contents)
@@ -239,7 +239,7 @@ govulncheck -json ./...
 
 ## Coverage Analysis Commands
 
-### Generating Coverage Reports
+## Generating Coverage Reports
 
 ```bash
 # Generate coverage profile
@@ -258,13 +258,13 @@ go test -coverprofile=coverage.out ./pkg/mypackage
 go test -covermode=atomic -coverprofile=coverage.out ./...
 ```
 
-### Coverage Modes
+## Coverage Modes
 
 - **set**: Did each statement run?
 - **count**: How many times did each statement run?
 - **atomic**: Like count, but counts precisely in parallel tests
 
-### Interpreting Coverage Reports
+## Interpreting Coverage Reports
 
 ```bash
 # Coverage by function
@@ -276,7 +276,7 @@ go tool cover -func=coverage.out
 
 ## Additional Tools
 
-### staticcheck
+## staticcheck
 
 ```bash
 # Install
@@ -286,7 +286,7 @@ go install honnef.co/go/tools/cmd/staticcheck@latest
 staticcheck ./...
 ```
 
-### gosec
+## gosec
 
 ```bash
 # Install
@@ -296,7 +296,7 @@ go install github.com/securego/gosec/v2/cmd/gosec@latest
 gosec ./...
 ```
 
-### go-critic
+## go-critic
 
 ```bash
 # Install

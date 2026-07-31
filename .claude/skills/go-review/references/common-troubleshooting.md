@@ -1,4 +1,4 @@
-## Troubleshooting
+# Troubleshooting
 
 - If evidence is partial, mark affected checks as deferred with explicit reason.
 - If PR context is incomplete, list missing evidence and mark impacted checks as deferred.

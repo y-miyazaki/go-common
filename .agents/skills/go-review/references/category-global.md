@@ -1,4 +1,4 @@
-## Global / Base (G)
+# Global / Base (G)
 
 **G-01 (SHOULD): No API keys/passwords/tokens in source**
 

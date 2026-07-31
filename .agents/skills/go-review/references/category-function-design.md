@@ -1,4 +1,4 @@
-## Function Design (FUNC)
+# Function Design (FUNC)
 
 **FUNC-01 (SHOULD): Split mixed-responsibility or multi-layer functions**
 

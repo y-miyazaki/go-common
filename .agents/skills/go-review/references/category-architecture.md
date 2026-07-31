@@ -1,4 +1,4 @@
-## Architecture (ARCH)
+# Architecture (ARCH)
 
 **ARCH-01 (SHOULD): Separate handler/usecase/repository from infrastructure**
 

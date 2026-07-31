@@ -1,4 +1,4 @@
-## Dependencies (DEP)
+# Dependencies (DEP)
 
 **DEP-01 (SHOULD): List direct deps in go.mod with pinned versions**
 

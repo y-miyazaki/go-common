@@ -1,4 +1,4 @@
-## Error Handling (ERR)
+# Error Handling (ERR)
 
 **ERR-01 (MUST): Wrap errors with fmt.Errorf %w and context**
 

@@ -1,4 +1,4 @@
-## Go Validation - Security Best Practices
+# Go Validation - Security Best Practices
 
 ## Contents
 

@@ -1,4 +1,4 @@
-## Concurrency (CON)
+# Concurrency (CON)
 
 **CON-01 (SHOULD): Ensure goroutines exit (watch context.Done / completion)**
 

@@ -1,4 +1,4 @@
-## Documentation (DOC)
+# Documentation (DOC)
 
 **DOC-01 (SHOULD): Package has a doc comment stating purpose**
 

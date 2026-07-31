@@ -1,4 +1,4 @@
-## Go Validation - Testing Best Practices
+# Go Validation - Testing Best Practices
 
 ## Contents
 
