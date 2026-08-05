@@ -1,5 +1,5 @@
 lockfile_version: '1'
-generated_at: '2026-08-05T08:22:15.146219+00:00'
+generated_at: '2026-08-05T08:35:11.283436+00:00'
 apm_version: 0.27.0
 dependencies:
 - repo_url: y-miyazaki/config
@@ -1408,6 +1408,31 @@ dependencies:
   content_hash: sha256:b60cd9530f2968c4d7cfab8c75e4e15a724346057ef33b5e6c5e4b9fad4b7c9d
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
+  name: common-hooks-cursor
+  host: github.com
+  resolved_commit: f6417a973be4e65076f589738f1c7776e8fe9926
+  resolved_ref: v1.8.72
+  version: 2.0.0
+  virtual_path: .apm/packages/common-hooks-cursor
+  is_virtual: true
+  package_type: apm_package
+  deployed_files:
+  - .cursor/hooks/common-hooks-cursor/scripts/actionlint.sh
+  - .cursor/hooks/common-hooks-cursor/scripts/ghalint.sh
+  - .cursor/hooks/common-hooks-cursor/scripts/gitleaks.sh
+  - .cursor/hooks/common-hooks-cursor/scripts/markdown_link_check.sh
+  - .cursor/hooks/common-hooks-cursor/scripts/markdownlint_cli2.sh
+  - .cursor/hooks/common-hooks-cursor/scripts/zizmor.sh
+  deployed_file_hashes:
+    .cursor/hooks/common-hooks-cursor/scripts/actionlint.sh: sha256:5a381f744f2d7895c3458240026a5de495a84ceab9d25536d6d1c544f141158e
+    .cursor/hooks/common-hooks-cursor/scripts/ghalint.sh: sha256:644c0c86799e80972e139e7ddd5c935789d90dde31713301a23b19febed40a42
+    .cursor/hooks/common-hooks-cursor/scripts/gitleaks.sh: sha256:3b323d16af65f68a2bd8d645a9ac180987764ff1c521511c92c6df3ed026e592
+    .cursor/hooks/common-hooks-cursor/scripts/markdown_link_check.sh: sha256:2ae6a0fd25a08af394fde0f1b35ca3dc5271d261e9bd02351ded87207a96b743
+    .cursor/hooks/common-hooks-cursor/scripts/markdownlint_cli2.sh: sha256:d229a83c68f734251b3355b65287bd8e0faa85556e58808a40b25c4e0e511723
+    .cursor/hooks/common-hooks-cursor/scripts/zizmor.sh: sha256:28f45ca1d6733c9b8d1a0a13d0ddfdbcb9c3a515636b3e7972eb45bc351ab044
+  content_hash: sha256:7155a314e1fe75572bcd87d421f54defa1d2cb1087db42cebc626c4d457d80c0
+  declared_license: Apache-2.0
+- repo_url: y-miyazaki/config
   name: config-go
   host: github.com
   resolved_commit: f6417a973be4e65076f589738f1c7776e8fe9926
@@ -1614,6 +1639,21 @@ dependencies:
   deployed_file_hashes:
     .claude/hooks/go-hooks-claude/scripts/golangci_lint.sh: sha256:c192d02baa26658db1c2451a864454272a94a7038f78f970a53286aa32a4a22b
   content_hash: sha256:f02848a4b98a2a03c259dc3f581fb362b51104464d9dedbca6260541527bf64f
+  declared_license: Apache-2.0
+- repo_url: y-miyazaki/config
+  name: go-hooks-cursor
+  host: github.com
+  resolved_commit: f6417a973be4e65076f589738f1c7776e8fe9926
+  resolved_ref: v1.8.72
+  version: 1.0.0
+  virtual_path: .apm/packages/go-hooks-cursor
+  is_virtual: true
+  package_type: apm_package
+  deployed_files:
+  - .cursor/hooks/go-hooks-cursor/scripts/golangci_lint.sh
+  deployed_file_hashes:
+    .cursor/hooks/go-hooks-cursor/scripts/golangci_lint.sh: sha256:c192d02baa26658db1c2451a864454272a94a7038f78f970a53286aa32a4a22b
+  content_hash: sha256:7e693d6fa5f2125e1baf0021883b0ed46326af671b1f6c074efb61fde3ab80dd
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: config-shell-script
@@ -1840,6 +1880,23 @@ dependencies:
     .claude/hooks/shell-script-hooks-claude/scripts/shellcheck.sh: sha256:223f1409ea7dc64b560b28fedc54f9643db379f302bc24febd21daa8f29ef1e2
     .claude/hooks/shell-script-hooks-claude/scripts/shfmt.sh: sha256:f5501a998d9e4ff6b70abf91a62e201009c718eae6073bc4ae3c815532472043
   content_hash: sha256:65519199cdfac4a7c2bbefd9ff7afffdc75b1befc0ee28b3ad0dc737c73ee258
+  declared_license: Apache-2.0
+- repo_url: y-miyazaki/config
+  name: shell-script-hooks-cursor
+  host: github.com
+  resolved_commit: f6417a973be4e65076f589738f1c7776e8fe9926
+  resolved_ref: v1.8.72
+  version: 1.0.0
+  virtual_path: .apm/packages/shell-script-hooks-cursor
+  is_virtual: true
+  package_type: apm_package
+  deployed_files:
+  - .cursor/hooks/shell-script-hooks-cursor/scripts/shellcheck.sh
+  - .cursor/hooks/shell-script-hooks-cursor/scripts/shfmt.sh
+  deployed_file_hashes:
+    .cursor/hooks/shell-script-hooks-cursor/scripts/shellcheck.sh: sha256:223f1409ea7dc64b560b28fedc54f9643db379f302bc24febd21daa8f29ef1e2
+    .cursor/hooks/shell-script-hooks-cursor/scripts/shfmt.sh: sha256:f5501a998d9e4ff6b70abf91a62e201009c718eae6073bc4ae3c815532472043
+  content_hash: sha256:d4ece9033123850bd57bf9aee7a422c9a99d293cc737f2281eae73961884a00c
   declared_license: Apache-2.0
 deployments:
 - kind: project-relative
@@ -9798,6 +9855,87 @@ deployments:
   - y-miyazaki/config/.apm/packages/common
   active_owner: y-miyazaki/config/.apm/packages/common
   content_hash: sha256:8dfd917e4b2652f8eedc6355660732645a18a85ee803cc8e82a83884d9e5c390
+- kind: project-relative
+  target: cursor
+  value: .cursor/hooks/common-hooks-cursor/scripts/actionlint.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/common-hooks-cursor
+  active_owner: y-miyazaki/config/.apm/packages/common-hooks-cursor
+  content_hash: sha256:5a381f744f2d7895c3458240026a5de495a84ceab9d25536d6d1c544f141158e
+- kind: project-relative
+  target: cursor
+  value: .cursor/hooks/common-hooks-cursor/scripts/ghalint.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/common-hooks-cursor
+  active_owner: y-miyazaki/config/.apm/packages/common-hooks-cursor
+  content_hash: sha256:644c0c86799e80972e139e7ddd5c935789d90dde31713301a23b19febed40a42
+- kind: project-relative
+  target: cursor
+  value: .cursor/hooks/common-hooks-cursor/scripts/gitleaks.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/common-hooks-cursor
+  active_owner: y-miyazaki/config/.apm/packages/common-hooks-cursor
+  content_hash: sha256:3b323d16af65f68a2bd8d645a9ac180987764ff1c521511c92c6df3ed026e592
+- kind: project-relative
+  target: cursor
+  value: .cursor/hooks/common-hooks-cursor/scripts/markdown_link_check.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/common-hooks-cursor
+  active_owner: y-miyazaki/config/.apm/packages/common-hooks-cursor
+  content_hash: sha256:2ae6a0fd25a08af394fde0f1b35ca3dc5271d261e9bd02351ded87207a96b743
+- kind: project-relative
+  target: cursor
+  value: .cursor/hooks/common-hooks-cursor/scripts/markdownlint_cli2.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/common-hooks-cursor
+  active_owner: y-miyazaki/config/.apm/packages/common-hooks-cursor
+  content_hash: sha256:d229a83c68f734251b3355b65287bd8e0faa85556e58808a40b25c4e0e511723
+- kind: project-relative
+  target: cursor
+  value: .cursor/hooks/common-hooks-cursor/scripts/zizmor.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/common-hooks-cursor
+  active_owner: y-miyazaki/config/.apm/packages/common-hooks-cursor
+  content_hash: sha256:28f45ca1d6733c9b8d1a0a13d0ddfdbcb9c3a515636b3e7972eb45bc351ab044
+- kind: project-relative
+  target: cursor
+  value: .cursor/hooks/go-hooks-cursor/scripts/golangci_lint.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/go-hooks-cursor
+  active_owner: y-miyazaki/config/.apm/packages/go-hooks-cursor
+  content_hash: sha256:c192d02baa26658db1c2451a864454272a94a7038f78f970a53286aa32a4a22b
+- kind: project-relative
+  target: cursor
+  value: .cursor/hooks/shell-script-hooks-cursor/scripts/shellcheck.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/shell-script-hooks-cursor
+  active_owner: y-miyazaki/config/.apm/packages/shell-script-hooks-cursor
+  content_hash: sha256:223f1409ea7dc64b560b28fedc54f9643db379f302bc24febd21daa8f29ef1e2
+- kind: project-relative
+  target: cursor
+  value: .cursor/hooks/shell-script-hooks-cursor/scripts/shfmt.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/shell-script-hooks-cursor
+  active_owner: y-miyazaki/config/.apm/packages/shell-script-hooks-cursor
+  content_hash: sha256:f5501a998d9e4ff6b70abf91a62e201009c718eae6073bc4ae3c815532472043
 - kind: project-relative
   target: cursor
   value: .cursor/rules/agent-skills.mdc
