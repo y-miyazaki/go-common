@@ -1,7 +1,7 @@
 {
   "Stop": [
     {
-      "matcher": "",
+      "matcher": "*",
       "hooks": [
         {
           "type": "command",
@@ -9,10 +9,10 @@
           "timeout": 60
         }
       ],
-      "_apm_source": "common-hooks-claude"
+      "_apm_source": "y-miyazaki/config/.apm/packages/common-hooks-claude"
     },
     {
-      "matcher": "",
+      "matcher": "*",
       "hooks": [
         {
           "type": "command",
@@ -20,10 +20,10 @@
           "timeout": 60
         }
       ],
-      "_apm_source": "common-hooks-claude"
+      "_apm_source": "y-miyazaki/config/.apm/packages/common-hooks-claude"
     },
     {
-      "matcher": "",
+      "matcher": "*",
       "hooks": [
         {
           "type": "command",
@@ -31,10 +31,10 @@
           "timeout": 60
         }
       ],
-      "_apm_source": "common-hooks-claude"
+      "_apm_source": "y-miyazaki/config/.apm/packages/common-hooks-claude"
     },
     {
-      "matcher": "",
+      "matcher": "*",
       "hooks": [
         {
           "type": "command",
@@ -42,10 +42,10 @@
           "timeout": 60
         }
       ],
-      "_apm_source": "common-hooks-claude"
+      "_apm_source": "y-miyazaki/config/.apm/packages/common-hooks-claude"
     },
     {
-      "matcher": "",
+      "matcher": "*",
       "hooks": [
         {
           "type": "command",
@@ -53,10 +53,10 @@
           "timeout": 240
         }
       ],
-      "_apm_source": "common-hooks-claude"
+      "_apm_source": "y-miyazaki/config/.apm/packages/common-hooks-claude"
     },
     {
-      "matcher": "",
+      "matcher": "*",
       "hooks": [
         {
           "type": "command",
@@ -64,10 +64,10 @@
           "timeout": 120
         }
       ],
-      "_apm_source": "common-hooks-claude"
+      "_apm_source": "y-miyazaki/config/.apm/packages/common-hooks-claude"
     },
     {
-      "matcher": "",
+      "matcher": "*",
       "hooks": [
         {
           "type": "command",
@@ -75,10 +75,10 @@
           "timeout": 120
         }
       ],
-      "_apm_source": "go-hooks-claude"
+      "_apm_source": "y-miyazaki/config/.apm/packages/go-hooks-claude"
     },
     {
-      "matcher": "",
+      "matcher": "*",
       "hooks": [
         {
           "type": "command",
@@ -86,21 +86,10 @@
           "timeout": 120
         }
       ],
-      "_apm_source": "shell-script-hooks-claude"
+      "_apm_source": "y-miyazaki/config/.apm/packages/shell-script-hooks-claude"
     }
   ],
   "PostToolUse": [
-    {
-      "matcher": "",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "command -v lean-ctx >/dev/null 2>&1 || exit 0; lean-ctx hook observe",
-          "timeout": 5
-        }
-      ],
-      "_apm_source": "common-hooks-claude"
-    },
     {
       "matcher": "Write",
       "hooks": [
@@ -110,31 +99,7 @@
           "timeout": 120
         }
       ],
-      "_apm_source": "shell-script-hooks-claude"
-    }
-  ],
-  "PreToolUse": [
-    {
-      "matcher": "Bash|Write",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "command -v lean-ctx >/dev/null 2>&1 || exit 0; lean-ctx hook rewrite",
-          "timeout": 15
-        }
-      ],
-      "_apm_source": "common-hooks-claude"
-    },
-    {
-      "matcher": "",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "command -v lean-ctx >/dev/null 2>&1 || exit 0; lean-ctx hook redirect",
-          "timeout": 5
-        }
-      ],
-      "_apm_source": "common-hooks-claude"
+      "_apm_source": "y-miyazaki/config/.apm/packages/shell-script-hooks-claude"
     }
   ]
 }
