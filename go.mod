@@ -30,7 +30,7 @@ require (
 	go.uber.org/zap v1.28.0
 	golang.org/x/exp v0.0.0-20260727155853-b88d891fe743
 	gorm.io/driver/mysql v1.6.0
-	gorm.io/driver/postgres v1.6.1
+	gorm.io/driver/postgres v1.6.2
 	gorm.io/driver/sqlserver v1.6.3
 	gorm.io/gorm v1.31.2
 	gorm.io/plugin/soft_delete v1.2.1
