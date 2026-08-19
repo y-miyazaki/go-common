@@ -1,47 +1,5 @@
 # Go Validation - Troubleshooting Guide
 
-## Contents
-
-- [Go Validation - Troubleshooting Guide](#go-validation---troubleshooting-guide)
-  - [Contents](#contents)
-  - [Overview](#overview)
-  - [go mod tidy Failures](#go-mod-tidy-failures)
-    - [Issue: Incompatible dependency versions](#issue-incompatible-dependency-versions)
-    - [Issue: Corrupted go.sum](#issue-corrupted-gosum)
-    - [Issue: Replace directives not working](#issue-replace-directives-not-working)
-  - [gofumpt Failures](#gofumpt-failures)
-    - [Issue: Parse errors](#issue-parse-errors)
-    - [Issue: File permissions](#issue-file-permissions)
-  - [go vet Failures](#go-vet-failures)
-    - [Issue: Printf format mismatches](#issue-printf-format-mismatches)
-    - [Issue: Shadowed variables](#issue-shadowed-variables)
-    - [Issue: Unreachable code](#issue-unreachable-code)
-  - [golangci-lint Failures](#golangci-lint-failures)
-    - [Issue: Unused variables](#issue-unused-variables)
-    - [Issue: Error not checked](#issue-error-not-checked)
-    - [Issue: Inefficient string concatenation](#issue-inefficient-string-concatenation)
-    - [Issue: Cognitive complexity too high](#issue-cognitive-complexity-too-high)
-    - [Issue: Magic numbers](#issue-magic-numbers)
-  - [Test Failures](#test-failures)
-    - [Issue: Test logic errors](#issue-test-logic-errors)
-    - [Issue: Table-driven test failures](#issue-table-driven-test-failures)
-    - [Issue: Test timeout](#issue-test-timeout)
-  - [Race Condition Failures](#race-condition-failures)
-    - [Issue: Data race detected](#issue-data-race-detected)
-    - [Issue: Concurrent map access](#issue-concurrent-map-access)
-  - [Coverage Failures](#coverage-failures)
-    - [Issue: Coverage below 80%](#issue-coverage-below-80)
-    - [Issue: Unable to measure coverage](#issue-unable-to-measure-coverage)
-  - [govulncheck Failures](#govulncheck-failures)
-    - [Issue: Known vulnerability found](#issue-known-vulnerability-found)
-    - [Issue: Indirect dependency vulnerability](#issue-indirect-dependency-vulnerability)
-    - [Issue: No patch available](#issue-no-patch-available)
-  - [Validation Shell Script Issues](#validation-shell-script-issues)
-    - [Issue: Shell Script not found](#issue-shell-script-not-found)
-    - [Issue: Permission denied](#issue-permission-denied)
-    - [Issue: Command not found in shell script](#issue-command-not-found-in-shell-script)
-  - [Summary](#summary)
-
 ## Overview
 
 This guide provides detailed troubleshooting steps for validation failures. Always start with the validation script, then refer to this guide for specific error types.

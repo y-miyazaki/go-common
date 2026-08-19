@@ -1,6 +1,6 @@
 # Testing (TEST)
 
-*_TEST-00 (MUST): Add/update *\_test.go in the same change as behavior*_
+*_TEST-00 (MUST): Add or update *\_test.go in the same change as behavior*_
 
 Check: When adding or materially changing exported behavior, are corresponding `*_test.go` files added or updated in the same change?
 Why: Untested behavior changes are hard to review and regress silently (see [Google eng-practices: Keep related test code in the same CL](https://google.github.io/eng-practices/review/developer/small-cls.html#test_code) and [go.dev: Add a test](https://go.dev/doc/tutorial/add-a-test))
@@ -12,17 +12,17 @@ Check: Are []struct format table-driven tests, subtests, and edge cases covered?
 Why: Duplicate test cases and Go idiom violations cause test omissions, increased maintenance cost
 Fix: []struct format table-driven, use subtests, cover edge cases
 
-**TEST-02 (SHOULD): Use assert vs require correctly; inject time/rand**
+**TEST-02 (SHOULD): Design testable APIs; inject time and rand**
 
-Check: Are assert for non-fatal and require for fatal checks used, testable API designed, and time/rand injected?
-Why: Excessive testify dependency, untestable APIs, and direct time/randomness usage increase external dependencies, unstable tests
-Fix: Decide testify dependency project policy, consider testability, inject time.Now/rand interfaces
+Check: Is the API designed for testability, and are time/rand injected rather than called directly?
+Why: Direct time/randomness usage and hard-to-substitute dependencies cause flaky tests and block isolated unit verification
+Fix: Inject clock/rand through interfaces or function fields; design APIs so tests can substitute dependencies without live I/O
 
-**TEST-03 (SHOULD): Mock external deps through consumer interfaces**
+**TEST-03 (SHOULD): Stub external deps through consumer interfaces**
 
-Check: Are gomock/testify mock used, interfaces segregated, and dependency injection present?
-Why: Real calls to external dependencies cause unstable tests, long execution time, production impact
-Fix: Use gomock/testify mock, segregate interfaces, dependency injection
+Check: Are external dependencies stubbed or mocked through small consumer-side interfaces with dependency injection?
+Why: Real network/SDK calls make tests slow, flaky, and risky in CI
+Fix: Define small consumer-side interfaces; substitute hand-written stubs/fakes by default, or generated gomock mocks when call-contract testing is required
 
 **TEST-04 (SHOULD): Share helpers/fixtures outside production packages**
 
@@ -41,3 +41,9 @@ Fix: Separate build tags, // +build integration, configure parallel execution
 Check: Do test helper functions call t.Helper() as their first statement?
 Why: Without t.Helper(), test failure line numbers point to the helper function body rather than the test call site, making failures harder to trace and diagnose
 Fix: Add t.Helper() as the first line of every test helper function that calls t.Fatal/t.Error/t.Log
+
+**TEST-07 (SHOULD): Keep one assertion stack per package; match sibling tests**
+
+Check: Does the package use one assertion stack (default stdlib plus go-cmp, or testify at package scope) and match sibling *_test.go layout?
+Why: Mixed assertion or mock styles in the same package increase review cost and produce inconsistent failure output
+Fix: Default to stdlib `t.Fatalf`/`t.Errorf` plus go-cmp for complex compares; adopt testify `require` or mockery/gomock only at package scope and match existing suite style

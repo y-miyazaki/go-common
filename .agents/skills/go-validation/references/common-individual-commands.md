@@ -1,28 +1,5 @@
 # Go Validation - Individual Commands Reference
 
-## Contents
-
-- [Go Validation - Individual Commands Reference](#go-validation---individual-commands-reference)
-  - [Contents](#contents)
-- [For Debugging Only](#for-debugging-only)
-- [Commands Overview](#commands-overview)
-- [1. go mod tidy](#1-go-mod-tidy)
-- [2. gofumpt](#2-gofumpt)
-- [3. go vet](#3-go-vet)
-- [4. golangci-lint](#4-golangci-lint)
-- [5. go test](#5-go-test)
-- [6. govulncheck](#6-govulncheck)
-- [Coverage Analysis Commands](#coverage-analysis-commands)
-  - [Generating Coverage Reports](#generating-coverage-reports)
-  - [Coverage Modes](#coverage-modes)
-  - [Interpreting Coverage Reports](#interpreting-coverage-reports)
-- [Additional Tools](#additional-tools)
-  - [staticcheck](#staticcheck)
-  - [gosec](#gosec)
-  - [go-critic](#go-critic)
-- [Profiling Commands](#profiling-commands)
-- [Summary](#summary)
-
 ## For Debugging Only
 
 This document contains detailed information about individual validation commands.

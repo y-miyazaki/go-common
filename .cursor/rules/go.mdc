@@ -9,6 +9,7 @@ globs: "**/*.go"
 
 - Scope covers implementing, testing, and validating Go source code.
 - When adding or changing behavior, add or update `*_test.go` in the same change (TEST-00).
+- Test authoring conventions live in companion Go Test rules (stem `go-test`); companion `globs` is `**/*.go` so pairing applies when editing source files (G-05).
 - Handle every returned `error` explicitly; blank-identifier discard needs a justifying comment (ERR-06).
 - Wrap errors with `fmt.Errorf("…: %w", err)` to preserve the causal chain (ERR-01).
 - Exported functions that perform I/O or may block take `context.Context` as the first parameter (CTX-01).
@@ -90,11 +91,12 @@ globs: "**/*.go"
 
 ### Testing (TEST)
 - TEST-01 (SHOULD): Prefer table-driven tests with subtests and edges
-- TEST-02 (SHOULD): Use assert vs require correctly; inject time/rand
-- TEST-03 (SHOULD): Mock external deps through consumer interfaces
+- TEST-02 (SHOULD): Design testable APIs; inject time and rand
+- TEST-03 (SHOULD): Stub external deps through consumer interfaces
 - TEST-04 (SHOULD): Share helpers/fixtures outside production packages
 - TEST-05 (SHOULD): Isolate integration tests with build tags
 - TEST-06 (SHOULD): Call t.Helper() first in test helpers
+- TEST-07 (SHOULD): Keep one assertion stack per package; match sibling tests
 
 ### Code Modification Guidelines
 

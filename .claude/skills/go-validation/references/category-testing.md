@@ -1,42 +1,10 @@
 # Go Validation - Testing Best Practices
 
-## Contents
-
-- [Go Validation - Testing Best Practices](#go-validation---testing-best-practices)
-  - [Contents](#contents)
-  - [Overview](#overview)
-  - [Test Structure](#test-structure)
-    - [Basic Test Structure](#basic-test-structure)
-  - [Table-Driven Tests](#table-driven-tests)
-    - [Basic Table-Driven Pattern](#basic-table-driven-pattern)
-    - [Advanced Table-Driven Pattern with Error Cases](#advanced-table-driven-pattern-with-error-cases)
-  - [Test Helpers](#test-helpers)
-    - [Using t.Helper()](#using-thelper)
-    - [Setup and Cleanup](#setup-and-cleanup)
-  - [Mocking and Test Doubles](#mocking-and-test-doubles)
-    - [Interface-Based Mocking](#interface-based-mocking)
-    - [testify/mock Package](#testifymock-package)
-  - [Coverage Strategies](#coverage-strategies)
-    - [Improving Coverage](#improving-coverage)
-    - [Coverage Analysis](#coverage-analysis)
-  - [Testing Concurrent Code](#testing-concurrent-code)
-    - [Testing with Race Detector](#testing-with-race-detector)
-    - [Testing Channels](#testing-channels)
-    - [Testing Timeouts](#testing-timeouts)
-  - [Benchmarking](#benchmarking)
-    - [Basic Benchmarks](#basic-benchmarks)
-    - [Table-Driven Benchmarks](#table-driven-benchmarks)
-  - [Test Organization](#test-organization)
-    - [File Naming](#file-naming)
-    - [Test Package Naming](#test-package-naming)
-  - [Common Patterns](#common-patterns)
-    - [Golden Files](#golden-files)
-    - [Testing HTTP Handlers](#testing-http-handlers)
-  - [Summary](#summary)
-
 ## Overview
 
 This guide provides patterns and best practices for writing effective Go tests that meet validation requirements.
+
+> **Scope:** Default examples use stdlib `testing` (and `go-cmp` where noted). When companion Go Test rules (stem `go-test`) are installed, follow that companion for test authoring. Optional testify sections below apply only when the package already adopted testify.
 
 ## Test Structure
 
@@ -45,37 +13,27 @@ This guide provides patterns and best practices for writing effective Go tests t
 ```go
 package mypackage_test
 
-import (
-    "testing"
-    "github.com/stretchr/testify/assert"
-    "github.com/stretchr/testify/require"
-)
+import "testing"
 
-// Setup and teardown
 func setup(t *testing.T) *TestContext {
     t.Helper()
-    // Setup code
     ctx := &TestContext{}
 
     t.Cleanup(func() {
-        // Cleanup code
         ctx.Close()
     })
 
     return ctx
 }
 
-// Test functions follow AAA pattern: Arrange-Act-Assert
 func TestMyFunction(t *testing.T) {
-    // Arrange - Set up test data and dependencies
     input := "test input"
-    expected := "expected output"
+    want := "expected output"
 
-    // Act - Execute the function being tested
-    result := MyFunction(input)
-
-    // Assert - Verify the results
-    assert.Equal(t, expected, result)
+    got := MyFunction(input)
+    if got != want {
+        t.Fatalf("MyFunction(%q) = %q, want %q", input, got, want)
+    }
 }
 ```
 
@@ -86,20 +44,22 @@ func TestMyFunction(t *testing.T) {
 ```go
 func TestAdd(t *testing.T) {
     tests := []struct {
-        name     string
-        a, b     int
-        expected int
+        name string
+        a, b int
+        want int
     }{
-        {"positive numbers", 2, 3, 5},
-        {"negative numbers", -1, -2, -3},
-        {"zero", 0, 0, 0},
-        {"mixed", -5, 10, 5},
+        {name: "positive numbers", a: 2, b: 3, want: 5},
+        {name: "negative numbers", a: -1, b: -2, want: -3},
+        {name: "zero", a: 0, b: 0, want: 0},
+        {name: "mixed", a: -5, b: 10, want: 5},
     }
 
     for _, tt := range tests {
         t.Run(tt.name, func(t *testing.T) {
-            result := Add(tt.a, tt.b)
-            assert.Equal(t, tt.expected, result)
+            got := Add(tt.a, tt.b)
+            if got != tt.want {
+                t.Fatalf("Add(%d, %d) = %d, want %d", tt.a, tt.b, got, tt.want)
+            }
         })
     }
 }
@@ -108,41 +68,36 @@ func TestAdd(t *testing.T) {
 ### Advanced Table-Driven Pattern with Error Cases
 
 ```go
+var (
+    errTestInvalidFormat = errors.New("invalid email format")
+    errTestEmptyEmail    = errors.New("email cannot be empty")
+)
+
 func TestValidateEmail(t *testing.T) {
     tests := []struct {
-        name      string
-        email     string
-        wantErr   bool
-        errString string
+        name    string
+        email   string
+        wantErr error
     }{
-        {
-            name:    "valid email",
-            email:   "user@example.com",
-            wantErr: false,
-        },
-        {
-            name:      "missing @",
-            email:     "userexample.com",
-            wantErr:   true,
-            errString: "invalid email format",
-        },
-        {
-            name:      "empty email",
-            email:     "",
-            wantErr:   true,
-            errString: "email cannot be empty",
-        },
+        {name: "valid email", email: "user@example.com"},
+        {name: "missing @", email: "userexample.com", wantErr: errTestInvalidFormat},
+        {name: "empty email", email: "", wantErr: errTestEmptyEmail},
     }
 
     for _, tt := range tests {
         t.Run(tt.name, func(t *testing.T) {
             err := ValidateEmail(tt.email)
-
-            if tt.wantErr {
-                require.Error(t, err)
-                assert.Contains(t, err.Error(), tt.errString)
-            } else {
-                require.NoError(t, err)
+            if tt.wantErr != nil {
+                if err == nil {
+                    t.Fatalf("ValidateEmail(%q) error = nil, want %v", tt.email, tt.wantErr)
+                }
+                if !errors.Is(err, tt.wantErr) {
+                    t.Fatalf("ValidateEmail(%q) error = %v, want %v", tt.email, err, tt.wantErr)
+                }
+                return
+            }
+            if err != nil {
+                t.Fatalf("ValidateEmail(%q) unexpected error: %v", tt.email, err)
             }
         })
     }
@@ -154,16 +109,19 @@ func TestValidateEmail(t *testing.T) {
 ### Using t.Helper()
 
 ```go
-// Helper function for common assertions
 func assertUserValid(t *testing.T, user *User) {
-    t.Helper() // Mark as helper for better error messages
-
-    require.NotNil(t, user)
-    assert.NotEmpty(t, user.ID)
-    assert.NotEmpty(t, user.Name)
+    t.Helper()
+    if user == nil {
+        t.Fatal("user is nil")
+    }
+    if user.ID == "" {
+        t.Fatal("user.ID is empty")
+    }
+    if user.Name == "" {
+        t.Fatal("user.Name is empty")
+    }
 }
 
-// Helper for test setup
 func createTestUser(t *testing.T, name string) *User {
     t.Helper()
 
@@ -184,24 +142,22 @@ func createTestUser(t *testing.T, name string) *User {
 
 ```go
 func TestDatabaseOperations(t *testing.T) {
-    // Setup
     db := setupTestDB(t)
 
-    // Test code
     user := &User{Name: "Test"}
-    err := db.SaveUser(user)
-    require.NoError(t, err)
-
-    // Cleanup happens automatically via t.Cleanup
+    if err := db.SaveUser(user); err != nil {
+        t.Fatalf("SaveUser() error = %v", err)
+    }
 }
 
 func setupTestDB(t *testing.T) *Database {
     t.Helper()
 
     db, err := OpenDatabase(":memory:")
-    require.NoError(t, err)
+    if err != nil {
+        t.Fatalf("OpenDatabase() error = %v", err)
+    }
 
-    // Register cleanup
     t.Cleanup(func() {
         _ = db.Close()
     })
@@ -212,44 +168,34 @@ func setupTestDB(t *testing.T) *Database {
 
 ## Mocking and Test Doubles
 
-### Interface-Based Mocking
+### Interface-Based Stubbing
 
 ```go
-// Production interface
 type DataStore interface {
     Get(key string) (string, error)
     Set(key, value string) error
 }
 
-// Mock implementation for testing
-type MockDataStore struct {
-    GetFunc func(key string) (string, error)
-    SetFunc func(key, value string) error
-
+type stubDataStore struct {
+    getFunc func(key string) (string, error)
     getCalls []string
-    setCalls [][2]string
 }
 
-func (m *MockDataStore) Get(key string) (string, error) {
-    m.getCalls = append(m.getCalls, key)
-    if m.GetFunc != nil {
-        return m.GetFunc(key)
+func (s *stubDataStore) Get(key string) (string, error) {
+    s.getCalls = append(s.getCalls, key)
+    if s.getFunc != nil {
+        return s.getFunc(key)
     }
     return "", nil
 }
 
-func (m *MockDataStore) Set(key, value string) error {
-    m.setCalls = append(m.setCalls, [2]string{key, value})
-    if m.SetFunc != nil {
-        return m.SetFunc(key, value)
-    }
+func (s *stubDataStore) Set(key, value string) error {
     return nil
 }
 
-// Usage in test
 func TestMyService(t *testing.T) {
-    mock := &MockDataStore{
-        GetFunc: func(key string) (string, error) {
+    store := &stubDataStore{
+        getFunc: func(key string) (string, error) {
             if key == "test" {
                 return "value", nil
             }
@@ -257,16 +203,24 @@ func TestMyService(t *testing.T) {
         },
     }
 
-    service := NewService(mock)
-    result, err := service.Process("test")
-
-    require.NoError(t, err)
-    assert.Equal(t, "processed value", result)
-    assert.Len(t, mock.getCalls, 1)
+    service := NewService(store)
+    got, err := service.Process("test")
+    if err != nil {
+        t.Fatalf("Process(%q) error = %v", "test", err)
+    }
+    want := "processed value"
+    if got != want {
+        t.Fatalf("Process(%q) = %q, want %q", "test", got, want)
+    }
+    if len(store.getCalls) != 1 {
+        t.Fatalf("Get calls = %d, want 1", len(store.getCalls))
+    }
 }
 ```
 
-### testify/mock Package
+### Optional: testify/mock (package-adopted testify only)
+
+Use only when the package already uses testify. Do not mix with the default stdlib plus go-cmp stack.
 
 ```go
 import (
@@ -337,36 +291,38 @@ func TestErrorHandling(t *testing.T) {
         name      string
         input     string
         wantErr   bool
-        setupMock func(*MockDataStore)
+        setupStub func(*stubDataStore)
     }{
         {
             name:    "success",
             input:   "valid",
             wantErr: false,
-            setupMock: func(m *MockDataStore) {
-                m.On("Get", mock.Anything).Return("value", nil)
+            setupStub: func(s *stubDataStore) {
+                s.getFunc = func(string) (string, error) { return "value", nil }
             },
         },
         {
             name:    "database error",
             input:   "test",
             wantErr: true,
-            setupMock: func(m *MockDataStore) {
-                m.On("Get", mock.Anything).Return("", errors.New("db error"))
+            setupStub: func(s *stubDataStore) {
+                s.getFunc = func(string) (string, error) { return "", errors.New("db error") }
             },
         },
     }
 
     for _, tt := range tests {
         t.Run(tt.name, func(t *testing.T) {
-            mock := new(MockDataStore)
-            tt.setupMock(mock)
+            store := &stubDataStore{}
+            tt.setupStub(store)
 
-            _, err := Process(mock, tt.input)
+            _, err := Process(store, tt.input)
             if tt.wantErr {
-                assert.Error(t, err)
-            } else {
-                assert.NoError(t, err)
+                if err == nil {
+                    t.Fatalf("Process(%q) error = nil, want error", tt.input)
+                }
+            } else if err != nil {
+                t.Fatalf("Process(%q) unexpected error: %v", tt.input, err)
             }
         })
     }
@@ -391,8 +347,10 @@ func TestEdgeCases(t *testing.T) {
 
     for _, tt := range tests {
         t.Run(tt.name, func(t *testing.T) {
-            result := FindMax(tt.input)
-            assert.Equal(t, tt.want, result)
+            got := FindMax(tt.input)
+            if got != tt.want {
+                t.Fatalf("FindMax(%v) = %d, want %d", tt.input, got, tt.want)
+            }
         })
     }
 }
@@ -439,8 +397,10 @@ func TestConcurrentAccess(t *testing.T) {
 
     wg.Wait()
 
-    expected := numGoroutines * numIncrements
-    assert.Equal(t, expected, counter.Value())
+    want := numGoroutines * numIncrements
+    if got := counter.Value(); got != want {
+        t.Fatalf("counter.Value() = %d, want %d", got, want)
+    }
 }
 
 // Run with: go test -race
@@ -467,7 +427,9 @@ func TestChannelCommunication(t *testing.T) {
     }
 
     <-done
-    assert.Len(t, received, 10)
+    if len(received) != 10 {
+        t.Fatalf("received len = %d, want 10", len(received))
+    }
 }
 ```
 
@@ -486,7 +448,9 @@ func TestWithTimeout(t *testing.T) {
 
     select {
     case res := <-result:
-        assert.Equal(t, "success", res)
+        if res != "success" {
+            t.Fatalf("result = %q, want %q", res, "success")
+        }
     case <-ctx.Done():
         t.Fatal("test timed out")
     }
@@ -584,15 +548,21 @@ func TestOutputFormat(t *testing.T) {
     goldenFile := "testdata/report.golden"
 
     if *update {
-        // Update golden file
-        err := os.WriteFile(goldenFile, []byte(result), 0644)
-        require.NoError(t, err)
+        if err := os.WriteFile(goldenFile, []byte(result), 0644); err != nil {
+            t.Fatalf("WriteFile() error = %v", err)
+        }
     }
 
     expected, err := os.ReadFile(goldenFile)
-    require.NoError(t, err)
+    if err != nil {
+        t.Fatalf("ReadFile() error = %v", err)
+    }
 
-    assert.Equal(t, string(expected), result)
+    if string(expected) != result {
+        t.Fatalf("result mismatch:
+want %q
+got  %q", string(expected), result)
+    }
 }
 
 var update = flag.Bool("update", false, "update golden files")
@@ -608,12 +578,17 @@ func TestHTTPHandler(t *testing.T) {
     handler := NewUserHandler(mockStore)
     handler.ServeHTTP(rec, req)
 
-    assert.Equal(t, http.StatusOK, rec.Code)
+    if rec.Code != http.StatusOK {
+        t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+    }
 
     var users []User
-    err := json.Unmarshal(rec.Body.Bytes(), &users)
-    require.NoError(t, err)
-    assert.NotEmpty(t, users)
+    if err := json.Unmarshal(rec.Body.Bytes(), &users); err != nil {
+        t.Fatalf("Unmarshal() error = %v", err)
+    }
+    if len(users) == 0 {
+        t.Fatal("users is empty")
+    }
 }
 ```
 
@@ -621,12 +596,12 @@ func TestHTTPHandler(t *testing.T) {
 
 Effective Go testing requires:
 
-- Clear test structure (AAA pattern)
+- Clear test structure with explicit `got` / `want` messages
 - Table-driven tests for multiple scenarios
 - Proper use of helpers and cleanup
-- Strategic mocking for dependencies
+- Hand-written stubs/fakes (or package-adopted mocks) for dependencies
 - Comprehensive coverage of edge cases and error paths
 - Race detection for concurrent code
 - Benchmarking for performance-critical code
 
-Follow these patterns to achieve and maintain ≥ 80% test coverage.
+Follow these patterns to achieve and maintain ≥ 80% test coverage. When companion Go Test rules (stem `go-test`) are present, prefer that companion for authoring conventions.

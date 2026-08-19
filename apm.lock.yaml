@@ -1,12 +1,12 @@
 lockfile_version: '1'
-generated_at: '2026-08-18T04:58:20.126495+00:00'
+generated_at: '2026-08-19T06:21:45.532678+00:00'
 apm_version: 0.27.0
 dependencies:
 - repo_url: y-miyazaki/config
   name: config-aws
   host: github.com
-  resolved_commit: 8d505770ce51faa61b0181756dafe6a630f4cc6f
-  resolved_ref: v1.8.92
+  resolved_commit: 346ffb484d5d8430d864b4d7e9218367f53404a4
+  resolved_ref: v1.8.93
   version: 1.0.0
   virtual_path: .apm/packages/aws
   is_virtual: true
@@ -16,8 +16,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-common
   host: github.com
-  resolved_commit: 8d505770ce51faa61b0181756dafe6a630f4cc6f
-  resolved_ref: v1.8.92
+  resolved_commit: 346ffb484d5d8430d864b4d7e9218367f53404a4
+  resolved_ref: v1.8.93
   version: 1.0.0
   virtual_path: .apm/packages/common
   is_virtual: true
@@ -344,13 +344,13 @@ dependencies:
     .cursor/rules/agent-skills.mdc: sha256:af694ab2fd1a6c4d2acd3aad0882274a39ebad79adb95c8d2bebb44eadb33dfe
     .cursor/rules/instructions.mdc: sha256:40f550a18738b519bc3453d5bdefe21054701f7f54c5a15b6f3496c9e92ae40a
     .cursor/rules/markdown.mdc: sha256:ddf4799d3864c8d6ca48e8d60031b27f804cdbd09bd85c44db9a0b80bd3c9b2d
-  content_hash: sha256:6d7e2c432f0ebc49f3cf0041c15fa7fd05521c2d745409f16a8c55d1ad8bb94b
+  content_hash: sha256:762bc6a19ab4659ff2a2dca2b37ea28df31c0604362f3eed619a1075f3b7ce65
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: common-hooks-claude
   host: github.com
-  resolved_commit: 8d505770ce51faa61b0181756dafe6a630f4cc6f
-  resolved_ref: v1.8.92
+  resolved_commit: 346ffb484d5d8430d864b4d7e9218367f53404a4
+  resolved_ref: v1.8.93
   version: 2.0.0
   virtual_path: .apm/packages/common-hooks-claude
   is_virtual: true
@@ -374,8 +374,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: common-hooks-cursor
   host: github.com
-  resolved_commit: 8d505770ce51faa61b0181756dafe6a630f4cc6f
-  resolved_ref: v1.8.92
+  resolved_commit: 346ffb484d5d8430d864b4d7e9218367f53404a4
+  resolved_ref: v1.8.93
   version: 2.0.0
   virtual_path: .apm/packages/common-hooks-cursor
   is_virtual: true
@@ -399,8 +399,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-github
   host: github.com
-  resolved_commit: 8d505770ce51faa61b0181756dafe6a630f4cc6f
-  resolved_ref: v1.8.92
+  resolved_commit: 346ffb484d5d8430d864b4d7e9218367f53404a4
+  resolved_ref: v1.8.93
   version: 1.0.0
   virtual_path: .apm/packages/github
   is_virtual: true
@@ -824,8 +824,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-github-actions
   host: github.com
-  resolved_commit: 8d505770ce51faa61b0181756dafe6a630f4cc6f
-  resolved_ref: v1.8.92
+  resolved_commit: 346ffb484d5d8430d864b4d7e9218367f53404a4
+  resolved_ref: v1.8.93
   version: 1.0.0
   virtual_path: .apm/packages/github-actions
   is_virtual: true
@@ -1001,8 +1001,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-go
   host: github.com
-  resolved_commit: 8d505770ce51faa61b0181756dafe6a630f4cc6f
-  resolved_ref: v1.8.92
+  resolved_commit: 346ffb484d5d8430d864b4d7e9218367f53404a4
+  resolved_ref: v1.8.93
   version: 1.0.0
   virtual_path: .apm/packages/go
   is_virtual: true
@@ -1054,6 +1054,7 @@ dependencies:
   - .agents/skills/go-validation/scripts/lib/validation.sh
   - .agents/skills/go-validation/scripts/lib/yaml_map_order.py
   - .agents/skills/go-validation/scripts/validate.sh
+  - .claude/rules/go-test.md
   - .claude/rules/go.md
   - .claude/skills/go-review
   - .claude/skills/go-review/SKILL.md
@@ -1101,6 +1102,7 @@ dependencies:
   - .claude/skills/go-validation/scripts/lib/validation.sh
   - .claude/skills/go-validation/scripts/lib/yaml_map_order.py
   - .claude/skills/go-validation/scripts/validate.sh
+  - .cursor/rules/go-test.mdc
   - .cursor/rules/go.mdc
   deployed_file_hashes:
     .agents/skills/go-review/SKILL.md: sha256:6f144d386f08501fdd11fd33ba0d9422de5bea4334c5334b876998f2f62bc49d
@@ -1120,8 +1122,8 @@ dependencies:
     .agents/skills/go-review/references/category-function-design.md: sha256:ba12e280300faa2110d830d41947ad3dec79cd9691e491385db58262c69a705a
     .agents/skills/go-review/references/category-global.md: sha256:bc0a33036f4b72afb9adc943b7585afebaf52f1a01df211bc57171f853932394
     .agents/skills/go-review/references/category-security.md: sha256:0ae3a9b491fd2bc4a589d2095c408c5d1c9684dbdc0b2cc0de502b19e7536dbd
-    .agents/skills/go-review/references/category-testing.md: sha256:a737f7c1b531d8fce68c4794fe503bf21cd8bfaf6f8fa26b8742251eda16ccba
-    .agents/skills/go-review/references/common-checklist.md: sha256:02d2459b6e634715566acdc93a6c8a97fcab427e7b231a84416a45d0d8ba0886
+    .agents/skills/go-review/references/category-testing.md: sha256:fed2775406eb1f2b4645b502d2b490292246319a83fd4e2452e3195452f9042b
+    .agents/skills/go-review/references/common-checklist.md: sha256:688d8ece5524bd613ef80d071580dfcff21f58aa40bbef7c46c1ae4fa03da36f
     .agents/skills/go-review/references/common-output-format.md: sha256:fcbaadf9e13b5cd6a9b8e891b6168406c4de17237d4038d39ebeeb4811be8987
     .agents/skills/go-review/references/common-troubleshooting.md: sha256:571bd26950e22249175ca592b926cd6cab9ca41d90da439af2dfb12bdea245bd
     .agents/skills/go-validation/SKILL.md: sha256:cf2c4f061629c8a2f558619f9baad2571489df27bec0c4a76d38a39d2c21f3e1
@@ -1131,12 +1133,12 @@ dependencies:
     .agents/skills/go-validation/evals/tasks/go-validation-partial-failure.yaml: sha256:0a35d53730d2d679f49a8ee7ec252a16a6de09540f8d1abc622d412a7b8895ce
     .agents/skills/go-validation/evals/tasks/go-validation-structured-output.yaml: sha256:9030e5778ab9c5a5d46b4207f32f352e1ab8b479221770b5ac1c73500e195143
     .agents/skills/go-validation/evals/tasks/go-validation-trigger-negative.yaml: sha256:d192593624493f0175cb834f0ce5ebb8646ce959829877c1ce39a9c143b9c606
-    .agents/skills/go-validation/references/category-security.md: sha256:4d76da9b8e31b6da0be6adcc235d77e83d636cfca4e6bd024c71e29df4080ff5
-    .agents/skills/go-validation/references/category-testing.md: sha256:b3149a6950c2e5e664219225499e0449d65b8790e1e14abd6f65b2bb3551991e
+    .agents/skills/go-validation/references/category-security.md: sha256:d5964f473bbf8b8b6216efa84a5c275e1cb3cb67ec31f2db532ed3133a866ba5
+    .agents/skills/go-validation/references/category-testing.md: sha256:942191a01a3413479a1296e9b646470618b0cd60b1516064510d3daac57e818e
     .agents/skills/go-validation/references/common-checklist.md: sha256:4e566ee3e6625a645384c6f4151dc1329c2f1065bc0e4ca1c3b0ba1ebc4a972f
-    .agents/skills/go-validation/references/common-individual-commands.md: sha256:4e3b01a3b951575da0ceb0dd12c6da92d3057356f0ca71e51149f8b0049a4d49
+    .agents/skills/go-validation/references/common-individual-commands.md: sha256:621ca56e3814a961136669dbb6d1b4e1c5bd90f989b6450b31de2197623f510a
     .agents/skills/go-validation/references/common-output-format.md: sha256:e21f30fe399e9851ec5b7e0a249722685f041bb647cd1255aa40b3f215062408
-    .agents/skills/go-validation/references/common-troubleshooting.md: sha256:8d3573ff634efecf7d785a2c253bc2b9494e5bf3a2432f915f01a2a64406de5e
+    .agents/skills/go-validation/references/common-troubleshooting.md: sha256:9319aa31ce634f58e366272e48b9fbbf09dce1a6f22608e8b940b48517a3f5ba
     .agents/skills/go-validation/scripts/lib/all.sh: sha256:dc9b27d00ff0b37be6f5c986a59a8107f59a83bede4de5818e453a38ae51f216
     .agents/skills/go-validation/scripts/lib/aws.sh: sha256:8040932c1176ff8f6f011586844cee9a07fa725b90de6c5b007d5cecf7f2d67a
     .agents/skills/go-validation/scripts/lib/common.sh: sha256:26dded5e470bfa13c48f3816b58def268413042de385a468ee851f6f578bceda
@@ -1147,7 +1149,8 @@ dependencies:
     .agents/skills/go-validation/scripts/lib/validation.sh: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
     .agents/skills/go-validation/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
     .agents/skills/go-validation/scripts/validate.sh: sha256:b382522c2854a0aa39caf7924e6b760911c8f9042a2cd6fbc9256bc44354af1f
-    .claude/rules/go.md: sha256:ae2afceb7447735ab0618374d35a463bb6912a7de0f7068209c3cf3341710bf9
+    .claude/rules/go-test.md: sha256:7caa7eac99b6adc6630129a2dba714603407f32e4d163dc84573bbe9ff2d3d07
+    .claude/rules/go.md: sha256:3543afc1d53316f83747d4bedb194949fa921b59a71b21ddc29c77e7c8ce5580
     .claude/skills/go-review/SKILL.md: sha256:6f144d386f08501fdd11fd33ba0d9422de5bea4334c5334b876998f2f62bc49d
     .claude/skills/go-review/eval.yaml: sha256:c8e9abf238dd1a8628bc5610e25e62c36e547722cdf97f91c71781fb23cd2e4f
     .claude/skills/go-review/evals/tasks/go-review-basic.yaml: sha256:05308719ab7f564bcbd9f8dc66903e6da21dc703fa3094bc9ee71a555c59cf71
@@ -1165,8 +1168,8 @@ dependencies:
     .claude/skills/go-review/references/category-function-design.md: sha256:ba12e280300faa2110d830d41947ad3dec79cd9691e491385db58262c69a705a
     .claude/skills/go-review/references/category-global.md: sha256:bc0a33036f4b72afb9adc943b7585afebaf52f1a01df211bc57171f853932394
     .claude/skills/go-review/references/category-security.md: sha256:0ae3a9b491fd2bc4a589d2095c408c5d1c9684dbdc0b2cc0de502b19e7536dbd
-    .claude/skills/go-review/references/category-testing.md: sha256:a737f7c1b531d8fce68c4794fe503bf21cd8bfaf6f8fa26b8742251eda16ccba
-    .claude/skills/go-review/references/common-checklist.md: sha256:02d2459b6e634715566acdc93a6c8a97fcab427e7b231a84416a45d0d8ba0886
+    .claude/skills/go-review/references/category-testing.md: sha256:fed2775406eb1f2b4645b502d2b490292246319a83fd4e2452e3195452f9042b
+    .claude/skills/go-review/references/common-checklist.md: sha256:688d8ece5524bd613ef80d071580dfcff21f58aa40bbef7c46c1ae4fa03da36f
     .claude/skills/go-review/references/common-output-format.md: sha256:fcbaadf9e13b5cd6a9b8e891b6168406c4de17237d4038d39ebeeb4811be8987
     .claude/skills/go-review/references/common-troubleshooting.md: sha256:571bd26950e22249175ca592b926cd6cab9ca41d90da439af2dfb12bdea245bd
     .claude/skills/go-validation/SKILL.md: sha256:cf2c4f061629c8a2f558619f9baad2571489df27bec0c4a76d38a39d2c21f3e1
@@ -1176,12 +1179,12 @@ dependencies:
     .claude/skills/go-validation/evals/tasks/go-validation-partial-failure.yaml: sha256:0a35d53730d2d679f49a8ee7ec252a16a6de09540f8d1abc622d412a7b8895ce
     .claude/skills/go-validation/evals/tasks/go-validation-structured-output.yaml: sha256:9030e5778ab9c5a5d46b4207f32f352e1ab8b479221770b5ac1c73500e195143
     .claude/skills/go-validation/evals/tasks/go-validation-trigger-negative.yaml: sha256:d192593624493f0175cb834f0ce5ebb8646ce959829877c1ce39a9c143b9c606
-    .claude/skills/go-validation/references/category-security.md: sha256:4d76da9b8e31b6da0be6adcc235d77e83d636cfca4e6bd024c71e29df4080ff5
-    .claude/skills/go-validation/references/category-testing.md: sha256:b3149a6950c2e5e664219225499e0449d65b8790e1e14abd6f65b2bb3551991e
+    .claude/skills/go-validation/references/category-security.md: sha256:d5964f473bbf8b8b6216efa84a5c275e1cb3cb67ec31f2db532ed3133a866ba5
+    .claude/skills/go-validation/references/category-testing.md: sha256:942191a01a3413479a1296e9b646470618b0cd60b1516064510d3daac57e818e
     .claude/skills/go-validation/references/common-checklist.md: sha256:4e566ee3e6625a645384c6f4151dc1329c2f1065bc0e4ca1c3b0ba1ebc4a972f
-    .claude/skills/go-validation/references/common-individual-commands.md: sha256:4e3b01a3b951575da0ceb0dd12c6da92d3057356f0ca71e51149f8b0049a4d49
+    .claude/skills/go-validation/references/common-individual-commands.md: sha256:621ca56e3814a961136669dbb6d1b4e1c5bd90f989b6450b31de2197623f510a
     .claude/skills/go-validation/references/common-output-format.md: sha256:e21f30fe399e9851ec5b7e0a249722685f041bb647cd1255aa40b3f215062408
-    .claude/skills/go-validation/references/common-troubleshooting.md: sha256:8d3573ff634efecf7d785a2c253bc2b9494e5bf3a2432f915f01a2a64406de5e
+    .claude/skills/go-validation/references/common-troubleshooting.md: sha256:9319aa31ce634f58e366272e48b9fbbf09dce1a6f22608e8b940b48517a3f5ba
     .claude/skills/go-validation/scripts/lib/all.sh: sha256:dc9b27d00ff0b37be6f5c986a59a8107f59a83bede4de5818e453a38ae51f216
     .claude/skills/go-validation/scripts/lib/aws.sh: sha256:8040932c1176ff8f6f011586844cee9a07fa725b90de6c5b007d5cecf7f2d67a
     .claude/skills/go-validation/scripts/lib/common.sh: sha256:26dded5e470bfa13c48f3816b58def268413042de385a468ee851f6f578bceda
@@ -1192,14 +1195,15 @@ dependencies:
     .claude/skills/go-validation/scripts/lib/validation.sh: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
     .claude/skills/go-validation/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
     .claude/skills/go-validation/scripts/validate.sh: sha256:b382522c2854a0aa39caf7924e6b760911c8f9042a2cd6fbc9256bc44354af1f
-    .cursor/rules/go.mdc: sha256:230c6cf8ed7ffe238e27fa9c5dd13ad73446f412be7b5453d8e98afea04d3f71
-  content_hash: sha256:2bc0280370821d3a41235c17d778c68104979fd074cd1e658be94c356312e381
+    .cursor/rules/go-test.mdc: sha256:7b6832167f7de68584a279f80a12e58debdc97cffb596b4edf95919fb4783106
+    .cursor/rules/go.mdc: sha256:5be3184db8fbad573680cb8a0ee846bb81ee6ddc49c99f5c6ef30da6baf529e6
+  content_hash: sha256:d78424e7cabf77603b73344304e2a61dc36cc3e434fe5cdff8140ffd6cbe4d0c
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: go-hooks-claude
   host: github.com
-  resolved_commit: 8d505770ce51faa61b0181756dafe6a630f4cc6f
-  resolved_ref: v1.8.92
+  resolved_commit: 346ffb484d5d8430d864b4d7e9218367f53404a4
+  resolved_ref: v1.8.93
   version: 1.0.0
   virtual_path: .apm/packages/go-hooks-claude
   is_virtual: true
@@ -1213,8 +1217,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: go-hooks-cursor
   host: github.com
-  resolved_commit: 8d505770ce51faa61b0181756dafe6a630f4cc6f
-  resolved_ref: v1.8.92
+  resolved_commit: 346ffb484d5d8430d864b4d7e9218367f53404a4
+  resolved_ref: v1.8.93
   version: 1.0.0
   virtual_path: .apm/packages/go-hooks-cursor
   is_virtual: true
@@ -1228,8 +1232,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-repo-maintenance
   host: github.com
-  resolved_commit: 8d505770ce51faa61b0181756dafe6a630f4cc6f
-  resolved_ref: v1.8.92
+  resolved_commit: 346ffb484d5d8430d864b4d7e9218367f53404a4
+  resolved_ref: v1.8.93
   version: 1.0.0
   virtual_path: .apm/packages/repo-maintenance
   is_virtual: true
@@ -2051,8 +2055,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-shell-script
   host: github.com
-  resolved_commit: 8d505770ce51faa61b0181756dafe6a630f4cc6f
-  resolved_ref: v1.8.92
+  resolved_commit: 346ffb484d5d8430d864b4d7e9218367f53404a4
+  resolved_ref: v1.8.93
   version: 1.0.0
   virtual_path: .apm/packages/shell-script
   is_virtual: true
@@ -2264,8 +2268,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: shell-script-hooks-claude
   host: github.com
-  resolved_commit: 8d505770ce51faa61b0181756dafe6a630f4cc6f
-  resolved_ref: v1.8.92
+  resolved_commit: 346ffb484d5d8430d864b4d7e9218367f53404a4
+  resolved_ref: v1.8.93
   version: 1.0.0
   virtual_path: .apm/packages/shell-script-hooks-claude
   is_virtual: true
@@ -2281,8 +2285,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: shell-script-hooks-cursor
   host: github.com
-  resolved_commit: 8d505770ce51faa61b0181756dafe6a630f4cc6f
-  resolved_ref: v1.8.92
+  resolved_commit: 346ffb484d5d8430d864b4d7e9218367f53404a4
+  resolved_ref: v1.8.93
   version: 1.0.0
   virtual_path: .apm/packages/shell-script-hooks-cursor
   is_virtual: true
@@ -2415,13 +2419,22 @@ deployments:
   content_hash: sha256:ae95b864da6385563445d539e12e0efd1564660a63a6ade7146a3ce1c057c854
 - kind: project-relative
   target: claude
+  value: .claude/rules/go-test.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/go
+  active_owner: y-miyazaki/config/.apm/packages/go
+  content_hash: sha256:7caa7eac99b6adc6630129a2dba714603407f32e4d163dc84573bbe9ff2d3d07
+- kind: project-relative
+  target: claude
   value: .claude/rules/go.md
   runtime: null
   scope: project
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:ae2afceb7447735ab0618374d35a463bb6912a7de0f7068209c3cf3341710bf9
+  content_hash: sha256:3543afc1d53316f83747d4bedb194949fa921b59a71b21ddc29c77e7c8ce5580
 - kind: project-relative
   target: claude
   value: .claude/rules/instructions.md
@@ -5355,7 +5368,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:a737f7c1b531d8fce68c4794fe503bf21cd8bfaf6f8fa26b8742251eda16ccba
+  content_hash: sha256:fed2775406eb1f2b4645b502d2b490292246319a83fd4e2452e3195452f9042b
 - kind: project-relative
   target: claude
   value: .claude/skills/go-review/references/common-checklist.md
@@ -5364,7 +5377,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:02d2459b6e634715566acdc93a6c8a97fcab427e7b231a84416a45d0d8ba0886
+  content_hash: sha256:688d8ece5524bd613ef80d071580dfcff21f58aa40bbef7c46c1ae4fa03da36f
 - kind: project-relative
   target: claude
   value: .claude/skills/go-review/references/common-output-format.md
@@ -5463,7 +5476,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:4d76da9b8e31b6da0be6adcc235d77e83d636cfca4e6bd024c71e29df4080ff5
+  content_hash: sha256:d5964f473bbf8b8b6216efa84a5c275e1cb3cb67ec31f2db532ed3133a866ba5
 - kind: project-relative
   target: claude
   value: .claude/skills/go-validation/references/category-testing.md
@@ -5472,7 +5485,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:b3149a6950c2e5e664219225499e0449d65b8790e1e14abd6f65b2bb3551991e
+  content_hash: sha256:942191a01a3413479a1296e9b646470618b0cd60b1516064510d3daac57e818e
 - kind: project-relative
   target: claude
   value: .claude/skills/go-validation/references/common-checklist.md
@@ -5490,7 +5503,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:4e3b01a3b951575da0ceb0dd12c6da92d3057356f0ca71e51149f8b0049a4d49
+  content_hash: sha256:621ca56e3814a961136669dbb6d1b4e1c5bd90f989b6450b31de2197623f510a
 - kind: project-relative
   target: claude
   value: .claude/skills/go-validation/references/common-output-format.md
@@ -5508,7 +5521,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:8d3573ff634efecf7d785a2c253bc2b9494e5bf3a2432f915f01a2a64406de5e
+  content_hash: sha256:9319aa31ce634f58e366272e48b9fbbf09dce1a6f22608e8b940b48517a3f5ba
 - kind: project-relative
   target: claude
   value: .claude/skills/go-validation/scripts/lib/all.sh
@@ -10071,7 +10084,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:a737f7c1b531d8fce68c4794fe503bf21cd8bfaf6f8fa26b8742251eda16ccba
+  content_hash: sha256:fed2775406eb1f2b4645b502d2b490292246319a83fd4e2452e3195452f9042b
 - kind: project-relative
   target: cursor
   value: .agents/skills/go-review/references/common-checklist.md
@@ -10080,7 +10093,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:02d2459b6e634715566acdc93a6c8a97fcab427e7b231a84416a45d0d8ba0886
+  content_hash: sha256:688d8ece5524bd613ef80d071580dfcff21f58aa40bbef7c46c1ae4fa03da36f
 - kind: project-relative
   target: cursor
   value: .agents/skills/go-review/references/common-output-format.md
@@ -10179,7 +10192,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:4d76da9b8e31b6da0be6adcc235d77e83d636cfca4e6bd024c71e29df4080ff5
+  content_hash: sha256:d5964f473bbf8b8b6216efa84a5c275e1cb3cb67ec31f2db532ed3133a866ba5
 - kind: project-relative
   target: cursor
   value: .agents/skills/go-validation/references/category-testing.md
@@ -10188,7 +10201,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:b3149a6950c2e5e664219225499e0449d65b8790e1e14abd6f65b2bb3551991e
+  content_hash: sha256:942191a01a3413479a1296e9b646470618b0cd60b1516064510d3daac57e818e
 - kind: project-relative
   target: cursor
   value: .agents/skills/go-validation/references/common-checklist.md
@@ -10206,7 +10219,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:4e3b01a3b951575da0ceb0dd12c6da92d3057356f0ca71e51149f8b0049a4d49
+  content_hash: sha256:621ca56e3814a961136669dbb6d1b4e1c5bd90f989b6450b31de2197623f510a
 - kind: project-relative
   target: cursor
   value: .agents/skills/go-validation/references/common-output-format.md
@@ -10224,7 +10237,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:8d3573ff634efecf7d785a2c253bc2b9494e5bf3a2432f915f01a2a64406de5e
+  content_hash: sha256:9319aa31ce634f58e366272e48b9fbbf09dce1a6f22608e8b940b48517a3f5ba
 - kind: project-relative
   target: cursor
   value: .agents/skills/go-validation/scripts/lib/all.sh
@@ -12000,13 +12013,22 @@ deployments:
   content_hash: sha256:696f0edc71b99a2292f30c099e7e55374926ddb9868addec29f684981e82f4f7
 - kind: project-relative
   target: cursor
+  value: .cursor/rules/go-test.mdc
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/go
+  active_owner: y-miyazaki/config/.apm/packages/go
+  content_hash: sha256:7b6832167f7de68584a279f80a12e58debdc97cffb596b4edf95919fb4783106
+- kind: project-relative
+  target: cursor
   value: .cursor/rules/go.mdc
   runtime: null
   scope: project
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:230c6cf8ed7ffe238e27fa9c5dd13ad73446f412be7b5453d8e98afea04d3f71
+  content_hash: sha256:5be3184db8fbad573680cb8a0ee846bb81ee6ddc49c99f5c6ef30da6baf529e6
 - kind: project-relative
   target: cursor
   value: .cursor/rules/instructions.mdc
@@ -12202,7 +12224,7 @@ mcp_configs:
     transport: stdio
     args:
     - -y
-    - '@upstash/context7-mcp@4.0.0'
+    - '@upstash/context7-mcp@4.0.2'
     registry: false
     command: npx
   fetch:

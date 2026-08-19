@@ -1,38 +1,5 @@
 # Go Validation - Security Best Practices
 
-## Contents
-
-- [Go Validation - Security Best Practices](#go-validation---security-best-practices)
-  - [Contents](#contents)
-  - [Overview](#overview)
-  - [Security Validation with govulncheck](#security-validation-with-govulncheck)
-    - [Understanding govulncheck](#understanding-govulncheck)
-    - [Running govulncheck](#running-govulncheck)
-    - [Interpreting Results](#interpreting-results)
-  - [Input Validation](#input-validation)
-    - [Validate All External Input](#validate-all-external-input)
-    - [Sanitize User Input](#sanitize-user-input)
-  - [Context Usage](#context-usage)
-    - [Always Use Context for Timeouts](#always-use-context-for-timeouts)
-    - [Cancel Long-Running Operations](#cancel-long-running-operations)
-  - [Error Handling](#error-handling)
-    - [Don't Expose Sensitive Information](#dont-expose-sensitive-information)
-    - [Log Errors Securely](#log-errors-securely)
-  - [Cryptography](#cryptography)
-    - [Use Standard Library Crypto](#use-standard-library-crypto)
-    - [Never Store Secrets in Code](#never-store-secrets-in-code)
-  - [SQL Injection Prevention](#sql-injection-prevention)
-    - [Use Prepared Statements](#use-prepared-statements)
-  - [File Operations](#file-operations)
-    - [Secure File Handling](#secure-file-handling)
-  - [Race Conditions](#race-conditions)
-    - [Thread-Safe Data Access](#thread-safe-data-access)
-  - [Denial of Service Prevention](#denial-of-service-prevention)
-    - [Limit Resource Consumption](#limit-resource-consumption)
-  - [Security Checklist](#security-checklist)
-  - [Additional Resources](#additional-resources)
-  - [Summary](#summary)
-
 ## Overview
 
 This guide provides security best practices for Go code that complement the validation checks.
