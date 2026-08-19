@@ -68,6 +68,69 @@ function get_changed_dirs {
 }
 
 #######################################
+# find_go_module_root: Find nearest ancestor directory containing go.mod
+#
+# Arguments:
+#   $1 - Starting directory path (relative or absolute)
+#
+# Outputs:
+#   Module root absolute path to stdout
+#
+# Returns:
+#   0 if found, 1 otherwise
+#
+# Usage:
+#   find_go_module_root "test/go/server"
+#
+#######################################
+function find_go_module_root {
+    local start_dir="$1"
+    local dir
+
+    if ! dir=$(cd "$start_dir" 2> /dev/null && pwd); then
+        return 1
+    fi
+
+    while [[ $dir != "/" ]]; do
+        if [[ -f $dir/go.mod ]]; then
+            printf '%s\n' "$dir"
+            return 0
+        fi
+        dir=$(dirname "$dir")
+    done
+
+    return 1
+}
+
+#######################################
+# collect_go_module_roots: Map changed-file dirs to unique Go module roots
+#
+# Arguments:
+#   $@ - Directories containing changed Go files
+#
+# Outputs:
+#   Newline-separated unique module root paths to stdout
+#
+# Returns:
+#   0 on success
+#
+# Usage:
+#   mapfile -t module_roots < <(collect_go_module_roots "${dirs[@]}")
+#
+#######################################
+function collect_go_module_roots {
+    local dir
+    local mod_root
+
+    for dir in "$@"; do
+        [[ -n $dir && -d $dir ]] || continue
+        if mod_root=$(find_go_module_root "$dir"); then
+            printf '%s\n' "$mod_root"
+        fi
+    done | sort -u
+}
+
+#######################################
 # truncate_reason_text: Cap reason size for agent responses
 #
 # Globals:
@@ -305,7 +368,7 @@ function report_failure {
 # main: Entry point
 #
 # Description:
-#   Runs golangci-lint on each directory containing changed Go files.
+#   Runs golangci-lint from each Go module root that contains changed files.
 #   Collects failures and calls report_failure with a summary.
 #
 # Globals:
@@ -339,13 +402,22 @@ function main {
         exit 0
     fi
 
+    local module_roots=()
+    mapfile -t module_roots < <(collect_go_module_roots "${dirs[@]}")
+
+    if ((${#module_roots[@]} == 0)); then
+        exit 0
+    fi
+
     local fails=0
     local output=""
-    for dir in "${dirs[@]}"; do
-        [[ -n $dir && -d $dir ]] || continue
+    for mod_root in "${module_roots[@]}"; do
+        [[ -n $mod_root && -d $mod_root ]] || continue
+        local rel_mod="${mod_root#"$root"/}"
         local result
-        result=$(golangci-lint run --fix "./${dir#./}/..." 2>&1) || {
+        result=$(cd "$mod_root" && golangci-lint run --fix ./... 2>&1) || {
             fails=$((fails + 1))
+            output+="=== ${rel_mod:-.} ==="$'\n'
             output+="${result}"$'\n'
         }
     done

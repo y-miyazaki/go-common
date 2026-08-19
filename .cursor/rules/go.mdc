@@ -90,6 +90,7 @@ globs: "**/*.go"
 - SEC-05 (SHOULD): Least privilege; no production debug; explicit CORS
 
 ### Testing (TEST)
+- TEST-00 (MUST): Add or update *_test.go in the same change as behavior
 - TEST-01 (SHOULD): Prefer table-driven tests with subtests and edges
 - TEST-02 (SHOULD): Design testable APIs; inject time and rand
 - TEST-03 (SHOULD): Stub external deps through consumer interfaces

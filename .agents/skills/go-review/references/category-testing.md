@@ -1,6 +1,6 @@
 # Testing (TEST)
 
-*_TEST-00 (MUST): Add or update *\_test.go in the same change as behavior*_
+**TEST-00 (MUST): Add or update *_test.go in the same change as behavior**
 
 Check: When adding or materially changing exported behavior, are corresponding `*_test.go` files added or updated in the same change?
 Why: Untested behavior changes are hard to review and regress silently (see [Google eng-practices: Keep related test code in the same CL](https://google.github.io/eng-practices/review/developer/small-cls.html#test_code) and [go.dev: Add a test](https://go.dev/doc/tutorial/add-a-test))

@@ -215,7 +215,7 @@ function determine_target_pattern {
         local go_files_count
         go_files_count=$(has_go_files "$base_dir")
         if [[ $go_files_count -gt 0 ]]; then
-            echo "$base_dir/..."
+            echo "./${base_dir#./}/..."
             return 0
         fi
     fi
