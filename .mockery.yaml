@@ -27,3 +27,9 @@ packages:
       AWSS3UploaderClientInterface:
       AWSS3DownloaderClientInterface:
       AWSS3TransferClientInterface:
+      AWSSecretsManagerClientInterface:
+      AWSBedrockClientInterface:
+      AWSCloudWatchLogsClientInterface:
+      AWSSESClientInterface:
+      AWSCognitoIdentityProviderClientInterface:
+      SlackClientInterface:

@@ -16,274 +16,200 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+	"github.com/y-miyazaki/go-common/pkg/repository/mocks"
+	"go.uber.org/mock/gomock"
 )
 
-// MockS3Client is a mock implementation of S3ClientInterface for testing
-type MockS3Client struct {
-	mock.Mock
+var (
+	errTestS3GetObject     = errors.New("object not found")
+	errTestS3DownloadObject = errors.New("download object failed")
+)
+
+func newS3Repo(t *testing.T, ctrl *gomock.Controller) (
+	*AWSS3Repository,
+	*mocks.MockAWSS3ClientInterface,
+	*mocks.MockAWSS3UploaderClientInterface,
+	*mocks.MockAWSS3DownloaderClientInterface,
+	*mocks.MockAWSS3PresignClientInterface,
+) {
+	t.Helper()
+
+	mockClient := mocks.NewMockAWSS3ClientInterface(ctrl)
+	mockUploader := mocks.NewMockAWSS3UploaderClientInterface(ctrl)
+	mockDownloader := mocks.NewMockAWSS3DownloaderClientInterface(ctrl)
+	mockPresigned := mocks.NewMockAWSS3PresignClientInterface(ctrl)
+	repo := NewAWSS3RepositoryWithInterface(mockClient, mockUploader, mockDownloader, mockPresigned)
+	return repo, mockClient, mockUploader, mockDownloader, mockPresigned
 }
 
-func (m *MockS3Client) GetObject(ctx context.Context, input *s3.GetObjectInput, opts ...func(*s3.Options)) (*s3.GetObjectOutput, error) {
-	args := m.Called(ctx, input, opts)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*s3.GetObjectOutput), args.Error(1)
-}
+func newS3RepoWithTransfer(t *testing.T, ctrl *gomock.Controller) (
+	*AWSS3Repository,
+	*mocks.MockAWSS3ClientInterface,
+	*mocks.MockAWSS3UploaderClientInterface,
+	*mocks.MockAWSS3DownloaderClientInterface,
+	*mocks.MockAWSS3PresignClientInterface,
+	*mocks.MockAWSS3TransferClientInterface,
+) {
+	t.Helper()
 
-func (m *MockS3Client) PutObject(ctx context.Context, input *s3.PutObjectInput, opts ...func(*s3.Options)) (*s3.PutObjectOutput, error) {
-	args := m.Called(ctx, input, opts)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*s3.PutObjectOutput), args.Error(1)
-}
-
-func (m *MockS3Client) DeleteObject(ctx context.Context, input *s3.DeleteObjectInput, opts ...func(*s3.Options)) (*s3.DeleteObjectOutput, error) {
-	args := m.Called(ctx, input, opts)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*s3.DeleteObjectOutput), args.Error(1)
-}
-
-func (m *MockS3Client) DeleteObjects(ctx context.Context, input *s3.DeleteObjectsInput, opts ...func(*s3.Options)) (*s3.DeleteObjectsOutput, error) {
-	args := m.Called(ctx, input, opts)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*s3.DeleteObjectsOutput), args.Error(1)
-}
-
-func (m *MockS3Client) ListObjectsV2(ctx context.Context, input *s3.ListObjectsV2Input, opts ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
-	args := m.Called(ctx, input, opts)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*s3.ListObjectsV2Output), args.Error(1)
-}
-
-func (m *MockS3Client) ListBuckets(ctx context.Context, input *s3.ListBucketsInput, opts ...func(*s3.Options)) (*s3.ListBucketsOutput, error) {
-	args := m.Called(ctx, input, opts)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*s3.ListBucketsOutput), args.Error(1)
-}
-
-func (m *MockS3Client) CreateBucket(ctx context.Context, input *s3.CreateBucketInput, opts ...func(*s3.Options)) (*s3.CreateBucketOutput, error) {
-	args := m.Called(ctx, input, opts)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*s3.CreateBucketOutput), args.Error(1)
-}
-
-func (m *MockS3Client) DeleteBucket(ctx context.Context, input *s3.DeleteBucketInput, opts ...func(*s3.Options)) (*s3.DeleteBucketOutput, error) {
-	args := m.Called(ctx, input, opts)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*s3.DeleteBucketOutput), args.Error(1)
-}
-
-// MockS3PresignClient is a mock implementation of S3PresignClientInterface for testing
-type MockS3PresignClient struct {
-	mock.Mock
-}
-
-func (m *MockS3PresignClient) PresignGetObject(ctx context.Context, input *s3.GetObjectInput, opts ...func(*s3.PresignOptions)) (*v4.PresignedHTTPRequest, error) {
-	args := m.Called(ctx, input, opts)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*v4.PresignedHTTPRequest), args.Error(1)
-}
-
-// MockS3Uploader is a mock implementation of S3UploaderClientInterface for testing
-type MockS3Uploader struct {
-	mock.Mock
-}
-
-func (m *MockS3Uploader) Upload(ctx context.Context, input *s3.PutObjectInput, opts ...func(*manager.Uploader)) (*manager.UploadOutput, error) {
-	args := m.Called(ctx, input, opts)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*manager.UploadOutput), args.Error(1)
-}
-
-// MockS3Downloader is a mock implementation of S3DownloaderClientInterface for testing
-type MockS3Downloader struct {
-	mock.Mock
-}
-
-func (m *MockS3Downloader) Download(ctx context.Context, w io.WriterAt, input *s3.GetObjectInput, opts ...func(*manager.Downloader)) (int64, error) {
-	args := m.Called(ctx, w, input, opts)
-	return args.Get(0).(int64), args.Error(1)
-}
-
-// MockS3TransferClient is a mock implementation of S3TransferClientInterface for testing
-type MockS3TransferClient struct {
-	mock.Mock
-}
-
-func (m *MockS3TransferClient) UploadObject(ctx context.Context, input *transfermanager.UploadObjectInput, opts ...func(*transfermanager.Options)) (*transfermanager.UploadObjectOutput, error) {
-	args := m.Called(ctx, input, opts)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*transfermanager.UploadObjectOutput), args.Error(1)
-}
-
-func (m *MockS3TransferClient) DownloadObject(ctx context.Context, input *transfermanager.DownloadObjectInput, opts ...func(*transfermanager.Options)) (*transfermanager.DownloadObjectOutput, error) {
-	args := m.Called(ctx, input, opts)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*transfermanager.DownloadObjectOutput), args.Error(1)
+	mockClient := mocks.NewMockAWSS3ClientInterface(ctrl)
+	mockUploader := mocks.NewMockAWSS3UploaderClientInterface(ctrl)
+	mockDownloader := mocks.NewMockAWSS3DownloaderClientInterface(ctrl)
+	mockPresigned := mocks.NewMockAWSS3PresignClientInterface(ctrl)
+	mockTransfer := mocks.NewMockAWSS3TransferClientInterface(ctrl)
+	repo := NewAWSS3RepositoryWithTransferClient(mockClient, mockUploader, mockDownloader, mockPresigned, mockTransfer)
+	return repo, mockClient, mockUploader, mockDownloader, mockPresigned, mockTransfer
 }
 
 func TestNewAWSS3RepositoryWithInterface(t *testing.T) {
-	mockClient := &MockS3Client{}
-	mockUploader := &MockS3Uploader{}
-	mockDownloader := &MockS3Downloader{}
-	mockPresigned := &MockS3PresignClient{}
+	t.Parallel()
+
+	ctrl := gomock.NewController(t)
+	mockClient := mocks.NewMockAWSS3ClientInterface(ctrl)
+	mockUploader := mocks.NewMockAWSS3UploaderClientInterface(ctrl)
+	mockDownloader := mocks.NewMockAWSS3DownloaderClientInterface(ctrl)
+	mockPresigned := mocks.NewMockAWSS3PresignClientInterface(ctrl)
 
 	repo := NewAWSS3RepositoryWithInterface(mockClient, mockUploader, mockDownloader, mockPresigned)
-	assert.NotNil(t, repo)
-	assert.Equal(t, mockClient, repo.Client)
-	assert.Equal(t, mockUploader, repo.uploader)
-	assert.Equal(t, mockDownloader, repo.downloader)
-	assert.Equal(t, mockPresigned, repo.presigned)
+	require.NotNil(t, repo)
+	require.Equal(t, mockClient, repo.Client)
+	require.Equal(t, mockUploader, repo.uploader)
+	require.Equal(t, mockDownloader, repo.downloader)
+	require.Equal(t, mockPresigned, repo.presigned)
 }
 
 func TestAWSS3Repository_GetObject(t *testing.T) {
-	mockClient := &MockS3Client{}
-	mockUploader := &MockS3Uploader{}
-	mockDownloader := &MockS3Downloader{}
-	mockPresigned := &MockS3PresignClient{}
+	t.Parallel()
 
-	repo := NewAWSS3RepositoryWithInterface(mockClient, mockUploader, mockDownloader, mockPresigned)
+	ctrl := gomock.NewController(t)
+	repo, mockClient, _, _, _ := newS3Repo(t, ctrl)
 
 	expectedOutput := &s3.GetObjectOutput{
 		Body: io.NopCloser(bytes.NewReader([]byte("test content"))),
 	}
 
-	mockClient.On("GetObject", mock.Anything, mock.MatchedBy(func(input *s3.GetObjectInput) bool {
-		return *input.Bucket == "test-bucket" && *input.Key == "test-key"
-	}), mock.Anything).Return(expectedOutput, nil)
+	mockClient.EXPECT().
+		GetObject(gomock.Any(), gomock.AssignableToTypeOf(&s3.GetObjectInput{}), gomock.Any()).
+		DoAndReturn(func(_ context.Context, input *s3.GetObjectInput, _ ...func(*s3.Options)) (*s3.GetObjectOutput, error) {
+			require.NotNil(t, input.Bucket)
+			require.NotNil(t, input.Key)
+			require.Equal(t, "test-bucket", *input.Bucket)
+			require.Equal(t, "test-key", *input.Key)
+			return expectedOutput, nil
+		})
 
 	result, err := repo.GetObject("test-bucket", "test-key")
 
-	assert.NoError(t, err)
-	assert.Equal(t, expectedOutput, result)
-	mockClient.AssertExpectations(t)
+	require.NoError(t, err)
+	require.Equal(t, expectedOutput, result)
 }
 
 func TestAWSS3Repository_GetObject_Error(t *testing.T) {
-	mockClient := &MockS3Client{}
-	mockUploader := &MockS3Uploader{}
-	mockDownloader := &MockS3Downloader{}
-	mockPresigned := &MockS3PresignClient{}
+	t.Parallel()
 
-	repo := NewAWSS3RepositoryWithInterface(mockClient, mockUploader, mockDownloader, mockPresigned)
+	ctrl := gomock.NewController(t)
+	repo, mockClient, _, _, _ := newS3Repo(t, ctrl)
 
-	expectedError := errors.New("object not found")
-
-	mockClient.On("GetObject", mock.Anything, mock.Anything, mock.Anything).Return(nil, expectedError)
+	mockClient.EXPECT().
+		GetObject(gomock.Any(), gomock.Any(), gomock.Any()).
+		Return(nil, errTestS3GetObject)
 
 	result, err := repo.GetObject("test-bucket", "test-key")
 
-	assert.Error(t, err)
-	assert.Nil(t, result)
-	assert.Contains(t, err.Error(), "s3 GetObject")
-	mockClient.AssertExpectations(t)
+	require.Error(t, err)
+	require.Nil(t, result)
+	require.Contains(t, err.Error(), "s3 GetObject")
+	require.ErrorIs(t, err, errTestS3GetObject)
 }
 
 func TestAWSS3Repository_PutObjectText(t *testing.T) {
-	mockClient := &MockS3Client{}
-	mockUploader := &MockS3Uploader{}
-	mockDownloader := &MockS3Downloader{}
-	mockPresigned := &MockS3PresignClient{}
+	t.Parallel()
 
-	repo := NewAWSS3RepositoryWithInterface(mockClient, mockUploader, mockDownloader, mockPresigned)
+	ctrl := gomock.NewController(t)
+	repo, mockClient, _, _, _ := newS3Repo(t, ctrl)
 
 	expectedOutput := &s3.PutObjectOutput{}
 
-	mockClient.On("PutObject", mock.Anything, mock.MatchedBy(func(input *s3.PutObjectInput) bool {
-		return *input.Bucket == "test-bucket" && *input.Key == "test-key"
-	}), mock.Anything).Return(expectedOutput, nil)
+	mockClient.EXPECT().
+		PutObject(gomock.Any(), gomock.AssignableToTypeOf(&s3.PutObjectInput{}), gomock.Any()).
+		DoAndReturn(func(_ context.Context, input *s3.PutObjectInput, _ ...func(*s3.Options)) (*s3.PutObjectOutput, error) {
+			require.NotNil(t, input.Bucket)
+			require.NotNil(t, input.Key)
+			require.Equal(t, "test-bucket", *input.Bucket)
+			require.Equal(t, "test-key", *input.Key)
+			return expectedOutput, nil
+		})
 
 	text := "test content"
 	result, err := repo.PutObjectText("test-bucket", "test-key", &text)
 
-	assert.NoError(t, err)
-	assert.Equal(t, expectedOutput, result)
-	mockClient.AssertExpectations(t)
+	require.NoError(t, err)
+	require.Equal(t, expectedOutput, result)
 }
 
 func TestAWSS3Repository_PutObjectFile(t *testing.T) {
-	mockClient := &MockS3Client{}
-	mockUploader := &MockS3Uploader{}
-	mockDownloader := &MockS3Downloader{}
-	mockPresigned := &MockS3PresignClient{}
+	t.Parallel()
 
-	repo := NewAWSS3RepositoryWithInterface(mockClient, mockUploader, mockDownloader, mockPresigned)
+	ctrl := gomock.NewController(t)
+	repo, mockClient, _, _, _ := newS3Repo(t, ctrl)
 
-	// Create a temporary file for testing
 	tempFile, err := os.CreateTemp("", "test-file-*.txt")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	defer os.Remove(tempFile.Name())
 
 	testContent := "test file content"
 	_, err = tempFile.WriteString(testContent)
-	assert.NoError(t, err)
-	tempFile.Close()
+	require.NoError(t, err)
+	require.NoError(t, tempFile.Close())
 
 	expectedOutput := &s3.PutObjectOutput{}
 
-	mockClient.On("PutObject", mock.Anything, mock.MatchedBy(func(input *s3.PutObjectInput) bool {
-		return *input.Bucket == "test-bucket" && *input.Key == "test-key"
-	}), mock.Anything).Return(expectedOutput, nil)
+	mockClient.EXPECT().
+		PutObject(gomock.Any(), gomock.AssignableToTypeOf(&s3.PutObjectInput{}), gomock.Any()).
+		DoAndReturn(func(_ context.Context, input *s3.PutObjectInput, _ ...func(*s3.Options)) (*s3.PutObjectOutput, error) {
+			require.NotNil(t, input.Bucket)
+			require.NotNil(t, input.Key)
+			require.Equal(t, "test-bucket", *input.Bucket)
+			require.Equal(t, "test-key", *input.Key)
+			return expectedOutput, nil
+		})
 
 	result, err := repo.PutObjectFile("test-bucket", "test-key", tempFile.Name())
 
-	assert.NoError(t, err)
-	assert.Equal(t, expectedOutput, result)
-	mockClient.AssertExpectations(t)
+	require.NoError(t, err)
+	require.Equal(t, expectedOutput, result)
 }
 
 func TestAWSS3Repository_DeleteObject(t *testing.T) {
-	mockClient := &MockS3Client{}
-	mockUploader := &MockS3Uploader{}
-	mockDownloader := &MockS3Downloader{}
-	mockPresigned := &MockS3PresignClient{}
+	t.Parallel()
 
-	repo := NewAWSS3RepositoryWithInterface(mockClient, mockUploader, mockDownloader, mockPresigned)
+	ctrl := gomock.NewController(t)
+	repo, mockClient, _, _, _ := newS3Repo(t, ctrl)
 
 	expectedOutput := &s3.DeleteObjectOutput{}
 
-	mockClient.On("DeleteObject", mock.Anything, mock.MatchedBy(func(input *s3.DeleteObjectInput) bool {
-		return *input.Bucket == "test-bucket" && *input.Key == "test-key"
-	}), mock.Anything).Return(expectedOutput, nil)
+	mockClient.EXPECT().
+		DeleteObject(gomock.Any(), gomock.AssignableToTypeOf(&s3.DeleteObjectInput{}), gomock.Any()).
+		DoAndReturn(func(_ context.Context, input *s3.DeleteObjectInput, _ ...func(*s3.Options)) (*s3.DeleteObjectOutput, error) {
+			require.NotNil(t, input.Bucket)
+			require.NotNil(t, input.Key)
+			require.Equal(t, "test-bucket", *input.Bucket)
+			require.Equal(t, "test-key", *input.Key)
+			return expectedOutput, nil
+		})
 
 	result, err := repo.DeleteObject("test-bucket", "test-key")
 
-	assert.NoError(t, err)
-	assert.Equal(t, expectedOutput, result)
-	mockClient.AssertExpectations(t)
+	require.NoError(t, err)
+	require.Equal(t, expectedOutput, result)
 }
 
 func TestAWSS3Repository_ListObjectsV2(t *testing.T) {
-	mockClient := &MockS3Client{}
-	mockUploader := &MockS3Uploader{}
-	mockDownloader := &MockS3Downloader{}
-	mockPresigned := &MockS3PresignClient{}
+	t.Parallel()
 
-	repo := NewAWSS3RepositoryWithInterface(mockClient, mockUploader, mockDownloader, mockPresigned)
+	ctrl := gomock.NewController(t)
+	repo, mockClient, _, _, _ := newS3Repo(t, ctrl)
 
 	expectedOutput := &s3.ListObjectsV2Output{
 		Contents: []types.Object{
@@ -294,41 +220,51 @@ func TestAWSS3Repository_ListObjectsV2(t *testing.T) {
 		},
 	}
 
-	mockClient.On("ListObjectsV2", mock.Anything, mock.MatchedBy(func(input *s3.ListObjectsV2Input) bool {
-		return *input.Bucket == "test-bucket" && *input.Prefix == "test-prefix"
-	}), mock.Anything).Return(expectedOutput, nil)
+	mockClient.EXPECT().
+		ListObjectsV2(gomock.Any(), gomock.AssignableToTypeOf(&s3.ListObjectsV2Input{}), gomock.Any()).
+		DoAndReturn(func(_ context.Context, input *s3.ListObjectsV2Input, _ ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
+			require.NotNil(t, input.Bucket)
+			require.NotNil(t, input.Prefix)
+			require.Equal(t, "test-bucket", *input.Bucket)
+			require.Equal(t, "test-prefix", *input.Prefix)
+			return expectedOutput, nil
+		})
 
 	result, err := repo.ListObjectsV2("test-bucket", "test-prefix")
 
-	assert.NoError(t, err)
-	assert.Equal(t, expectedOutput, result)
-	mockClient.AssertExpectations(t)
+	require.NoError(t, err)
+	require.Equal(t, expectedOutput, result)
 }
 
 func TestAWSS3Repository_GetPresignedURL(t *testing.T) {
-	mockClient := &MockS3Client{}
-	mockUploader := &MockS3Uploader{}
-	mockDownloader := &MockS3Downloader{}
-	mockPresigned := &MockS3PresignClient{}
+	t.Parallel()
 
-	repo := NewAWSS3RepositoryWithInterface(mockClient, mockUploader, mockDownloader, mockPresigned)
+	ctrl := gomock.NewController(t)
+	repo, _, _, _, mockPresigned := newS3Repo(t, ctrl)
 
 	expectedOutput := &v4.PresignedHTTPRequest{
 		URL: "https://test-bucket.s3.amazonaws.com/test-key?X-Amz-Expires=60",
 	}
 
-	mockPresigned.On("PresignGetObject", mock.Anything, mock.MatchedBy(func(input *s3.GetObjectInput) bool {
-		return *input.Bucket == "test-bucket" && *input.Key == "test-key"
-	}), mock.Anything).Return(expectedOutput, nil)
+	mockPresigned.EXPECT().
+		PresignGetObject(gomock.Any(), gomock.AssignableToTypeOf(&s3.GetObjectInput{}), gomock.Any()).
+		DoAndReturn(func(_ context.Context, input *s3.GetObjectInput, _ ...func(*s3.PresignOptions)) (*v4.PresignedHTTPRequest, error) {
+			require.NotNil(t, input.Bucket)
+			require.NotNil(t, input.Key)
+			require.Equal(t, "test-bucket", *input.Bucket)
+			require.Equal(t, "test-key", *input.Key)
+			return expectedOutput, nil
+		})
 
 	result, err := repo.GetPresignedURL("test-bucket", "test-key", time.Minute)
 
-	assert.NoError(t, err)
-	assert.Equal(t, expectedOutput, result)
-	mockPresigned.AssertExpectations(t)
+	require.NoError(t, err)
+	require.Equal(t, expectedOutput, result)
 }
 
 func TestAWSS3Repository_NormalizePath(t *testing.T) {
+	t.Parallel()
+
 	repo := &AWSS3Repository{}
 
 	tests := []struct {
@@ -353,32 +289,33 @@ func TestAWSS3Repository_NormalizePath(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			result := repo.normalizePath(tt.input)
-			assert.Equal(t, tt.expected, result)
+			require.Equal(t, tt.expected, result)
 		})
 	}
 }
 
 func TestNewAWSS3Repository(t *testing.T) {
-	// Test with nil client
+	t.Parallel()
+
 	repo := NewAWSS3Repository(nil)
-	assert.NotNil(t, repo)
-	assert.Nil(t, repo.Client)
-	assert.Nil(t, repo.uploader)
-	assert.Nil(t, repo.downloader)
-	assert.Nil(t, repo.presigned)
-	assert.Nil(t, repo.transferClient)
+	require.NotNil(t, repo)
+	require.Nil(t, repo.Client)
+	require.Nil(t, repo.uploader)
+	require.Nil(t, repo.downloader)
+	require.Nil(t, repo.presigned)
+	require.Nil(t, repo.transferClient)
 }
 
 func TestAWSS3Repository_ListBuckets(t *testing.T) {
-	mockClient := &MockS3Client{}
-	mockUploader := &MockS3Uploader{}
-	mockDownloader := &MockS3Downloader{}
-	mockPresigned := &MockS3PresignClient{}
+	t.Parallel()
 
-	repo := NewAWSS3RepositoryWithInterface(mockClient, mockUploader, mockDownloader, mockPresigned)
+	ctrl := gomock.NewController(t)
+	repo, mockClient, _, _, _ := newS3Repo(t, ctrl)
 
 	expectedOutput := &s3.ListBucketsOutput{
 		Buckets: []types.Bucket{
@@ -393,219 +330,231 @@ func TestAWSS3Repository_ListBuckets(t *testing.T) {
 		},
 	}
 
-	mockClient.On("ListBuckets", mock.Anything, mock.Anything, mock.Anything).Return(expectedOutput, nil)
+	mockClient.EXPECT().
+		ListBuckets(gomock.Any(), gomock.Any(), gomock.Any()).
+		Return(expectedOutput, nil)
 
 	result, err := repo.ListBuckets()
 
-	assert.NoError(t, err)
-	assert.Equal(t, expectedOutput, result)
-	mockClient.AssertExpectations(t)
+	require.NoError(t, err)
+	require.Equal(t, expectedOutput, result)
 }
 
 func TestAWSS3Repository_CreateBucket(t *testing.T) {
-	mockClient := &MockS3Client{}
-	mockUploader := &MockS3Uploader{}
-	mockDownloader := &MockS3Downloader{}
-	mockPresigned := &MockS3PresignClient{}
+	t.Parallel()
 
-	repo := NewAWSS3RepositoryWithInterface(mockClient, mockUploader, mockDownloader, mockPresigned)
+	ctrl := gomock.NewController(t)
+	repo, mockClient, _, _, _ := newS3Repo(t, ctrl)
 
 	expectedOutput := &s3.CreateBucketOutput{}
 
-	mockClient.On("CreateBucket", mock.Anything, mock.MatchedBy(func(input *s3.CreateBucketInput) bool {
-		return *input.Bucket == "test-bucket"
-	}), mock.Anything).Return(expectedOutput, nil)
+	mockClient.EXPECT().
+		CreateBucket(gomock.Any(), gomock.AssignableToTypeOf(&s3.CreateBucketInput{}), gomock.Any()).
+		DoAndReturn(func(_ context.Context, input *s3.CreateBucketInput, _ ...func(*s3.Options)) (*s3.CreateBucketOutput, error) {
+			require.NotNil(t, input.Bucket)
+			require.Equal(t, "test-bucket", *input.Bucket)
+			return expectedOutput, nil
+		})
 
 	result, err := repo.CreateBucket("test-bucket")
 
-	assert.NoError(t, err)
-	assert.Equal(t, expectedOutput, result)
-	mockClient.AssertExpectations(t)
+	require.NoError(t, err)
+	require.Equal(t, expectedOutput, result)
 }
 
 func TestAWSS3Repository_DeleteBucket(t *testing.T) {
-	mockClient := &MockS3Client{}
-	mockUploader := &MockS3Uploader{}
-	mockDownloader := &MockS3Downloader{}
-	mockPresigned := &MockS3PresignClient{}
+	t.Parallel()
 
-	repo := NewAWSS3RepositoryWithInterface(mockClient, mockUploader, mockDownloader, mockPresigned)
+	ctrl := gomock.NewController(t)
+	repo, mockClient, _, _, _ := newS3Repo(t, ctrl)
 
 	expectedOutput := &s3.DeleteBucketOutput{}
 
-	mockClient.On("DeleteBucket", mock.Anything, mock.MatchedBy(func(input *s3.DeleteBucketInput) bool {
-		return *input.Bucket == "test-bucket"
-	}), mock.Anything).Return(expectedOutput, nil)
+	mockClient.EXPECT().
+		DeleteBucket(gomock.Any(), gomock.AssignableToTypeOf(&s3.DeleteBucketInput{}), gomock.Any()).
+		DoAndReturn(func(_ context.Context, input *s3.DeleteBucketInput, _ ...func(*s3.Options)) (*s3.DeleteBucketOutput, error) {
+			require.NotNil(t, input.Bucket)
+			require.Equal(t, "test-bucket", *input.Bucket)
+			return expectedOutput, nil
+		})
 
 	result, err := repo.DeleteBucket("test-bucket")
 
-	assert.NoError(t, err)
-	assert.Equal(t, expectedOutput, result)
-	mockClient.AssertExpectations(t)
+	require.NoError(t, err)
+	require.Equal(t, expectedOutput, result)
 }
 
 func TestAWSS3Repository_DeleteObjects(t *testing.T) {
-	mockClient := &MockS3Client{}
-	mockUploader := &MockS3Uploader{}
-	mockDownloader := &MockS3Downloader{}
-	mockPresigned := &MockS3PresignClient{}
+	t.Parallel()
 
-	repo := NewAWSS3RepositoryWithInterface(mockClient, mockUploader, mockDownloader, mockPresigned)
+	ctrl := gomock.NewController(t)
+	repo, mockClient, _, _, _ := newS3Repo(t, ctrl)
 
 	expectedOutput := &s3.DeleteObjectsOutput{}
 
-	mockClient.On("DeleteObjects", mock.Anything, mock.MatchedBy(func(input *s3.DeleteObjectsInput) bool {
-		return *input.Bucket == "test-bucket" && len(input.Delete.Objects) == 2
-	}), mock.Anything).Return(expectedOutput, nil)
+	mockClient.EXPECT().
+		DeleteObjects(gomock.Any(), gomock.AssignableToTypeOf(&s3.DeleteObjectsInput{}), gomock.Any()).
+		DoAndReturn(func(_ context.Context, input *s3.DeleteObjectsInput, _ ...func(*s3.Options)) (*s3.DeleteObjectsOutput, error) {
+			require.NotNil(t, input.Bucket)
+			require.Equal(t, "test-bucket", *input.Bucket)
+			require.Len(t, input.Delete.Objects, 2)
+			return expectedOutput, nil
+		})
 
 	result, err := repo.DeleteObjects("test-bucket", []string{"key1", "key2"})
 
-	assert.NoError(t, err)
-	assert.Equal(t, expectedOutput, result)
-	mockClient.AssertExpectations(t)
+	require.NoError(t, err)
+	require.Equal(t, expectedOutput, result)
 }
 
 func TestAWSS3Repository_Upload(t *testing.T) {
-	mockClient := &MockS3Client{}
-	mockUploader := &MockS3Uploader{}
-	mockDownloader := &MockS3Downloader{}
-	mockPresigned := &MockS3PresignClient{}
+	t.Parallel()
 
-	repo := NewAWSS3RepositoryWithInterface(mockClient, mockUploader, mockDownloader, mockPresigned)
+	ctrl := gomock.NewController(t)
+	repo, _, mockUploader, _, _ := newS3Repo(t, ctrl)
 
 	expectedOutput := &manager.UploadOutput{}
 
-	// Create a temporary file for testing
 	tempFile, err := os.CreateTemp("", "test_upload_*")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	defer os.Remove(tempFile.Name())
 
 	_, err = tempFile.WriteString("test content")
-	assert.NoError(t, err)
-	tempFile.Close()
+	require.NoError(t, err)
+	require.NoError(t, tempFile.Close())
 
-	mockUploader.On("Upload", mock.Anything, mock.MatchedBy(func(input *s3.PutObjectInput) bool {
-		return *input.Bucket == "test-bucket" && *input.Key == "test-key"
-	}), mock.Anything).Return(expectedOutput, nil)
+	mockUploader.EXPECT().
+		Upload(gomock.Any(), gomock.AssignableToTypeOf(&s3.PutObjectInput{}), gomock.Any()).
+		DoAndReturn(func(_ context.Context, input *s3.PutObjectInput, _ ...func(*manager.Uploader)) (*manager.UploadOutput, error) {
+			require.NotNil(t, input.Bucket)
+			require.NotNil(t, input.Key)
+			require.Equal(t, "test-bucket", *input.Bucket)
+			require.Equal(t, "test-key", *input.Key)
+			return expectedOutput, nil
+		})
 
 	result, err := repo.Upload("test-bucket", "test-key", tempFile.Name())
 
-	assert.NoError(t, err)
-	assert.Equal(t, expectedOutput, result)
-	mockUploader.AssertExpectations(t)
+	require.NoError(t, err)
+	require.Equal(t, expectedOutput, result)
 }
 
 func TestAWSS3Repository_Download(t *testing.T) {
-	mockClient := &MockS3Client{}
-	mockUploader := &MockS3Uploader{}
-	mockDownloader := &MockS3Downloader{}
-	mockPresigned := &MockS3PresignClient{}
+	t.Parallel()
 
-	repo := NewAWSS3RepositoryWithInterface(mockClient, mockUploader, mockDownloader, mockPresigned)
+	ctrl := gomock.NewController(t)
+	repo, _, _, mockDownloader, _ := newS3Repo(t, ctrl)
 
-	// Create a temporary file for testing
 	tempFile, err := os.CreateTemp("", "test_download_*")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	defer os.Remove(tempFile.Name())
-	tempFile.Close()
+	require.NoError(t, tempFile.Close())
 
-	mockDownloader.On("Download", mock.Anything, mock.Anything, mock.MatchedBy(func(input *s3.GetObjectInput) bool {
-		return *input.Bucket == "test-bucket" && *input.Key == "test-key"
-	}), mock.Anything).Return(int64(100), nil)
+	mockDownloader.EXPECT().
+		Download(gomock.Any(), gomock.Any(), gomock.AssignableToTypeOf(&s3.GetObjectInput{}), gomock.Any()).
+		DoAndReturn(func(_ context.Context, _ io.WriterAt, input *s3.GetObjectInput, _ ...func(*manager.Downloader)) (int64, error) {
+			require.NotNil(t, input.Bucket)
+			require.NotNil(t, input.Key)
+			require.Equal(t, "test-bucket", *input.Bucket)
+			require.Equal(t, "test-key", *input.Key)
+			return int64(100), nil
+		})
 
 	err = repo.Download("test-bucket", "test-key", tempFile.Name())
 
-	assert.NoError(t, err)
-	mockDownloader.AssertExpectations(t)
+	require.NoError(t, err)
 }
 
 func TestAWSS3Repository_UploadObject(t *testing.T) {
-	mockClient := &MockS3Client{}
-	mockUploader := &MockS3Uploader{}
-	mockDownloader := &MockS3Downloader{}
-	mockPresigned := &MockS3PresignClient{}
-	mockTransfer := &MockS3TransferClient{}
+	t.Parallel()
 
-	repo := NewAWSS3RepositoryWithTransferClient(mockClient, mockUploader, mockDownloader, mockPresigned, mockTransfer)
+	ctrl := gomock.NewController(t)
+	repo, _, _, _, _, mockTransfer := newS3RepoWithTransfer(t, ctrl)
 
 	expectedOutput := &transfermanager.UploadObjectOutput{}
 
 	tempFile, err := os.CreateTemp("", "test_upload_object_*")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	defer os.Remove(tempFile.Name())
 
 	_, err = tempFile.WriteString("test content")
-	assert.NoError(t, err)
-	tempFile.Close()
+	require.NoError(t, err)
+	require.NoError(t, tempFile.Close())
 
-	mockTransfer.On("UploadObject", mock.Anything, mock.MatchedBy(func(input *transfermanager.UploadObjectInput) bool {
-		if input == nil || input.Bucket == nil || input.Key == nil || input.ContentType == nil {
-			return false
-		}
-		body, readErr := io.ReadAll(input.Body)
-		if readErr != nil {
-			return false
-		}
-		return *input.Bucket == "test-bucket" &&
-			*input.Key == "test-key" &&
-			string(body) == "test content" &&
-			*input.ContentType == "text/plain; charset=utf-8"
-	}), mock.Anything).Return(expectedOutput, nil)
+	mockTransfer.EXPECT().
+		UploadObject(gomock.Any(), gomock.AssignableToTypeOf(&transfermanager.UploadObjectInput{}), gomock.Any()).
+		DoAndReturn(func(_ context.Context, input *transfermanager.UploadObjectInput, _ ...func(*transfermanager.Options)) (*transfermanager.UploadObjectOutput, error) {
+			if input == nil || input.Bucket == nil || input.Key == nil || input.ContentType == nil {
+				return nil, errors.New("invalid input")
+			}
+			body, readErr := io.ReadAll(input.Body)
+			if readErr != nil {
+				return nil, readErr
+			}
+			require.Equal(t, "test-bucket", *input.Bucket)
+			require.Equal(t, "test-key", *input.Key)
+			require.Equal(t, "test content", string(body))
+			require.Equal(t, "text/plain; charset=utf-8", *input.ContentType)
+			return expectedOutput, nil
+		})
 
 	result, err := repo.UploadObject("test-bucket", "test-key", tempFile.Name())
 
-	assert.NoError(t, err)
-	assert.Equal(t, expectedOutput, result)
-	mockTransfer.AssertExpectations(t)
+	require.NoError(t, err)
+	require.Equal(t, expectedOutput, result)
 }
 
 func TestAWSS3Repository_DownloadObject_Error_NoPartialFile(t *testing.T) {
-	mockClient := &MockS3Client{}
-	mockUploader := &MockS3Uploader{}
-	mockDownloader := &MockS3Downloader{}
-	mockPresigned := &MockS3PresignClient{}
-	mockTransfer := &MockS3TransferClient{}
+	t.Parallel()
 
-	repo := NewAWSS3RepositoryWithTransferClient(mockClient, mockUploader, mockDownloader, mockPresigned, mockTransfer)
+	ctrl := gomock.NewController(t)
+	repo, _, _, _, _, mockTransfer := newS3RepoWithTransfer(t, ctrl)
 
 	tempDir := t.TempDir()
 	destinationPath := filepath.Join(tempDir, "downloaded.txt")
 
-	mockTransfer.On("DownloadObject", mock.Anything, mock.MatchedBy(func(input *transfermanager.DownloadObjectInput) bool {
-		return *input.Bucket == "test-bucket" && *input.Key == "test-key"
-	}), mock.Anything).Return(nil, errors.New("download failed"))
+	mockTransfer.EXPECT().
+		DownloadObject(gomock.Any(), gomock.AssignableToTypeOf(&transfermanager.DownloadObjectInput{}), gomock.Any()).
+		DoAndReturn(func(_ context.Context, input *transfermanager.DownloadObjectInput, _ ...func(*transfermanager.Options)) (*transfermanager.DownloadObjectOutput, error) {
+			require.NotNil(t, input.Bucket)
+			require.NotNil(t, input.Key)
+			require.Equal(t, "test-bucket", *input.Bucket)
+			require.Equal(t, "test-key", *input.Key)
+			return nil, errTestS3DownloadObject
+		})
 
 	result, err := repo.DownloadObject("test-bucket", "test-key", destinationPath)
 
-	assert.Error(t, err)
-	assert.Nil(t, result)
+	require.Error(t, err)
+	require.Nil(t, result)
 	_, statErr := os.Stat(destinationPath)
-	assert.ErrorIs(t, statErr, os.ErrNotExist)
-	mockTransfer.AssertExpectations(t)
+	require.ErrorIs(t, statErr, os.ErrNotExist)
 }
 
 func TestAWSS3Repository_DownloadObject(t *testing.T) {
-	mockClient := &MockS3Client{}
-	mockUploader := &MockS3Uploader{}
-	mockDownloader := &MockS3Downloader{}
-	mockPresigned := &MockS3PresignClient{}
-	mockTransfer := &MockS3TransferClient{}
+	t.Parallel()
 
-	repo := NewAWSS3RepositoryWithTransferClient(mockClient, mockUploader, mockDownloader, mockPresigned, mockTransfer)
+	ctrl := gomock.NewController(t)
+	repo, _, _, _, _, mockTransfer := newS3RepoWithTransfer(t, ctrl)
 
 	tempFile, err := os.CreateTemp("", "test_download_object_*")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	defer os.Remove(tempFile.Name())
-	tempFile.Close()
+	require.NoError(t, tempFile.Close())
 
 	expectedOutput := &transfermanager.DownloadObjectOutput{}
-	mockTransfer.On("DownloadObject", mock.Anything, mock.MatchedBy(func(input *transfermanager.DownloadObjectInput) bool {
-		return *input.Bucket == "test-bucket" && *input.Key == "test-key"
-	}), mock.Anything).Return(expectedOutput, nil)
+	mockTransfer.EXPECT().
+		DownloadObject(gomock.Any(), gomock.AssignableToTypeOf(&transfermanager.DownloadObjectInput{}), gomock.Any()).
+		DoAndReturn(func(_ context.Context, input *transfermanager.DownloadObjectInput, _ ...func(*transfermanager.Options)) (*transfermanager.DownloadObjectOutput, error) {
+			require.NotNil(t, input.Bucket)
+			require.NotNil(t, input.Key)
+			require.Equal(t, "test-bucket", *input.Bucket)
+			require.Equal(t, "test-key", *input.Key)
+			return expectedOutput, nil
+		})
 
 	result, err := repo.DownloadObject("test-bucket", "test-key", tempFile.Name())
 
-	assert.NoError(t, err)
-	assert.Equal(t, expectedOutput, result)
-	mockTransfer.AssertExpectations(t)
+	require.NoError(t, err)
+	require.Equal(t, expectedOutput, result)
 }

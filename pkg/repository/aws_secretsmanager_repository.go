@@ -27,6 +27,11 @@ func NewAWSSecretsManagerRepository(c *secretsmanager.Client) *AWSSecretsManager
 	}
 }
 
+// NewAWSSecretsManagerRepositoryWithInterface returns AWSSecretsManagerRepository instance with interface (for testing).
+func NewAWSSecretsManagerRepositoryWithInterface(c AWSSecretsManagerClientInterface) *AWSSecretsManagerRepository {
+	return &AWSSecretsManagerRepository{Client: c}
+}
+
 // GetSecretString gets a secret string from secretsmanager.
 func (r *AWSSecretsManagerRepository) GetSecretString(ctx context.Context, secretName string) (string, error) {
 	result, err := r.Client.GetSecretValue(ctx, &secretsmanager.GetSecretValueInput{

@@ -9,131 +9,107 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
+
+	"github.com/y-miyazaki/go-common/pkg/repository/mocks"
 )
 
-// MockCloudWatchLogsClient is a mock implementation of the CloudWatch Logs client
-type MockCloudWatchLogsClient struct {
-	mock.Mock
-}
+var errTestCloudWatchLogs = errors.New("cloudwatch logs error")
 
-func (m *MockCloudWatchLogsClient) CreateLogGroup(ctx context.Context, params *cloudwatchlogs.CreateLogGroupInput, optFns ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.CreateLogGroupOutput, error) {
-	args := m.Called(ctx, params)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*cloudwatchlogs.CreateLogGroupOutput), args.Error(1)
-}
+func TestNewAWSCloudWatchLogsRepository(t *testing.T) {
+	t.Parallel()
 
-func (m *MockCloudWatchLogsClient) CreateLogStream(ctx context.Context, params *cloudwatchlogs.CreateLogStreamInput, optFns ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.CreateLogStreamOutput, error) {
-	args := m.Called(ctx, params)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*cloudwatchlogs.CreateLogStreamOutput), args.Error(1)
-}
+	mockClient := &cloudwatchlogs.Client{}
+	repo := NewAWSCloudWatchLogsRepository(mockClient)
 
-func (m *MockCloudWatchLogsClient) PutRetentionPolicy(ctx context.Context, params *cloudwatchlogs.PutRetentionPolicyInput, optFns ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.PutRetentionPolicyOutput, error) {
-	args := m.Called(ctx, params)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*cloudwatchlogs.PutRetentionPolicyOutput), args.Error(1)
-}
-
-func (m *MockCloudWatchLogsClient) DescribeLogGroups(ctx context.Context, params *cloudwatchlogs.DescribeLogGroupsInput, optFns ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.DescribeLogGroupsOutput, error) {
-	args := m.Called(ctx, params)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*cloudwatchlogs.DescribeLogGroupsOutput), args.Error(1)
-}
-
-func (m *MockCloudWatchLogsClient) DescribeLogStreams(ctx context.Context, params *cloudwatchlogs.DescribeLogStreamsInput, optFns ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.DescribeLogStreamsOutput, error) {
-	args := m.Called(ctx, params)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*cloudwatchlogs.DescribeLogStreamsOutput), args.Error(1)
-}
-
-func (m *MockCloudWatchLogsClient) PutLogEvents(ctx context.Context, params *cloudwatchlogs.PutLogEventsInput, optFns ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.PutLogEventsOutput, error) {
-	args := m.Called(ctx, params)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*cloudwatchlogs.PutLogEventsOutput), args.Error(1)
-}
-
-func (m *MockCloudWatchLogsClient) FilterLogEvents(ctx context.Context, params *cloudwatchlogs.FilterLogEventsInput, optFns ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.FilterLogEventsOutput, error) {
-	args := m.Called(ctx, params)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*cloudwatchlogs.FilterLogEventsOutput), args.Error(1)
-}
-
-func (m *MockCloudWatchLogsClient) DescribeMetricFilters(ctx context.Context, params *cloudwatchlogs.DescribeMetricFiltersInput, optFns ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.DescribeMetricFiltersOutput, error) {
-	args := m.Called(ctx, params)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*cloudwatchlogs.DescribeMetricFiltersOutput), args.Error(1)
+	require.NotNil(t, repo)
+	require.Equal(t, mockClient, repo.Client)
 }
 
 func TestAWSCloudWatchLogsRepository_CreateLogGroup(t *testing.T) {
-	mockClient := &MockCloudWatchLogsClient{}
-	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
+	t.Parallel()
 
 	logGroupName := "test-log-group"
-	mockClient.On("CreateLogGroup", mock.Anything, mock.MatchedBy(func(input *cloudwatchlogs.CreateLogGroupInput) bool {
-		return *input.LogGroupName == logGroupName
-	})).Return(&cloudwatchlogs.CreateLogGroupOutput{}, nil)
 
-	_, err := repo.CreateLogGroup(context.Background(), logGroupName)
+	tests := []struct {
+		name       string
+		setupMock  func(m *mocks.MockAWSCloudWatchLogsClientInterface)
+		wantErrMsg string
+	}{
+		{
+			name: "success",
+			setupMock: func(m *mocks.MockAWSCloudWatchLogsClientInterface) {
+				m.EXPECT().
+					CreateLogGroup(gomock.Any(), gomock.AssignableToTypeOf(&cloudwatchlogs.CreateLogGroupInput{})).
+					DoAndReturn(func(_ context.Context, input *cloudwatchlogs.CreateLogGroupInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.CreateLogGroupOutput, error) {
+						require.NotNil(t, input.LogGroupName)
+						require.Equal(t, logGroupName, *input.LogGroupName)
+						return &cloudwatchlogs.CreateLogGroupOutput{}, nil
+					})
+			},
+		},
+		{
+			name: "client error",
+			setupMock: func(m *mocks.MockAWSCloudWatchLogsClientInterface) {
+				m.EXPECT().
+					CreateLogGroup(gomock.Any(), gomock.Any()).
+					Return(nil, errTestCloudWatchLogs)
+			},
+			wantErrMsg: "cloudwatchlogs CreateLogGroup",
+		},
+	}
 
-	assert.NoError(t, err)
-	mockClient.AssertExpectations(t)
-}
+	for i := range tests {
+		tc := tests[i]
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 
-func TestAWSCloudWatchLogsRepository_CreateLogGroup_Error(t *testing.T) {
-	mockClient := &MockCloudWatchLogsClient{}
-	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
+			ctrl := gomock.NewController(t)
+			mockClient := mocks.NewMockAWSCloudWatchLogsClientInterface(ctrl)
+			tc.setupMock(mockClient)
 
-	logGroupName := "test-log-group"
-	expectedError := errors.New("cloudwatch logs error")
+			repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
+			_, err := repo.CreateLogGroup(context.Background(), logGroupName)
 
-	mockClient.On("CreateLogGroup", mock.Anything, mock.Anything).Return(nil, expectedError)
+			if tc.wantErrMsg != "" {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.wantErrMsg)
+				require.Contains(t, err.Error(), errTestCloudWatchLogs.Error())
+				return
+			}
 
-	_, err := repo.CreateLogGroup(context.Background(), logGroupName)
-
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "cloudwatchlogs CreateLogGroup")
-	assert.Contains(t, err.Error(), expectedError.Error())
-	mockClient.AssertExpectations(t)
+			require.NoError(t, err)
+		})
+	}
 }
 
 func TestAWSCloudWatchLogsRepository_CreateLogStream(t *testing.T) {
-	mockClient := &MockCloudWatchLogsClient{}
-	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
+	t.Parallel()
 
 	logGroupName := "test-log-group"
 	logStreamName := "test-log-stream"
 
-	mockClient.On("CreateLogStream", mock.Anything, mock.MatchedBy(func(input *cloudwatchlogs.CreateLogStreamInput) bool {
-		return *input.LogGroupName == logGroupName && *input.LogStreamName == logStreamName
-	})).Return(&cloudwatchlogs.CreateLogStreamOutput{}, nil)
+	ctrl := gomock.NewController(t)
+	mockClient := mocks.NewMockAWSCloudWatchLogsClientInterface(ctrl)
+	mockClient.EXPECT().
+		CreateLogStream(gomock.Any(), gomock.AssignableToTypeOf(&cloudwatchlogs.CreateLogStreamInput{})).
+		DoAndReturn(func(_ context.Context, input *cloudwatchlogs.CreateLogStreamInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.CreateLogStreamOutput, error) {
+			require.NotNil(t, input.LogGroupName)
+			require.NotNil(t, input.LogStreamName)
+			require.Equal(t, logGroupName, *input.LogGroupName)
+			require.Equal(t, logStreamName, *input.LogStreamName)
+			return &cloudwatchlogs.CreateLogStreamOutput{}, nil
+		})
 
+	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
 	_, err := repo.CreateLogStream(context.Background(), logGroupName, logStreamName)
 
-	assert.NoError(t, err)
-	mockClient.AssertExpectations(t)
+	require.NoError(t, err)
 }
 
 func TestAWSCloudWatchLogsRepository_PutLogEvents(t *testing.T) {
-	mockClient := &MockCloudWatchLogsClient{}
-	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
+	t.Parallel()
 
 	logGroupName := "test-log-group"
 	logStreamName := "test-log-stream"
@@ -143,25 +119,32 @@ func TestAWSCloudWatchLogsRepository_PutLogEvents(t *testing.T) {
 			Timestamp: aws.Int64(time.Now().UnixMilli()),
 		},
 	}
-
 	expectedOutput := &cloudwatchlogs.PutLogEventsOutput{
 		NextSequenceToken: aws.String("next-token"),
 	}
 
-	mockClient.On("PutLogEvents", mock.Anything, mock.MatchedBy(func(input *cloudwatchlogs.PutLogEventsInput) bool {
-		return *input.LogGroupName == logGroupName && *input.LogStreamName == logStreamName && len(input.LogEvents) == 1
-	})).Return(expectedOutput, nil)
+	ctrl := gomock.NewController(t)
+	mockClient := mocks.NewMockAWSCloudWatchLogsClientInterface(ctrl)
+	mockClient.EXPECT().
+		PutLogEvents(gomock.Any(), gomock.AssignableToTypeOf(&cloudwatchlogs.PutLogEventsInput{})).
+		DoAndReturn(func(_ context.Context, input *cloudwatchlogs.PutLogEventsInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.PutLogEventsOutput, error) {
+			require.NotNil(t, input.LogGroupName)
+			require.NotNil(t, input.LogStreamName)
+			require.Equal(t, logGroupName, *input.LogGroupName)
+			require.Equal(t, logStreamName, *input.LogStreamName)
+			require.Len(t, input.LogEvents, 1)
+			return expectedOutput, nil
+		})
 
-	result, err := repo.PutLogEvents(context.Background(), logGroupName, logStreamName, logEvents, nil)
+	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
+	got, err := repo.PutLogEvents(context.Background(), logGroupName, logStreamName, logEvents, nil)
 
-	assert.NoError(t, err)
-	assert.Equal(t, expectedOutput, result)
-	mockClient.AssertExpectations(t)
+	require.NoError(t, err)
+	require.Equal(t, expectedOutput, got)
 }
 
 func TestAWSCloudWatchLogsRepository_DescribeLogGroups(t *testing.T) {
-	mockClient := &MockCloudWatchLogsClient{}
-	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
+	t.Parallel()
 
 	in := &cloudwatchlogs.DescribeLogGroupsInput{LogGroupNamePrefix: aws.String("test-")}
 	expectedOutput := &cloudwatchlogs.DescribeLogGroupsOutput{
@@ -174,44 +157,55 @@ func TestAWSCloudWatchLogsRepository_DescribeLogGroups(t *testing.T) {
 		},
 	}
 
-	mockClient.On("DescribeLogGroups", mock.Anything, mock.MatchedBy(func(input *cloudwatchlogs.DescribeLogGroupsInput) bool {
-		return input.LogGroupNamePrefix != nil && *input.LogGroupNamePrefix == *in.LogGroupNamePrefix
-	})).Return(expectedOutput, nil)
+	ctrl := gomock.NewController(t)
+	mockClient := mocks.NewMockAWSCloudWatchLogsClientInterface(ctrl)
+	mockClient.EXPECT().
+		DescribeLogGroups(gomock.Any(), gomock.AssignableToTypeOf(&cloudwatchlogs.DescribeLogGroupsInput{})).
+		DoAndReturn(func(_ context.Context, input *cloudwatchlogs.DescribeLogGroupsInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.DescribeLogGroupsOutput, error) {
+			require.NotNil(t, input.LogGroupNamePrefix)
+			require.Equal(t, *in.LogGroupNamePrefix, *input.LogGroupNamePrefix)
+			return expectedOutput, nil
+		})
 
-	result, err := repo.DescribeLogGroups(context.Background(), in)
+	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
+	got, err := repo.DescribeLogGroups(context.Background(), in)
 
-	assert.NoError(t, err)
-	assert.Equal(t, expectedOutput, result)
-	assert.Len(t, result.LogGroups, 1)
-	mockClient.AssertExpectations(t)
+	require.NoError(t, err)
+	require.Equal(t, expectedOutput, got)
+	require.Len(t, got.LogGroups, 1)
 }
 
 func TestAWSCloudWatchLogsRepository_PutRetentionPolicy(t *testing.T) {
-	mockClient := &MockCloudWatchLogsClient{}
-	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
+	t.Parallel()
 
 	logGroupName := "test-log-group"
 	retentionInDays := int32(30)
 
-	mockClient.On("PutRetentionPolicy", mock.Anything, mock.MatchedBy(func(input *cloudwatchlogs.PutRetentionPolicyInput) bool {
-		return *input.LogGroupName == logGroupName && *input.RetentionInDays == retentionInDays
-	})).Return(&cloudwatchlogs.PutRetentionPolicyOutput{}, nil)
+	ctrl := gomock.NewController(t)
+	mockClient := mocks.NewMockAWSCloudWatchLogsClientInterface(ctrl)
+	mockClient.EXPECT().
+		PutRetentionPolicy(gomock.Any(), gomock.AssignableToTypeOf(&cloudwatchlogs.PutRetentionPolicyInput{})).
+		DoAndReturn(func(_ context.Context, input *cloudwatchlogs.PutRetentionPolicyInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.PutRetentionPolicyOutput, error) {
+			require.NotNil(t, input.LogGroupName)
+			require.NotNil(t, input.RetentionInDays)
+			require.Equal(t, logGroupName, *input.LogGroupName)
+			require.Equal(t, retentionInDays, *input.RetentionInDays)
+			return &cloudwatchlogs.PutRetentionPolicyOutput{}, nil
+		})
 
+	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
 	_, err := repo.PutRetentionPolicy(context.Background(), logGroupName, retentionInDays)
 
-	assert.NoError(t, err)
-	mockClient.AssertExpectations(t)
+	require.NoError(t, err)
 }
 
 func TestAWSCloudWatchLogsRepository_DescribeLogStreams(t *testing.T) {
-	mockClient := &MockCloudWatchLogsClient{}
-	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
+	t.Parallel()
 
 	in := &cloudwatchlogs.DescribeLogStreamsInput{
 		LogGroupName:        aws.String("test-log-group"),
 		LogStreamNamePrefix: aws.String("test-stream-"),
 	}
-
 	expectedOutput := &cloudwatchlogs.DescribeLogStreamsOutput{
 		LogStreams: []types.LogStream{
 			{
@@ -222,21 +216,28 @@ func TestAWSCloudWatchLogsRepository_DescribeLogStreams(t *testing.T) {
 		},
 	}
 
-	mockClient.On("DescribeLogStreams", mock.Anything, mock.MatchedBy(func(input *cloudwatchlogs.DescribeLogStreamsInput) bool {
-		return *input.LogGroupName == *in.LogGroupName && input.LogStreamNamePrefix != nil && *input.LogStreamNamePrefix == *in.LogStreamNamePrefix
-	})).Return(expectedOutput, nil)
+	ctrl := gomock.NewController(t)
+	mockClient := mocks.NewMockAWSCloudWatchLogsClientInterface(ctrl)
+	mockClient.EXPECT().
+		DescribeLogStreams(gomock.Any(), gomock.AssignableToTypeOf(&cloudwatchlogs.DescribeLogStreamsInput{})).
+		DoAndReturn(func(_ context.Context, input *cloudwatchlogs.DescribeLogStreamsInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.DescribeLogStreamsOutput, error) {
+			require.NotNil(t, input.LogGroupName)
+			require.NotNil(t, input.LogStreamNamePrefix)
+			require.Equal(t, *in.LogGroupName, *input.LogGroupName)
+			require.Equal(t, *in.LogStreamNamePrefix, *input.LogStreamNamePrefix)
+			return expectedOutput, nil
+		})
 
-	result, err := repo.DescribeLogStreams(context.Background(), in)
+	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
+	got, err := repo.DescribeLogStreams(context.Background(), in)
 
-	assert.NoError(t, err)
-	assert.Equal(t, expectedOutput, result)
-	assert.Len(t, result.LogStreams, 1)
-	mockClient.AssertExpectations(t)
+	require.NoError(t, err)
+	require.Equal(t, expectedOutput, got)
+	require.Len(t, got.LogStreams, 1)
 }
 
 func TestAWSCloudWatchLogsRepository_FilterLogEvents(t *testing.T) {
-	mockClient := &MockCloudWatchLogsClient{}
-	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
+	t.Parallel()
 
 	startTime := int64(1640995200) // 2022-01-01 00:00:00 UTC
 	endTime := int64(1641081600)   // 2022-01-02 00:00:00 UTC
@@ -246,7 +247,6 @@ func TestAWSCloudWatchLogsRepository_FilterLogEvents(t *testing.T) {
 		EndTime:       aws.Int64(endTime),
 		FilterPattern: aws.String("ERROR"),
 	}
-
 	expectedOutput := &cloudwatchlogs.FilterLogEventsOutput{
 		Events: []types.FilteredLogEvent{
 			{
@@ -257,80 +257,199 @@ func TestAWSCloudWatchLogsRepository_FilterLogEvents(t *testing.T) {
 		},
 	}
 
-	mockClient.On("FilterLogEvents", mock.Anything, mock.MatchedBy(func(input *cloudwatchlogs.FilterLogEventsInput) bool {
-		return *input.LogGroupName == *in.LogGroupName && *input.StartTime == *in.StartTime && *input.EndTime == *in.EndTime && *input.FilterPattern == *in.FilterPattern
-	})).Return(expectedOutput, nil)
+	ctrl := gomock.NewController(t)
+	mockClient := mocks.NewMockAWSCloudWatchLogsClientInterface(ctrl)
+	mockClient.EXPECT().
+		FilterLogEvents(gomock.Any(), gomock.AssignableToTypeOf(&cloudwatchlogs.FilterLogEventsInput{})).
+		DoAndReturn(func(_ context.Context, input *cloudwatchlogs.FilterLogEventsInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.FilterLogEventsOutput, error) {
+			require.NotNil(t, input.LogGroupName)
+			require.NotNil(t, input.StartTime)
+			require.NotNil(t, input.EndTime)
+			require.NotNil(t, input.FilterPattern)
+			require.Equal(t, *in.LogGroupName, *input.LogGroupName)
+			require.Equal(t, *in.StartTime, *input.StartTime)
+			require.Equal(t, *in.EndTime, *input.EndTime)
+			require.Equal(t, *in.FilterPattern, *input.FilterPattern)
+			return expectedOutput, nil
+		})
 
-	result, err := repo.FilterLogEvents(context.Background(), in)
+	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
+	got, err := repo.FilterLogEvents(context.Background(), in)
 
-	assert.NoError(t, err)
-	assert.Equal(t, expectedOutput, result)
-	assert.Len(t, result.Events, 1)
-	mockClient.AssertExpectations(t)
+	require.NoError(t, err)
+	require.Equal(t, expectedOutput, got)
+	require.Len(t, got.Events, 1)
 }
 
 func TestAWSCloudWatchLogsRepository_GetNextSequenceToken(t *testing.T) {
-	mockClient := &MockCloudWatchLogsClient{}
-	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
+	t.Parallel()
 
 	logGroupName := "test-log-group"
 	logStreamName := "test-stream"
 	expectedToken := "sequence-token-123"
 
-	streamsOutput := &cloudwatchlogs.DescribeLogStreamsOutput{
-		LogStreams: []types.LogStream{
+	tests := []struct {
+		name       string
+		setupMock  func(m *mocks.MockAWSCloudWatchLogsClientInterface)
+		want       *string
+		wantErrMsg string
+	}{
+		{
+			name: "success",
+			setupMock: func(m *mocks.MockAWSCloudWatchLogsClientInterface) {
+				streamsOutput := &cloudwatchlogs.DescribeLogStreamsOutput{
+					LogStreams: []types.LogStream{
+						{
+							LogStreamName:       aws.String(logStreamName),
+							UploadSequenceToken: aws.String(expectedToken),
+						},
+					},
+				}
+				m.EXPECT().
+					DescribeLogStreams(gomock.Any(), gomock.AssignableToTypeOf(&cloudwatchlogs.DescribeLogStreamsInput{})).
+					DoAndReturn(func(_ context.Context, input *cloudwatchlogs.DescribeLogStreamsInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.DescribeLogStreamsOutput, error) {
+						require.NotNil(t, input.LogGroupName)
+						require.NotNil(t, input.LogStreamNamePrefix)
+						require.Equal(t, logGroupName, *input.LogGroupName)
+						require.Equal(t, logStreamName, *input.LogStreamNamePrefix)
+						return streamsOutput, nil
+					})
+			},
+			want: aws.String(expectedToken),
+		},
+		{
+			name: "stream not found",
+			setupMock: func(m *mocks.MockAWSCloudWatchLogsClientInterface) {
+				m.EXPECT().
+					DescribeLogStreams(gomock.Any(), gomock.Any()).
+					Return(&cloudwatchlogs.DescribeLogStreamsOutput{LogStreams: []types.LogStream{}}, nil)
+			},
+			wantErrMsg: "log stream not found",
+		},
+	}
+
+	for i := range tests {
+		tc := tests[i]
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			ctrl := gomock.NewController(t)
+			mockClient := mocks.NewMockAWSCloudWatchLogsClientInterface(ctrl)
+			tc.setupMock(mockClient)
+
+			repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
+			got, err := repo.GetNextSequenceToken(context.Background(), logGroupName, logStreamName)
+
+			if tc.wantErrMsg != "" {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.wantErrMsg)
+				require.Nil(t, got)
+				return
+			}
+
+			require.NoError(t, err)
+			require.Equal(t, tc.want, got)
+		})
+	}
+}
+
+func TestAWSCloudWatchLogsRepository_DescribeMetricFilters(t *testing.T) {
+	t.Parallel()
+
+	in := &cloudwatchlogs.DescribeMetricFiltersInput{LogGroupName: aws.String("test-log-group")}
+	expectedOutput := &cloudwatchlogs.DescribeMetricFiltersOutput{
+		MetricFilters: []types.MetricFilter{
 			{
-				LogStreamName:       aws.String(logStreamName),
-				UploadSequenceToken: aws.String(expectedToken),
+				FilterName:    aws.String("test-filter"),
+				FilterPattern: aws.String("[...]"),
+				LogGroupName:  aws.String(*in.LogGroupName),
+				CreationTime:  aws.Int64(time.Now().UnixMilli()),
+				MetricTransformations: []types.MetricTransformation{
+					{
+						MetricName:  aws.String("test-metric-name"),
+						MetricValue: aws.String("1"),
+					},
+				},
 			},
 		},
 	}
 
-	mockClient.On("DescribeLogStreams", mock.Anything, mock.MatchedBy(func(input *cloudwatchlogs.DescribeLogStreamsInput) bool {
-		return *input.LogGroupName == logGroupName && *input.LogStreamNamePrefix == logStreamName
-	})).Return(streamsOutput, nil)
-
-	result, err := repo.GetNextSequenceToken(context.Background(), logGroupName, logStreamName)
-
-	assert.NoError(t, err)
-	assert.Equal(t, expectedToken, *result)
-	mockClient.AssertExpectations(t)
-}
-
-func TestAWSCloudWatchLogsRepository_GetNextSequenceToken_StreamNotFound(t *testing.T) {
-	mockClient := &MockCloudWatchLogsClient{}
-	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
-
-	logGroupName := "test-log-group"
-	logStreamName := "non-existent-stream"
-
-	streamsOutput := &cloudwatchlogs.DescribeLogStreamsOutput{
-		LogStreams: []types.LogStream{}, // Empty result
+	tests := []struct {
+		name       string
+		input      *cloudwatchlogs.DescribeMetricFiltersInput
+		setupMock  func(m *mocks.MockAWSCloudWatchLogsClientInterface)
+		want       *cloudwatchlogs.DescribeMetricFiltersOutput
+		wantErrMsg string
+	}{
+		{
+			name:  "success",
+			input: in,
+			setupMock: func(m *mocks.MockAWSCloudWatchLogsClientInterface) {
+				m.EXPECT().
+					DescribeMetricFilters(gomock.Any(), gomock.AssignableToTypeOf(&cloudwatchlogs.DescribeMetricFiltersInput{})).
+					DoAndReturn(func(_ context.Context, input *cloudwatchlogs.DescribeMetricFiltersInput, _ ...func(*cloudwatchlogs.Options)) (*cloudwatchlogs.DescribeMetricFiltersOutput, error) {
+						require.NotNil(t, input.LogGroupName)
+						require.Equal(t, *in.LogGroupName, *input.LogGroupName)
+						return expectedOutput, nil
+					})
+			},
+			want: expectedOutput,
+		},
+		{
+			name:  "client error",
+			input: &cloudwatchlogs.DescribeMetricFiltersInput{LogGroupName: aws.String("test-log-group")},
+			setupMock: func(m *mocks.MockAWSCloudWatchLogsClientInterface) {
+				m.EXPECT().
+					DescribeMetricFilters(gomock.Any(), gomock.Any()).
+					Return(nil, errTestCloudWatchLogs)
+			},
+			wantErrMsg: "cloudwatchlogs DescribeMetricFilters",
+		},
+		{
+			name:  "nil input",
+			input: nil,
+			wantErrMsg: "DescribeMetricFiltersInput cannot be nil",
+		},
 	}
 
-	mockClient.On("DescribeLogStreams", mock.Anything, mock.Anything).Return(streamsOutput, nil)
+	for i := range tests {
+		tc := tests[i]
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 
-	result, err := repo.GetNextSequenceToken(context.Background(), logGroupName, logStreamName)
+			ctrl := gomock.NewController(t)
+			mockClient := mocks.NewMockAWSCloudWatchLogsClientInterface(ctrl)
+			if tc.setupMock != nil {
+				tc.setupMock(mockClient)
+			}
 
-	assert.Error(t, err)
-	assert.Nil(t, result)
-	assert.Contains(t, err.Error(), "log stream not found")
-	mockClient.AssertExpectations(t)
+			repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
+			got, err := repo.DescribeMetricFilters(context.Background(), tc.input)
+
+			if tc.wantErrMsg != "" {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.wantErrMsg)
+				require.Nil(t, got)
+				if tc.input == nil {
+					return
+				}
+				require.Contains(t, err.Error(), errTestCloudWatchLogs.Error())
+				return
+			}
+
+			require.NoError(t, err)
+			require.Equal(t, tc.want, got)
+			require.Len(t, got.MetricFilters, 1)
+		})
+	}
 }
 
-// Test actual AWSCloudWatchLogsRepository functions with integration-style tests
 func TestAWSCloudWatchLogsRepositoryReal_PutRetentionPolicy(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
 
-	// Skip if no real AWS credentials are available
 	t.Skip("Skipping CloudWatch Logs integration test - requires real AWS credentials")
-
-	// This would test the actual repository with real AWS client
-	// mockClient := &cloudwatchlogs.Client{} // Real client
-	// repo := NewAWSCloudWatchLogsRepository(mockClient)
-	// ... test actual AWS calls
 }
 
 func TestAWSCloudWatchLogsRepositoryReal_DescribeLogStreams(t *testing.T) {
@@ -363,66 +482,4 @@ func TestAWSCloudWatchLogsRepositoryReal_GetNextSequenceToken_StreamNotFound(t *
 	}
 
 	t.Skip("Skipping CloudWatch Logs integration test - requires real AWS credentials")
-}
-
-func TestAWSCloudWatchLogsRepository_DescribeMetricFilters(t *testing.T) {
-	mockClient := &MockCloudWatchLogsClient{}
-	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
-
-	in := &cloudwatchlogs.DescribeMetricFiltersInput{LogGroupName: aws.String("test-log-group")}
-	expectedOutput := &cloudwatchlogs.DescribeMetricFiltersOutput{
-		MetricFilters: []types.MetricFilter{
-			{
-				FilterName:    aws.String("test-filter"),
-				FilterPattern: aws.String("[...]"),
-				LogGroupName:  aws.String(*in.LogGroupName),
-				CreationTime:  aws.Int64(time.Now().UnixMilli()),
-				MetricTransformations: []types.MetricTransformation{
-					{
-						MetricName:  aws.String("test-metric-name"),
-						MetricValue: aws.String("1"),
-					},
-				},
-			},
-		},
-	}
-
-	mockClient.On("DescribeMetricFilters", mock.Anything, mock.MatchedBy(func(input *cloudwatchlogs.DescribeMetricFiltersInput) bool {
-		return input.LogGroupName != nil && *input.LogGroupName == *in.LogGroupName
-	})).Return(expectedOutput, nil)
-
-	result, err := repo.DescribeMetricFilters(context.Background(), in)
-
-	assert.NoError(t, err)
-	assert.Equal(t, expectedOutput, result)
-	assert.Len(t, result.MetricFilters, 1)
-	mockClient.AssertExpectations(t)
-}
-
-func TestAWSCloudWatchLogsRepository_DescribeMetricFilters_Error(t *testing.T) {
-	mockClient := &MockCloudWatchLogsClient{}
-	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
-
-	expectedError := errors.New("cloudwatch logs error")
-
-	mockClient.On("DescribeMetricFilters", mock.Anything, mock.Anything).Return(nil, expectedError)
-
-	_, err := repo.DescribeMetricFilters(context.Background(), &cloudwatchlogs.DescribeMetricFiltersInput{LogGroupName: aws.String("test-log-group")})
-
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "cloudwatchlogs DescribeMetricFilters")
-	assert.Contains(t, err.Error(), expectedError.Error())
-	mockClient.AssertExpectations(t)
-}
-
-func TestAWSCloudWatchLogsRepository_DescribeMetricFilters_NilInput(t *testing.T) {
-	mockClient := &MockCloudWatchLogsClient{}
-	repo := NewAWSCloudWatchLogsRepositoryWithInterface(mockClient)
-
-	result, err := repo.DescribeMetricFilters(context.Background(), nil)
-
-	assert.Error(t, err)
-	assert.Nil(t, result)
-	assert.Contains(t, err.Error(), "DescribeMetricFiltersInput cannot be nil")
-	mockClient.AssertNotCalled(t, "DescribeMetricFilters", mock.Anything, mock.Anything)
 }
