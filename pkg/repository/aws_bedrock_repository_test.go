@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"bytes"
 	"context"
 	"os"
 	"testing"
@@ -61,7 +62,7 @@ func TestAWSBedrockRepository_InvokeModel(t *testing.T) {
 	expectedResponse := []byte(`{"completion":"response"}`)
 
 	mockClient.On("InvokeModel", mock.Anything, mock.MatchedBy(func(input *bedrockruntime.InvokeModelInput) bool {
-		return *input.ModelId == modelID && string(input.Body) == string(payload)
+		return *input.ModelId == modelID && bytes.Equal(input.Body, payload)
 	})).Return(&bedrockruntime.InvokeModelOutput{
 		Body: expectedResponse,
 	}, nil)
@@ -82,7 +83,7 @@ func TestAWSBedrockRepository_InvokeModelWithStream(t *testing.T) {
 	expectedOutput := &bedrockruntime.InvokeModelWithResponseStreamOutput{}
 
 	mockClient.On("InvokeModelWithResponseStream", mock.Anything, mock.MatchedBy(func(input *bedrockruntime.InvokeModelWithResponseStreamInput) bool {
-		return *input.ModelId == modelID && string(input.Body) == string(payload)
+		return *input.ModelId == modelID && bytes.Equal(input.Body, payload)
 	})).Return(expectedOutput, nil)
 
 	result, err := repo.InvokeModelWithStream(context.Background(), modelID, payload)

@@ -1,3 +1,4 @@
+//revive:disable:comments-density reason: table-driven tests are self-explanatory via subtest names.
 package gincontext
 
 import (
@@ -7,199 +8,178 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var errTestSample = errors.New("test")
+
 func TestGetGinContextError(t *testing.T) {
-	c := &gin.Context{}
-	errData := errors.New("test")
-	SetGinContextError(c, errData)
+	t.Parallel()
 
-	type args struct {
-		c *gin.Context
-	}
 	tests := []struct {
-		name    string
-		args    args
 		want    error
-		wantErr bool
+		wantErr error
+		setup   func(c *gin.Context)
+		name    string
 	}{
 		{
-			name: "test1",
-			args: args{
-				c: c,
+			name: "returns stored error",
+			setup: func(c *gin.Context) {
+				SetGinContextError(c, errTestSample)
 			},
-			want:    errData,
-			wantErr: false,
+			want: errTestSample,
 		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetGinContextError(tt.args.c)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetGinContextError() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !errors.Is(tt.want, got) && tt.want != got {
-				t.Errorf("GetGinContextError() = %v, want %v", got, tt.want)
-			}
-		})
+		{
+			name:  "returns nil when no error stored",
+			setup: func(c *gin.Context) {},
+			want:  nil,
+		},
+		{
+			name: "returns ErrCannotGetError for non-error value",
+			setup: func(c *gin.Context) {
+				c.Set(contextKeyError, "not an error")
+			},
+			wantErr: ErrCannotGetError,
+		},
 	}
 
-	c = &gin.Context{}
-	tests = []struct {
-		name    string
-		args    args
-		want    error
-		wantErr bool
-	}{
-		{
-			name: "test2",
-			args: args{
-				c: c,
-			},
-			want:    nil,
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetGinContextError(tt.args.c)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetGinContextError() error = %v, wantErr %v", err, tt.wantErr)
+			t.Parallel()
+
+			c := &gin.Context{}
+			tt.setup(c)
+
+			got, err := GetGinContextError(c)
+			if tt.wantErr != nil {
+				if err == nil {
+					t.Fatalf("GetGinContextError() error = nil, want %v", tt.wantErr)
+				}
+				if !errors.Is(err, tt.wantErr) {
+					t.Fatalf("GetGinContextError() error = %v, want %v", err, tt.wantErr)
+				}
 				return
 			}
-			if !errors.Is(tt.want, got) && tt.want != got {
-				t.Errorf("GetGinContextError() = %v, want %v", got, tt.want)
+			if err != nil {
+				t.Fatalf("GetGinContextError() unexpected error: %v", err)
+			}
+			if !errors.Is(tt.want, got) && !errors.Is(tt.want, got) {
+				t.Fatalf("GetGinContextError() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
 func TestGetGinContextErrorMessage(t *testing.T) {
-	c := &gin.Context{}
-	SetGinContextErrorMessage(c, "test")
-	type args struct {
-		c *gin.Context
-	}
+	t.Parallel()
+
 	tests := []struct {
+		wantErr error
+		setup   func(c *gin.Context)
 		name    string
-		args    args
 		want    string
-		wantErr bool
 	}{
 		{
-			name: "test1",
-			args: args{
-				c: c,
+			name: "returns stored message",
+			setup: func(c *gin.Context) {
+				SetGinContextErrorMessage(c, "test")
 			},
-			want:    "test",
-			wantErr: false,
+			want: "test",
 		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetGinContextErrorMessage(tt.args.c)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetGinContextErrorMessage() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("GetGinContextErrorMessage() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-	c = &gin.Context{}
-	tests = []struct {
-		name    string
-		args    args
-		want    string
-		wantErr bool
-	}{
 		{
-			name: "test1",
-			args: args{
-				c: c,
+			name:  "returns empty string when no message stored",
+			setup: func(c *gin.Context) {},
+			want:  "",
+		},
+		{
+			name: "returns ErrCannotGetMessage for non-string value",
+			setup: func(c *gin.Context) {
+				c.Set(contextKeyErrorMessage, 12345)
 			},
-			want:    "",
-			wantErr: false,
+			wantErr: ErrCannotGetMessage,
 		},
 	}
-	for _, tt := range tests {
+
+	for i := range tests {
+		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetGinContextErrorMessage(tt.args.c)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetGinContextErrorMessage() error = %v, wantErr %v", err, tt.wantErr)
+			t.Parallel()
+
+			c := &gin.Context{}
+			tt.setup(c)
+
+			got, err := GetGinContextErrorMessage(c)
+			if tt.wantErr != nil {
+				if err == nil {
+					t.Fatalf("GetGinContextErrorMessage() error = nil, want %v", tt.wantErr)
+				}
+				if !errors.Is(err, tt.wantErr) {
+					t.Fatalf("GetGinContextErrorMessage() error = %v, want %v", err, tt.wantErr)
+				}
 				return
 			}
+			if err != nil {
+				t.Fatalf("GetGinContextErrorMessage() unexpected error: %v", err)
+			}
 			if got != tt.want {
-				t.Errorf("GetGinContextErrorMessage() = %v, want %v", got, tt.want)
+				t.Fatalf("GetGinContextErrorMessage() = %q, want %q", got, tt.want)
 			}
 		})
 	}
 }
 
 func TestSetGinContextError(t *testing.T) {
-	c := &gin.Context{}
-	type args struct {
-		c   *gin.Context
-		err error
-	}
+	t.Parallel()
+
 	tests := []struct {
+		err  error
 		name string
-		args args
 	}{
-		{
-			name: "test1",
-			args: args{
-				c:   c,
-				err: errors.New("test"),
-			},
-		},
+		{name: "stores error on context", err: errTestSample},
 	}
-	for _, tt := range tests {
+
+	for i := range tests {
+		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
-			SetGinContextError(tt.args.c, tt.args.err)
+			t.Parallel()
+
+			c := &gin.Context{}
+			SetGinContextError(c, tt.err)
+
+			got, err := GetGinContextError(c)
+			if err != nil {
+				t.Fatalf("GetGinContextError() unexpected error: %v", err)
+			}
+			if !errors.Is(got, tt.err) {
+				t.Fatalf("GetGinContextError() = %v, want %v", got, tt.err)
+			}
 		})
 	}
 }
 
-func TestGetGinContextError_NonErrorValue(t *testing.T) {
-	c := &gin.Context{}
-	c.Set(contextKeyError, "not an error") // store non-error value
-	_, err := GetGinContextError(c)
-	if !errors.Is(err, ErrCannotGetError) {
-		t.Errorf("expected ErrCannotGetError, got: %v", err)
-	}
-}
-
-func TestGetGinContextErrorMessage_NonStringValue(t *testing.T) {
-	c := &gin.Context{}
-	c.Set(contextKeyErrorMessage, 12345) // store non-string value
-	_, err := GetGinContextErrorMessage(c)
-	if !errors.Is(err, ErrCannotGetMessage) {
-		t.Errorf("expected ErrCannotGetMessage, got: %v", err)
-	}
-}
-
 func TestSetGinContextErrorMessage(t *testing.T) {
-	c := &gin.Context{}
-	type args struct {
-		c       *gin.Context
-		message any
-	}
+	t.Parallel()
+
 	tests := []struct {
-		name string
-		args args
+		name    string
+		message string
 	}{
-		{
-			name: "test1",
-			args: args{
-				c:       c,
-				message: "test",
-			},
-		},
+		{name: "stores message on context", message: "test"},
 	}
-	for _, tt := range tests {
+
+	for i := range tests {
+		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
-			SetGinContextErrorMessage(tt.args.c, tt.args.message)
+			t.Parallel()
+
+			c := &gin.Context{}
+			SetGinContextErrorMessage(c, tt.message)
+
+			got, err := GetGinContextErrorMessage(c)
+			if err != nil {
+				t.Fatalf("GetGinContextErrorMessage() unexpected error: %v", err)
+			}
+			if got != tt.message {
+				t.Fatalf("GetGinContextErrorMessage() = %q, want %q", got, tt.message)
+			}
 		})
 	}
 }

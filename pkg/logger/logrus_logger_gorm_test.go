@@ -14,8 +14,8 @@ import (
 )
 
 type ToDo struct {
-	ID   int
 	Name string
+	ID   int
 }
 
 func TestNewGormLogger(t *testing.T) {

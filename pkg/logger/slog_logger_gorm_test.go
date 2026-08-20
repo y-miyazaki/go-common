@@ -13,8 +13,8 @@ import (
 )
 
 type ToDoSlog struct {
-	ID   int
 	Name string
+	ID   int
 }
 
 func TestNewSlogGormLogger(t *testing.T) {

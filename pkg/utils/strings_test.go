@@ -1,13 +1,14 @@
+//revive:disable:comments-density reason: table-driven tests are self-explanatory via subtest names.
 package utils
 
 import (
 	"io"
-
 	"strings"
 	"testing"
 )
 
 func TestGetStringCount(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		str string
 	}
@@ -31,16 +32,19 @@ func TestGetStringCount(t *testing.T) {
 			want: 14,
 		},
 	}
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := GetStringCount(tt.args.str); got != tt.want {
-				t.Errorf("GetStringCount() = %v, want %v", got, tt.want)
+				t.Fatalf("GetStringCount(%q) = %v, want %v", tt.args.str, got, tt.want)
 			}
 		})
 	}
 }
 
 func TestCheckStringCount(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		str    string
 		maxLen int
@@ -75,24 +79,27 @@ func TestCheckStringCount(t *testing.T) {
 			want: false,
 		},
 	}
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := CheckStringCount(tt.args.str, tt.args.maxLen); got != tt.want {
-				t.Errorf("CheckStringCount() = %v, want %v", got, tt.want)
+				t.Fatalf("CheckStringCount(%q, %d) = %v, want %v", tt.args.str, tt.args.maxLen, got, tt.want)
 			}
 		})
 	}
 }
 
 func TestSliceUTF8(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		str string
 		pos int
 	}
 	tests := []struct {
 		name string
-		args args
 		want string
+		args args
 	}{
 		{
 			name: "normal1",
@@ -127,20 +134,23 @@ func TestSliceUTF8(t *testing.T) {
 			want: "あいうえお",
 		},
 	}
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := SliceUTF8(tt.args.str, tt.args.pos); got != tt.want {
-				t.Errorf("SliceUTF8() = %v, want %v", got, tt.want)
+				t.Fatalf("SliceUTF8(%q, %d) = %v, want %v", tt.args.str, tt.args.pos, got, tt.want)
 			}
 		})
 	}
 }
 
 func TestSliceUTF8AddString(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		str       string
-		pos       int
 		addString string
+		pos       int
 	}
 	tests := []struct {
 		name string
@@ -184,16 +194,19 @@ func TestSliceUTF8AddString(t *testing.T) {
 			want: "あいうえお",
 		},
 	}
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := SliceUTF8AddString(tt.args.str, tt.args.pos, tt.args.addString); got != tt.want {
-				t.Errorf("SliceUTF8AddString() = %v, want %v", got, tt.want)
+				t.Fatalf("SliceUTF8AddString(%q, %d, %q) = %v, want %v", tt.args.str, tt.args.pos, tt.args.addString, got, tt.want)
 			}
 		})
 	}
 }
 
 func TestConvertToStringaa(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		input any
 	}
@@ -261,21 +274,29 @@ func TestConvertToStringaa(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got, err := ConvertToString(tt.args.input)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ConvertToString() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				if err == nil {
+					t.Fatalf("ConvertToString() error = nil, want error")
+				}
 				return
 			}
+			if err != nil {
+				t.Fatalf("ConvertToString() unexpected error: %v", err)
+			}
 			if got != tt.want {
-				t.Errorf("ConvertToString() = %v, want %v", got, tt.want)
+				t.Fatalf("ConvertToString() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
 func TestGetStringFromReadCloser(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		r io.ReadCloser
 	}
@@ -302,15 +323,22 @@ func TestGetStringFromReadCloser(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got, err := GetStringFromReadCloser(tt.args.r)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetStringFromReadCloser() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				if err == nil {
+					t.Fatalf("GetStringFromReadCloser() error = nil, want error")
+				}
 				return
 			}
+			if err != nil {
+				t.Fatalf("GetStringFromReadCloser() unexpected error: %v", err)
+			}
 			if got != tt.want {
-				t.Errorf("GetStringFromReadCloser() = %v, want %v", got, tt.want)
+				t.Fatalf("GetStringFromReadCloser() = %q, want %q", got, tt.want)
 			}
 		})
 	}

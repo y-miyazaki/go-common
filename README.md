@@ -1,4 +1,5 @@
 <!-- omit in toc -->
+
 # go-common
 
 ![Go](https://custom-icon-badges.herokuapp.com/badge/Go-00ADD8.svg?logo=Go&logoColor=white)
@@ -10,14 +11,15 @@
 
 This repository provides common libraries and example applications for Go language, utilizing libraries such as AWS SDK v2, Gin, and GORM with practical samples.
 
-- go 1.26  
-- AWS SDK v2  
-- Gin (Web Framework)  
-- GORM (ORM)  
-- golangci-lint (Lint Tool)  
-- Delve (Debugger)  
+- go 1.26
+- AWS SDK v2
+- Gin (Web Framework)
+- GORM (ORM)
+- golangci-lint (Lint Tool)
+- Delve (Debugger)
 
 <!-- omit in toc -->
+
 ## Table of Contents
 
 - [Installation](#installation)
@@ -131,27 +133,29 @@ This section explains how to set up a local, non-containerized development works
 
 #### Requirements
 
-- go 1.26 or higher  
-- Git  
-- GitHub CLI (gh)  
+- go 1.26 or higher
+- Git
+- GitHub CLI (gh)
 
 #### Setup
 
-1. Clone the repository:  
-    ```bash
-    git clone https://github.com/y-miyazaki/go-common.git
-    cd go-common
-    ```
+1. Clone the repository:
 
-2. Install dependencies:  
-    ```bash
-    go mod download
-    ```
+   ```bash
+   git clone https://github.com/y-miyazaki/go-common.git
+   cd go-common
+   ```
 
-3. Set up authentication with GitHub CLI:  
-    ```bash
-    gh auth login
-    ```
+2. Install dependencies:
+
+   ```bash
+   go mod download
+   ```
+
+3. Set up authentication with GitHub CLI:
+   ```bash
+   gh auth login
+   ```
 
 ### Local development environment (devcontainer)
 
@@ -168,71 +172,75 @@ This section describes how to use a VS Code devcontainer to create a reproducibl
 
 #### Setup
 
-1. Clone the repository (if not already done):  
+1. Clone the repository (if not already done):
 
-    ```bash
-    git clone https://github.com/y-miyazaki/go-common.git
-    cd go-common
-    ```
+   ```bash
+   git clone https://github.com/y-miyazaki/go-common.git
+   cd go-common
+   ```
 
-2. Create devcontainer  
+2. Create devcontainer
 
-    ```bash
-    mkdir -p .devcontainer
-    mkdir -p env/common/tmp/gh
-    touch env/common/tmp/.gitconfig
-    cp -p env/example/.devcontainer/devcontainer.json .devcontainer/devcontainer.json
-    ```
+   ```bash
+   mkdir -p .devcontainer
+   mkdir -p env/common/tmp/gh
+   touch env/common/tmp/.gitconfig
+   cp -p env/example/.devcontainer/devcontainer.json .devcontainer/devcontainer.json
+   ```
 
-4. Configure .gitconfig  
-    The following excerpt is a locally mounted file; update values for your name and email.
-    ```bash
-    cat env/common/tmp/.gitconfig
-    ```
+3. Configure .gitconfig  
+   The following excerpt is a locally mounted file; update values for your name and email.
 
-    ```gitconfig:env/common/tmp/.gitconfig
-    [user]
-        name = Your Name
-        email = your.email@example.com
-    [init]
-        defaultBranch = main
-    [credential]
-        helper = !gh auth git-credential
-    [safe]
-        directory = /workspace
-    ```
+   ```bash
+   cat env/common/tmp/.gitconfig
+   ```
 
-5. Launch devcontainer from Visual Studio Code  
-    Open the command palette with `F1` or `Ctrl+Shift+P`, then run `Dev Containers: Open folder in Container` (or `Dev containers: Reopen in Container` / `Dev Containers: Rebuild Container`).  
+   ```gitconfig:env/common/tmp/.gitconfig
+   [user]
+       name = Your Name
+       email = your.email@example.com
+   [init]
+       defaultBranch = main
+   [credential]
+       helper = !gh auth git-credential
+   [safe]
+       directory = /workspace
+   ```
 
-6. Download Go modules:  
-    ```bash
-    go mod download
-    ```
+4. Launch devcontainer from Visual Studio Code  
+   Open the command palette with `F1` or `Ctrl+Shift+P`, then run `Dev Containers: Open folder in Container` (or `Dev containers: Reopen in Container` / `Dev Containers: Rebuild Container`).
 
-7. GitHub CLI login  
-    After launching the devcontainer, run the following to log in to GitHub CLI. Skip if already logged in.
+5. Download Go modules:
 
-    ```bash
-    gh auth login
-    ```
+   ```bash
+   go mod download
+   ```
 
-8. Run the Gin example (example/gin1):  
-    ```bash
-    cd example/gin1
-    go run ./...
-    # or from repo root
-    # bash ./scripts/go/check.sh -f ./example/gin1/
-    ```
+6. GitHub CLI login  
+   After launching the devcontainer, run the following to log in to GitHub CLI. Skip if already logged in.
 
-9. Test the server (default port 8080):  
-    ```bash
-    curl http://localhost:8080/health
-    ```
+   ```bash
+   gh auth login
+   ```
+
+7. Run the Gin example (example/gin1):
+
+   ```bash
+   cd example/gin1
+   go run ./...
+   # or from repo root
+   # bash ./scripts/go/check.sh -f ./example/gin1/
+   ```
+
+8. Test the server (default port 8080):
+   ```bash
+   curl http://localhost:8080/health
+   ```
 
 ### Commands
 
 #### Build and Test
+
 ```bash
 # Batch verification (recommended)
 bash ./scripts/go/check.sh
@@ -247,6 +255,7 @@ go test -cover ./...
 ```
 
 #### Code Quality Check
+
 ```bash
 # Batch verification (recommended)
 bash ./scripts/go/check.sh
@@ -260,6 +269,7 @@ govulncheck ./...
 ```
 
 #### Development Support
+
 ```bash
 # Module organization
 go mod tidy
@@ -276,22 +286,22 @@ dlv debug ./example/gin1
 ### Common Issues
 
 - **Git push returns 403 error**  
-    Check if GitHub CLI authentication is set correctly. Use `gh auth status` to verify status, and re-run `gh auth login` if necessary.
+  Check if GitHub CLI authentication is set correctly. Use `gh auth status` to verify status, and re-run `gh auth login` if necessary.
 - **devcontainer startup failure**  
-    Check execution permissions of `env/common/scripts/init.sh` and verify `/bin/sh` compatibility issues. Run with `bash` if needed.
+  Check execution permissions of `env/common/scripts/init.sh` and verify `/bin/sh` compatibility issues. Run with `bash` if needed.
 - **Dependency errors**  
-    Run `go mod tidy` and ensure Go version is 1.24 or higher.
+  Run `go mod tidy` and ensure Go version is 1.24 or higher.
 - **Lint errors**  
-    Check output of `golangci-lint run` and fix pointed locations. Refer to configuration file `.golangci.yml`.
+  Check output of `golangci-lint run` and fix pointed locations. Refer to configuration file `.golangci.yml`.
 
 ### Getting Help
 
 - **Documentation**  
-    Refer to this README and documentation in each directory.
+  Refer to this README and documentation in each directory.
 - **Issues**  
-    Report issues via GitHub Issues.
+  Report issues via GitHub Issues.
 - **Contribution**  
-    Refer to CONTRIBUTING.md and create pull requests.
+  Refer to CONTRIBUTING.md and create pull requests.
 
 ## License
 

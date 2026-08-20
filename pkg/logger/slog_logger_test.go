@@ -14,8 +14,8 @@ import (
 // TestNewLogger tests logger initialization
 func TestNewSlogLogger(t *testing.T) {
 	tests := []struct {
-		name string
 		cfg  *SlogConfig
+		name string
 	}{
 		{
 			name: "should use defaults with nil config",

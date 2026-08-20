@@ -1,3 +1,4 @@
+//revive:disable:comments-density reason: table-driven tests are self-explanatory via subtest names.
 package utils
 
 import (
@@ -7,6 +8,7 @@ import (
 )
 
 func TestGetDateFormatString(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		t      time.Time
 		format string
@@ -163,10 +165,12 @@ func TestGetDateFormatString(t *testing.T) {
 		},
 	}
 	count := 1
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := GetDateFormatString(tt.args.t, tt.args.format); got != tt.want {
-				t.Errorf("GetDateFormatString() = %v, want %v", got, tt.want)
+				t.Fatalf("GetDateFormatString() = %v, want %v", got, tt.want)
 			}
 		})
 		count++
@@ -174,6 +178,7 @@ func TestGetDateFormatString(t *testing.T) {
 }
 
 func TestGetDateTime(t *testing.T) {
+	t.Parallel()
 	tt := time.Date(2019, time.February, 9, 8, 7, 4, 0, time.UTC)
 	tt2 := time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC)
 	type args struct {
@@ -181,9 +186,9 @@ func TestGetDateTime(t *testing.T) {
 		format string
 	}
 	tests := []struct {
-		name    string
-		args    args
 		want    time.Time
+		args    args
+		name    string
 		wantErr bool
 	}{
 		{
@@ -205,30 +210,38 @@ func TestGetDateTime(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got, err := GetDateTime(tt.args.str, tt.args.format)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetDateTime() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				if err == nil {
+					t.Fatalf("GetDateTime() error = nil, want error")
+				}
 				return
 			}
+			if err != nil {
+				t.Fatalf("GetDateTime() unexpected error: %v", err)
+			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetDateTime() = %v, want %v", got, tt.want)
+				t.Fatalf("GetDateTime() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
 func TestConvertUTCToJST(t *testing.T) {
+	t.Parallel()
 	tt := time.Date(2019, time.February, 9, 8, 7, 4, 0, time.UTC)
 	tt2 := tt.In(time.FixedZone("Asia/Tokyo", dateConvertUTCToJSTOffset))
 	type args struct {
 		t time.Time
 	}
 	tests := []struct {
-		name string
 		args args
 		want time.Time
+		name string
 	}{
 		{
 			name: "test1",
@@ -251,24 +264,29 @@ func TestConvertUTCToJST(t *testing.T) {
 			want: "17:07:04",
 		},
 	}
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := ConvertUTCToJST(tt.args.t); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ConvertUTCToJST() = %v, want %v", got, tt.want)
+				t.Fatalf("ConvertUTCToJST() = %v, want %v", got, tt.want)
 			}
 		})
 	}
-	for _, tt := range tests2 {
+	for i := range tests2 {
+		tt := tests2[i]
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got := GetDateFormatString(ConvertUTCToJST(tt.args.t), DateFormatHourMinuteSecond)
 			if got != tt.want {
-				t.Errorf("ConvertUTCToJST() = %v, want %v", got, tt.want)
+				t.Fatalf("ConvertUTCToJST() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
 func TestConvertJSTToUTC(t *testing.T) {
+	t.Parallel()
 	tt := time.Date(2019, time.February, 9, 8, 7, 4, 0, time.UTC)
 	tt2 := tt.In(time.FixedZone("Asia/Tokyo", dateConvertUTCToJSTOffset))
 	type args struct {
@@ -287,11 +305,13 @@ func TestConvertJSTToUTC(t *testing.T) {
 			want: "08:07:04",
 		},
 	}
-	for _, tt := range tests {
+	for i := range tests {
+		tt := tests[i]
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got := GetDateFormatString(ConvertJSTToUTC(tt.args.t), DateFormatHourMinuteSecond)
 			if got != tt.want {
-				t.Errorf("ConvertJSTToUTC() = %v, want %v", got, tt.want)
+				t.Fatalf("ConvertJSTToUTC() = %v, want %v", got, tt.want)
 			}
 		})
 	}

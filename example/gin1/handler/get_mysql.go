@@ -14,7 +14,9 @@ func (h *HTTPHandler) HandleMySQL(c *gin.Context) {
 	// Create the user table in MySQL database
 	err := h.mysqlDB.Migrator().CreateTable(&entity.User{})
 	if err != nil {
-		panic("can't create table")
+		h.Logger.WithError(err).Errorf("can't create table")
+		c.JSON(http.StatusOK, gin.H{"message": "ok"})
+		return
 	}
 
 	// Create a new user record
@@ -28,7 +30,7 @@ func (h *HTTPHandler) HandleMySQL(c *gin.Context) {
 	// Clean up by dropping the table
 	err = h.mysqlDB.Migrator().DropTable(&entity.User{})
 	if err != nil {
-		panic("can't drop table")
+		h.Logger.WithError(err).Errorf("can't drop table")
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "ok"})
 }

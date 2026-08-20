@@ -14,9 +14,9 @@ func TestNewSlack(t *testing.T) {
 		OauthAccessToken: "test",
 	}
 	tests := []struct {
-		name string
 		args args
 		want *slack.Client
+		name string
 	}{
 		{
 			name: "test1",

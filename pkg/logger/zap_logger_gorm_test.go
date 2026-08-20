@@ -12,8 +12,8 @@ import (
 )
 
 type ToDoZap struct {
-	ID   int
 	Name string
+	ID   int
 }
 
 func TestNewZapGormLogger(t *testing.T) {

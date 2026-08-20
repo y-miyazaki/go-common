@@ -40,19 +40,20 @@ func (h *HTTPHandler) HandleS3(c *gin.Context) {
 	object, err := h.awsS3Repository.GetObject(bucket, "test.txt")
 	if err != nil {
 		h.Logger.WithError(err).Errorf("can't get s3 object")
-	}
-	rc := object.Body
-	defer func() {
-		err = rc.Close()
+	} else if object != nil && object.Body != nil {
+		rc := object.Body
+		defer func() {
+			err = rc.Close()
+			if err != nil {
+				h.Logger.WithError(err).Errorf("can't close body")
+			}
+		}()
+		text, err = utils.GetStringFromReadCloser(rc)
 		if err != nil {
-			h.Logger.WithError(err).Errorf("can't close body")
+			h.Logger.WithError(err).Errorf("can't get text")
 		}
-	}()
-	text, err = utils.GetStringFromReadCloser(rc)
-	if err != nil {
-		h.Logger.WithError(err).Errorf("can't get text")
+		h.Logger.Infof("text.txt = %s", text)
 	}
-	h.Logger.Infof("text.txt = %s", text)
 
 	// ListObjectV2
 	listObjects, err := h.awsS3Repository.ListObjectsV2(bucket, "")

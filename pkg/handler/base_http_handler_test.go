@@ -51,7 +51,7 @@ func TestBaseHTTPHandler_ResponseZIP(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.Equal(t, "application/zip", w.Header().Get("Content-Type"))
 	assert.Equal(t, "attachment;filename=test.zip", w.Header().Get("Content-Disposition"))
-	assert.True(t, len(w.Body.Bytes()) > 0)
+	assert.Positive(t, len(w.Body.Bytes()))
 }
 
 func TestBaseHTTPHandler_ResponseStatusBadRequest(t *testing.T) {

@@ -35,8 +35,8 @@ func TestAWSServiceString(t *testing.T) {
 
 func TestCreateHTTPClientWithLogger(t *testing.T) {
 	tests := []struct {
-		name     string
 		logger   any
+		name     string
 		expected bool
 	}{
 		{
@@ -88,9 +88,9 @@ func TestCreateHTTPClientWithLogger(t *testing.T) {
 
 func TestCreateAWSConfig(t *testing.T) {
 	tests := []struct {
-		name        string
 		params      *AWSConfigParams
 		httpClient  *http.Client
+		name        string
 		expectError bool
 	}{
 		{

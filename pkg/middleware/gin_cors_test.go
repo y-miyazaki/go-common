@@ -31,7 +31,7 @@ func TestGinCors_AllowAllOrigins(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-	c.Request, _ = http.NewRequest("GET", "/test", nil)
+	c.Request, _ = http.NewRequest(http.MethodGet, "/test", nil)
 	c.Request.Header.Set("Origin", "http://example.com")
 
 	middleware(c)
@@ -49,7 +49,7 @@ func TestGinCors_SpecificOrigin(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-	c.Request, _ = http.NewRequest("GET", "/test", nil)
+	c.Request, _ = http.NewRequest(http.MethodGet, "/test", nil)
 	c.Request.Header.Set("Origin", "http://example.com")
 
 	middleware(c)
@@ -66,7 +66,7 @@ func TestGinCors_InvalidOrigin(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-	c.Request, _ = http.NewRequest("GET", "/test", nil)
+	c.Request, _ = http.NewRequest(http.MethodGet, "/test", nil)
 	c.Request.Header.Set("Origin", "http://invalid.com")
 
 	middleware(c)
@@ -86,7 +86,7 @@ func TestGinCors_OptionsRequest(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-	c.Request, _ = http.NewRequest("OPTIONS", "/test", nil)
+	c.Request, _ = http.NewRequest(http.MethodOptions, "/test", nil)
 	c.Request.Header.Set("Origin", "http://example.com")
 
 	middleware(c)
@@ -123,7 +123,7 @@ func TestGinCors_OptionsRequest_NoOptionsMethod(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
-	c.Request, _ = http.NewRequest("OPTIONS", "/test", nil)
+	c.Request, _ = http.NewRequest(http.MethodOptions, "/test", nil)
 	c.Request.Header.Set("Origin", "http://example.com")
 
 	middleware(c)

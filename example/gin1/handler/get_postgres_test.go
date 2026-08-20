@@ -1,3 +1,4 @@
+//revive:disable:comments-density reason: table-driven tests are self-explanatory via subtest names.
 package handler
 
 import (
@@ -6,50 +7,65 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestHTTPHandler_HandlePostgres(t *testing.T) {
-	// Skip test that requires complex GORM mocking
-	t.Skip("Skipping PostgreSQL test - requires complex GORM mocking setup")
+	tests := []struct {
+		setup      func(t *testing.T) *HTTPHandler
+		name       string
+		wantBody   string
+		wantStatus int
+	}{
+		{
+			name: "creates user and returns ok",
+			setup: func(t *testing.T) *HTTPHandler {
+				return NewHTTPHandler(newTestLogger(), nil, newPostgresGormDB(t), nil, nil)
+			},
+			wantStatus: http.StatusOK,
+			wantBody:   `"message":"ok"`,
+		},
+		{
+			name: "create table error returns ok without panic",
+			setup: func(t *testing.T) *HTTPHandler {
+				return NewHTTPHandler(newTestLogger(), nil, newPostgresGormDBCreateTableError(t), nil, nil)
+			},
+			wantStatus: http.StatusOK,
+			wantBody:   `"message":"ok"`,
+		},
+	}
 
-	// This test would require setting up comprehensive GORM mocks
-	// For now, we skip it to avoid complex mocking setup
-	// TODO: Implement comprehensive GORM mocking for testing
+	for i := range tests {
+		tt := tests[i]
+		t.Run(tt.name, func(t *testing.T) {
+			h := tt.setup(t)
+			status, body := invokeHandler(t, h.HandlePostgres)
+			require.Equal(t, tt.wantStatus, status)
+			require.Contains(t, body, tt.wantBody)
+		})
+	}
 }
 
-func TestHTTPHandler_HandlePostgres_POST(t *testing.T) {
-	// Create HTTPHandler instance
+func TestHTTPHandler_HandlePostgres_Route(t *testing.T) {
+	tests := []struct {
+		name       string
+		method     string
+		wantStatus int
+	}{
+		{name: "post method returns not found", method: http.MethodPost, wantStatus: http.StatusNotFound},
+	}
+
 	h := &HTTPHandler{}
-
-	// Create a new Gin router
 	router := gin.New()
-
-	// Register the route
 	router.GET("/postgres", h.HandlePostgres)
 
-	// Create a test request with POST method (should not match)
-	req, err := http.NewRequest("POST", "/postgres", nil)
-	assert.NoError(t, err)
-
-	// Create a response recorder
-	w := httptest.NewRecorder()
-
-	// Perform the request
-	router.ServeHTTP(w, req)
-
-	// Assert the response - should be 404 Not Found for unmatched route
-	assert.Equal(t, http.StatusNotFound, w.Code)
-}
-
-func TestHTTPHandler_HandlePostgres_ErrorCreateTable(t *testing.T) {
-	// Mock the database to return an error on CreateTable
-	// Since we can't easily mock GORM, we'll skip this test for now
-	t.Skip("Skipping error test due to GORM mocking complexity")
-}
-
-func TestHTTPHandler_HandlePostgres_ErrorDropTable(t *testing.T) {
-	// Mock the database to return an error on DropTable
-	// Since we can't easily mock GORM, we'll skip this test for now
-	t.Skip("Skipping error test due to GORM mocking complexity")
+	for i := range tests {
+		tt := tests[i]
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(tt.method, "/postgres", http.NoBody)
+			rec := httptest.NewRecorder()
+			router.ServeHTTP(rec, req)
+			require.Equal(t, tt.wantStatus, rec.Code)
+		})
+	}
 }

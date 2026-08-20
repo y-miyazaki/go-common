@@ -605,18 +605,18 @@ func TestAWSCognitoRepository_GetSecretHash(t *testing.T) {
 	hash := repo.getSecretHash("testuser")
 
 	assert.NotEmpty(t, hash)
-	assert.True(t, len(hash) > 0)
+	assert.Positive(t, len(hash))
 }
 
 func TestAWSCognitoRepository_GetAccessToken(t *testing.T) {
 	repo := &AWSCognitoRepository{}
 
 	tests := []struct {
+		errorType           error
 		name                string
 		authorizationHeader string
 		expectedToken       string
 		expectError         bool
-		errorType           error
 	}{
 		{
 			name:                "valid bearer token",

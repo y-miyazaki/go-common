@@ -1,3 +1,4 @@
+//revive:disable:comments-density reason: table-driven tests are self-explanatory via subtest names.
 package handler
 
 import (
@@ -6,55 +7,52 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestHTTPHandler_HealthCheck(t *testing.T) {
-	// Create a new Gin router
-	router := gin.New()
+	t.Parallel()
 
-	// Create HTTPHandler instance
-	h := &HTTPHandler{}
+	tests := []struct {
+		name       string
+		wantBody   string
+		wantStatus int
+	}{
+		{name: "returns ok message", wantStatus: http.StatusOK, wantBody: `"message":"ok"`},
+	}
 
-	// Register the route
-	router.GET("/health", h.HealthCheck)
-
-	// Create a test request
-	req, err := http.NewRequest("GET", "/health", nil)
-	assert.NoError(t, err)
-
-	// Create a response recorder
-	w := httptest.NewRecorder()
-
-	// Perform the request
-	router.ServeHTTP(w, req)
-
-	// Assert the response
-	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Contains(t, w.Body.String(), "ok")
-	assert.Contains(t, w.Body.String(), "message")
+	for i := range tests {
+		tt := tests[i]
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			h := &HTTPHandler{}
+			status, body := invokeHandler(t, h.HealthCheck)
+			require.Equal(t, tt.wantStatus, status)
+			require.Contains(t, body, tt.wantBody)
+		})
+	}
 }
 
-func TestHTTPHandler_HealthCheck_POST(t *testing.T) {
-	// Create a new Gin router
-	router := gin.New()
+func TestHTTPHandler_HealthCheck_Route(t *testing.T) {
+	tests := []struct {
+		name       string
+		method     string
+		wantStatus int
+	}{
+		{name: "post method returns not found", method: http.MethodPost, wantStatus: http.StatusNotFound},
+	}
 
-	// Create HTTPHandler instance
 	h := &HTTPHandler{}
-
-	// Register the route
+	router := gin.New()
 	router.GET("/health", h.HealthCheck)
 
-	// Create a test request with POST method (should not match)
-	req, err := http.NewRequest("POST", "/health", nil)
-	assert.NoError(t, err)
-
-	// Create a response recorder
-	w := httptest.NewRecorder()
-
-	// Perform the request
-	router.ServeHTTP(w, req)
-
-	// Assert the response - should be 404 Not Found for unmatched route
-	assert.Equal(t, http.StatusNotFound, w.Code)
+	for i := range tests {
+		tt := tests[i]
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(tt.method, "/health", http.NoBody)
+			rec := httptest.NewRecorder()
+			router.ServeHTTP(rec, req)
+			require.Equal(t, tt.wantStatus, rec.Code)
+		})
+	}
 }

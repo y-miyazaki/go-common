@@ -1,76 +1,96 @@
+//revive:disable:comments-density reason: table-driven tests are self-explanatory via subtest names.
 package config
 
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewConfig(t *testing.T) {
-	setting := &Setting{
-		LoggerFormatter:       "json",
-		LoggerOut:             "stdout",
-		LoggerLevel:           "info",
-		SlackOauthAccessToken: "",
+	t.Parallel()
+
+	tests := []struct {
+		setting      *Setting
+		name         string
+		wantSlackNil bool
+	}{
+		{
+			name: "json logger without slack",
+			setting: &Setting{
+				LoggerFormatter:       "json",
+				LoggerOut:             "stdout",
+				LoggerLevel:           "info",
+				SlackOauthAccessToken: "",
+			},
+			wantSlackNil: true,
+		},
+		{
+			name: "text logger with slack token",
+			setting: &Setting{
+				LoggerFormatter:       "text",
+				LoggerOut:             "stdout",
+				LoggerLevel:           "debug",
+				SlackOauthAccessToken: "test-token",
+			},
+			wantSlackNil: false,
+		},
 	}
 
-	config := NewConfig(setting)
-
-	assert.NotNil(t, config)
-	assert.NotNil(t, config.Logger)
-	assert.Nil(t, config.SlackClient)
+	for i := range tests {
+		tt := tests[i]
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			cfg := NewConfig(tt.setting)
+			require.NotNil(t, cfg)
+			require.NotNil(t, cfg.Logger)
+			if tt.wantSlackNil {
+				require.Nil(t, cfg.SlackClient)
+			} else {
+				require.NotNil(t, cfg.SlackClient)
+			}
+		})
+	}
 }
 
-func TestNewConfigWithSlack(t *testing.T) {
-	setting := &Setting{
-		LoggerFormatter:       "text",
-		LoggerOut:             "stdout",
-		LoggerLevel:           "debug",
-		SlackOauthAccessToken: "test-token",
+func TestNewConfig_InvalidSetting(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		setting *Setting
+		name    string
+	}{
+		{
+			name: "invalid formatter panics",
+			setting: &Setting{
+				LoggerFormatter: "invalid",
+				LoggerOut:       "stdout",
+				LoggerLevel:     "info",
+			},
+		},
+		{
+			name: "invalid output panics",
+			setting: &Setting{
+				LoggerFormatter: "json",
+				LoggerOut:       "invalid",
+				LoggerLevel:     "info",
+			},
+		},
+		{
+			name: "invalid level panics",
+			setting: &Setting{
+				LoggerFormatter: "json",
+				LoggerOut:       "stdout",
+				LoggerLevel:     "invalid",
+			},
+		},
 	}
 
-	config := NewConfig(setting)
-
-	assert.NotNil(t, config)
-	assert.NotNil(t, config.Logger)
-	assert.NotNil(t, config.SlackClient)
-}
-
-func TestNewConfigInvalidFormatter(t *testing.T) {
-	setting := &Setting{
-		LoggerFormatter:       "invalid",
-		LoggerOut:             "stdout",
-		LoggerLevel:           "info",
-		SlackOauthAccessToken: "",
+	for i := range tests {
+		tt := tests[i]
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			require.Panics(t, func() { NewConfig(tt.setting) })
+		})
 	}
-
-	assert.Panics(t, func() {
-		NewConfig(setting)
-	})
-}
-
-func TestNewConfigInvalidOut(t *testing.T) {
-	setting := &Setting{
-		LoggerFormatter:       "json",
-		LoggerOut:             "invalid",
-		LoggerLevel:           "info",
-		SlackOauthAccessToken: "",
-	}
-
-	assert.Panics(t, func() {
-		NewConfig(setting)
-	})
-}
-
-func TestNewConfigInvalidLevel(t *testing.T) {
-	setting := &Setting{
-		LoggerFormatter:       "json",
-		LoggerOut:             "stdout",
-		LoggerLevel:           "invalid",
-		SlackOauthAccessToken: "",
-	}
-
-	assert.Panics(t, func() {
-		NewConfig(setting)
-	})
 }

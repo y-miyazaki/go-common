@@ -469,7 +469,7 @@ func TestAWSSESRepository_SendBulkEmail_EmptyEntries(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedOutput, result)
-	assert.Len(t, result.BulkEmailEntryResults, 0)
+	assert.Empty(t, result.BulkEmailEntryResults)
 	mockClient.AssertExpectations(t)
 }
 

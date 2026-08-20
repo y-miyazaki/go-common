@@ -1,3 +1,4 @@
+//revive:disable:comments-density reason: table-driven tests are self-explanatory via subtest names.
 package handler
 
 import (
@@ -5,106 +6,92 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/y-miyazaki/go-common/pkg/handler"
-	"github.com/y-miyazaki/go-common/pkg/logger"
-
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/y-miyazaki/go-common/pkg/dto"
+	"github.com/y-miyazaki/go-common/pkg/handler"
 )
 
-func TestHTTPHandler_HandleError1(t *testing.T) {
-	// Create a new Gin router
-	router := gin.New()
-
-	// Create HTTPHandler instance with mock logger
-	mockLogger := logger.NewLogger(logrus.New())
-	baseHandler := &handler.BaseHTTPHandler{
-		Logger: mockLogger,
+func TestHTTPHandler_HandleError(t *testing.T) {
+	tests := []struct {
+		handler    func(*HTTPHandler, *gin.Context)
+		name       string
+		wantBody   string
+		wantStatus int
+	}{
+		{
+			name:       "handle error1 returns internal server error",
+			handler:    func(h *HTTPHandler, c *gin.Context) { h.HandleError1(c) },
+			wantStatus: http.StatusInternalServerError,
+			wantBody:   "test",
+		},
+		{
+			name:       "handle error2 returns internal server error",
+			handler:    func(h *HTTPHandler, c *gin.Context) { h.HandleError2(c) },
+			wantStatus: http.StatusInternalServerError,
+			wantBody:   "test",
+		},
 	}
-	h := &HTTPHandler{
-		BaseHTTPHandler: baseHandler,
+
+	for i := range tests {
+		tt := tests[i]
+		t.Run(tt.name, func(t *testing.T) {
+			h := &HTTPHandler{
+				BaseHTTPHandler: &handler.BaseHTTPHandler{Logger: newTestLogger()},
+			}
+			status, body := invokeHandler(t, func(c *gin.Context) { tt.handler(h, c) })
+			require.Equal(t, tt.wantStatus, status)
+			require.Contains(t, body, tt.wantBody)
+		})
 	}
-
-	// Register the route
-	router.GET("/error1", h.HandleError1)
-
-	// Create a test request
-	req, err := http.NewRequest("GET", "/error1", nil)
-	assert.NoError(t, err)
-
-	// Create a response recorder
-	w := httptest.NewRecorder()
-
-	// Perform the request
-	router.ServeHTTP(w, req)
-
-	// Assert the response
-	assert.Equal(t, http.StatusInternalServerError, w.Code)
-	// Note: The error message might be in the response body or logged
-	// Just check that we get an internal server error
-	assert.Contains(t, w.Body.String(), "test")
 }
 
-func TestHTTPHandler_HandleError2(t *testing.T) {
-	// Create a new Gin router
+func TestHTTPHandler_HandleError_Route(t *testing.T) {
+	tests := []struct {
+		name       string
+		path       string
+		method     string
+		wantStatus int
+	}{
+		{name: "post to error1 returns not found", path: "/error1", method: http.MethodPost, wantStatus: http.StatusNotFound},
+	}
+
+	h := &HTTPHandler{BaseHTTPHandler: &handler.BaseHTTPHandler{Logger: newTestLogger()}}
 	router := gin.New()
-
-	// Create HTTPHandler instance with mock logger
-	mockLogger := logger.NewLogger(logrus.New())
-	baseHandler := &handler.BaseHTTPHandler{
-		Logger: mockLogger,
-	}
-	h := &HTTPHandler{
-		BaseHTTPHandler: baseHandler,
-	}
-
-	// Register the route
+	router.GET("/error1", h.HandleError1)
 	router.GET("/error2", h.HandleError2)
 
-	// Create a test request
-	req, err := http.NewRequest("GET", "/error2", nil)
-	assert.NoError(t, err)
-
-	// Create a response recorder
-	w := httptest.NewRecorder()
-
-	// Perform the request
-	router.ServeHTTP(w, req)
-
-	// Assert the response
-	assert.Equal(t, http.StatusInternalServerError, w.Code)
-	// Note: The error message might be in the response body or logged
-	// Just check that we get an internal server error
-	assert.Contains(t, w.Body.String(), "test")
+	for i := range tests {
+		tt := tests[i]
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(tt.method, tt.path, http.NoBody)
+			rec := httptest.NewRecorder()
+			router.ServeHTTP(rec, req)
+			require.Equal(t, tt.wantStatus, rec.Code)
+		})
+	}
 }
 
-func TestHTTPHandler_HandleError1_POST(t *testing.T) {
-	// Create a new Gin router
-	router := gin.New()
+func TestHandlerErrorSentinels(t *testing.T) {
+	t.Parallel()
 
-	// Create HTTPHandler instance with mock logger
-	mockLogger := logger.NewLogger(logrus.New())
-	baseHandler := &handler.BaseHTTPHandler{
-		Logger: mockLogger,
+	tests := []struct {
+		name string
+		err  error
+		want string
+	}{
+		{name: "err test1 message", err: ErrTest1, want: "error test1"},
+		{name: "err test2 message", err: ErrTest2, want: "error test2"},
 	}
-	h := &HTTPHandler{
-		BaseHTTPHandler: baseHandler,
+
+	for i := range tests {
+		tt := tests[i]
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			require.Equal(t, tt.want, tt.err.Error())
+		})
 	}
-
-	// Register the route
-	router.GET("/error1", h.HandleError1)
-
-	// Create a test request with POST method (should not match)
-	req, err := http.NewRequest("POST", "/error1", nil)
-	assert.NoError(t, err)
-
-	// Create a response recorder
-	w := httptest.NewRecorder()
-
-	// Perform the request
-	router.ServeHTTP(w, req)
-
-	// Assert the response - should be 404 Not Found for unmatched route
-	assert.Equal(t, http.StatusNotFound, w.Code)
 }
+
+// Ensure dto import is used by error handlers at compile time.
+var _ = dto.HTTPErrorResponse{}

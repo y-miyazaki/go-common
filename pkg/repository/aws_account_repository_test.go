@@ -7,81 +7,105 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/account"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
+
+	"github.com/y-miyazaki/go-common/pkg/repository/mocks"
 )
 
-// MockAccountClient is a mock implementation of the AWS Account client.
-type MockAccountClient struct {
-	mock.Mock
-}
-
-func (m *MockAccountClient) GetAccountInformation(ctx context.Context, params *account.GetAccountInformationInput, optFns ...func(*account.Options)) (*account.GetAccountInformationOutput, error) {
-	args := m.Called(ctx, params, optFns)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*account.GetAccountInformationOutput), args.Error(1)
-}
+var errTestAccountService = errors.New("account service error")
 
 func TestNewAWSAccountRepository(t *testing.T) {
+	t.Parallel()
+
 	mockClient := &account.Client{}
 	repo := NewAWSAccountRepository(mockClient)
 
-	assert.NotNil(t, repo)
-	assert.Equal(t, mockClient, repo.Client)
+	require.NotNil(t, repo)
+	require.Equal(t, mockClient, repo.Client)
 }
 
-func TestAWSAccountRepository_GetAccountInformation_WithAccountID(t *testing.T) {
-	mockClient := &MockAccountClient{}
-	repo := NewAWSAccountRepositoryWithInterface(mockClient)
+func TestAWSAccountRepository_GetAccountInformation(t *testing.T) {
+	t.Parallel()
 
-	accountID := "123456789012"
-	expected := &account.GetAccountInformationOutput{
-		AccountId:   aws.String(accountID),
-		AccountName: aws.String("sample-account"),
+	tests := []struct {
+		name       string
+		accountID  string
+		setupMock  func(m *mocks.MockAWSAccountClientInterface)
+		want       *account.GetAccountInformationOutput
+		wantErr    error
+		wantErrMsg string
+	}{
+		{
+			name:      "with account ID",
+			accountID: "123456789012",
+			setupMock: func(m *mocks.MockAWSAccountClientInterface) {
+				expected := &account.GetAccountInformationOutput{
+					AccountId:   aws.String("123456789012"),
+					AccountName: aws.String("sample-account"),
+				}
+				m.EXPECT().
+					GetAccountInformation(gomock.Any(), gomock.AssignableToTypeOf(&account.GetAccountInformationInput{})).
+					DoAndReturn(func(_ context.Context, input *account.GetAccountInformationInput, _ ...func(*account.Options)) (*account.GetAccountInformationOutput, error) {
+						require.NotNil(t, input.AccountId)
+						require.Equal(t, "123456789012", *input.AccountId)
+						return expected, nil
+					})
+			},
+			want: &account.GetAccountInformationOutput{
+				AccountId:   aws.String("123456789012"),
+				AccountName: aws.String("sample-account"),
+			},
+		},
+		{
+			name:      "without account ID",
+			accountID: "",
+			setupMock: func(m *mocks.MockAWSAccountClientInterface) {
+				expected := &account.GetAccountInformationOutput{}
+				m.EXPECT().
+					GetAccountInformation(gomock.Any(), gomock.AssignableToTypeOf(&account.GetAccountInformationInput{})).
+					DoAndReturn(func(_ context.Context, input *account.GetAccountInformationInput, _ ...func(*account.Options)) (*account.GetAccountInformationOutput, error) {
+						require.Nil(t, input.AccountId)
+						return expected, nil
+					})
+			},
+			want: &account.GetAccountInformationOutput{},
+		},
+		{
+			name:      "client error",
+			accountID: "123456789012",
+			setupMock: func(m *mocks.MockAWSAccountClientInterface) {
+				m.EXPECT().
+					GetAccountInformation(gomock.Any(), gomock.Any()).
+					Return(nil, errTestAccountService)
+			},
+			wantErrMsg: "account GetAccountInformation",
+		},
 	}
 
-	mockClient.On("GetAccountInformation", mock.Anything, mock.MatchedBy(func(input *account.GetAccountInformationInput) bool {
-		return input.AccountId != nil && *input.AccountId == accountID
-	}), mock.Anything).Return(expected, nil)
+	for i := range tests {
+		tc := tests[i]
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 
-	result, err := repo.GetAccountInformation(context.Background(), accountID)
+			ctrl := gomock.NewController(t)
+			mockClient := mocks.NewMockAWSAccountClientInterface(ctrl)
+			if tc.setupMock != nil {
+				tc.setupMock(mockClient)
+			}
 
-	assert.NoError(t, err)
-	assert.Equal(t, expected, result)
-	mockClient.AssertExpectations(t)
-}
+			repo := NewAWSAccountRepositoryWithInterface(mockClient)
+			got, err := repo.GetAccountInformation(context.Background(), tc.accountID)
 
-func TestAWSAccountRepository_GetAccountInformation_WithoutAccountID(t *testing.T) {
-	mockClient := &MockAccountClient{}
-	repo := NewAWSAccountRepositoryWithInterface(mockClient)
+			if tc.wantErrMsg != "" {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.wantErrMsg)
+				require.Nil(t, got)
+				return
+			}
 
-	expected := &account.GetAccountInformationOutput{}
-
-	mockClient.On("GetAccountInformation", mock.Anything, mock.MatchedBy(func(input *account.GetAccountInformationInput) bool {
-		return input.AccountId == nil
-	}), mock.Anything).Return(expected, nil)
-
-	result, err := repo.GetAccountInformation(context.Background(), "")
-
-	assert.NoError(t, err)
-	assert.Equal(t, expected, result)
-	mockClient.AssertExpectations(t)
-}
-
-func TestAWSAccountRepository_GetAccountInformation_Error(t *testing.T) {
-	mockClient := &MockAccountClient{}
-	repo := NewAWSAccountRepositoryWithInterface(mockClient)
-
-	expectedErr := errors.New("account service error")
-
-	mockClient.On("GetAccountInformation", mock.Anything, mock.Anything, mock.Anything).Return(nil, expectedErr)
-
-	result, err := repo.GetAccountInformation(context.Background(), "123456789012")
-
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "account GetAccountInformation")
-	assert.Nil(t, result)
-	mockClient.AssertExpectations(t)
+			require.NoError(t, err)
+			require.Equal(t, tc.want, got)
+		})
+	}
 }

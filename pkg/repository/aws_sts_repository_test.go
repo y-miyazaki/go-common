@@ -7,267 +7,368 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
+
+	"github.com/y-miyazaki/go-common/pkg/repository/mocks"
 )
 
-// MockSTSClient is a mock implementation of the STS client.
-type MockSTSClient struct {
-	mock.Mock
-}
-
-func (m *MockSTSClient) GetAccessKeyInfo(ctx context.Context, params *sts.GetAccessKeyInfoInput, optFns ...func(*sts.Options)) (*sts.GetAccessKeyInfoOutput, error) {
-	args := m.Called(ctx, params, optFns)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*sts.GetAccessKeyInfoOutput), args.Error(1)
-}
-
-func (m *MockSTSClient) GetCallerIdentity(ctx context.Context, params *sts.GetCallerIdentityInput, optFns ...func(*sts.Options)) (*sts.GetCallerIdentityOutput, error) {
-	args := m.Called(ctx, params, optFns)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*sts.GetCallerIdentityOutput), args.Error(1)
-}
-
-func (m *MockSTSClient) GetDelegatedAccessToken(ctx context.Context, params *sts.GetDelegatedAccessTokenInput, optFns ...func(*sts.Options)) (*sts.GetDelegatedAccessTokenOutput, error) {
-	args := m.Called(ctx, params, optFns)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*sts.GetDelegatedAccessTokenOutput), args.Error(1)
-}
-
-func (m *MockSTSClient) GetFederationToken(ctx context.Context, params *sts.GetFederationTokenInput, optFns ...func(*sts.Options)) (*sts.GetFederationTokenOutput, error) {
-	args := m.Called(ctx, params, optFns)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*sts.GetFederationTokenOutput), args.Error(1)
-}
-
-func (m *MockSTSClient) GetSessionToken(ctx context.Context, params *sts.GetSessionTokenInput, optFns ...func(*sts.Options)) (*sts.GetSessionTokenOutput, error) {
-	args := m.Called(ctx, params, optFns)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*sts.GetSessionTokenOutput), args.Error(1)
-}
-
-func (m *MockSTSClient) GetWebIdentityToken(ctx context.Context, params *sts.GetWebIdentityTokenInput, optFns ...func(*sts.Options)) (*sts.GetWebIdentityTokenOutput, error) {
-	args := m.Called(ctx, params, optFns)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*sts.GetWebIdentityTokenOutput), args.Error(1)
-}
+var errTestSTS = errors.New("sts error")
 
 func TestNewAWSSTSRepository(t *testing.T) {
+	t.Parallel()
+
 	mockClient := &sts.Client{}
 	repo := NewAWSSTSRepository(mockClient)
 
-	assert.NotNil(t, repo)
-	assert.Equal(t, mockClient, repo.Client)
+	require.NotNil(t, repo)
+	require.Equal(t, mockClient, repo.Client)
 }
 
 func TestAWSSTSRepository_GetCallerIdentity(t *testing.T) {
-	mockClient := &MockSTSClient{}
-	repo := NewAWSSTSRepositoryWithInterface(mockClient)
+	t.Parallel()
 
-	expected := &sts.GetCallerIdentityOutput{Account: aws.String("123456789012")}
+	tests := []struct {
+		name       string
+		setupMock  func(m *mocks.MockAWSSTSClientInterface)
+		want       *sts.GetCallerIdentityOutput
+		wantErrMsg string
+	}{
+		{
+			name: "success",
+			setupMock: func(m *mocks.MockAWSSTSClientInterface) {
+				expected := &sts.GetCallerIdentityOutput{Account: aws.String("123456789012")}
+				m.EXPECT().
+					GetCallerIdentity(gomock.Any(), gomock.AssignableToTypeOf(&sts.GetCallerIdentityInput{})).
+					Return(expected, nil)
+			},
+			want: &sts.GetCallerIdentityOutput{Account: aws.String("123456789012")},
+		},
+		{
+			name: "client error",
+			setupMock: func(m *mocks.MockAWSSTSClientInterface) {
+				m.EXPECT().GetCallerIdentity(gomock.Any(), gomock.Any()).Return(nil, errTestSTS)
+			},
+			wantErrMsg: "sts GetCallerIdentity",
+		},
+	}
 
-	mockClient.On("GetCallerIdentity", mock.Anything, mock.MatchedBy(func(input *sts.GetCallerIdentityInput) bool {
-		return input != nil
-	}), mock.Anything).Return(expected, nil)
+	for i := range tests {
+		tc := tests[i]
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 
-	result, err := repo.GetCallerIdentity(context.Background())
+			ctrl := gomock.NewController(t)
+			mockClient := mocks.NewMockAWSSTSClientInterface(ctrl)
+			tc.setupMock(mockClient)
 
-	assert.NoError(t, err)
-	assert.Equal(t, expected, result)
-	mockClient.AssertExpectations(t)
+			repo := NewAWSSTSRepositoryWithInterface(mockClient)
+			got, err := repo.GetCallerIdentity(context.Background())
+
+			if tc.wantErrMsg != "" {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.wantErrMsg)
+				require.Nil(t, got)
+				return
+			}
+
+			require.NoError(t, err)
+			require.Equal(t, tc.want, got)
+		})
+	}
 }
 
 func TestAWSSTSRepository_GetAccessKeyInfo(t *testing.T) {
-	mockClient := &MockSTSClient{}
-	repo := NewAWSSTSRepositoryWithInterface(mockClient)
+	t.Parallel()
 
 	accessKeyID := "AKIAIOSFODNN7EXAMPLE"
-	expected := &sts.GetAccessKeyInfoOutput{Account: aws.String("123456789012")}
 
-	mockClient.On("GetAccessKeyInfo", mock.Anything, mock.MatchedBy(func(input *sts.GetAccessKeyInfoInput) bool {
-		return input.AccessKeyId != nil && *input.AccessKeyId == accessKeyID
-	}), mock.Anything).Return(expected, nil)
+	tests := []struct {
+		name       string
+		setupMock  func(m *mocks.MockAWSSTSClientInterface)
+		want       *sts.GetAccessKeyInfoOutput
+		wantErrMsg string
+	}{
+		{
+			name: "success",
+			setupMock: func(m *mocks.MockAWSSTSClientInterface) {
+				expected := &sts.GetAccessKeyInfoOutput{Account: aws.String("123456789012")}
+				m.EXPECT().
+					GetAccessKeyInfo(gomock.Any(), gomock.AssignableToTypeOf(&sts.GetAccessKeyInfoInput{})).
+					DoAndReturn(func(_ context.Context, input *sts.GetAccessKeyInfoInput, _ ...func(*sts.Options)) (*sts.GetAccessKeyInfoOutput, error) {
+						require.NotNil(t, input.AccessKeyId)
+						require.Equal(t, accessKeyID, *input.AccessKeyId)
+						return expected, nil
+					})
+			},
+			want: &sts.GetAccessKeyInfoOutput{Account: aws.String("123456789012")},
+		},
+		{
+			name: "client error",
+			setupMock: func(m *mocks.MockAWSSTSClientInterface) {
+				m.EXPECT().GetAccessKeyInfo(gomock.Any(), gomock.Any()).Return(nil, errTestSTS)
+			},
+			wantErrMsg: "sts GetAccessKeyInfo",
+		},
+	}
 
-	result, err := repo.GetAccessKeyInfo(context.Background(), accessKeyID)
+	for i := range tests {
+		tc := tests[i]
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 
-	assert.NoError(t, err)
-	assert.Equal(t, expected, result)
-	mockClient.AssertExpectations(t)
-}
+			ctrl := gomock.NewController(t)
+			mockClient := mocks.NewMockAWSSTSClientInterface(ctrl)
+			tc.setupMock(mockClient)
 
-func TestAWSSTSRepository_GetAccessKeyInfo_Error(t *testing.T) {
-	mockClient := &MockSTSClient{}
-	repo := NewAWSSTSRepositoryWithInterface(mockClient)
+			repo := NewAWSSTSRepositoryWithInterface(mockClient)
+			got, err := repo.GetAccessKeyInfo(context.Background(), accessKeyID)
 
-	expectedErr := errors.New("sts error")
-	mockClient.On("GetAccessKeyInfo", mock.Anything, mock.Anything, mock.Anything).Return(nil, expectedErr)
+			if tc.wantErrMsg != "" {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.wantErrMsg)
+				require.Nil(t, got)
+				return
+			}
 
-	result, err := repo.GetAccessKeyInfo(context.Background(), "AKIAIOSFODNN7EXAMPLE")
-
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "sts GetAccessKeyInfo")
-	assert.Nil(t, result)
-	mockClient.AssertExpectations(t)
+			require.NoError(t, err)
+			require.Equal(t, tc.want, got)
+		})
+	}
 }
 
 func TestAWSSTSRepository_GetDelegatedAccessToken(t *testing.T) {
-	mockClient := &MockSTSClient{}
-	repo := NewAWSSTSRepositoryWithInterface(mockClient)
+	t.Parallel()
 
 	tradeInToken := "trade-token"
-	expected := &sts.GetDelegatedAccessTokenOutput{}
 
-	mockClient.On("GetDelegatedAccessToken", mock.Anything, mock.MatchedBy(func(input *sts.GetDelegatedAccessTokenInput) bool {
-		return input.TradeInToken != nil && *input.TradeInToken == tradeInToken
-	}), mock.Anything).Return(expected, nil)
+	tests := []struct {
+		name       string
+		setupMock  func(m *mocks.MockAWSSTSClientInterface)
+		want       *sts.GetDelegatedAccessTokenOutput
+		wantErrMsg string
+	}{
+		{
+			name: "success",
+			setupMock: func(m *mocks.MockAWSSTSClientInterface) {
+				expected := &sts.GetDelegatedAccessTokenOutput{}
+				m.EXPECT().
+					GetDelegatedAccessToken(gomock.Any(), gomock.AssignableToTypeOf(&sts.GetDelegatedAccessTokenInput{})).
+					DoAndReturn(func(_ context.Context, input *sts.GetDelegatedAccessTokenInput, _ ...func(*sts.Options)) (*sts.GetDelegatedAccessTokenOutput, error) {
+						require.NotNil(t, input.TradeInToken)
+						require.Equal(t, tradeInToken, *input.TradeInToken)
+						return expected, nil
+					})
+			},
+			want: &sts.GetDelegatedAccessTokenOutput{},
+		},
+		{
+			name: "client error",
+			setupMock: func(m *mocks.MockAWSSTSClientInterface) {
+				m.EXPECT().GetDelegatedAccessToken(gomock.Any(), gomock.Any()).Return(nil, errTestSTS)
+			},
+			wantErrMsg: "sts GetDelegatedAccessToken",
+		},
+	}
 
-	result, err := repo.GetDelegatedAccessToken(context.Background(), tradeInToken)
+	for i := range tests {
+		tc := tests[i]
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 
-	assert.NoError(t, err)
-	assert.Equal(t, expected, result)
-	mockClient.AssertExpectations(t)
-}
+			ctrl := gomock.NewController(t)
+			mockClient := mocks.NewMockAWSSTSClientInterface(ctrl)
+			tc.setupMock(mockClient)
 
-func TestAWSSTSRepository_GetDelegatedAccessToken_Error(t *testing.T) {
-	mockClient := &MockSTSClient{}
-	repo := NewAWSSTSRepositoryWithInterface(mockClient)
+			repo := NewAWSSTSRepositoryWithInterface(mockClient)
+			got, err := repo.GetDelegatedAccessToken(context.Background(), tradeInToken)
 
-	expectedErr := errors.New("sts error")
-	mockClient.On("GetDelegatedAccessToken", mock.Anything, mock.Anything, mock.Anything).Return(nil, expectedErr)
+			if tc.wantErrMsg != "" {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.wantErrMsg)
+				require.Nil(t, got)
+				return
+			}
 
-	result, err := repo.GetDelegatedAccessToken(context.Background(), "trade-token")
-
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "sts GetDelegatedAccessToken")
-	assert.Nil(t, result)
-	mockClient.AssertExpectations(t)
+			require.NoError(t, err)
+			require.Equal(t, tc.want, got)
+		})
+	}
 }
 
 func TestAWSSTSRepository_GetFederationToken(t *testing.T) {
-	mockClient := &MockSTSClient{}
-	repo := NewAWSSTSRepositoryWithInterface(mockClient)
+	t.Parallel()
 
 	in := &sts.GetFederationTokenInput{Name: aws.String("federated-user")}
-	expected := &sts.GetFederationTokenOutput{}
 
-	mockClient.On("GetFederationToken", mock.Anything, in, mock.Anything).Return(expected, nil)
+	tests := []struct {
+		name       string
+		input      *sts.GetFederationTokenInput
+		setupMock  func(m *mocks.MockAWSSTSClientInterface)
+		want       *sts.GetFederationTokenOutput
+		wantErrMsg string
+	}{
+		{
+			name:  "success",
+			input: in,
+			setupMock: func(m *mocks.MockAWSSTSClientInterface) {
+				expected := &sts.GetFederationTokenOutput{}
+				m.EXPECT().GetFederationToken(gomock.Any(), in).Return(expected, nil)
+			},
+			want: &sts.GetFederationTokenOutput{},
+		},
+		{
+			name:  "nil input uses empty request",
+			input: nil,
+			setupMock: func(m *mocks.MockAWSSTSClientInterface) {
+				m.EXPECT().
+					GetFederationToken(gomock.Any(), gomock.AssignableToTypeOf(&sts.GetFederationTokenInput{})).
+					Return(nil, errTestSTS)
+			},
+			wantErrMsg: "sts GetFederationToken",
+		},
+	}
 
-	result, err := repo.GetFederationToken(context.Background(), in)
+	for i := range tests {
+		tc := tests[i]
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 
-	assert.NoError(t, err)
-	assert.Equal(t, expected, result)
-	mockClient.AssertExpectations(t)
-}
+			ctrl := gomock.NewController(t)
+			mockClient := mocks.NewMockAWSSTSClientInterface(ctrl)
+			tc.setupMock(mockClient)
 
-func TestAWSSTSRepository_GetFederationToken_NilInput_Error(t *testing.T) {
-	mockClient := &MockSTSClient{}
-	repo := NewAWSSTSRepositoryWithInterface(mockClient)
+			repo := NewAWSSTSRepositoryWithInterface(mockClient)
+			got, err := repo.GetFederationToken(context.Background(), tc.input)
 
-	expectedErr := errors.New("sts error")
-	mockClient.On("GetFederationToken", mock.Anything, mock.MatchedBy(func(input *sts.GetFederationTokenInput) bool {
-		return input != nil
-	}), mock.Anything).Return(nil, expectedErr)
+			if tc.wantErrMsg != "" {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.wantErrMsg)
+				require.Nil(t, got)
+				return
+			}
 
-	result, err := repo.GetFederationToken(context.Background(), nil)
-
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "sts GetFederationToken")
-	assert.Nil(t, result)
-	mockClient.AssertExpectations(t)
+			require.NoError(t, err)
+			require.Equal(t, tc.want, got)
+		})
+	}
 }
 
 func TestAWSSTSRepository_GetSessionToken(t *testing.T) {
-	mockClient := &MockSTSClient{}
-	repo := NewAWSSTSRepositoryWithInterface(mockClient)
+	t.Parallel()
 
 	in := &sts.GetSessionTokenInput{DurationSeconds: aws.Int32(3600)}
-	expected := &sts.GetSessionTokenOutput{}
 
-	mockClient.On("GetSessionToken", mock.Anything, in, mock.Anything).Return(expected, nil)
+	tests := []struct {
+		name       string
+		input      *sts.GetSessionTokenInput
+		setupMock  func(m *mocks.MockAWSSTSClientInterface)
+		want       *sts.GetSessionTokenOutput
+		wantErrMsg string
+	}{
+		{
+			name:  "success",
+			input: in,
+			setupMock: func(m *mocks.MockAWSSTSClientInterface) {
+				expected := &sts.GetSessionTokenOutput{}
+				m.EXPECT().GetSessionToken(gomock.Any(), in).Return(expected, nil)
+			},
+			want: &sts.GetSessionTokenOutput{},
+		},
+		{
+			name:  "nil input uses empty request",
+			input: nil,
+			setupMock: func(m *mocks.MockAWSSTSClientInterface) {
+				m.EXPECT().
+					GetSessionToken(gomock.Any(), gomock.AssignableToTypeOf(&sts.GetSessionTokenInput{})).
+					Return(nil, errTestSTS)
+			},
+			wantErrMsg: "sts GetSessionToken",
+		},
+	}
 
-	result, err := repo.GetSessionToken(context.Background(), in)
+	for i := range tests {
+		tc := tests[i]
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 
-	assert.NoError(t, err)
-	assert.Equal(t, expected, result)
-	mockClient.AssertExpectations(t)
-}
+			ctrl := gomock.NewController(t)
+			mockClient := mocks.NewMockAWSSTSClientInterface(ctrl)
+			tc.setupMock(mockClient)
 
-func TestAWSSTSRepository_GetSessionToken_NilInput_Error(t *testing.T) {
-	mockClient := &MockSTSClient{}
-	repo := NewAWSSTSRepositoryWithInterface(mockClient)
+			repo := NewAWSSTSRepositoryWithInterface(mockClient)
+			got, err := repo.GetSessionToken(context.Background(), tc.input)
 
-	expectedErr := errors.New("sts error")
-	mockClient.On("GetSessionToken", mock.Anything, mock.MatchedBy(func(input *sts.GetSessionTokenInput) bool {
-		return input != nil
-	}), mock.Anything).Return(nil, expectedErr)
+			if tc.wantErrMsg != "" {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.wantErrMsg)
+				require.Nil(t, got)
+				return
+			}
 
-	result, err := repo.GetSessionToken(context.Background(), nil)
-
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "sts GetSessionToken")
-	assert.Nil(t, result)
-	mockClient.AssertExpectations(t)
+			require.NoError(t, err)
+			require.Equal(t, tc.want, got)
+		})
+	}
 }
 
 func TestAWSSTSRepository_GetWebIdentityToken(t *testing.T) {
-	mockClient := &MockSTSClient{}
-	repo := NewAWSSTSRepositoryWithInterface(mockClient)
+	t.Parallel()
 
 	in := &sts.GetWebIdentityTokenInput{
 		Audience:         []string{"service-a"},
 		SigningAlgorithm: aws.String("RS256"),
 	}
-	expected := &sts.GetWebIdentityTokenOutput{}
 
-	mockClient.On("GetWebIdentityToken", mock.Anything, in, mock.Anything).Return(expected, nil)
+	tests := []struct {
+		name       string
+		input      *sts.GetWebIdentityTokenInput
+		setupMock  func(m *mocks.MockAWSSTSClientInterface)
+		want       *sts.GetWebIdentityTokenOutput
+		wantErrMsg string
+	}{
+		{
+			name:  "success",
+			input: in,
+			setupMock: func(m *mocks.MockAWSSTSClientInterface) {
+				expected := &sts.GetWebIdentityTokenOutput{}
+				m.EXPECT().GetWebIdentityToken(gomock.Any(), in).Return(expected, nil)
+			},
+			want: &sts.GetWebIdentityTokenOutput{},
+		},
+		{
+			name:  "nil input uses empty request",
+			input: nil,
+			setupMock: func(m *mocks.MockAWSSTSClientInterface) {
+				m.EXPECT().
+					GetWebIdentityToken(gomock.Any(), gomock.AssignableToTypeOf(&sts.GetWebIdentityTokenInput{})).
+					Return(nil, errTestSTS)
+			},
+			wantErrMsg: "sts GetWebIdentityToken",
+		},
+	}
 
-	result, err := repo.GetWebIdentityToken(context.Background(), in)
+	for i := range tests {
+		tc := tests[i]
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 
-	assert.NoError(t, err)
-	assert.Equal(t, expected, result)
-	mockClient.AssertExpectations(t)
-}
+			ctrl := gomock.NewController(t)
+			mockClient := mocks.NewMockAWSSTSClientInterface(ctrl)
+			tc.setupMock(mockClient)
 
-func TestAWSSTSRepository_GetWebIdentityToken_NilInput_Error(t *testing.T) {
-	mockClient := &MockSTSClient{}
-	repo := NewAWSSTSRepositoryWithInterface(mockClient)
+			repo := NewAWSSTSRepositoryWithInterface(mockClient)
+			got, err := repo.GetWebIdentityToken(context.Background(), tc.input)
 
-	expectedErr := errors.New("sts error")
-	mockClient.On("GetWebIdentityToken", mock.Anything, mock.MatchedBy(func(input *sts.GetWebIdentityTokenInput) bool {
-		return input != nil
-	}), mock.Anything).Return(nil, expectedErr)
+			if tc.wantErrMsg != "" {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.wantErrMsg)
+				require.Nil(t, got)
+				return
+			}
 
-	result, err := repo.GetWebIdentityToken(context.Background(), nil)
-
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "sts GetWebIdentityToken")
-	assert.Nil(t, result)
-	mockClient.AssertExpectations(t)
-}
-
-func TestAWSSTSRepository_GetCallerIdentity_Error(t *testing.T) {
-	mockClient := &MockSTSClient{}
-	repo := NewAWSSTSRepositoryWithInterface(mockClient)
-
-	expectedErr := errors.New("sts error")
-	mockClient.On("GetCallerIdentity", mock.Anything, mock.Anything, mock.Anything).Return(nil, expectedErr)
-
-	result, err := repo.GetCallerIdentity(context.Background())
-
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "sts GetCallerIdentity")
-	assert.Nil(t, result)
-	mockClient.AssertExpectations(t)
+			require.NoError(t, err)
+			require.Equal(t, tc.want, got)
+		})
+	}
 }
