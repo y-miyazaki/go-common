@@ -25,13 +25,13 @@ paths:
 
 ### Naming Conventions
 
-| Component      | Rule                             | Example                         |
-| -------------- | -------------------------------- | ------------------------------- |
-| Test file      | `<stem>_test.go` beside source   | `parser.go` → `parser_test.go`  |
-| Test func      | `Test<TypeOrFunc>_<Behavior>`    | `TestParser_NormalizesInput`    |
-| Subtest name   | Lowercase descriptive phrase     | `empty input returns error`     |
-| Sentinel error | `errTest<Name>` at package scope | `errTestNotFound`               |
-| Stub type      | `stub<Role>`                     | `stubStore`, `stubRunCollector` |
+| Component      | Rule                                                         | Example                                                |
+| -------------- | ------------------------------------------------------------ | ------------------------------------------------------ |
+| Test file      | `<source-stem>_test.go`; splits keep `<source-stem>_` prefix | `parser.go` → `parser_test.go`, `parser_error_test.go` |
+| Test func      | `Test<TypeOrFunc>_<Behavior>`                                | `TestParser_NormalizesInput`                           |
+| Subtest name   | Lowercase descriptive phrase                                 | `empty input returns error`                            |
+| Sentinel error | `errTest<Name>` at package scope                             | `errTestNotFound`                                      |
+| Stub type      | `stub<Role>`                                                 | `stubStore`, `stubRunCollector`                        |
 
 ### Default Test Stack
 
@@ -198,6 +198,11 @@ func (s stubStore) Get(_ context.Context, key string) (string, error) {
 
 ## Guidelines
 
+### Naming (NAME)
+
+- NAME-01 (MUST): Every `*_test.go` filename must start with the stem of the production file it tests (`<source-stem>_test.go`). When splitting a suite, keep that prefix (`<source-stem>_<aspect>_test.go`) — do not use unrelated names (`error_test.go`, `helpers_test.go`) that hide the target file
+- NAME-02 (SHOULD): Reserve `example_test.go` and `export_test.go` only for godoc `Example` functions and external-test export wiring — not general unit tests
+
 ### Table-driven tests (TBL)
 
 - TBL-01 (MUST): Default to `[]struct` + `for _, tt := range tests` + `t.Run` for unit tests — including a single case (table of one row is fine). Requires Go 1.22+ when combining `for _, tt := range tests` with `t.Parallel()` inside subtests
@@ -270,6 +275,7 @@ collectFn := func() ([]Item, error) {
 - Using `testify/assert` (non-fatal) in table-driven subtests
 - Inline `errors.New` in test bodies (`err113`)
 - Copying large table rows with `for _, tt := range tests` when gocritic `rangeValCopy` is enabled — index with `for i := range tests { tt := tests[i] }` instead
+- Split `*_test.go` files named without the source stem prefix (for example `integration_test.go` instead of `parser_integration_test.go`)
 - Disabling revive or golangci as a whole on `*_test.go`
 - Adding `//revive:disable:comments-density` when that rule is not enabled on tests
 - Refactoring production code solely to inject mocks unless a test already justifies the seam

@@ -1,6 +1,6 @@
 # Testing (TEST)
 
-**TEST-00 (MUST): Add or update *_test.go in the same change as behavior**
+*_TEST-00 (MUST): Add or update *\_test.go in the same change as behavior*_
 
 Check: When adding or materially changing exported behavior, are corresponding `*_test.go` files added or updated in the same change?
 Why: Untested behavior changes are hard to review and regress silently (see [Google eng-practices: Keep related test code in the same CL](https://google.github.io/eng-practices/review/developer/small-cls.html#test_code) and [go.dev: Add a test](https://go.dev/doc/tutorial/add-a-test))
@@ -47,3 +47,9 @@ Fix: Add t.Helper() as the first line of every test helper function that calls t
 Check: Does the package use one assertion stack (default stdlib plus go-cmp, or testify at package scope) and match sibling *_test.go layout?
 Why: Mixed assertion or mock styles in the same package increase review cost and produce inconsistent failure output
 Fix: Default to stdlib `t.Fatalf`/`t.Errorf` plus go-cmp for complex compares; adopt testify `require` or mockery/gomock only at package scope and match existing suite style
+
+*_TEST-08 (MUST): Prefix every *\_test.go filename with the source stem under test*_
+
+Check: Does every `*_test.go` file name start with the stem of the production file it tests (for example `parser.go` → `parser_test.go` or `parser_error_test.go`)?
+Why: Unrelated split names (`error_test.go`, `helpers_test.go`) hide which source file a suite covers and make navigation harder during review
+Fix: Rename to `<source-stem>_test.go` or `<source-stem>_<aspect>_test.go`; reserve `example_test.go` and `export_test.go` for godoc examples and external-test export wiring only
