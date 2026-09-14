@@ -1,12 +1,12 @@
 lockfile_version: '1'
-generated_at: '2026-08-20T06:02:49.653086+00:00'
+generated_at: '2026-09-14T05:10:44.759179+00:00'
 apm_version: 0.27.0
 dependencies:
 - repo_url: y-miyazaki/config
   name: config-aws
   host: github.com
-  resolved_commit: e3e0b48915de1940dc92525eb66b6452775246c3
-  resolved_ref: v1.8.95
+  resolved_commit: 6161084dd07868b76ba056e0717817347c266517
+  resolved_ref: v1.8.100
   version: 1.0.0
   virtual_path: .apm/packages/aws
   is_virtual: true
@@ -16,8 +16,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-common
   host: github.com
-  resolved_commit: e3e0b48915de1940dc92525eb66b6452775246c3
-  resolved_ref: v1.8.95
+  resolved_commit: 6161084dd07868b76ba056e0717817347c266517
+  resolved_ref: v1.8.100
   version: 1.0.0
   virtual_path: .apm/packages/common
   is_virtual: true
@@ -265,7 +265,7 @@ dependencies:
     .claude/agents/test-engineer.md: sha256:8dfd917e4b2652f8eedc6355660732645a18a85ee803cc8e82a83884d9e5c390
     .claude/rules/agent-skills.md: sha256:da339d58b235af68c93fdfffcb6b0063a67e09b82d0a93976122449bc1a4fcc6
     .claude/rules/instructions.md: sha256:d39dbe318449062c8de00678d7ad1bf024913c00c45ada535717d26db89c220f
-    .claude/rules/markdown.md: sha256:1c5594de45504a9ed5384297f547a40362d442f9bbdcfd76c6ea37b161b04748
+    .claude/rules/markdown.md: sha256:67c019eba7931bf52778706d22a623568f1974239b65789d44630112179deae7
     .claude/skills/agent-skills-review/SKILL.md: sha256:61be5b0410af0627d7056affa13ac486098746a5ad86510c4d06b8905e96d8ee
     .claude/skills/agent-skills-review/eval.yaml: sha256:dd6b3b2266e89d218bbaf9e258038ade3caae076c4d588fcc872c44687276235
     .claude/skills/agent-skills-review/evals/tasks/agent-skills-review-itemid-path.yaml: sha256:8bcf884754370c9b05cb8246c1f09ff83f3e2c3312b35350adae79f2ee1a39c9
@@ -343,14 +343,14 @@ dependencies:
     .cursor/agents/test-engineer.md: sha256:8dfd917e4b2652f8eedc6355660732645a18a85ee803cc8e82a83884d9e5c390
     .cursor/rules/agent-skills.mdc: sha256:6ec504f93ea1bb6273e6ffb74be62d55635a44b70496b51cc34f2472bdda1742
     .cursor/rules/instructions.mdc: sha256:297a6a6a2fd3e70c075a7b29876901c57419ae15adc561ff2b29360ab2865d22
-    .cursor/rules/markdown.mdc: sha256:ddf4799d3864c8d6ca48e8d60031b27f804cdbd09bd85c44db9a0b80bd3c9b2d
-  content_hash: sha256:1e37ea5650847a00db6ee9d0a0ded65577c408b3adc25025c1e71fc555a28ab8
+    .cursor/rules/markdown.mdc: sha256:c7d5eddf9cc356a4fbfe94d4e3176062f7c91739c056d75d4291273ed6cefaa4
+  content_hash: sha256:9a738d06d1201081a1c76b106740eab4ec45b4d5b3bbe2c44c6133548ae6251d
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: common-hooks-claude
   host: github.com
-  resolved_commit: e3e0b48915de1940dc92525eb66b6452775246c3
-  resolved_ref: v1.8.95
+  resolved_commit: 6161084dd07868b76ba056e0717817347c266517
+  resolved_ref: v1.8.100
   version: 2.0.0
   virtual_path: .apm/packages/common-hooks-claude
   is_virtual: true
@@ -374,8 +374,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: common-hooks-cursor
   host: github.com
-  resolved_commit: e3e0b48915de1940dc92525eb66b6452775246c3
-  resolved_ref: v1.8.95
+  resolved_commit: 6161084dd07868b76ba056e0717817347c266517
+  resolved_ref: v1.8.100
   version: 2.0.0
   virtual_path: .apm/packages/common-hooks-cursor
   is_virtual: true
@@ -399,8 +399,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-github
   host: github.com
-  resolved_commit: e3e0b48915de1940dc92525eb66b6452775246c3
-  resolved_ref: v1.8.95
+  resolved_commit: 6161084dd07868b76ba056e0717817347c266517
+  resolved_ref: v1.8.100
   version: 1.0.0
   virtual_path: .apm/packages/github
   is_virtual: true
@@ -819,13 +819,13 @@ dependencies:
     .claude/skills/github-pr-revise/scripts/lib/terraform.sh: sha256:19d9b56a4346d68a4656ccfe61c64b8638c86ffdc02b830a7cdd84be7449551d
     .claude/skills/github-pr-revise/scripts/lib/validation.sh: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
     .claude/skills/github-pr-revise/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
-  content_hash: sha256:6484f55921825ce67ef608718dacab8cf6035ec64d9c00975563e7604f990c31
+  content_hash: sha256:637dc54e35a05544efc8cfcb17e552c9442a3459eb7ce02eeb8d04ab2b78ef8e
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: config-github-actions
   host: github.com
-  resolved_commit: e3e0b48915de1940dc92525eb66b6452775246c3
-  resolved_ref: v1.8.95
+  resolved_commit: 6161084dd07868b76ba056e0717817347c266517
+  resolved_ref: v1.8.100
   version: 1.0.0
   virtual_path: .apm/packages/github-actions
   is_virtual: true
@@ -839,6 +839,7 @@ dependencies:
   - .agents/skills/github-actions-review/evals/tasks/github-actions-review-specific-check.yaml
   - .agents/skills/github-actions-review/evals/tasks/github-actions-review-structured-output.yaml
   - .agents/skills/github-actions-review/evals/tasks/github-actions-review-trigger-negative.yaml
+  - .agents/skills/github-actions-review/references/category-anti-patterns.md
   - .agents/skills/github-actions-review/references/category-best-practices.md
   - .agents/skills/github-actions-review/references/category-error-handling.md
   - .agents/skills/github-actions-review/references/category-global.md
@@ -881,6 +882,7 @@ dependencies:
   - .claude/skills/github-actions-review/evals/tasks/github-actions-review-specific-check.yaml
   - .claude/skills/github-actions-review/evals/tasks/github-actions-review-structured-output.yaml
   - .claude/skills/github-actions-review/evals/tasks/github-actions-review-trigger-negative.yaml
+  - .claude/skills/github-actions-review/references/category-anti-patterns.md
   - .claude/skills/github-actions-review/references/category-best-practices.md
   - .claude/skills/github-actions-review/references/category-error-handling.md
   - .claude/skills/github-actions-review/references/category-global.md
@@ -923,6 +925,7 @@ dependencies:
     .agents/skills/github-actions-review/evals/tasks/github-actions-review-specific-check.yaml: sha256:bd9fbce5c7ad7d93bc9e4724c6ac8a498065dddcb0b6e4c625d9b74dcd5fa51f
     .agents/skills/github-actions-review/evals/tasks/github-actions-review-structured-output.yaml: sha256:5178b92374c922a25969a1e9bc1179c00b3ed427b2fde3da9d411298bdc724bb
     .agents/skills/github-actions-review/evals/tasks/github-actions-review-trigger-negative.yaml: sha256:7dcf918f7fc8bdefbb17221190c563f8bbce7aa08f810b5b23742ba734c59db1
+    .agents/skills/github-actions-review/references/category-anti-patterns.md: sha256:c0868c5cd88795f26a17c553e6f80cb9bf2508c9fca9d34716218a84a299a941
     .agents/skills/github-actions-review/references/category-best-practices.md: sha256:8c6760d74b84109e9fe7001bdfb208d02b9c798d83cb16c45358a37794a8c07f
     .agents/skills/github-actions-review/references/category-error-handling.md: sha256:4c735a76e02cf9e4a4d5569dd02eeb5d69f37a9858c547df8368ec98432ad777
     .agents/skills/github-actions-review/references/category-global.md: sha256:10a6f5010c4ec87ebfde91533bd298bd3fc42c599608c6223f16993fc7891121
@@ -930,7 +933,7 @@ dependencies:
     .agents/skills/github-actions-review/references/category-performance.md: sha256:60da7d439654444faa2feb826a5b54c84769fb5ce46fdc22ebb44d2048bc03a9
     .agents/skills/github-actions-review/references/category-security.md: sha256:b235071710f31625daf973132d859b8f175c8abc07d0ec04cb7fadc9e50dc1e9
     .agents/skills/github-actions-review/references/category-tool-integration.md: sha256:892c068222d4713c07dad0f81d6fcf385d1c63bf40b9829bd24cc9bf19df5f8d
-    .agents/skills/github-actions-review/references/common-checklist.md: sha256:1dc826ea76ad98fd764db55e709469833e6f040ad12922065715249c1ee0ce2b
+    .agents/skills/github-actions-review/references/common-checklist.md: sha256:63b19070b4eee7d60d0e451c745238b66dc231c1869c9312dd9f24d830a61641
     .agents/skills/github-actions-review/references/common-output-format.md: sha256:fcbaadf9e13b5cd6a9b8e891b6168406c4de17237d4038d39ebeeb4811be8987
     .agents/skills/github-actions-review/references/common-troubleshooting.md: sha256:b5b1eea13c4226d92bf0c1067e8d6079b52cb2cb322ebd7f6bba815705681bb0
     .agents/skills/github-actions-validation/SKILL.md: sha256:3381a389eb92d7b0d422b3b61de18dbd58ec4c3559d228990f8c100897fa488e
@@ -955,7 +958,7 @@ dependencies:
     .agents/skills/github-actions-validation/scripts/lib/validation.sh: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
     .agents/skills/github-actions-validation/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
     .agents/skills/github-actions-validation/scripts/validate.sh: sha256:95a9b6a15968a74f9a4093183d104c971af0420181846745f2e5d2c25d2596e8
-    .claude/rules/github-actions-workflow.md: sha256:f953cb348975084f1d3d35a9bf7a451a68543b04ef360595425d244506287f68
+    .claude/rules/github-actions-workflow.md: sha256:26686bf4f4fecb2a90c6866829e162ed4e3c88c5c7401d3cab643d7c787187c6
     .claude/skills/github-actions-review/SKILL.md: sha256:ef4d69e2fb5ffdcb02d66f0cfabc10bb1d2039b7924012198f37cbb102f1cdfd
     .claude/skills/github-actions-review/eval.yaml: sha256:332dc19bd9f6b814d1cc0dc4d5077aa872d1277e9d12354d8196673c92b47b4b
     .claude/skills/github-actions-review/evals/tasks/github-actions-review-basic.yaml: sha256:e796f016b75ddd23b5bb29bf44c0824d161cc7b0374f3987b06d61b7a188bce2
@@ -963,6 +966,7 @@ dependencies:
     .claude/skills/github-actions-review/evals/tasks/github-actions-review-specific-check.yaml: sha256:bd9fbce5c7ad7d93bc9e4724c6ac8a498065dddcb0b6e4c625d9b74dcd5fa51f
     .claude/skills/github-actions-review/evals/tasks/github-actions-review-structured-output.yaml: sha256:5178b92374c922a25969a1e9bc1179c00b3ed427b2fde3da9d411298bdc724bb
     .claude/skills/github-actions-review/evals/tasks/github-actions-review-trigger-negative.yaml: sha256:7dcf918f7fc8bdefbb17221190c563f8bbce7aa08f810b5b23742ba734c59db1
+    .claude/skills/github-actions-review/references/category-anti-patterns.md: sha256:c0868c5cd88795f26a17c553e6f80cb9bf2508c9fca9d34716218a84a299a941
     .claude/skills/github-actions-review/references/category-best-practices.md: sha256:8c6760d74b84109e9fe7001bdfb208d02b9c798d83cb16c45358a37794a8c07f
     .claude/skills/github-actions-review/references/category-error-handling.md: sha256:4c735a76e02cf9e4a4d5569dd02eeb5d69f37a9858c547df8368ec98432ad777
     .claude/skills/github-actions-review/references/category-global.md: sha256:10a6f5010c4ec87ebfde91533bd298bd3fc42c599608c6223f16993fc7891121
@@ -970,7 +974,7 @@ dependencies:
     .claude/skills/github-actions-review/references/category-performance.md: sha256:60da7d439654444faa2feb826a5b54c84769fb5ce46fdc22ebb44d2048bc03a9
     .claude/skills/github-actions-review/references/category-security.md: sha256:b235071710f31625daf973132d859b8f175c8abc07d0ec04cb7fadc9e50dc1e9
     .claude/skills/github-actions-review/references/category-tool-integration.md: sha256:892c068222d4713c07dad0f81d6fcf385d1c63bf40b9829bd24cc9bf19df5f8d
-    .claude/skills/github-actions-review/references/common-checklist.md: sha256:1dc826ea76ad98fd764db55e709469833e6f040ad12922065715249c1ee0ce2b
+    .claude/skills/github-actions-review/references/common-checklist.md: sha256:63b19070b4eee7d60d0e451c745238b66dc231c1869c9312dd9f24d830a61641
     .claude/skills/github-actions-review/references/common-output-format.md: sha256:fcbaadf9e13b5cd6a9b8e891b6168406c4de17237d4038d39ebeeb4811be8987
     .claude/skills/github-actions-review/references/common-troubleshooting.md: sha256:b5b1eea13c4226d92bf0c1067e8d6079b52cb2cb322ebd7f6bba815705681bb0
     .claude/skills/github-actions-validation/SKILL.md: sha256:3381a389eb92d7b0d422b3b61de18dbd58ec4c3559d228990f8c100897fa488e
@@ -995,14 +999,14 @@ dependencies:
     .claude/skills/github-actions-validation/scripts/lib/validation.sh: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
     .claude/skills/github-actions-validation/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
     .claude/skills/github-actions-validation/scripts/validate.sh: sha256:95a9b6a15968a74f9a4093183d104c971af0420181846745f2e5d2c25d2596e8
-    .cursor/rules/github-actions-workflow.mdc: sha256:417082e8c259c878716488c07cbb3ae0e798aef583bd64307bf974dc343ebb0f
-  content_hash: sha256:8bf6c72325d2d0aed976460e627df8c5dd81260c7f0f7927f81dc153e5f57e5b
+    .cursor/rules/github-actions-workflow.mdc: sha256:648e52a204b6f2dae00c8b3ac1432e6b72ae8b5ce2905a66d77a1b6caec6825c
+  content_hash: sha256:31be23049075639c4f830560896828025e302eac465c09ddbe2ae84b65a921d3
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: config-go
   host: github.com
-  resolved_commit: e3e0b48915de1940dc92525eb66b6452775246c3
-  resolved_ref: v1.8.95
+  resolved_commit: 6161084dd07868b76ba056e0717817347c266517
+  resolved_ref: v1.8.100
   version: 1.0.0
   virtual_path: .apm/packages/go
   is_virtual: true
@@ -1016,6 +1020,7 @@ dependencies:
   - .agents/skills/go-review/evals/tasks/go-review-specific-check.yaml
   - .agents/skills/go-review/evals/tasks/go-review-structured-output.yaml
   - .agents/skills/go-review/evals/tasks/go-review-trigger-negative.yaml
+  - .agents/skills/go-review/references/category-anti-patterns.md
   - .agents/skills/go-review/references/category-architecture.md
   - .agents/skills/go-review/references/category-code-standards.md
   - .agents/skills/go-review/references/category-concurrency.md
@@ -1026,6 +1031,7 @@ dependencies:
   - .agents/skills/go-review/references/category-function-design.md
   - .agents/skills/go-review/references/category-global.md
   - .agents/skills/go-review/references/category-security.md
+  - .agents/skills/go-review/references/category-test-anti-patterns.md
   - .agents/skills/go-review/references/category-testing.md
   - .agents/skills/go-review/references/common-checklist.md
   - .agents/skills/go-review/references/common-output-format.md
@@ -1064,6 +1070,7 @@ dependencies:
   - .claude/skills/go-review/evals/tasks/go-review-specific-check.yaml
   - .claude/skills/go-review/evals/tasks/go-review-structured-output.yaml
   - .claude/skills/go-review/evals/tasks/go-review-trigger-negative.yaml
+  - .claude/skills/go-review/references/category-anti-patterns.md
   - .claude/skills/go-review/references/category-architecture.md
   - .claude/skills/go-review/references/category-code-standards.md
   - .claude/skills/go-review/references/category-concurrency.md
@@ -1074,6 +1081,7 @@ dependencies:
   - .claude/skills/go-review/references/category-function-design.md
   - .claude/skills/go-review/references/category-global.md
   - .claude/skills/go-review/references/category-security.md
+  - .claude/skills/go-review/references/category-test-anti-patterns.md
   - .claude/skills/go-review/references/category-testing.md
   - .claude/skills/go-review/references/common-checklist.md
   - .claude/skills/go-review/references/common-output-format.md
@@ -1105,13 +1113,14 @@ dependencies:
   - .cursor/rules/go-test.mdc
   - .cursor/rules/go.mdc
   deployed_file_hashes:
-    .agents/skills/go-review/SKILL.md: sha256:6f144d386f08501fdd11fd33ba0d9422de5bea4334c5334b876998f2f62bc49d
+    .agents/skills/go-review/SKILL.md: sha256:8431b2623e4fb28532a322c9a838fd1c624a08023fa62718a61034dcfdcfd96a
     .agents/skills/go-review/eval.yaml: sha256:c8e9abf238dd1a8628bc5610e25e62c36e547722cdf97f91c71781fb23cd2e4f
     .agents/skills/go-review/evals/tasks/go-review-basic.yaml: sha256:05308719ab7f564bcbd9f8dc66903e6da21dc703fa3094bc9ee71a555c59cf71
     .agents/skills/go-review/evals/tasks/go-review-boundary-guardrail.yaml: sha256:9f85b8480cea21b61346c517223fb9d7b96f3a570af66b6c0a9608739cbcf674
     .agents/skills/go-review/evals/tasks/go-review-specific-check.yaml: sha256:a7e6fa201c33ca99863202c679b7e3635ebb3f4c4082e18c47e374d545507399
     .agents/skills/go-review/evals/tasks/go-review-structured-output.yaml: sha256:5bc5b7300b9de14c04319958eecb961d9bad8ba97017dcc0cc7873a1be20c7ac
     .agents/skills/go-review/evals/tasks/go-review-trigger-negative.yaml: sha256:2bfea3279aa63a75a3975e2f0bf271cf04b0333829a9c9b095ddbcff129c0b8d
+    .agents/skills/go-review/references/category-anti-patterns.md: sha256:987ece00f5ccfd01a17ed8ed03cdaaa1fc523309eeb1adc720da568bdd10c8df
     .agents/skills/go-review/references/category-architecture.md: sha256:0e2fd8cb0791298608a1befe6c154c84595c10165a29962cfd387c5d1fd1f01f
     .agents/skills/go-review/references/category-code-standards.md: sha256:d5f522248f5145627c7604cb665ab5da0fe21c081909639a6a1e3a5e2970bcbf
     .agents/skills/go-review/references/category-concurrency.md: sha256:41fc120930fda7c884d1610457ba175d139cba5605fb790963e79e739afd3e8d
@@ -1122,11 +1131,12 @@ dependencies:
     .agents/skills/go-review/references/category-function-design.md: sha256:ba12e280300faa2110d830d41947ad3dec79cd9691e491385db58262c69a705a
     .agents/skills/go-review/references/category-global.md: sha256:bc0a33036f4b72afb9adc943b7585afebaf52f1a01df211bc57171f853932394
     .agents/skills/go-review/references/category-security.md: sha256:0ae3a9b491fd2bc4a589d2095c408c5d1c9684dbdc0b2cc0de502b19e7536dbd
-    .agents/skills/go-review/references/category-testing.md: sha256:de3627860508253919d35d62a12b49850e4c428b746dac57eb215f31c7d922cc
-    .agents/skills/go-review/references/common-checklist.md: sha256:aee6c620cd3e16a9fbf5c8ed06d1699ce57af93c97bc420513ae969271f1e977
+    .agents/skills/go-review/references/category-test-anti-patterns.md: sha256:325d55fdd3d0f1c09831f448c708f2f8a07b5a9ac4f42d1e6e22a8c5b956f4c4
+    .agents/skills/go-review/references/category-testing.md: sha256:8c0415d965db894be13fdfb173b80b27ef2bae68d341e7dde18faa8c7082c20c
+    .agents/skills/go-review/references/common-checklist.md: sha256:3b08d8c62011650d229bceef1b5d95e6466f1d18d763f3c4cb011c239fe36423
     .agents/skills/go-review/references/common-output-format.md: sha256:fcbaadf9e13b5cd6a9b8e891b6168406c4de17237d4038d39ebeeb4811be8987
     .agents/skills/go-review/references/common-troubleshooting.md: sha256:571bd26950e22249175ca592b926cd6cab9ca41d90da439af2dfb12bdea245bd
-    .agents/skills/go-validation/SKILL.md: sha256:cf2c4f061629c8a2f558619f9baad2571489df27bec0c4a76d38a39d2c21f3e1
+    .agents/skills/go-validation/SKILL.md: sha256:6f8a6dd90803674b6090a34e5a4843fb627943bd1078e2f8fdc14d3f4450e2dd
     .agents/skills/go-validation/eval.yaml: sha256:3d73d5fc24f17d2d083a12b8b126ff5abbb53e320f4a3ff90d4d7c2a3ff7a00c
     .agents/skills/go-validation/evals/tasks/go-validation-basic.yaml: sha256:2b253e635832329d35745fd2f855e00cafd8f65eb68a040bb6269aa8790bb76e
     .agents/skills/go-validation/evals/tasks/go-validation-boundary-guardrail.yaml: sha256:a574bb4a1c99224c0eeb0f298abe7b4134192c66e642d23fd842da149530d4e9
@@ -1134,7 +1144,7 @@ dependencies:
     .agents/skills/go-validation/evals/tasks/go-validation-structured-output.yaml: sha256:9030e5778ab9c5a5d46b4207f32f352e1ab8b479221770b5ac1c73500e195143
     .agents/skills/go-validation/evals/tasks/go-validation-trigger-negative.yaml: sha256:d192593624493f0175cb834f0ce5ebb8646ce959829877c1ce39a9c143b9c606
     .agents/skills/go-validation/references/category-security.md: sha256:d5964f473bbf8b8b6216efa84a5c275e1cb3cb67ec31f2db532ed3133a866ba5
-    .agents/skills/go-validation/references/category-testing.md: sha256:942191a01a3413479a1296e9b646470618b0cd60b1516064510d3daac57e818e
+    .agents/skills/go-validation/references/category-testing.md: sha256:5f86bc6c964caf1d41d8dea3d8d2a2130f819bb70d22eecf93ec9154228251ed
     .agents/skills/go-validation/references/common-checklist.md: sha256:4e566ee3e6625a645384c6f4151dc1329c2f1065bc0e4ca1c3b0ba1ebc4a972f
     .agents/skills/go-validation/references/common-individual-commands.md: sha256:621ca56e3814a961136669dbb6d1b4e1c5bd90f989b6450b31de2197623f510a
     .agents/skills/go-validation/references/common-output-format.md: sha256:e21f30fe399e9851ec5b7e0a249722685f041bb647cd1255aa40b3f215062408
@@ -1149,15 +1159,16 @@ dependencies:
     .agents/skills/go-validation/scripts/lib/validation.sh: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
     .agents/skills/go-validation/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
     .agents/skills/go-validation/scripts/validate.sh: sha256:4c78176c796d29534862fc5bf6727bcea24e4a0e78915005880e725540181df4
-    .claude/rules/go-test.md: sha256:46e8031787c6e59387c726ad5df154336c0116208581e45e11386332f59dade8
-    .claude/rules/go.md: sha256:f1896015c06891e285a05e35c7cf21cdd313dc013e4cc24027564a262f115c57
-    .claude/skills/go-review/SKILL.md: sha256:6f144d386f08501fdd11fd33ba0d9422de5bea4334c5334b876998f2f62bc49d
+    .claude/rules/go-test.md: sha256:149c4447429fc8b75e1dc3cb25e4363ff11d05c58e09d85475bde73eada1ba33
+    .claude/rules/go.md: sha256:9e60f3040be8d99c77653493b5d15e24d50baec7ce370d9de688ebcf73ab9b0c
+    .claude/skills/go-review/SKILL.md: sha256:8431b2623e4fb28532a322c9a838fd1c624a08023fa62718a61034dcfdcfd96a
     .claude/skills/go-review/eval.yaml: sha256:c8e9abf238dd1a8628bc5610e25e62c36e547722cdf97f91c71781fb23cd2e4f
     .claude/skills/go-review/evals/tasks/go-review-basic.yaml: sha256:05308719ab7f564bcbd9f8dc66903e6da21dc703fa3094bc9ee71a555c59cf71
     .claude/skills/go-review/evals/tasks/go-review-boundary-guardrail.yaml: sha256:9f85b8480cea21b61346c517223fb9d7b96f3a570af66b6c0a9608739cbcf674
     .claude/skills/go-review/evals/tasks/go-review-specific-check.yaml: sha256:a7e6fa201c33ca99863202c679b7e3635ebb3f4c4082e18c47e374d545507399
     .claude/skills/go-review/evals/tasks/go-review-structured-output.yaml: sha256:5bc5b7300b9de14c04319958eecb961d9bad8ba97017dcc0cc7873a1be20c7ac
     .claude/skills/go-review/evals/tasks/go-review-trigger-negative.yaml: sha256:2bfea3279aa63a75a3975e2f0bf271cf04b0333829a9c9b095ddbcff129c0b8d
+    .claude/skills/go-review/references/category-anti-patterns.md: sha256:987ece00f5ccfd01a17ed8ed03cdaaa1fc523309eeb1adc720da568bdd10c8df
     .claude/skills/go-review/references/category-architecture.md: sha256:0e2fd8cb0791298608a1befe6c154c84595c10165a29962cfd387c5d1fd1f01f
     .claude/skills/go-review/references/category-code-standards.md: sha256:d5f522248f5145627c7604cb665ab5da0fe21c081909639a6a1e3a5e2970bcbf
     .claude/skills/go-review/references/category-concurrency.md: sha256:41fc120930fda7c884d1610457ba175d139cba5605fb790963e79e739afd3e8d
@@ -1168,11 +1179,12 @@ dependencies:
     .claude/skills/go-review/references/category-function-design.md: sha256:ba12e280300faa2110d830d41947ad3dec79cd9691e491385db58262c69a705a
     .claude/skills/go-review/references/category-global.md: sha256:bc0a33036f4b72afb9adc943b7585afebaf52f1a01df211bc57171f853932394
     .claude/skills/go-review/references/category-security.md: sha256:0ae3a9b491fd2bc4a589d2095c408c5d1c9684dbdc0b2cc0de502b19e7536dbd
-    .claude/skills/go-review/references/category-testing.md: sha256:de3627860508253919d35d62a12b49850e4c428b746dac57eb215f31c7d922cc
-    .claude/skills/go-review/references/common-checklist.md: sha256:aee6c620cd3e16a9fbf5c8ed06d1699ce57af93c97bc420513ae969271f1e977
+    .claude/skills/go-review/references/category-test-anti-patterns.md: sha256:325d55fdd3d0f1c09831f448c708f2f8a07b5a9ac4f42d1e6e22a8c5b956f4c4
+    .claude/skills/go-review/references/category-testing.md: sha256:8c0415d965db894be13fdfb173b80b27ef2bae68d341e7dde18faa8c7082c20c
+    .claude/skills/go-review/references/common-checklist.md: sha256:3b08d8c62011650d229bceef1b5d95e6466f1d18d763f3c4cb011c239fe36423
     .claude/skills/go-review/references/common-output-format.md: sha256:fcbaadf9e13b5cd6a9b8e891b6168406c4de17237d4038d39ebeeb4811be8987
     .claude/skills/go-review/references/common-troubleshooting.md: sha256:571bd26950e22249175ca592b926cd6cab9ca41d90da439af2dfb12bdea245bd
-    .claude/skills/go-validation/SKILL.md: sha256:cf2c4f061629c8a2f558619f9baad2571489df27bec0c4a76d38a39d2c21f3e1
+    .claude/skills/go-validation/SKILL.md: sha256:6f8a6dd90803674b6090a34e5a4843fb627943bd1078e2f8fdc14d3f4450e2dd
     .claude/skills/go-validation/eval.yaml: sha256:3d73d5fc24f17d2d083a12b8b126ff5abbb53e320f4a3ff90d4d7c2a3ff7a00c
     .claude/skills/go-validation/evals/tasks/go-validation-basic.yaml: sha256:2b253e635832329d35745fd2f855e00cafd8f65eb68a040bb6269aa8790bb76e
     .claude/skills/go-validation/evals/tasks/go-validation-boundary-guardrail.yaml: sha256:a574bb4a1c99224c0eeb0f298abe7b4134192c66e642d23fd842da149530d4e9
@@ -1180,7 +1192,7 @@ dependencies:
     .claude/skills/go-validation/evals/tasks/go-validation-structured-output.yaml: sha256:9030e5778ab9c5a5d46b4207f32f352e1ab8b479221770b5ac1c73500e195143
     .claude/skills/go-validation/evals/tasks/go-validation-trigger-negative.yaml: sha256:d192593624493f0175cb834f0ce5ebb8646ce959829877c1ce39a9c143b9c606
     .claude/skills/go-validation/references/category-security.md: sha256:d5964f473bbf8b8b6216efa84a5c275e1cb3cb67ec31f2db532ed3133a866ba5
-    .claude/skills/go-validation/references/category-testing.md: sha256:942191a01a3413479a1296e9b646470618b0cd60b1516064510d3daac57e818e
+    .claude/skills/go-validation/references/category-testing.md: sha256:5f86bc6c964caf1d41d8dea3d8d2a2130f819bb70d22eecf93ec9154228251ed
     .claude/skills/go-validation/references/common-checklist.md: sha256:4e566ee3e6625a645384c6f4151dc1329c2f1065bc0e4ca1c3b0ba1ebc4a972f
     .claude/skills/go-validation/references/common-individual-commands.md: sha256:621ca56e3814a961136669dbb6d1b4e1c5bd90f989b6450b31de2197623f510a
     .claude/skills/go-validation/references/common-output-format.md: sha256:e21f30fe399e9851ec5b7e0a249722685f041bb647cd1255aa40b3f215062408
@@ -1195,15 +1207,15 @@ dependencies:
     .claude/skills/go-validation/scripts/lib/validation.sh: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
     .claude/skills/go-validation/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
     .claude/skills/go-validation/scripts/validate.sh: sha256:4c78176c796d29534862fc5bf6727bcea24e4a0e78915005880e725540181df4
-    .cursor/rules/go-test.mdc: sha256:015e9cbd225804cc79ddcd59e823da9e7f89d612fe08f1e66abaa3ca5cd23ca1
-    .cursor/rules/go.mdc: sha256:5587c8af81ac19aaafef03f3075717e4dfa342ffa642f09f7f06b3f8f56fa54c
-  content_hash: sha256:a37caeeb1421d2c7145a8be52796230fef5de2560cb9d0385c271e602fce6db7
+    .cursor/rules/go-test.mdc: sha256:ca048b77a5cf1faa80e814f4b6a1dd0051fd368c4e21ad91bf8996bba8e7cb59
+    .cursor/rules/go.mdc: sha256:addf85784dd59e32cea637481d7bd3d032db360d1e347495e90eabd65eb053b0
+  content_hash: sha256:0b84e9728d90c46f1d2c57a69fc88736734dfb20dfec963a7c35ea147c5c93a6
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: go-hooks-claude
   host: github.com
-  resolved_commit: e3e0b48915de1940dc92525eb66b6452775246c3
-  resolved_ref: v1.8.95
+  resolved_commit: 6161084dd07868b76ba056e0717817347c266517
+  resolved_ref: v1.8.100
   version: 1.0.0
   virtual_path: .apm/packages/go-hooks-claude
   is_virtual: true
@@ -1217,8 +1229,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: go-hooks-cursor
   host: github.com
-  resolved_commit: e3e0b48915de1940dc92525eb66b6452775246c3
-  resolved_ref: v1.8.95
+  resolved_commit: 6161084dd07868b76ba056e0717817347c266517
+  resolved_ref: v1.8.100
   version: 1.0.0
   virtual_path: .apm/packages/go-hooks-cursor
   is_virtual: true
@@ -1232,8 +1244,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-repo-maintenance
   host: github.com
-  resolved_commit: e3e0b48915de1940dc92525eb66b6452775246c3
-  resolved_ref: v1.8.95
+  resolved_commit: 6161084dd07868b76ba056e0717817347c266517
+  resolved_ref: v1.8.100
   version: 1.0.0
   virtual_path: .apm/packages/repo-maintenance
   is_virtual: true
@@ -2055,8 +2067,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-shell-script
   host: github.com
-  resolved_commit: e3e0b48915de1940dc92525eb66b6452775246c3
-  resolved_ref: v1.8.95
+  resolved_commit: 6161084dd07868b76ba056e0717817347c266517
+  resolved_ref: v1.8.100
   version: 1.0.0
   virtual_path: .apm/packages/shell-script
   is_virtual: true
@@ -2182,7 +2194,7 @@ dependencies:
     .agents/skills/shell-script-review/references/category-logging.md: sha256:fe682b8aed0e71f42eb14e9453810b686de26b0412971ca48a785cafa7e62656
     .agents/skills/shell-script-review/references/category-security.md: sha256:08b0fbec8bd1413909da31945c8b835fce63b64e5242630c9713ce07184a3e8b
     .agents/skills/shell-script-review/references/category-testing.md: sha256:a7a2649267e121563b8712fcaf0fad60ae8d15c632703104b120bbcd02bc8af8
-    .agents/skills/shell-script-review/references/common-checklist.md: sha256:59dc91adb89e8b34e773237f16b18c195726a279061fa8431503d801839f0520
+    .agents/skills/shell-script-review/references/common-checklist.md: sha256:4a3d6e5b658311c1e1c5ecc6ca3883cc5fdefa4d361ae489a7beda36d66226dd
     .agents/skills/shell-script-review/references/common-output-format.md: sha256:fcbaadf9e13b5cd6a9b8e891b6168406c4de17237d4038d39ebeeb4811be8987
     .agents/skills/shell-script-review/references/common-troubleshooting.md: sha256:426d9a560e3224eb3c53a36c5ef29bb788f4762a6e40f5c66deab74ab016df16
     .agents/skills/shell-script-validation/SKILL.md: sha256:01a885dc4c7c653b8c5f3104aca7e46f439a0c9d26bb3832e5b9c954e88dd9e5
@@ -2212,8 +2224,8 @@ dependencies:
     .agents/skills/shell-script-validation/scripts/lib/validation.sh: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
     .agents/skills/shell-script-validation/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
     .agents/skills/shell-script-validation/scripts/validate.sh: sha256:7a72768ff4e5dd30a01ff713b49f701f628349b95c3ea98ae44ff7618937a9b6
-    .claude/rules/bats.md: sha256:1e7c1549930f30e421fd525b983a43216d9b5444bc1f8a58c6f90289b0b45c61
-    .claude/rules/shell-script.md: sha256:e6c0852b75b55c596af7555a7eac92ed52e8e948274a3199828621df0f40673c
+    .claude/rules/bats.md: sha256:e9b8043aa6fd78fdfbbf1a335a1dd4fd53cba01cc645df0562a52615af7884da
+    .claude/rules/shell-script.md: sha256:593c4da1aeaec36c55f8d2d7127ecdc13345d25d65f3b1536696f70a62ae962e
     .claude/skills/shell-script-review/SKILL.md: sha256:278775eeff0781b46b8ceb5cc2eb09a0ced6162c96659a68268f30d6cc8ae5b1
     .claude/skills/shell-script-review/eval.yaml: sha256:787b28497c258dc8bb5850176f43f9956d26b979c19319a149e00dff0de1084a
     .claude/skills/shell-script-review/evals/tasks/shell-script-review-basic.yaml: sha256:49daaacf14929630cc344423578640e23f321d87d94c809052f82adce59890e0
@@ -2231,7 +2243,7 @@ dependencies:
     .claude/skills/shell-script-review/references/category-logging.md: sha256:fe682b8aed0e71f42eb14e9453810b686de26b0412971ca48a785cafa7e62656
     .claude/skills/shell-script-review/references/category-security.md: sha256:08b0fbec8bd1413909da31945c8b835fce63b64e5242630c9713ce07184a3e8b
     .claude/skills/shell-script-review/references/category-testing.md: sha256:a7a2649267e121563b8712fcaf0fad60ae8d15c632703104b120bbcd02bc8af8
-    .claude/skills/shell-script-review/references/common-checklist.md: sha256:59dc91adb89e8b34e773237f16b18c195726a279061fa8431503d801839f0520
+    .claude/skills/shell-script-review/references/common-checklist.md: sha256:4a3d6e5b658311c1e1c5ecc6ca3883cc5fdefa4d361ae489a7beda36d66226dd
     .claude/skills/shell-script-review/references/common-output-format.md: sha256:fcbaadf9e13b5cd6a9b8e891b6168406c4de17237d4038d39ebeeb4811be8987
     .claude/skills/shell-script-review/references/common-troubleshooting.md: sha256:426d9a560e3224eb3c53a36c5ef29bb788f4762a6e40f5c66deab74ab016df16
     .claude/skills/shell-script-validation/SKILL.md: sha256:01a885dc4c7c653b8c5f3104aca7e46f439a0c9d26bb3832e5b9c954e88dd9e5
@@ -2261,15 +2273,15 @@ dependencies:
     .claude/skills/shell-script-validation/scripts/lib/validation.sh: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
     .claude/skills/shell-script-validation/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
     .claude/skills/shell-script-validation/scripts/validate.sh: sha256:7a72768ff4e5dd30a01ff713b49f701f628349b95c3ea98ae44ff7618937a9b6
-    .cursor/rules/bats.mdc: sha256:b3a981b711ab51d980ffed814007e42cf033f87065d728f813ee2cb22806a84e
-    .cursor/rules/shell-script.mdc: sha256:b2c0efaf1f07c83fd4b6c5cf70dee51f237a1852221ced9b6ad2d63d742b50a7
-  content_hash: sha256:36950691cfae3861c5e0ba80ed49b8a53f321c1696c277b681c3bc06e7249148
+    .cursor/rules/bats.mdc: sha256:90afbfdd4b8443d9bc305b1c1bf225330b5079d828861ddb2347f1bb837d77d7
+    .cursor/rules/shell-script.mdc: sha256:332f40ccac5f53e6447971e8a5711e59daea845dea692e5ea9d22da4ebfaafd4
+  content_hash: sha256:71335dff0b20c9212458d2b87aaadb808a99497f96ba1bd7f56c136272e2ed79
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: shell-script-hooks-claude
   host: github.com
-  resolved_commit: e3e0b48915de1940dc92525eb66b6452775246c3
-  resolved_ref: v1.8.95
+  resolved_commit: 6161084dd07868b76ba056e0717817347c266517
+  resolved_ref: v1.8.100
   version: 1.0.0
   virtual_path: .apm/packages/shell-script-hooks-claude
   is_virtual: true
@@ -2285,8 +2297,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: shell-script-hooks-cursor
   host: github.com
-  resolved_commit: e3e0b48915de1940dc92525eb66b6452775246c3
-  resolved_ref: v1.8.95
+  resolved_commit: 6161084dd07868b76ba056e0717817347c266517
+  resolved_ref: v1.8.100
   version: 1.0.0
   virtual_path: .apm/packages/shell-script-hooks-cursor
   is_virtual: true
@@ -2407,7 +2419,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/shell-script
   active_owner: y-miyazaki/config/.apm/packages/shell-script
-  content_hash: sha256:1e7c1549930f30e421fd525b983a43216d9b5444bc1f8a58c6f90289b0b45c61
+  content_hash: sha256:e9b8043aa6fd78fdfbbf1a335a1dd4fd53cba01cc645df0562a52615af7884da
 - kind: project-relative
   target: claude
   value: .claude/rules/github-actions-workflow.md
@@ -2416,7 +2428,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/github-actions
   active_owner: y-miyazaki/config/.apm/packages/github-actions
-  content_hash: sha256:f953cb348975084f1d3d35a9bf7a451a68543b04ef360595425d244506287f68
+  content_hash: sha256:26686bf4f4fecb2a90c6866829e162ed4e3c88c5c7401d3cab643d7c787187c6
 - kind: project-relative
   target: claude
   value: .claude/rules/go-test.md
@@ -2425,7 +2437,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:46e8031787c6e59387c726ad5df154336c0116208581e45e11386332f59dade8
+  content_hash: sha256:149c4447429fc8b75e1dc3cb25e4363ff11d05c58e09d85475bde73eada1ba33
 - kind: project-relative
   target: claude
   value: .claude/rules/go.md
@@ -2434,7 +2446,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:f1896015c06891e285a05e35c7cf21cdd313dc013e4cc24027564a262f115c57
+  content_hash: sha256:9e60f3040be8d99c77653493b5d15e24d50baec7ce370d9de688ebcf73ab9b0c
 - kind: project-relative
   target: claude
   value: .claude/rules/instructions.md
@@ -2452,7 +2464,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/common
   active_owner: y-miyazaki/config/.apm/packages/common
-  content_hash: sha256:1c5594de45504a9ed5384297f547a40362d442f9bbdcfd76c6ea37b161b04748
+  content_hash: sha256:67c019eba7931bf52778706d22a623568f1974239b65789d44630112179deae7
 - kind: project-relative
   target: claude
   value: .claude/rules/shell-script.md
@@ -2461,7 +2473,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/shell-script
   active_owner: y-miyazaki/config/.apm/packages/shell-script
-  content_hash: sha256:e6c0852b75b55c596af7555a7eac92ed52e8e948274a3199828621df0f40673c
+  content_hash: sha256:593c4da1aeaec36c55f8d2d7127ecdc13345d25d65f3b1536696f70a62ae962e
 - kind: project-relative
   target: claude
   value: .claude/skills/agent-skills-review
@@ -3958,6 +3970,15 @@ deployments:
   content_hash: sha256:7dcf918f7fc8bdefbb17221190c563f8bbce7aa08f810b5b23742ba734c59db1
 - kind: project-relative
   target: claude
+  value: .claude/skills/github-actions-review/references/category-anti-patterns.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/github-actions
+  active_owner: y-miyazaki/config/.apm/packages/github-actions
+  content_hash: sha256:c0868c5cd88795f26a17c553e6f80cb9bf2508c9fca9d34716218a84a299a941
+- kind: project-relative
+  target: claude
   value: .claude/skills/github-actions-review/references/category-best-practices.md
   runtime: null
   scope: project
@@ -4027,7 +4048,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/github-actions
   active_owner: y-miyazaki/config/.apm/packages/github-actions
-  content_hash: sha256:1dc826ea76ad98fd764db55e709469833e6f040ad12922065715249c1ee0ce2b
+  content_hash: sha256:63b19070b4eee7d60d0e451c745238b66dc231c1869c9312dd9f24d830a61641
 - kind: project-relative
   target: claude
   value: .claude/skills/github-actions-review/references/common-output-format.md
@@ -5215,7 +5236,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:6f144d386f08501fdd11fd33ba0d9422de5bea4334c5334b876998f2f62bc49d
+  content_hash: sha256:8431b2623e4fb28532a322c9a838fd1c624a08023fa62718a61034dcfdcfd96a
 - kind: project-relative
   target: claude
   value: .claude/skills/go-review/eval.yaml
@@ -5270,6 +5291,15 @@ deployments:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
   content_hash: sha256:2bfea3279aa63a75a3975e2f0bf271cf04b0333829a9c9b095ddbcff129c0b8d
+- kind: project-relative
+  target: claude
+  value: .claude/skills/go-review/references/category-anti-patterns.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/go
+  active_owner: y-miyazaki/config/.apm/packages/go
+  content_hash: sha256:987ece00f5ccfd01a17ed8ed03cdaaa1fc523309eeb1adc720da568bdd10c8df
 - kind: project-relative
   target: claude
   value: .claude/skills/go-review/references/category-architecture.md
@@ -5362,13 +5392,22 @@ deployments:
   content_hash: sha256:0ae3a9b491fd2bc4a589d2095c408c5d1c9684dbdc0b2cc0de502b19e7536dbd
 - kind: project-relative
   target: claude
+  value: .claude/skills/go-review/references/category-test-anti-patterns.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/go
+  active_owner: y-miyazaki/config/.apm/packages/go
+  content_hash: sha256:325d55fdd3d0f1c09831f448c708f2f8a07b5a9ac4f42d1e6e22a8c5b956f4c4
+- kind: project-relative
+  target: claude
   value: .claude/skills/go-review/references/category-testing.md
   runtime: null
   scope: project
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:de3627860508253919d35d62a12b49850e4c428b746dac57eb215f31c7d922cc
+  content_hash: sha256:8c0415d965db894be13fdfb173b80b27ef2bae68d341e7dde18faa8c7082c20c
 - kind: project-relative
   target: claude
   value: .claude/skills/go-review/references/common-checklist.md
@@ -5377,7 +5416,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:aee6c620cd3e16a9fbf5c8ed06d1699ce57af93c97bc420513ae969271f1e977
+  content_hash: sha256:3b08d8c62011650d229bceef1b5d95e6466f1d18d763f3c4cb011c239fe36423
 - kind: project-relative
   target: claude
   value: .claude/skills/go-review/references/common-output-format.md
@@ -5413,7 +5452,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:cf2c4f061629c8a2f558619f9baad2571489df27bec0c4a76d38a39d2c21f3e1
+  content_hash: sha256:6f8a6dd90803674b6090a34e5a4843fb627943bd1078e2f8fdc14d3f4450e2dd
 - kind: project-relative
   target: claude
   value: .claude/skills/go-validation/eval.yaml
@@ -5485,7 +5524,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:942191a01a3413479a1296e9b646470618b0cd60b1516064510d3daac57e818e
+  content_hash: sha256:5f86bc6c964caf1d41d8dea3d8d2a2130f819bb70d22eecf93ec9154228251ed
 - kind: project-relative
   target: claude
   value: .claude/skills/go-validation/references/common-checklist.md
@@ -6511,7 +6550,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/shell-script
   active_owner: y-miyazaki/config/.apm/packages/shell-script
-  content_hash: sha256:59dc91adb89e8b34e773237f16b18c195726a279061fa8431503d801839f0520
+  content_hash: sha256:4a3d6e5b658311c1e1c5ecc6ca3883cc5fdefa4d361ae489a7beda36d66226dd
 - kind: project-relative
   target: claude
   value: .claude/skills/shell-script-review/references/common-output-format.md
@@ -8674,6 +8713,15 @@ deployments:
   content_hash: sha256:7dcf918f7fc8bdefbb17221190c563f8bbce7aa08f810b5b23742ba734c59db1
 - kind: project-relative
   target: cursor
+  value: .agents/skills/github-actions-review/references/category-anti-patterns.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/github-actions
+  active_owner: y-miyazaki/config/.apm/packages/github-actions
+  content_hash: sha256:c0868c5cd88795f26a17c553e6f80cb9bf2508c9fca9d34716218a84a299a941
+- kind: project-relative
+  target: cursor
   value: .agents/skills/github-actions-review/references/category-best-practices.md
   runtime: null
   scope: project
@@ -8743,7 +8791,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/github-actions
   active_owner: y-miyazaki/config/.apm/packages/github-actions
-  content_hash: sha256:1dc826ea76ad98fd764db55e709469833e6f040ad12922065715249c1ee0ce2b
+  content_hash: sha256:63b19070b4eee7d60d0e451c745238b66dc231c1869c9312dd9f24d830a61641
 - kind: project-relative
   target: cursor
   value: .agents/skills/github-actions-review/references/common-output-format.md
@@ -9931,7 +9979,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:6f144d386f08501fdd11fd33ba0d9422de5bea4334c5334b876998f2f62bc49d
+  content_hash: sha256:8431b2623e4fb28532a322c9a838fd1c624a08023fa62718a61034dcfdcfd96a
 - kind: project-relative
   target: cursor
   value: .agents/skills/go-review/eval.yaml
@@ -9986,6 +10034,15 @@ deployments:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
   content_hash: sha256:2bfea3279aa63a75a3975e2f0bf271cf04b0333829a9c9b095ddbcff129c0b8d
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/go-review/references/category-anti-patterns.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/go
+  active_owner: y-miyazaki/config/.apm/packages/go
+  content_hash: sha256:987ece00f5ccfd01a17ed8ed03cdaaa1fc523309eeb1adc720da568bdd10c8df
 - kind: project-relative
   target: cursor
   value: .agents/skills/go-review/references/category-architecture.md
@@ -10078,13 +10135,22 @@ deployments:
   content_hash: sha256:0ae3a9b491fd2bc4a589d2095c408c5d1c9684dbdc0b2cc0de502b19e7536dbd
 - kind: project-relative
   target: cursor
+  value: .agents/skills/go-review/references/category-test-anti-patterns.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/go
+  active_owner: y-miyazaki/config/.apm/packages/go
+  content_hash: sha256:325d55fdd3d0f1c09831f448c708f2f8a07b5a9ac4f42d1e6e22a8c5b956f4c4
+- kind: project-relative
+  target: cursor
   value: .agents/skills/go-review/references/category-testing.md
   runtime: null
   scope: project
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:de3627860508253919d35d62a12b49850e4c428b746dac57eb215f31c7d922cc
+  content_hash: sha256:8c0415d965db894be13fdfb173b80b27ef2bae68d341e7dde18faa8c7082c20c
 - kind: project-relative
   target: cursor
   value: .agents/skills/go-review/references/common-checklist.md
@@ -10093,7 +10159,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:aee6c620cd3e16a9fbf5c8ed06d1699ce57af93c97bc420513ae969271f1e977
+  content_hash: sha256:3b08d8c62011650d229bceef1b5d95e6466f1d18d763f3c4cb011c239fe36423
 - kind: project-relative
   target: cursor
   value: .agents/skills/go-review/references/common-output-format.md
@@ -10129,7 +10195,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:cf2c4f061629c8a2f558619f9baad2571489df27bec0c4a76d38a39d2c21f3e1
+  content_hash: sha256:6f8a6dd90803674b6090a34e5a4843fb627943bd1078e2f8fdc14d3f4450e2dd
 - kind: project-relative
   target: cursor
   value: .agents/skills/go-validation/eval.yaml
@@ -10201,7 +10267,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:942191a01a3413479a1296e9b646470618b0cd60b1516064510d3daac57e818e
+  content_hash: sha256:5f86bc6c964caf1d41d8dea3d8d2a2130f819bb70d22eecf93ec9154228251ed
 - kind: project-relative
   target: cursor
   value: .agents/skills/go-validation/references/common-checklist.md
@@ -11227,7 +11293,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/shell-script
   active_owner: y-miyazaki/config/.apm/packages/shell-script
-  content_hash: sha256:59dc91adb89e8b34e773237f16b18c195726a279061fa8431503d801839f0520
+  content_hash: sha256:4a3d6e5b658311c1e1c5ecc6ca3883cc5fdefa4d361ae489a7beda36d66226dd
 - kind: project-relative
   target: cursor
   value: .agents/skills/shell-script-review/references/common-output-format.md
@@ -12001,7 +12067,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/shell-script
   active_owner: y-miyazaki/config/.apm/packages/shell-script
-  content_hash: sha256:b3a981b711ab51d980ffed814007e42cf033f87065d728f813ee2cb22806a84e
+  content_hash: sha256:90afbfdd4b8443d9bc305b1c1bf225330b5079d828861ddb2347f1bb837d77d7
 - kind: project-relative
   target: cursor
   value: .cursor/rules/github-actions-workflow.mdc
@@ -12010,7 +12076,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/github-actions
   active_owner: y-miyazaki/config/.apm/packages/github-actions
-  content_hash: sha256:417082e8c259c878716488c07cbb3ae0e798aef583bd64307bf974dc343ebb0f
+  content_hash: sha256:648e52a204b6f2dae00c8b3ac1432e6b72ae8b5ce2905a66d77a1b6caec6825c
 - kind: project-relative
   target: cursor
   value: .cursor/rules/go-test.mdc
@@ -12019,7 +12085,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:015e9cbd225804cc79ddcd59e823da9e7f89d612fe08f1e66abaa3ca5cd23ca1
+  content_hash: sha256:ca048b77a5cf1faa80e814f4b6a1dd0051fd368c4e21ad91bf8996bba8e7cb59
 - kind: project-relative
   target: cursor
   value: .cursor/rules/go.mdc
@@ -12028,7 +12094,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:5587c8af81ac19aaafef03f3075717e4dfa342ffa642f09f7f06b3f8f56fa54c
+  content_hash: sha256:addf85784dd59e32cea637481d7bd3d032db360d1e347495e90eabd65eb053b0
 - kind: project-relative
   target: cursor
   value: .cursor/rules/instructions.mdc
@@ -12046,7 +12112,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/common
   active_owner: y-miyazaki/config/.apm/packages/common
-  content_hash: sha256:ddf4799d3864c8d6ca48e8d60031b27f804cdbd09bd85c44db9a0b80bd3c9b2d
+  content_hash: sha256:c7d5eddf9cc356a4fbfe94d4e3176062f7c91739c056d75d4291273ed6cefaa4
 - kind: project-relative
   target: cursor
   value: .cursor/rules/shell-script.mdc
@@ -12055,7 +12121,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/shell-script
   active_owner: y-miyazaki/config/.apm/packages/shell-script
-  content_hash: sha256:b2c0efaf1f07c83fd4b6c5cf70dee51f237a1852221ced9b6ad2d63d742b50a7
+  content_hash: sha256:332f40ccac5f53e6447971e8a5711e59daea845dea692e5ea9d22da4ebfaafd4
 - kind: uri
   target: mcp
   value: aws-documentation-mcp-server
@@ -12077,6 +12143,24 @@ deployments:
 - kind: uri
   target: mcp
   value: context7
+  runtime: claude
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: uri
+  target: mcp
+  value: fetch
+  runtime: claude
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: uri
+  target: mcp
+  value: github
   runtime: claude
   scope: project
   owners:
@@ -12224,7 +12308,7 @@ mcp_configs:
     transport: stdio
     args:
     - -y
-    - '@upstash/context7-mcp@4.0.2'
+    - '@upstash/context7-mcp@4.0.3'
     registry: false
     command: npx
   fetch:
@@ -12233,7 +12317,7 @@ mcp_configs:
     args:
     - --with
     - mcp>=1.28,<2
-    - mcp-server-fetch==2026.7.10
+    - mcp-server-fetch==2026.8.18
     registry: false
     command: uvx
   github:
@@ -12241,7 +12325,7 @@ mcp_configs:
     transport: stdio
     args:
     - -lc
-    - TOKEN="${GH_TOKEN:-$GITHUB_TOKEN}"; exec uvx mcp-compressor==0.31.7 -- https://api.githubcopilot.com/mcp/
+    - TOKEN="${GH_TOKEN:-$GITHUB_TOKEN}"; exec uvx mcp-compressor==0.31.8 -- https://api.githubcopilot.com/mcp/
       -H "Authorization=Bearer ${TOKEN}" --auth explicit-headers
     registry: false
     command: bash
@@ -12250,7 +12334,7 @@ mcp_configs:
     transport: stdio
     args:
     - -y
-    - lean-ctx-bin@3.9.18
+    - lean-ctx-bin@3.9.20
     registry: false
     command: npx
 mcp_target_servers:
@@ -12258,6 +12342,8 @@ mcp_target_servers:
   - aws-documentation-mcp-server
   - aws-pricing-mcp-server
   - context7
+  - fetch
+  - github
   - lean-ctx
   cursor:
   - aws-documentation-mcp-server

@@ -6,7 +6,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: y-miyazaki
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 ## Input
@@ -46,7 +46,7 @@ Structured validation results in fixed tool order.
 - [common-checklist.md](references/common-checklist.md) (always read)
 - [common-output-format.md](references/common-output-format.md) (always read)
 - [common-troubleshooting.md](references/common-troubleshooting.md) (read on failure)
-- [common-individual-commands.md](references/common-individual-commands.md) (read on failure)
+- [common-individual-commands.md](references/common-individual-commands.md) (read on debugging)
 - [category-security.md](references/category-security.md) (read on failure)
 - [category-testing.md](references/category-testing.md) (read on failure)
 

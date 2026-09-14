@@ -69,7 +69,7 @@
 
 ## Testing (TEST)
 
-- TEST-00 (MUST): Add or update *_test.go in the same change as behavior
+- TEST-00 (MUST): Add or update \*_test.go in the same change as behavior
 - TEST-01 (SHOULD): Prefer table-driven tests with subtests and edges
 - TEST-02 (SHOULD): Design testable APIs; inject time and rand
 - TEST-03 (SHOULD): Stub external deps through consumer interfaces
@@ -77,4 +77,24 @@
 - TEST-05 (SHOULD): Isolate integration tests with build tags
 - TEST-06 (SHOULD): Call t.Helper() first in test helpers
 - TEST-07 (SHOULD): Keep one assertion stack per package; match sibling tests
-- TEST-08 (MUST): Prefix every *_test.go filename with the source stem under test
+- TEST-08 (MUST): Prefix every \*_test.go filename with the source stem under test
+
+## Anti-Patterns (AP)
+
+- AP-01 (SHOULD): Discard errors with `_` without a justifying comment
+- AP-02 (SHOULD): Store request-scoped context on structs
+- AP-03 (SHOULD): Concatenate untrusted input into SQL
+- AP-04 (SHOULD): Embed secrets in source or test data
+
+## Test Anti-Patterns (TAP)
+
+- TAP-01 (SHOULD): One `Test*` function per table row when a table-driven loop would suffice
+- TAP-02 (SHOULD): Mixing testify `require`/`assert` with the default stdlib plus go-cmp stack in the same package
+- TAP-03 (SHOULD): Using `testify/assert` (non-fatal) in table-driven subtests
+- TAP-04 (MUST): Inline `errors.New` in test bodies (`err113`)
+- TAP-05 (SHOULD): Copying large table rows with `for _, tt := range tests` when gocritic `rangeValCopy` is enabled
+- TAP-06 (MUST): Split `*_test.go` files named without the source stem prefix
+- TAP-07 (SHOULD): Disabling revive or golangci as a whole on `*_test.go`
+- TAP-08 (SHOULD): Adding `//revive:disable:comments-density` when that rule is not enabled on tests
+- TAP-09 (SHOULD): Refactoring production code solely to inject mocks unless a test already justifies the seam
+- TAP-10 (MUST): Real credentials, tokens, or production identifiers in fixtures

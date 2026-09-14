@@ -6,7 +6,7 @@ description: >-
 license: Apache-2.0
 metadata:
   author: y-miyazaki
-  version: "1.2.1"
+  version: "1.2.4"
 ---
 
 ## Input
@@ -46,6 +46,7 @@ Return structured Markdown in accordance with [references/common-output-format.m
 - [category-security.md](references/category-security.md) (always read)
 - [category-concurrency.md](references/category-concurrency.md) (always read)
 - [category-error-handling.md](references/category-error-handling.md) (always read)
+- [category-anti-patterns.md](references/category-anti-patterns.md) (always read)
 - [category-architecture.md](references/category-architecture.md) (always read)
 - [category-code-standards.md](references/category-code-standards.md) (always read)
 - [category-context.md](references/category-context.md) (always read)
@@ -53,6 +54,7 @@ Return structured Markdown in accordance with [references/common-output-format.m
 - [category-documentation.md](references/category-documentation.md) (always read)
 - [category-function-design.md](references/category-function-design.md) (always read)
 - [category-testing.md](references/category-testing.md) (always read)
+- [category-test-anti-patterns.md](references/category-test-anti-patterns.md) (always read)
 
 ## Workflow
 

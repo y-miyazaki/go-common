@@ -8,7 +8,7 @@ paths:
 ## Scope
 
 - Scope covers implementing, testing, and validating Go source code.
-- When adding or changing behavior, add or update `*_test.go` in the same change (TEST-00).
+- When adding or changing behavior, add or update `*_test.go` in the same change (MUST).
 - Test authoring conventions live in companion Go Test rules (stem `go-test`); companion `globs` is `**/*.go` so pairing applies when editing source files (G-05).
 - Handle every returned `error` explicitly; blank-identifier discard needs a justifying comment (ERR-06).
 - Wrap errors with `fmt.Errorf("…: %w", err)` to preserve the causal chain (ERR-01).
@@ -99,33 +99,28 @@ paths:
 - SEC-04 (SHOULD): Mask passwords/tokens in logs
 - SEC-05 (SHOULD): Least privilege; no production debug; explicit CORS
 
-### Testing (TEST)
+### Anti-Patterns (AP)
 
-- TEST-00 (MUST): Add or update *_test.go in the same change as behavior
-- TEST-01 (SHOULD): Prefer table-driven tests with subtests and edges
-- TEST-02 (SHOULD): Design testable APIs; inject time and rand
-- TEST-03 (SHOULD): Stub external deps through consumer interfaces
-- TEST-04 (SHOULD): Share helpers/fixtures outside production packages
-- TEST-05 (SHOULD): Isolate integration tests with build tags
-- TEST-06 (SHOULD): Call t.Helper() first in test helpers
-- TEST-07 (SHOULD): Keep one assertion stack per package; match sibling tests
-- TEST-08 (MUST): Prefix every *_test.go filename with the source stem under test
+- AP-01 (SHOULD): Discard errors with `_` without a justifying comment
+- AP-02 (SHOULD): Store request-scoped context on structs
+- AP-03 (SHOULD): Concatenate untrusted input into SQL
+- AP-04 (SHOULD): Embed secrets in source or test data
 
 ### Code Modification Guidelines
 
-- When adding or changing behavior, add or update *_test.go files in the same change.
+- When adding or changing behavior, add or update *_test.go files in the same change; follow companion Go Test rules (stem `go-test`) for test layout.
 
 ## Testing and Validation
 
 Operational notes:
 
 - Target at least 80% test coverage when verifying behavior changes.
-- Separate integration tests with `//go:build integration`.
+- Test authoring conventions: companion Go Test rules (stem `go-test`).
 
 On-demand validation: see go-validation skill SKILL.md.
 
 ## Security Guidelines
 
-- Do not hardcode secrets or credentials in source code, logs, or test data.
-- Validate external inputs and use explicit error handling for privilege-boundary operations.
-- Wrap error outputs to avoid sensitive data leakage and log only the minimum required information.
+- Do not paste real secrets, credentials, or production identifiers into this instruction file, code samples, or review notes. Use obvious placeholders.
+- Validate external inputs at trust boundaries; use parameterized queries — never concatenate untrusted input into SQL (SEC-01).
+- Do not leak stack traces, internal paths, or tokens in user-facing error messages (ERR-05).
