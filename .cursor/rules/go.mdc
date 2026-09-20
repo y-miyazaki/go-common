@@ -1,5 +1,5 @@
 ---
-description: Go Development Instructions
+description: "Go Development Instructions"
 globs: "**/*.go"
 ---
 

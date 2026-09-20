@@ -1,5 +1,5 @@
 ---
-description: Go test authoring conventions for tests, stubs, and test pairing
+description: "Go test authoring conventions for tests, stubs, and test pairing"
 globs: "**/*.go"
 ---
 
