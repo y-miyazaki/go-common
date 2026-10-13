@@ -23,7 +23,7 @@
       "type": "stdio",
       "command": "uvx",
       "args": [
-        "awslabs.aws-documentation-mcp-server==1.2.1"
+        "awslabs.aws-documentation-mcp-server==1.2.2"
       ]
     },
     "aws-pricing-mcp-server": {
@@ -62,14 +62,6 @@
       "type": "stdio",
       "command": "codebase-memory-mcp",
       "args": []
-    },
-    "lean-ctx": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "lean-ctx-bin@3.10.5"
-      ]
     }
   }
 }

@@ -1,6 +1,6 @@
 module github.com/y-miyazaki/go-common
 
-go 1.26.8
+go 1.26.9
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
