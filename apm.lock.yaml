@@ -4,8 +4,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-aws
   host: github.com
-  resolved_commit: 64feb80c9d7d1203b0ab775967fbeaeb39846451
-  resolved_ref: v1.8.117
+  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
+  resolved_ref: v1.8.119
   version: 1.0.0
   virtual_path: .apm/packages/aws
   is_virtual: true
@@ -15,8 +15,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-common
   host: github.com
-  resolved_commit: 64feb80c9d7d1203b0ab775967fbeaeb39846451
-  resolved_ref: v1.8.117
+  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
+  resolved_ref: v1.8.119
   version: 1.0.0
   virtual_path: .apm/packages/common
   is_virtual: true
@@ -200,7 +200,7 @@ dependencies:
     .agents/skills/agent-skills-review/references/category-patterns.md: sha256:bbacad96ee450ee790173ef3c44d5bf67aea3ca24e3377f4876de484999aec30
     .agents/skills/agent-skills-review/references/category-quality.md: sha256:3bb41bd4acf9dd3a3ebf4e8796aeb1ec3c6aea370a0fd5e12f6edd72c1fae35b
     .agents/skills/agent-skills-review/references/category-structure.md: sha256:ba306fcd80221973f94a50b2a6b6de0e2f4e9ff21c597e240488614e03d44670
-    .agents/skills/agent-skills-review/references/common-checklist.md: sha256:4571f4cde51fc108b4c7e1392ba59d5997dbbdfa44a8274c9e1086cbad37e1fe
+    .agents/skills/agent-skills-review/references/common-checklist.md: sha256:8d397d14f752c8aba43ba5dceaed182ec40c3dc5b6ce5277de531b6b47562ef5
     .agents/skills/agent-skills-review/references/common-output-format.md: sha256:fcbaadf9e13b5cd6a9b8e891b6168406c4de17237d4038d39ebeeb4811be8987
     .agents/skills/agent-skills-review/references/common-troubleshooting.md: sha256:739667f7503bcc82dde153552f906ab97cb048b575de8aa9c374d1bd9310ff39
     .agents/skills/agent-skills-review/scripts/lib/all.sh: sha256:dc9b27d00ff0b37be6f5c986a59a8107f59a83bede4de5818e453a38ae51f216
@@ -237,7 +237,7 @@ dependencies:
     .agents/skills/instructions-review/references/category-security.md: sha256:bf9547aa5931818083449c2b3a375ee96aea3bba608ef757e59e8da2f8593b76
     .agents/skills/instructions-review/references/category-standards.md: sha256:54c8b7f2e4ed2f01e4b36a0f7ef78a1d8d1b4ff7b81add99b5808e2241dc9ddb
     .agents/skills/instructions-review/references/category-testing.md: sha256:447e69d7f6c5b3ab22440e0d91c638c8594021639ee9bdb6b9c27e7b413821ad
-    .agents/skills/instructions-review/references/common-checklist.md: sha256:9a7d0430f86387320c522856b22e42be8fe0c1307f06ad5a52d55cbabaeedbbb
+    .agents/skills/instructions-review/references/common-checklist.md: sha256:7496b0e41515a152dcd867afedba0dd4f6bfa4efc3f1f593a7a7da95c9b2b4fb
     .agents/skills/instructions-review/references/common-output-format.md: sha256:fcbaadf9e13b5cd6a9b8e891b6168406c4de17237d4038d39ebeeb4811be8987
     .agents/skills/instructions-review/references/common-troubleshooting.md: sha256:8503ca9408390cb4a9d0c734dc544c377ce95b2fd3c9683004a63a947413eb74
     .agents/skills/markdown-validation/SKILL.md: sha256:c2be6c1c07552c49c5a40fcc7b7ba863ebad42a81d155a9b1bcd63f10656292e
@@ -262,8 +262,8 @@ dependencies:
     .agents/skills/markdown-validation/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
     .agents/skills/markdown-validation/scripts/validate.sh: sha256:e3539d49e2c14344c3a36960a0af773871233964f163b9e4044ed5cefdfc9efa
     .claude/agents/test-engineer.md: sha256:8dfd917e4b2652f8eedc6355660732645a18a85ee803cc8e82a83884d9e5c390
-    .claude/rules/agent-skills.md: sha256:da339d58b235af68c93fdfffcb6b0063a67e09b82d0a93976122449bc1a4fcc6
-    .claude/rules/instructions.md: sha256:d39dbe318449062c8de00678d7ad1bf024913c00c45ada535717d26db89c220f
+    .claude/rules/agent-skills.md: sha256:49007409747a75404a56c0c87e08d9588fb173bbc2c1319cf64845021c1003e9
+    .claude/rules/instructions.md: sha256:27318b9c03647fba11a0ab2f1fe572e4cd0c5ade238e3e27989acb558f502ef4
     .claude/rules/markdown.md: sha256:67c019eba7931bf52778706d22a623568f1974239b65789d44630112179deae7
     .claude/skills/agent-skills-review/SKILL.md: sha256:61be5b0410af0627d7056affa13ac486098746a5ad86510c4d06b8905e96d8ee
     .claude/skills/agent-skills-review/eval.yaml: sha256:dd6b3b2266e89d218bbaf9e258038ade3caae076c4d588fcc872c44687276235
@@ -278,7 +278,7 @@ dependencies:
     .claude/skills/agent-skills-review/references/category-patterns.md: sha256:bbacad96ee450ee790173ef3c44d5bf67aea3ca24e3377f4876de484999aec30
     .claude/skills/agent-skills-review/references/category-quality.md: sha256:3bb41bd4acf9dd3a3ebf4e8796aeb1ec3c6aea370a0fd5e12f6edd72c1fae35b
     .claude/skills/agent-skills-review/references/category-structure.md: sha256:ba306fcd80221973f94a50b2a6b6de0e2f4e9ff21c597e240488614e03d44670
-    .claude/skills/agent-skills-review/references/common-checklist.md: sha256:4571f4cde51fc108b4c7e1392ba59d5997dbbdfa44a8274c9e1086cbad37e1fe
+    .claude/skills/agent-skills-review/references/common-checklist.md: sha256:8d397d14f752c8aba43ba5dceaed182ec40c3dc5b6ce5277de531b6b47562ef5
     .claude/skills/agent-skills-review/references/common-output-format.md: sha256:fcbaadf9e13b5cd6a9b8e891b6168406c4de17237d4038d39ebeeb4811be8987
     .claude/skills/agent-skills-review/references/common-troubleshooting.md: sha256:739667f7503bcc82dde153552f906ab97cb048b575de8aa9c374d1bd9310ff39
     .claude/skills/agent-skills-review/scripts/lib/all.sh: sha256:dc9b27d00ff0b37be6f5c986a59a8107f59a83bede4de5818e453a38ae51f216
@@ -315,7 +315,7 @@ dependencies:
     .claude/skills/instructions-review/references/category-security.md: sha256:bf9547aa5931818083449c2b3a375ee96aea3bba608ef757e59e8da2f8593b76
     .claude/skills/instructions-review/references/category-standards.md: sha256:54c8b7f2e4ed2f01e4b36a0f7ef78a1d8d1b4ff7b81add99b5808e2241dc9ddb
     .claude/skills/instructions-review/references/category-testing.md: sha256:447e69d7f6c5b3ab22440e0d91c638c8594021639ee9bdb6b9c27e7b413821ad
-    .claude/skills/instructions-review/references/common-checklist.md: sha256:9a7d0430f86387320c522856b22e42be8fe0c1307f06ad5a52d55cbabaeedbbb
+    .claude/skills/instructions-review/references/common-checklist.md: sha256:7496b0e41515a152dcd867afedba0dd4f6bfa4efc3f1f593a7a7da95c9b2b4fb
     .claude/skills/instructions-review/references/common-output-format.md: sha256:fcbaadf9e13b5cd6a9b8e891b6168406c4de17237d4038d39ebeeb4811be8987
     .claude/skills/instructions-review/references/common-troubleshooting.md: sha256:8503ca9408390cb4a9d0c734dc544c377ce95b2fd3c9683004a63a947413eb74
     .claude/skills/markdown-validation/SKILL.md: sha256:c2be6c1c07552c49c5a40fcc7b7ba863ebad42a81d155a9b1bcd63f10656292e
@@ -340,16 +340,16 @@ dependencies:
     .claude/skills/markdown-validation/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
     .claude/skills/markdown-validation/scripts/validate.sh: sha256:e3539d49e2c14344c3a36960a0af773871233964f163b9e4044ed5cefdfc9efa
     .cursor/agents/test-engineer.md: sha256:8dfd917e4b2652f8eedc6355660732645a18a85ee803cc8e82a83884d9e5c390
-    .cursor/rules/agent-skills.mdc: sha256:14e4cb59c97e39f20d7aef3d2a9d34383f32663b7cbfe807f23c9ea53cda22bf
-    .cursor/rules/instructions.mdc: sha256:7cc7ae586c8403d368874bf71113e83f69f262090ec664ea4e77bbdf9122b064
+    .cursor/rules/agent-skills.mdc: sha256:aafb607db4e03bfbfc609e3836be3cf81cc67d80b4fa20836cc8b7309d27ca55
+    .cursor/rules/instructions.mdc: sha256:5a189c964fab5c53593cbb83a7bd63f9e06f7794e680747ed452f6a270767d9a
     .cursor/rules/markdown.mdc: sha256:e77c6b8ca2523de09eb9ada60ea18e8fbbeaae6a92f70f9b6f887a4f73387fa7
-  content_hash: sha256:bfbdd597c47123f472c45ae161242e59072aebde50c62f5d71b299458cb3cdfb
+  content_hash: sha256:bf812467b290a3713a3138e5c9ada6bce1322fed8e9c55235ceabeecdca2b6d4
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: common-hooks-claude
   host: github.com
-  resolved_commit: 64feb80c9d7d1203b0ab775967fbeaeb39846451
-  resolved_ref: v1.8.117
+  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
+  resolved_ref: v1.8.119
   version: 2.0.0
   virtual_path: .apm/packages/common-hooks-claude
   is_virtual: true
@@ -373,8 +373,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: common-hooks-cursor
   host: github.com
-  resolved_commit: 64feb80c9d7d1203b0ab775967fbeaeb39846451
-  resolved_ref: v1.8.117
+  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
+  resolved_ref: v1.8.119
   version: 2.0.0
   virtual_path: .apm/packages/common-hooks-cursor
   is_virtual: true
@@ -398,8 +398,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-github
   host: github.com
-  resolved_commit: 64feb80c9d7d1203b0ab775967fbeaeb39846451
-  resolved_ref: v1.8.117
+  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
+  resolved_ref: v1.8.119
   version: 1.0.0
   virtual_path: .apm/packages/github
   is_virtual: true
@@ -823,8 +823,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-github-actions
   host: github.com
-  resolved_commit: 64feb80c9d7d1203b0ab775967fbeaeb39846451
-  resolved_ref: v1.8.117
+  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
+  resolved_ref: v1.8.119
   version: 1.0.0
   virtual_path: .apm/packages/github-actions
   is_virtual: true
@@ -932,7 +932,7 @@ dependencies:
     .agents/skills/github-actions-review/references/category-performance.md: sha256:60da7d439654444faa2feb826a5b54c84769fb5ce46fdc22ebb44d2048bc03a9
     .agents/skills/github-actions-review/references/category-security.md: sha256:b235071710f31625daf973132d859b8f175c8abc07d0ec04cb7fadc9e50dc1e9
     .agents/skills/github-actions-review/references/category-tool-integration.md: sha256:892c068222d4713c07dad0f81d6fcf385d1c63bf40b9829bd24cc9bf19df5f8d
-    .agents/skills/github-actions-review/references/common-checklist.md: sha256:63b19070b4eee7d60d0e451c745238b66dc231c1869c9312dd9f24d830a61641
+    .agents/skills/github-actions-review/references/common-checklist.md: sha256:cea45982ce914f2de41cdf712c31d631e8268bbf6d7d10f7215b47a022937950
     .agents/skills/github-actions-review/references/common-output-format.md: sha256:fcbaadf9e13b5cd6a9b8e891b6168406c4de17237d4038d39ebeeb4811be8987
     .agents/skills/github-actions-review/references/common-troubleshooting.md: sha256:b5b1eea13c4226d92bf0c1067e8d6079b52cb2cb322ebd7f6bba815705681bb0
     .agents/skills/github-actions-validation/SKILL.md: sha256:3381a389eb92d7b0d422b3b61de18dbd58ec4c3559d228990f8c100897fa488e
@@ -957,7 +957,7 @@ dependencies:
     .agents/skills/github-actions-validation/scripts/lib/validation.sh: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
     .agents/skills/github-actions-validation/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
     .agents/skills/github-actions-validation/scripts/validate.sh: sha256:95a9b6a15968a74f9a4093183d104c971af0420181846745f2e5d2c25d2596e8
-    .claude/rules/github-actions-workflow.md: sha256:26686bf4f4fecb2a90c6866829e162ed4e3c88c5c7401d3cab643d7c787187c6
+    .claude/rules/github-actions-workflow.md: sha256:6c2a29468cb77b51bec60005f7d5e53e9981235557f6ae297c1a0bdb92704f6e
     .claude/skills/github-actions-review/SKILL.md: sha256:ef4d69e2fb5ffdcb02d66f0cfabc10bb1d2039b7924012198f37cbb102f1cdfd
     .claude/skills/github-actions-review/eval.yaml: sha256:332dc19bd9f6b814d1cc0dc4d5077aa872d1277e9d12354d8196673c92b47b4b
     .claude/skills/github-actions-review/evals/tasks/github-actions-review-basic.yaml: sha256:e796f016b75ddd23b5bb29bf44c0824d161cc7b0374f3987b06d61b7a188bce2
@@ -973,7 +973,7 @@ dependencies:
     .claude/skills/github-actions-review/references/category-performance.md: sha256:60da7d439654444faa2feb826a5b54c84769fb5ce46fdc22ebb44d2048bc03a9
     .claude/skills/github-actions-review/references/category-security.md: sha256:b235071710f31625daf973132d859b8f175c8abc07d0ec04cb7fadc9e50dc1e9
     .claude/skills/github-actions-review/references/category-tool-integration.md: sha256:892c068222d4713c07dad0f81d6fcf385d1c63bf40b9829bd24cc9bf19df5f8d
-    .claude/skills/github-actions-review/references/common-checklist.md: sha256:63b19070b4eee7d60d0e451c745238b66dc231c1869c9312dd9f24d830a61641
+    .claude/skills/github-actions-review/references/common-checklist.md: sha256:cea45982ce914f2de41cdf712c31d631e8268bbf6d7d10f7215b47a022937950
     .claude/skills/github-actions-review/references/common-output-format.md: sha256:fcbaadf9e13b5cd6a9b8e891b6168406c4de17237d4038d39ebeeb4811be8987
     .claude/skills/github-actions-review/references/common-troubleshooting.md: sha256:b5b1eea13c4226d92bf0c1067e8d6079b52cb2cb322ebd7f6bba815705681bb0
     .claude/skills/github-actions-validation/SKILL.md: sha256:3381a389eb92d7b0d422b3b61de18dbd58ec4c3559d228990f8c100897fa488e
@@ -998,14 +998,14 @@ dependencies:
     .claude/skills/github-actions-validation/scripts/lib/validation.sh: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
     .claude/skills/github-actions-validation/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
     .claude/skills/github-actions-validation/scripts/validate.sh: sha256:95a9b6a15968a74f9a4093183d104c971af0420181846745f2e5d2c25d2596e8
-    .cursor/rules/github-actions-workflow.mdc: sha256:862f7e565eaed6add09ae279aab5c4987eaf97488121f3b4d3a4b532e33fa929
-  content_hash: sha256:31be23049075639c4f830560896828025e302eac465c09ddbe2ae84b65a921d3
+    .cursor/rules/github-actions-workflow.mdc: sha256:1e8aa24cfc1558fac2c385b4a2f5e36205280bd32f338c55f80dafc471dba6f2
+  content_hash: sha256:52911f17f99f270870d0e939acc10d982d0823da70e1b93222c5b31508a3490f
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: config-go
   host: github.com
-  resolved_commit: 64feb80c9d7d1203b0ab775967fbeaeb39846451
-  resolved_ref: v1.8.117
+  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
+  resolved_ref: v1.8.119
   version: 1.0.0
   virtual_path: .apm/packages/go
   is_virtual: true
@@ -1132,7 +1132,7 @@ dependencies:
     .agents/skills/go-review/references/category-security.md: sha256:0ae3a9b491fd2bc4a589d2095c408c5d1c9684dbdc0b2cc0de502b19e7536dbd
     .agents/skills/go-review/references/category-test-anti-patterns.md: sha256:325d55fdd3d0f1c09831f448c708f2f8a07b5a9ac4f42d1e6e22a8c5b956f4c4
     .agents/skills/go-review/references/category-testing.md: sha256:8c0415d965db894be13fdfb173b80b27ef2bae68d341e7dde18faa8c7082c20c
-    .agents/skills/go-review/references/common-checklist.md: sha256:3b08d8c62011650d229bceef1b5d95e6466f1d18d763f3c4cb011c239fe36423
+    .agents/skills/go-review/references/common-checklist.md: sha256:af9cec09810f7184d30bfb21e38ad8ea50a9bb12be0b30b97795ee06876b4352
     .agents/skills/go-review/references/common-output-format.md: sha256:fcbaadf9e13b5cd6a9b8e891b6168406c4de17237d4038d39ebeeb4811be8987
     .agents/skills/go-review/references/common-troubleshooting.md: sha256:571bd26950e22249175ca592b926cd6cab9ca41d90da439af2dfb12bdea245bd
     .agents/skills/go-validation/SKILL.md: sha256:6f8a6dd90803674b6090a34e5a4843fb627943bd1078e2f8fdc14d3f4450e2dd
@@ -1159,7 +1159,7 @@ dependencies:
     .agents/skills/go-validation/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
     .agents/skills/go-validation/scripts/validate.sh: sha256:4c78176c796d29534862fc5bf6727bcea24e4a0e78915005880e725540181df4
     .claude/rules/go-test.md: sha256:149c4447429fc8b75e1dc3cb25e4363ff11d05c58e09d85475bde73eada1ba33
-    .claude/rules/go.md: sha256:9e60f3040be8d99c77653493b5d15e24d50baec7ce370d9de688ebcf73ab9b0c
+    .claude/rules/go.md: sha256:af37354a5004ed366f4cc39f9d18ca2e9e2ea43f99fe057fbbc7a981d6f07d52
     .claude/skills/go-review/SKILL.md: sha256:8431b2623e4fb28532a322c9a838fd1c624a08023fa62718a61034dcfdcfd96a
     .claude/skills/go-review/eval.yaml: sha256:c8e9abf238dd1a8628bc5610e25e62c36e547722cdf97f91c71781fb23cd2e4f
     .claude/skills/go-review/evals/tasks/go-review-basic.yaml: sha256:05308719ab7f564bcbd9f8dc66903e6da21dc703fa3094bc9ee71a555c59cf71
@@ -1180,7 +1180,7 @@ dependencies:
     .claude/skills/go-review/references/category-security.md: sha256:0ae3a9b491fd2bc4a589d2095c408c5d1c9684dbdc0b2cc0de502b19e7536dbd
     .claude/skills/go-review/references/category-test-anti-patterns.md: sha256:325d55fdd3d0f1c09831f448c708f2f8a07b5a9ac4f42d1e6e22a8c5b956f4c4
     .claude/skills/go-review/references/category-testing.md: sha256:8c0415d965db894be13fdfb173b80b27ef2bae68d341e7dde18faa8c7082c20c
-    .claude/skills/go-review/references/common-checklist.md: sha256:3b08d8c62011650d229bceef1b5d95e6466f1d18d763f3c4cb011c239fe36423
+    .claude/skills/go-review/references/common-checklist.md: sha256:af9cec09810f7184d30bfb21e38ad8ea50a9bb12be0b30b97795ee06876b4352
     .claude/skills/go-review/references/common-output-format.md: sha256:fcbaadf9e13b5cd6a9b8e891b6168406c4de17237d4038d39ebeeb4811be8987
     .claude/skills/go-review/references/common-troubleshooting.md: sha256:571bd26950e22249175ca592b926cd6cab9ca41d90da439af2dfb12bdea245bd
     .claude/skills/go-validation/SKILL.md: sha256:6f8a6dd90803674b6090a34e5a4843fb627943bd1078e2f8fdc14d3f4450e2dd
@@ -1207,14 +1207,14 @@ dependencies:
     .claude/skills/go-validation/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
     .claude/skills/go-validation/scripts/validate.sh: sha256:4c78176c796d29534862fc5bf6727bcea24e4a0e78915005880e725540181df4
     .cursor/rules/go-test.mdc: sha256:6872f2f609669804498db13cb85f335f0105aadc35e0817fb5b2f47275aa4a0c
-    .cursor/rules/go.mdc: sha256:f21c9e54bafc157578d3dcdbdd128535a4d2cc7eff62c0005d6af22a64700910
-  content_hash: sha256:0b84e9728d90c46f1d2c57a69fc88736734dfb20dfec963a7c35ea147c5c93a6
+    .cursor/rules/go.mdc: sha256:1033e017dc393ed0cc9c9c971ffaeffe1efb23fec6389b3cc2b98b4426213ac7
+  content_hash: sha256:12aae358c7c299c08a2e7efac54d7fe5b8b9237295f9c3b9d1fa697330f38d82
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: go-hooks-claude
   host: github.com
-  resolved_commit: 64feb80c9d7d1203b0ab775967fbeaeb39846451
-  resolved_ref: v1.8.117
+  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
+  resolved_ref: v1.8.119
   version: 1.0.0
   virtual_path: .apm/packages/go-hooks-claude
   is_virtual: true
@@ -1228,8 +1228,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: go-hooks-cursor
   host: github.com
-  resolved_commit: 64feb80c9d7d1203b0ab775967fbeaeb39846451
-  resolved_ref: v1.8.117
+  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
+  resolved_ref: v1.8.119
   version: 1.0.0
   virtual_path: .apm/packages/go-hooks-cursor
   is_virtual: true
@@ -1243,8 +1243,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-repo-maintenance
   host: github.com
-  resolved_commit: 64feb80c9d7d1203b0ab775967fbeaeb39846451
-  resolved_ref: v1.8.117
+  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
+  resolved_ref: v1.8.119
   version: 1.0.0
   virtual_path: .apm/packages/repo-maintenance
   is_virtual: true
@@ -1455,6 +1455,29 @@ dependencies:
   - .agents/skills/tech-debt/scripts/lib/terraform.sh
   - .agents/skills/tech-debt/scripts/lib/validation.sh
   - .agents/skills/tech-debt/scripts/lib/yaml_map_order.py
+  - .agents/skills/test-gap
+  - .agents/skills/test-gap/SKILL.md
+  - .agents/skills/test-gap/assets/pr-body-template-survey.md
+  - .agents/skills/test-gap/assets/pr-body-template.md
+  - .agents/skills/test-gap/eval.yaml
+  - .agents/skills/test-gap/evals/tasks/basic.yaml
+  - .agents/skills/test-gap/references/category-automation-envelope.md
+  - .agents/skills/test-gap/references/category-input-schema.md
+  - .agents/skills/test-gap/references/category-pr-body-links.md
+  - .agents/skills/test-gap/references/category-scope.md
+  - .agents/skills/test-gap/references/common-checklist.md
+  - .agents/skills/test-gap/references/common-output-format.md
+  - .agents/skills/test-gap/scripts/detect_test_gap.sh
+  - .agents/skills/test-gap/scripts/lib/all.sh
+  - .agents/skills/test-gap/scripts/lib/aws.sh
+  - .agents/skills/test-gap/scripts/lib/common.sh
+  - .agents/skills/test-gap/scripts/lib/csv.sh
+  - .agents/skills/test-gap/scripts/lib/json.sh
+  - .agents/skills/test-gap/scripts/lib/repo_paths.sh
+  - .agents/skills/test-gap/scripts/lib/terraform.sh
+  - .agents/skills/test-gap/scripts/lib/validation.sh
+  - .agents/skills/test-gap/scripts/lib/yaml_map_order.py
+  - .agents/skills/test-gap/scripts/update_test_gap_ledger.sh
   - .claude/skills/changelog
   - .claude/skills/changelog/SKILL.md
   - .claude/skills/changelog/assets/pr-body-template-survey.md
@@ -1660,6 +1683,29 @@ dependencies:
   - .claude/skills/tech-debt/scripts/lib/terraform.sh
   - .claude/skills/tech-debt/scripts/lib/validation.sh
   - .claude/skills/tech-debt/scripts/lib/yaml_map_order.py
+  - .claude/skills/test-gap
+  - .claude/skills/test-gap/SKILL.md
+  - .claude/skills/test-gap/assets/pr-body-template-survey.md
+  - .claude/skills/test-gap/assets/pr-body-template.md
+  - .claude/skills/test-gap/eval.yaml
+  - .claude/skills/test-gap/evals/tasks/basic.yaml
+  - .claude/skills/test-gap/references/category-automation-envelope.md
+  - .claude/skills/test-gap/references/category-input-schema.md
+  - .claude/skills/test-gap/references/category-pr-body-links.md
+  - .claude/skills/test-gap/references/category-scope.md
+  - .claude/skills/test-gap/references/common-checklist.md
+  - .claude/skills/test-gap/references/common-output-format.md
+  - .claude/skills/test-gap/scripts/detect_test_gap.sh
+  - .claude/skills/test-gap/scripts/lib/all.sh
+  - .claude/skills/test-gap/scripts/lib/aws.sh
+  - .claude/skills/test-gap/scripts/lib/common.sh
+  - .claude/skills/test-gap/scripts/lib/csv.sh
+  - .claude/skills/test-gap/scripts/lib/json.sh
+  - .claude/skills/test-gap/scripts/lib/repo_paths.sh
+  - .claude/skills/test-gap/scripts/lib/terraform.sh
+  - .claude/skills/test-gap/scripts/lib/validation.sh
+  - .claude/skills/test-gap/scripts/lib/yaml_map_order.py
+  - .claude/skills/test-gap/scripts/update_test_gap_ledger.sh
   deployed_file_hashes:
     .agents/skills/changelog/SKILL.md: sha256:84bb4886520eefe8103756946334bc11bfe18fb585b5fe3ef3a53dff32ec4b62
     .agents/skills/changelog/assets/pr-body-template-survey.md: sha256:1413ac656707dcbc97973e959a01a33af477906868df13c29009074dcdc4517c
@@ -1861,6 +1907,28 @@ dependencies:
     .agents/skills/tech-debt/scripts/lib/terraform.sh: sha256:19d9b56a4346d68a4656ccfe61c64b8638c86ffdc02b830a7cdd84be7449551d
     .agents/skills/tech-debt/scripts/lib/validation.sh: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
     .agents/skills/tech-debt/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
+    .agents/skills/test-gap/SKILL.md: sha256:82e84f24e669225d277d7380ba98337712a952650f8dc3bc5bd8d97f8a5094d7
+    .agents/skills/test-gap/assets/pr-body-template-survey.md: sha256:ec62987e48827408e2a49022991ff2b4de63d88c39f120cd6a6456d4264d8318
+    .agents/skills/test-gap/assets/pr-body-template.md: sha256:3f7106e7c74c434d8e77ff3260aad91e3e2527ee1c51935701ac2696efbabc54
+    .agents/skills/test-gap/eval.yaml: sha256:9f74149085888e6cc3a57b05ce98ba5c0f0aa8534ed1ee81d45d71d3f68ad307
+    .agents/skills/test-gap/evals/tasks/basic.yaml: sha256:87f3033b27dfab6041a998fe7ad27ca6d1568116f8e420e7c69919cfc0548a98
+    .agents/skills/test-gap/references/category-automation-envelope.md: sha256:6e7cfac3fe1e27cec33958767d45818d86e381f618170ebd74ded658e8df20e7
+    .agents/skills/test-gap/references/category-input-schema.md: sha256:737a351d4fae88907bf2132f47621e200d7c107a46bdee587ca40d3701646b24
+    .agents/skills/test-gap/references/category-pr-body-links.md: sha256:7f571d008f8baad3cc3ed2c2d0e229f36581301afe6cf4602402760837f2b6a0
+    .agents/skills/test-gap/references/category-scope.md: sha256:753602fc24b1e87d1d33ddf31a0fedb092a65a709352940a076c0168dfdb8d9d
+    .agents/skills/test-gap/references/common-checklist.md: sha256:00bd4c142d2acd0fbba2c7da20573da2e36e291553751bc895314887d5cc7dbf
+    .agents/skills/test-gap/references/common-output-format.md: sha256:a59c4f66bdc2f8f48e3ab0e1d43abd62fcd6ce905203cc0d1f334a1ba71b0152
+    .agents/skills/test-gap/scripts/detect_test_gap.sh: sha256:6bceaeb39471f8f5d794138d7b7791d966622ec2595db9c4f7b578ba3b02f5eb
+    .agents/skills/test-gap/scripts/lib/all.sh: sha256:dc9b27d00ff0b37be6f5c986a59a8107f59a83bede4de5818e453a38ae51f216
+    .agents/skills/test-gap/scripts/lib/aws.sh: sha256:8040932c1176ff8f6f011586844cee9a07fa725b90de6c5b007d5cecf7f2d67a
+    .agents/skills/test-gap/scripts/lib/common.sh: sha256:26dded5e470bfa13c48f3816b58def268413042de385a468ee851f6f578bceda
+    .agents/skills/test-gap/scripts/lib/csv.sh: sha256:f9cddbbcba29d3b3baebbe45ad9cd1c9b015ff8342c01f55a4361f3154a0cf49
+    .agents/skills/test-gap/scripts/lib/json.sh: sha256:4a865c119ac68f6635c4e9301b497d78794dc0e890df9fc214976cd8d77a1a7b
+    .agents/skills/test-gap/scripts/lib/repo_paths.sh: sha256:4175492cd08671457c500eb2fa5880cb170a5e285379f3cec3219be935d6b3b7
+    .agents/skills/test-gap/scripts/lib/terraform.sh: sha256:19d9b56a4346d68a4656ccfe61c64b8638c86ffdc02b830a7cdd84be7449551d
+    .agents/skills/test-gap/scripts/lib/validation.sh: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
+    .agents/skills/test-gap/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
+    .agents/skills/test-gap/scripts/update_test_gap_ledger.sh: sha256:0efc429f9e0faaf0e101fccb2e397712d9a8a4d30a148f7b8cea18fea75ff75d
     .claude/skills/changelog/SKILL.md: sha256:84bb4886520eefe8103756946334bc11bfe18fb585b5fe3ef3a53dff32ec4b62
     .claude/skills/changelog/assets/pr-body-template-survey.md: sha256:1413ac656707dcbc97973e959a01a33af477906868df13c29009074dcdc4517c
     .claude/skills/changelog/assets/pr-body-template.md: sha256:23c90eb7c89a6433852e2b6ccb8995f8c0d0c93c14cb317eec9217b76f683518
@@ -2061,13 +2129,35 @@ dependencies:
     .claude/skills/tech-debt/scripts/lib/terraform.sh: sha256:19d9b56a4346d68a4656ccfe61c64b8638c86ffdc02b830a7cdd84be7449551d
     .claude/skills/tech-debt/scripts/lib/validation.sh: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
     .claude/skills/tech-debt/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
-  content_hash: sha256:3913e7b0a744bdbac388729c4f174ef79b2e20646c42eea3f432f6d42009ea90
+    .claude/skills/test-gap/SKILL.md: sha256:82e84f24e669225d277d7380ba98337712a952650f8dc3bc5bd8d97f8a5094d7
+    .claude/skills/test-gap/assets/pr-body-template-survey.md: sha256:ec62987e48827408e2a49022991ff2b4de63d88c39f120cd6a6456d4264d8318
+    .claude/skills/test-gap/assets/pr-body-template.md: sha256:3f7106e7c74c434d8e77ff3260aad91e3e2527ee1c51935701ac2696efbabc54
+    .claude/skills/test-gap/eval.yaml: sha256:9f74149085888e6cc3a57b05ce98ba5c0f0aa8534ed1ee81d45d71d3f68ad307
+    .claude/skills/test-gap/evals/tasks/basic.yaml: sha256:87f3033b27dfab6041a998fe7ad27ca6d1568116f8e420e7c69919cfc0548a98
+    .claude/skills/test-gap/references/category-automation-envelope.md: sha256:6e7cfac3fe1e27cec33958767d45818d86e381f618170ebd74ded658e8df20e7
+    .claude/skills/test-gap/references/category-input-schema.md: sha256:737a351d4fae88907bf2132f47621e200d7c107a46bdee587ca40d3701646b24
+    .claude/skills/test-gap/references/category-pr-body-links.md: sha256:7f571d008f8baad3cc3ed2c2d0e229f36581301afe6cf4602402760837f2b6a0
+    .claude/skills/test-gap/references/category-scope.md: sha256:753602fc24b1e87d1d33ddf31a0fedb092a65a709352940a076c0168dfdb8d9d
+    .claude/skills/test-gap/references/common-checklist.md: sha256:00bd4c142d2acd0fbba2c7da20573da2e36e291553751bc895314887d5cc7dbf
+    .claude/skills/test-gap/references/common-output-format.md: sha256:a59c4f66bdc2f8f48e3ab0e1d43abd62fcd6ce905203cc0d1f334a1ba71b0152
+    .claude/skills/test-gap/scripts/detect_test_gap.sh: sha256:6bceaeb39471f8f5d794138d7b7791d966622ec2595db9c4f7b578ba3b02f5eb
+    .claude/skills/test-gap/scripts/lib/all.sh: sha256:dc9b27d00ff0b37be6f5c986a59a8107f59a83bede4de5818e453a38ae51f216
+    .claude/skills/test-gap/scripts/lib/aws.sh: sha256:8040932c1176ff8f6f011586844cee9a07fa725b90de6c5b007d5cecf7f2d67a
+    .claude/skills/test-gap/scripts/lib/common.sh: sha256:26dded5e470bfa13c48f3816b58def268413042de385a468ee851f6f578bceda
+    .claude/skills/test-gap/scripts/lib/csv.sh: sha256:f9cddbbcba29d3b3baebbe45ad9cd1c9b015ff8342c01f55a4361f3154a0cf49
+    .claude/skills/test-gap/scripts/lib/json.sh: sha256:4a865c119ac68f6635c4e9301b497d78794dc0e890df9fc214976cd8d77a1a7b
+    .claude/skills/test-gap/scripts/lib/repo_paths.sh: sha256:4175492cd08671457c500eb2fa5880cb170a5e285379f3cec3219be935d6b3b7
+    .claude/skills/test-gap/scripts/lib/terraform.sh: sha256:19d9b56a4346d68a4656ccfe61c64b8638c86ffdc02b830a7cdd84be7449551d
+    .claude/skills/test-gap/scripts/lib/validation.sh: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
+    .claude/skills/test-gap/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
+    .claude/skills/test-gap/scripts/update_test_gap_ledger.sh: sha256:0efc429f9e0faaf0e101fccb2e397712d9a8a4d30a148f7b8cea18fea75ff75d
+  content_hash: sha256:cf065b71c213ee7a09b5420af7663ce28c8adcc3dc803bb18bdf9900421317c7
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: config-shell-script
   host: github.com
-  resolved_commit: 64feb80c9d7d1203b0ab775967fbeaeb39846451
-  resolved_ref: v1.8.117
+  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
+  resolved_ref: v1.8.119
   version: 1.0.0
   virtual_path: .apm/packages/shell-script
   is_virtual: true
@@ -2193,7 +2283,7 @@ dependencies:
     .agents/skills/shell-script-review/references/category-logging.md: sha256:fe682b8aed0e71f42eb14e9453810b686de26b0412971ca48a785cafa7e62656
     .agents/skills/shell-script-review/references/category-security.md: sha256:08b0fbec8bd1413909da31945c8b835fce63b64e5242630c9713ce07184a3e8b
     .agents/skills/shell-script-review/references/category-testing.md: sha256:a7a2649267e121563b8712fcaf0fad60ae8d15c632703104b120bbcd02bc8af8
-    .agents/skills/shell-script-review/references/common-checklist.md: sha256:4a3d6e5b658311c1e1c5ecc6ca3883cc5fdefa4d361ae489a7beda36d66226dd
+    .agents/skills/shell-script-review/references/common-checklist.md: sha256:2eda918ed96cf04d6f8058145a287c11d9e1f2d3e80163874855a5995ba2b5e9
     .agents/skills/shell-script-review/references/common-output-format.md: sha256:fcbaadf9e13b5cd6a9b8e891b6168406c4de17237d4038d39ebeeb4811be8987
     .agents/skills/shell-script-review/references/common-troubleshooting.md: sha256:426d9a560e3224eb3c53a36c5ef29bb788f4762a6e40f5c66deab74ab016df16
     .agents/skills/shell-script-validation/SKILL.md: sha256:01a885dc4c7c653b8c5f3104aca7e46f439a0c9d26bb3832e5b9c954e88dd9e5
@@ -2224,7 +2314,7 @@ dependencies:
     .agents/skills/shell-script-validation/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
     .agents/skills/shell-script-validation/scripts/validate.sh: sha256:7a72768ff4e5dd30a01ff713b49f701f628349b95c3ea98ae44ff7618937a9b6
     .claude/rules/bats.md: sha256:e9b8043aa6fd78fdfbbf1a335a1dd4fd53cba01cc645df0562a52615af7884da
-    .claude/rules/shell-script.md: sha256:593c4da1aeaec36c55f8d2d7127ecdc13345d25d65f3b1536696f70a62ae962e
+    .claude/rules/shell-script.md: sha256:d8c780ac26e04ed0d24eb22972dfc0a879b85cab97762be8a692198ad05fae3b
     .claude/skills/shell-script-review/SKILL.md: sha256:278775eeff0781b46b8ceb5cc2eb09a0ced6162c96659a68268f30d6cc8ae5b1
     .claude/skills/shell-script-review/eval.yaml: sha256:787b28497c258dc8bb5850176f43f9956d26b979c19319a149e00dff0de1084a
     .claude/skills/shell-script-review/evals/tasks/shell-script-review-basic.yaml: sha256:49daaacf14929630cc344423578640e23f321d87d94c809052f82adce59890e0
@@ -2242,7 +2332,7 @@ dependencies:
     .claude/skills/shell-script-review/references/category-logging.md: sha256:fe682b8aed0e71f42eb14e9453810b686de26b0412971ca48a785cafa7e62656
     .claude/skills/shell-script-review/references/category-security.md: sha256:08b0fbec8bd1413909da31945c8b835fce63b64e5242630c9713ce07184a3e8b
     .claude/skills/shell-script-review/references/category-testing.md: sha256:a7a2649267e121563b8712fcaf0fad60ae8d15c632703104b120bbcd02bc8af8
-    .claude/skills/shell-script-review/references/common-checklist.md: sha256:4a3d6e5b658311c1e1c5ecc6ca3883cc5fdefa4d361ae489a7beda36d66226dd
+    .claude/skills/shell-script-review/references/common-checklist.md: sha256:2eda918ed96cf04d6f8058145a287c11d9e1f2d3e80163874855a5995ba2b5e9
     .claude/skills/shell-script-review/references/common-output-format.md: sha256:fcbaadf9e13b5cd6a9b8e891b6168406c4de17237d4038d39ebeeb4811be8987
     .claude/skills/shell-script-review/references/common-troubleshooting.md: sha256:426d9a560e3224eb3c53a36c5ef29bb788f4762a6e40f5c66deab74ab016df16
     .claude/skills/shell-script-validation/SKILL.md: sha256:01a885dc4c7c653b8c5f3104aca7e46f439a0c9d26bb3832e5b9c954e88dd9e5
@@ -2273,14 +2363,14 @@ dependencies:
     .claude/skills/shell-script-validation/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
     .claude/skills/shell-script-validation/scripts/validate.sh: sha256:7a72768ff4e5dd30a01ff713b49f701f628349b95c3ea98ae44ff7618937a9b6
     .cursor/rules/bats.mdc: sha256:9e10de6308b02f26ccf1a58051977a46b1622ab3feb04458ec6d0bb21f2694d6
-    .cursor/rules/shell-script.mdc: sha256:75270f1bab40d5169d9fdeac4f07a02ee1aefe323ced3e25c971ce797c91b58a
-  content_hash: sha256:71335dff0b20c9212458d2b87aaadb808a99497f96ba1bd7f56c136272e2ed79
+    .cursor/rules/shell-script.mdc: sha256:b03f45b6302df3015d165e718a3b60f58f73d83bb81f37c8618a904f76f11eb9
+  content_hash: sha256:5c49dcf6780ed08637e5c188c2f90103ead2f3df7e939445ce03c9de7f6ff9e2
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: shell-script-hooks-claude
   host: github.com
-  resolved_commit: 64feb80c9d7d1203b0ab775967fbeaeb39846451
-  resolved_ref: v1.8.117
+  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
+  resolved_ref: v1.8.119
   version: 1.0.0
   virtual_path: .apm/packages/shell-script-hooks-claude
   is_virtual: true
@@ -2296,8 +2386,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: shell-script-hooks-cursor
   host: github.com
-  resolved_commit: 64feb80c9d7d1203b0ab775967fbeaeb39846451
-  resolved_ref: v1.8.117
+  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
+  resolved_ref: v1.8.119
   version: 1.0.0
   virtual_path: .apm/packages/shell-script-hooks-cursor
   is_virtual: true
@@ -2409,7 +2499,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/common
   active_owner: y-miyazaki/config/.apm/packages/common
-  content_hash: sha256:da339d58b235af68c93fdfffcb6b0063a67e09b82d0a93976122449bc1a4fcc6
+  content_hash: sha256:49007409747a75404a56c0c87e08d9588fb173bbc2c1319cf64845021c1003e9
 - kind: project-relative
   target: claude
   value: .claude/rules/bats.md
@@ -2427,7 +2517,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/github-actions
   active_owner: y-miyazaki/config/.apm/packages/github-actions
-  content_hash: sha256:26686bf4f4fecb2a90c6866829e162ed4e3c88c5c7401d3cab643d7c787187c6
+  content_hash: sha256:6c2a29468cb77b51bec60005f7d5e53e9981235557f6ae297c1a0bdb92704f6e
 - kind: project-relative
   target: claude
   value: .claude/rules/go-test.md
@@ -2445,7 +2535,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:9e60f3040be8d99c77653493b5d15e24d50baec7ce370d9de688ebcf73ab9b0c
+  content_hash: sha256:af37354a5004ed366f4cc39f9d18ca2e9e2ea43f99fe057fbbc7a981d6f07d52
 - kind: project-relative
   target: claude
   value: .claude/rules/instructions.md
@@ -2454,7 +2544,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/common
   active_owner: y-miyazaki/config/.apm/packages/common
-  content_hash: sha256:d39dbe318449062c8de00678d7ad1bf024913c00c45ada535717d26db89c220f
+  content_hash: sha256:27318b9c03647fba11a0ab2f1fe572e4cd0c5ade238e3e27989acb558f502ef4
 - kind: project-relative
   target: claude
   value: .claude/rules/markdown.md
@@ -2472,7 +2562,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/shell-script
   active_owner: y-miyazaki/config/.apm/packages/shell-script
-  content_hash: sha256:593c4da1aeaec36c55f8d2d7127ecdc13345d25d65f3b1536696f70a62ae962e
+  content_hash: sha256:d8c780ac26e04ed0d24eb22972dfc0a879b85cab97762be8a692198ad05fae3b
 - kind: project-relative
   target: claude
   value: .claude/skills/agent-skills-review
@@ -2607,7 +2697,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/common
   active_owner: y-miyazaki/config/.apm/packages/common
-  content_hash: sha256:4571f4cde51fc108b4c7e1392ba59d5997dbbdfa44a8274c9e1086cbad37e1fe
+  content_hash: sha256:8d397d14f752c8aba43ba5dceaed182ec40c3dc5b6ce5277de531b6b47562ef5
 - kind: project-relative
   target: claude
   value: .claude/skills/agent-skills-review/references/common-output-format.md
@@ -4047,7 +4137,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/github-actions
   active_owner: y-miyazaki/config/.apm/packages/github-actions
-  content_hash: sha256:63b19070b4eee7d60d0e451c745238b66dc231c1869c9312dd9f24d830a61641
+  content_hash: sha256:cea45982ce914f2de41cdf712c31d631e8268bbf6d7d10f7215b47a022937950
 - kind: project-relative
   target: claude
   value: .claude/skills/github-actions-review/references/common-output-format.md
@@ -5415,7 +5505,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:3b08d8c62011650d229bceef1b5d95e6466f1d18d763f3c4cb011c239fe36423
+  content_hash: sha256:af9cec09810f7184d30bfb21e38ad8ea50a9bb12be0b30b97795ee06876b4352
 - kind: project-relative
   target: claude
   value: .claude/skills/go-review/references/common-output-format.md
@@ -5784,7 +5874,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/common
   active_owner: y-miyazaki/config/.apm/packages/common
-  content_hash: sha256:9a7d0430f86387320c522856b22e42be8fe0c1307f06ad5a52d55cbabaeedbbb
+  content_hash: sha256:7496b0e41515a152dcd867afedba0dd4f6bfa4efc3f1f593a7a7da95c9b2b4fb
 - kind: project-relative
   target: claude
   value: .claude/skills/instructions-review/references/common-output-format.md
@@ -6549,7 +6639,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/shell-script
   active_owner: y-miyazaki/config/.apm/packages/shell-script
-  content_hash: sha256:4a3d6e5b658311c1e1c5ecc6ca3883cc5fdefa4d361ae489a7beda36d66226dd
+  content_hash: sha256:2eda918ed96cf04d6f8058145a287c11d9e1f2d3e80163874855a5995ba2b5e9
 - kind: project-relative
   target: claude
   value: .claude/skills/shell-script-review/references/common-output-format.md
@@ -7217,6 +7307,213 @@ deployments:
   active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
   content_hash: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
 - kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:82e84f24e669225d277d7380ba98337712a952650f8dc3bc5bd8d97f8a5094d7
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/assets/pr-body-template-survey.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:ec62987e48827408e2a49022991ff2b4de63d88c39f120cd6a6456d4264d8318
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/assets/pr-body-template.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:3f7106e7c74c434d8e77ff3260aad91e3e2527ee1c51935701ac2696efbabc54
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/eval.yaml
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:9f74149085888e6cc3a57b05ce98ba5c0f0aa8534ed1ee81d45d71d3f68ad307
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/evals/tasks/basic.yaml
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:87f3033b27dfab6041a998fe7ad27ca6d1568116f8e420e7c69919cfc0548a98
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/references/category-automation-envelope.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:6e7cfac3fe1e27cec33958767d45818d86e381f618170ebd74ded658e8df20e7
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/references/category-input-schema.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:737a351d4fae88907bf2132f47621e200d7c107a46bdee587ca40d3701646b24
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/references/category-pr-body-links.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:7f571d008f8baad3cc3ed2c2d0e229f36581301afe6cf4602402760837f2b6a0
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/references/category-scope.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:753602fc24b1e87d1d33ddf31a0fedb092a65a709352940a076c0168dfdb8d9d
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/references/common-checklist.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:00bd4c142d2acd0fbba2c7da20573da2e36e291553751bc895314887d5cc7dbf
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/references/common-output-format.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:a59c4f66bdc2f8f48e3ab0e1d43abd62fcd6ce905203cc0d1f334a1ba71b0152
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/scripts/detect_test_gap.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:6bceaeb39471f8f5d794138d7b7791d966622ec2595db9c4f7b578ba3b02f5eb
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/scripts/lib/all.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:dc9b27d00ff0b37be6f5c986a59a8107f59a83bede4de5818e453a38ae51f216
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/scripts/lib/aws.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:8040932c1176ff8f6f011586844cee9a07fa725b90de6c5b007d5cecf7f2d67a
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/scripts/lib/common.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:26dded5e470bfa13c48f3816b58def268413042de385a468ee851f6f578bceda
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/scripts/lib/csv.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:f9cddbbcba29d3b3baebbe45ad9cd1c9b015ff8342c01f55a4361f3154a0cf49
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/scripts/lib/json.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:4a865c119ac68f6635c4e9301b497d78794dc0e890df9fc214976cd8d77a1a7b
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/scripts/lib/repo_paths.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:4175492cd08671457c500eb2fa5880cb170a5e285379f3cec3219be935d6b3b7
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/scripts/lib/terraform.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:19d9b56a4346d68a4656ccfe61c64b8638c86ffdc02b830a7cdd84be7449551d
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/scripts/lib/validation.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/scripts/lib/yaml_map_order.py
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
+- kind: project-relative
+  target: claude
+  value: .claude/skills/test-gap/scripts/update_test_gap_ledger.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:0efc429f9e0faaf0e101fccb2e397712d9a8a4d30a148f7b8cea18fea75ff75d
+- kind: project-relative
   target: cursor
   value: .agents/skills/agent-skills-review
   runtime: null
@@ -7350,7 +7647,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/common
   active_owner: y-miyazaki/config/.apm/packages/common
-  content_hash: sha256:4571f4cde51fc108b4c7e1392ba59d5997dbbdfa44a8274c9e1086cbad37e1fe
+  content_hash: sha256:8d397d14f752c8aba43ba5dceaed182ec40c3dc5b6ce5277de531b6b47562ef5
 - kind: project-relative
   target: cursor
   value: .agents/skills/agent-skills-review/references/common-output-format.md
@@ -8790,7 +9087,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/github-actions
   active_owner: y-miyazaki/config/.apm/packages/github-actions
-  content_hash: sha256:63b19070b4eee7d60d0e451c745238b66dc231c1869c9312dd9f24d830a61641
+  content_hash: sha256:cea45982ce914f2de41cdf712c31d631e8268bbf6d7d10f7215b47a022937950
 - kind: project-relative
   target: cursor
   value: .agents/skills/github-actions-review/references/common-output-format.md
@@ -10158,7 +10455,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:3b08d8c62011650d229bceef1b5d95e6466f1d18d763f3c4cb011c239fe36423
+  content_hash: sha256:af9cec09810f7184d30bfb21e38ad8ea50a9bb12be0b30b97795ee06876b4352
 - kind: project-relative
   target: cursor
   value: .agents/skills/go-review/references/common-output-format.md
@@ -10527,7 +10824,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/common
   active_owner: y-miyazaki/config/.apm/packages/common
-  content_hash: sha256:9a7d0430f86387320c522856b22e42be8fe0c1307f06ad5a52d55cbabaeedbbb
+  content_hash: sha256:7496b0e41515a152dcd867afedba0dd4f6bfa4efc3f1f593a7a7da95c9b2b4fb
 - kind: project-relative
   target: cursor
   value: .agents/skills/instructions-review/references/common-output-format.md
@@ -11292,7 +11589,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/shell-script
   active_owner: y-miyazaki/config/.apm/packages/shell-script
-  content_hash: sha256:4a3d6e5b658311c1e1c5ecc6ca3883cc5fdefa4d361ae489a7beda36d66226dd
+  content_hash: sha256:2eda918ed96cf04d6f8058145a287c11d9e1f2d3e80163874855a5995ba2b5e9
 - kind: project-relative
   target: cursor
   value: .agents/skills/shell-script-review/references/common-output-format.md
@@ -11961,6 +12258,213 @@ deployments:
   content_hash: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
 - kind: project-relative
   target: cursor
+  value: .agents/skills/test-gap
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: null
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:82e84f24e669225d277d7380ba98337712a952650f8dc3bc5bd8d97f8a5094d7
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/assets/pr-body-template-survey.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:ec62987e48827408e2a49022991ff2b4de63d88c39f120cd6a6456d4264d8318
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/assets/pr-body-template.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:3f7106e7c74c434d8e77ff3260aad91e3e2527ee1c51935701ac2696efbabc54
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/eval.yaml
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:9f74149085888e6cc3a57b05ce98ba5c0f0aa8534ed1ee81d45d71d3f68ad307
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/evals/tasks/basic.yaml
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:87f3033b27dfab6041a998fe7ad27ca6d1568116f8e420e7c69919cfc0548a98
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/references/category-automation-envelope.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:6e7cfac3fe1e27cec33958767d45818d86e381f618170ebd74ded658e8df20e7
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/references/category-input-schema.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:737a351d4fae88907bf2132f47621e200d7c107a46bdee587ca40d3701646b24
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/references/category-pr-body-links.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:7f571d008f8baad3cc3ed2c2d0e229f36581301afe6cf4602402760837f2b6a0
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/references/category-scope.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:753602fc24b1e87d1d33ddf31a0fedb092a65a709352940a076c0168dfdb8d9d
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/references/common-checklist.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:00bd4c142d2acd0fbba2c7da20573da2e36e291553751bc895314887d5cc7dbf
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/references/common-output-format.md
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:a59c4f66bdc2f8f48e3ab0e1d43abd62fcd6ce905203cc0d1f334a1ba71b0152
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/scripts/detect_test_gap.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:6bceaeb39471f8f5d794138d7b7791d966622ec2595db9c4f7b578ba3b02f5eb
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/scripts/lib/all.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:dc9b27d00ff0b37be6f5c986a59a8107f59a83bede4de5818e453a38ae51f216
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/scripts/lib/aws.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:8040932c1176ff8f6f011586844cee9a07fa725b90de6c5b007d5cecf7f2d67a
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/scripts/lib/common.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:26dded5e470bfa13c48f3816b58def268413042de385a468ee851f6f578bceda
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/scripts/lib/csv.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:f9cddbbcba29d3b3baebbe45ad9cd1c9b015ff8342c01f55a4361f3154a0cf49
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/scripts/lib/json.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:4a865c119ac68f6635c4e9301b497d78794dc0e890df9fc214976cd8d77a1a7b
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/scripts/lib/repo_paths.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:4175492cd08671457c500eb2fa5880cb170a5e285379f3cec3219be935d6b3b7
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/scripts/lib/terraform.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:19d9b56a4346d68a4656ccfe61c64b8638c86ffdc02b830a7cdd84be7449551d
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/scripts/lib/validation.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/scripts/lib/yaml_map_order.py
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
+- kind: project-relative
+  target: cursor
+  value: .agents/skills/test-gap/scripts/update_test_gap_ledger.sh
+  runtime: null
+  scope: project
+  owners:
+  - y-miyazaki/config/.apm/packages/repo-maintenance
+  active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
+  content_hash: sha256:0efc429f9e0faaf0e101fccb2e397712d9a8a4d30a148f7b8cea18fea75ff75d
+- kind: project-relative
+  target: cursor
   value: .cursor/agents/test-engineer.md
   runtime: null
   scope: project
@@ -12057,7 +12561,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/common
   active_owner: y-miyazaki/config/.apm/packages/common
-  content_hash: sha256:14e4cb59c97e39f20d7aef3d2a9d34383f32663b7cbfe807f23c9ea53cda22bf
+  content_hash: sha256:aafb607db4e03bfbfc609e3836be3cf81cc67d80b4fa20836cc8b7309d27ca55
 - kind: project-relative
   target: cursor
   value: .cursor/rules/bats.mdc
@@ -12075,7 +12579,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/github-actions
   active_owner: y-miyazaki/config/.apm/packages/github-actions
-  content_hash: sha256:862f7e565eaed6add09ae279aab5c4987eaf97488121f3b4d3a4b532e33fa929
+  content_hash: sha256:1e8aa24cfc1558fac2c385b4a2f5e36205280bd32f338c55f80dafc471dba6f2
 - kind: project-relative
   target: cursor
   value: .cursor/rules/go-test.mdc
@@ -12093,7 +12597,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:f21c9e54bafc157578d3dcdbdd128535a4d2cc7eff62c0005d6af22a64700910
+  content_hash: sha256:1033e017dc393ed0cc9c9c971ffaeffe1efb23fec6389b3cc2b98b4426213ac7
 - kind: project-relative
   target: cursor
   value: .cursor/rules/instructions.mdc
@@ -12102,7 +12606,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/common
   active_owner: y-miyazaki/config/.apm/packages/common
-  content_hash: sha256:7cc7ae586c8403d368874bf71113e83f69f262090ec664ea4e77bbdf9122b064
+  content_hash: sha256:5a189c964fab5c53593cbb83a7bd63f9e06f7794e680747ed452f6a270767d9a
 - kind: project-relative
   target: cursor
   value: .cursor/rules/markdown.mdc
@@ -12120,7 +12624,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/shell-script
   active_owner: y-miyazaki/config/.apm/packages/shell-script
-  content_hash: sha256:75270f1bab40d5169d9fdeac4f07a02ee1aefe323ced3e25c971ce797c91b58a
+  content_hash: sha256:b03f45b6302df3015d165e718a3b60f58f73d83bb81f37c8618a904f76f11eb9
 - kind: uri
   target: mcp
   value: aws-documentation-mcp-server
