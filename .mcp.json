@@ -38,7 +38,7 @@
       "command": "npx",
       "args": [
         "-y",
-        "@upstash/context7-mcp@4.1.1"
+        "@upstash/context7-mcp@4.2.0"
       ]
     },
     "fetch": {
@@ -55,7 +55,7 @@
       "command": "bash",
       "args": [
         "-lc",
-        "TOKEN=\"${GH_TOKEN:-$GITHUB_TOKEN}\"; exec uvx mcp-compressor==0.33.0 -- https://api.githubcopilot.com/mcp/ -H \"Authorization=Bearer ${TOKEN}\" --auth explicit-headers"
+        "TOKEN=\"${GH_TOKEN:-$GITHUB_TOKEN}\"; exec uvx mcp-compressor==0.35.0 -- https://api.githubcopilot.com/mcp/ -H \"Authorization=Bearer ${TOKEN}\" --auth explicit-headers"
       ]
     },
     "codebase-memory-mcp": {

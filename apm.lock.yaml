@@ -4,8 +4,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-aws
   host: github.com
-  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
-  resolved_ref: v1.8.119
+  resolved_commit: 5da13eb637a89cfa6d46d1a254ccb2463d87c4df
+  resolved_ref: v1.8.121
   version: 1.0.0
   virtual_path: .apm/packages/aws
   is_virtual: true
@@ -15,8 +15,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-common
   host: github.com
-  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
-  resolved_ref: v1.8.119
+  resolved_commit: 5da13eb637a89cfa6d46d1a254ccb2463d87c4df
+  resolved_ref: v1.8.121
   version: 1.0.0
   virtual_path: .apm/packages/common
   is_virtual: true
@@ -343,13 +343,13 @@ dependencies:
     .cursor/rules/agent-skills.mdc: sha256:aafb607db4e03bfbfc609e3836be3cf81cc67d80b4fa20836cc8b7309d27ca55
     .cursor/rules/instructions.mdc: sha256:5a189c964fab5c53593cbb83a7bd63f9e06f7794e680747ed452f6a270767d9a
     .cursor/rules/markdown.mdc: sha256:e77c6b8ca2523de09eb9ada60ea18e8fbbeaae6a92f70f9b6f887a4f73387fa7
-  content_hash: sha256:bf812467b290a3713a3138e5c9ada6bce1322fed8e9c55235ceabeecdca2b6d4
+  content_hash: sha256:a5b67e17955db6d176298221804ca32772714e329f4ad16e746598ccd034a403
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: common-hooks-claude
   host: github.com
-  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
-  resolved_ref: v1.8.119
+  resolved_commit: 5da13eb637a89cfa6d46d1a254ccb2463d87c4df
+  resolved_ref: v1.8.121
   version: 2.0.0
   virtual_path: .apm/packages/common-hooks-claude
   is_virtual: true
@@ -373,8 +373,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: common-hooks-cursor
   host: github.com
-  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
-  resolved_ref: v1.8.119
+  resolved_commit: 5da13eb637a89cfa6d46d1a254ccb2463d87c4df
+  resolved_ref: v1.8.121
   version: 2.0.0
   virtual_path: .apm/packages/common-hooks-cursor
   is_virtual: true
@@ -398,8 +398,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-github
   host: github.com
-  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
-  resolved_ref: v1.8.119
+  resolved_commit: 5da13eb637a89cfa6d46d1a254ccb2463d87c4df
+  resolved_ref: v1.8.121
   version: 1.0.0
   virtual_path: .apm/packages/github
   is_virtual: true
@@ -818,13 +818,13 @@ dependencies:
     .claude/skills/github-pr-revise/scripts/lib/terraform.sh: sha256:19d9b56a4346d68a4656ccfe61c64b8638c86ffdc02b830a7cdd84be7449551d
     .claude/skills/github-pr-revise/scripts/lib/validation.sh: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
     .claude/skills/github-pr-revise/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
-  content_hash: sha256:17605ac0092c6446604069152dede9f965c2e44c31a7ae3c36a531158de7d27c
+  content_hash: sha256:0850e0b9f35899de185e43f3eb4127999fc231205fa1335ca290becd8f84d0c7
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: config-github-actions
   host: github.com
-  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
-  resolved_ref: v1.8.119
+  resolved_commit: 5da13eb637a89cfa6d46d1a254ccb2463d87c4df
+  resolved_ref: v1.8.121
   version: 1.0.0
   virtual_path: .apm/packages/github-actions
   is_virtual: true
@@ -1004,8 +1004,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-go
   host: github.com
-  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
-  resolved_ref: v1.8.119
+  resolved_commit: 5da13eb637a89cfa6d46d1a254ccb2463d87c4df
+  resolved_ref: v1.8.121
   version: 1.0.0
   virtual_path: .apm/packages/go
   is_virtual: true
@@ -1213,8 +1213,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: go-hooks-claude
   host: github.com
-  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
-  resolved_ref: v1.8.119
+  resolved_commit: 5da13eb637a89cfa6d46d1a254ccb2463d87c4df
+  resolved_ref: v1.8.121
   version: 1.0.0
   virtual_path: .apm/packages/go-hooks-claude
   is_virtual: true
@@ -1228,8 +1228,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: go-hooks-cursor
   host: github.com
-  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
-  resolved_ref: v1.8.119
+  resolved_commit: 5da13eb637a89cfa6d46d1a254ccb2463d87c4df
+  resolved_ref: v1.8.121
   version: 1.0.0
   virtual_path: .apm/packages/go-hooks-cursor
   is_virtual: true
@@ -1243,8 +1243,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-repo-maintenance
   host: github.com
-  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
-  resolved_ref: v1.8.119
+  resolved_commit: 5da13eb637a89cfa6d46d1a254ccb2463d87c4df
+  resolved_ref: v1.8.121
   version: 1.0.0
   virtual_path: .apm/packages/repo-maintenance
   is_virtual: true
@@ -2156,8 +2156,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-shell-script
   host: github.com
-  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
-  resolved_ref: v1.8.119
+  resolved_commit: 5da13eb637a89cfa6d46d1a254ccb2463d87c4df
+  resolved_ref: v1.8.121
   version: 1.0.0
   virtual_path: .apm/packages/shell-script
   is_virtual: true
@@ -2369,8 +2369,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: shell-script-hooks-claude
   host: github.com
-  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
-  resolved_ref: v1.8.119
+  resolved_commit: 5da13eb637a89cfa6d46d1a254ccb2463d87c4df
+  resolved_ref: v1.8.121
   version: 1.0.0
   virtual_path: .apm/packages/shell-script-hooks-claude
   is_virtual: true
@@ -2386,8 +2386,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: shell-script-hooks-cursor
   host: github.com
-  resolved_commit: 8103690c11ef708b382835505bbfb7eb5e7c1561
-  resolved_ref: v1.8.119
+  resolved_commit: 5da13eb637a89cfa6d46d1a254ccb2463d87c4df
+  resolved_ref: v1.8.121
   version: 1.0.0
   virtual_path: .apm/packages/shell-script-hooks-cursor
   is_virtual: true
@@ -12636,6 +12636,15 @@ deployments:
   content_hash: null
 - kind: uri
   target: mcp
+  value: context7
+  runtime: claude
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: uri
+  target: mcp
   value: github
   runtime: claude
   scope: project
@@ -12646,6 +12655,15 @@ deployments:
 - kind: uri
   target: mcp
   value: aws-documentation-mcp-server
+  runtime: cursor
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: uri
+  target: mcp
+  value: context7
   runtime: cursor
   scope: project
   owners:
@@ -12711,7 +12729,7 @@ mcp_configs:
     transport: stdio
     args:
     - -y
-    - '@upstash/context7-mcp@4.1.1'
+    - '@upstash/context7-mcp@4.2.0'
     registry: false
     command: npx
   fetch:
@@ -12728,16 +12746,18 @@ mcp_configs:
     transport: stdio
     args:
     - -lc
-    - TOKEN="${GH_TOKEN:-$GITHUB_TOKEN}"; exec uvx mcp-compressor==0.33.0 -- https://api.githubcopilot.com/mcp/
+    - TOKEN="${GH_TOKEN:-$GITHUB_TOKEN}"; exec uvx mcp-compressor==0.35.0 -- https://api.githubcopilot.com/mcp/
       -H "Authorization=Bearer ${TOKEN}" --auth explicit-headers
     registry: false
     command: bash
 mcp_target_servers:
   claude:
   - aws-documentation-mcp-server
+  - context7
   - github
   cursor:
   - aws-documentation-mcp-server
+  - context7
   - github
 mcp_config_provenance:
   aws-documentation-mcp-server: config-aws
