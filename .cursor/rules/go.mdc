@@ -1,6 +1,6 @@
 ---
-description: "Go Development Instructions"
-globs: "**/*.go"
+description: Go Development Instructions
+globs: **/*.go
 ---
 
 # Go Development Instructions
