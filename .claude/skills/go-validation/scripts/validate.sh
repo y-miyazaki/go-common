@@ -11,6 +11,12 @@
 #         --skip-tests Skip go test, race, coverage, and benchmark checks
 #   arguments:
 #     directory        Package or directory to validate (optional)
+#
+# Design Rules:
+#   - Read-only by default: formatting and go.mod/go.sum changes are applied only with --fix.
+#   - --dry-run prints the planned commands without running them.
+#   - With a directory argument all checks are scoped to it; otherwise the whole repository is validated.
+#   - Exits non-zero when any check fails.
 #######################################
 
 # Error handling: exit on error, unset variable, or failed pipeline
@@ -37,6 +43,7 @@ TARGET_DIR=""
 TARGET_PATTERN="./..."
 COVERAGE_THRESHOLD=80
 EXIT_CODE=0
+TEMP_FILES=()
 # When true, limit checks to TARGET_DIR (not "." or "./...")
 IS_SCOPED=false
 SKIP_TESTS=false
@@ -180,6 +187,28 @@ function parse_arguments {
 }
 
 #######################################
+# cleanup_temp_files: Remove temporary files created during validation
+#
+# Globals:
+#   TEMP_FILES - Temporary files to remove
+#
+# Arguments:
+#   None
+#
+# Outputs:
+#   None
+#
+# Returns:
+#   0 on success
+#######################################
+function cleanup_temp_files {
+    local f
+    for f in "${TEMP_FILES[@]}"; do
+        rm -f "$f"
+    done
+}
+
+#######################################
 # determine_target_pattern: Determine target pattern for Go tools
 #
 # Description:
@@ -210,14 +239,18 @@ function determine_target_pattern {
         return 0
     fi
 
-    # If a specific directory is provided and it exists
-    if [[ -d $base_dir && $base_dir != "." ]]; then
+    # A specific directory must contain Go files; never fall back to validating the whole repository
+    if [[ $base_dir != "." ]]; then
+        if [[ ! -d $base_dir ]]; then
+            error_exit "Directory not found: $base_dir"
+        fi
         local go_files_count
         go_files_count=$(has_go_files "$base_dir")
         if [[ $go_files_count -gt 0 ]]; then
             echo "./${base_dir#./}/..."
             return 0
         fi
+        error_exit "No Go files found in $base_dir or its subdirectories"
     fi
 
     # For current directory, check if there are Go files
@@ -230,6 +263,33 @@ function determine_target_pattern {
 
     # Use ./... for recursive processing from current directory
     echo "./..."
+}
+
+#######################################
+# has_go_files: Check if directory contains Go files
+#
+# Description:
+#   Checks if the specified directory contains any Go files
+#
+# Globals:
+#   None
+#
+# Arguments:
+#   $1 - Directory path to check
+#
+# Outputs:
+#   None
+#
+# Returns:
+#   Number of Go files found (integer)
+#
+# Usage:
+#   count=$(has_go_files "/path/to/dir")
+#
+#######################################
+function has_go_files {
+    local dir=$1
+    find "$dir" -name "*.go" 2> /dev/null | wc -l
 }
 
 #######################################
@@ -312,11 +372,12 @@ function run_coverage_tests {
     fi
 
     local coverage_file
-    coverage_file=$(mktemp /tmp/coverage.XXXXXX.out) || {
+    coverage_file=$(mktemp "${TMPDIR:-/tmp}/coverage.XXXXXX") || {
         log "ERROR" "Failed to create temporary coverage file"
         EXIT_CODE=1
         return 1
     }
+    TEMP_FILES+=("$coverage_file")
     if go test -coverprofile="$coverage_file" "$TARGET_PATTERN"; then
         local coverage_percent
         local coverage_output
@@ -393,37 +454,10 @@ function run_go_build {
 }
 
 #######################################
-# has_go_files: Check if directory contains Go files
-#
-# Description:
-#   Checks if the specified directory contains any Go files
-#
-# Globals:
-#   None
-#
-# Arguments:
-#   $1 - Directory path to check
-#
-# Outputs:
-#   None
-#
-# Returns:
-#   Number of Go files found (integer)
-#
-# Usage:
-#   count=$(has_go_files "/path/to/dir")
-#
-#######################################
-function has_go_files {
-    local dir=$1
-    find "$dir" -name "*.go" 2> /dev/null | wc -l
-}
-
-#######################################
 # run_go_mod_tidy: Run go mod tidy
 #
 # Description:
-#   Runs go mod tidy to clean up the go.mod and go.sum files
+#   Runs go mod tidy (with --fix) or go mod tidy -diff (check only) on go.mod and go.sum
 #
 # Globals:
 #   None
@@ -465,11 +499,37 @@ function run_go_mod_tidy {
         EXIT_CODE=1
         return 1
     }
-    if go mod tidy; then
-        log "INFO" "go mod tidy completed successfully (dir=$mod_dir)"
+    if [[ $FIX_MODE == "true" ]]; then
+        if go mod tidy; then
+            log "INFO" "go mod tidy completed successfully (dir=$mod_dir)"
+        else
+            log "ERROR" "go mod tidy failed (dir=$mod_dir)"
+            EXIT_CODE=1
+        fi
+    elif go help mod tidy 2>&1 | grep -q -- '-diff'; then
+        # Check only: validation must not rewrite go.mod / go.sum (-diff needs Go 1.23+)
+        if go mod tidy -diff; then
+            log "INFO" "go.mod and go.sum are tidy (dir=$mod_dir)"
+        else
+            log "ERROR" "go.mod/go.sum are not tidy (dir=$mod_dir). Run with --fix or 'go mod tidy'"
+            EXIT_CODE=1
+        fi
     else
-        log "ERROR" "go mod tidy failed (dir=$mod_dir)"
-        EXIT_CODE=1
+        # Older toolchains: tidy, compare, then always restore the original files
+        local backup_dir
+        backup_dir="$(mktemp -d)"
+        cp go.mod "$backup_dir/go.mod"
+        [[ -f go.sum ]] && cp go.sum "$backup_dir/go.sum"
+        if go mod tidy && diff -q go.mod "$backup_dir/go.mod" > /dev/null \
+            && { [[ ! -f $backup_dir/go.sum ]] || diff -q go.sum "$backup_dir/go.sum" > /dev/null; }; then
+            log "INFO" "go.mod and go.sum are tidy (dir=$mod_dir)"
+        else
+            log "ERROR" "go.mod/go.sum are not tidy (dir=$mod_dir). Run with --fix or 'go mod tidy'"
+            EXIT_CODE=1
+        fi
+        cp "$backup_dir/go.mod" go.mod
+        [[ -f $backup_dir/go.sum ]] && cp "$backup_dir/go.sum" go.sum
+        rm -rf "$backup_dir"
     fi
     popd > /dev/null || true
 }
@@ -517,11 +577,12 @@ function run_golangci_lint {
     lint_args+=("$TARGET_PATTERN")
 
     local lint_output
-    lint_output=$(mktemp /tmp/golint_output.XXXXXX.txt) || {
+    lint_output=$(mktemp "${TMPDIR:-/tmp}/golint_output.XXXXXX") || {
         log "ERROR" "Failed to create temporary lint output file"
         EXIT_CODE=1
         return 1
     }
+    TEMP_FILES+=("$lint_output")
 
     if golangci-lint "${lint_args[@]}" 2>&1 | tee "$lint_output"; then
         log "INFO" "golangci-lint passed"
@@ -544,6 +605,45 @@ function run_golangci_lint {
         fi
     fi
     rm -f "$lint_output"
+}
+
+#######################################
+# run_race_tests: Run race condition tests
+#
+# Description:
+#   Runs go test with race detection enabled
+#
+# Globals:
+#   None
+#
+# Arguments:
+#   None
+#
+# Outputs:
+#   None
+#
+# Returns:
+#   None (sets EXIT_CODE and RACE_FAILED on failure)
+#
+# Usage:
+#   run_race_tests
+#
+#######################################
+function run_race_tests {
+    echo_section "Running race condition tests"
+
+    if [[ $DRY_RUN == "true" ]]; then
+        log "INFO" "DRY-RUN: Would run 'CGO_ENABLED=1 go test -race $TARGET_PATTERN'"
+        return 0
+    fi
+
+    if CGO_ENABLED=1 go test -race "$TARGET_PATTERN"; then
+        log "INFO" "Race condition tests passed"
+    else
+        log "ERROR" "Race condition tests failed"
+        EXIT_CODE=1
+        RACE_FAILED=1
+    fi
 }
 
 #######################################
@@ -636,11 +736,12 @@ function run_tests {
     test_args+=("$TARGET_PATTERN")
 
     local test_output
-    test_output=$(mktemp /tmp/gotest_output.XXXXXX.txt) || {
+    test_output=$(mktemp "${TMPDIR:-/tmp}/gotest_output.XXXXXX") || {
         log "ERROR" "Failed to create temporary test output file"
         EXIT_CODE=1
         return 1
     }
+    TEMP_FILES+=("$test_output")
 
     if go test "${test_args[@]}" 2>&1 | tee "$test_output"; then
         log "INFO" "All tests passed"
@@ -655,45 +756,6 @@ function run_tests {
         TEST_FAIL_COUNT=$(printf '%s\n' "$TEST_FAIL_COUNT" | awk 'NR == 1 {print $1; exit}')
     fi
     rm -f "$test_output"
-}
-
-#######################################
-# run_race_tests: Run race condition tests
-#
-# Description:
-#   Runs go test with race detection enabled
-#
-# Globals:
-#   None
-#
-# Arguments:
-#   None
-#
-# Outputs:
-#   None
-#
-# Returns:
-#   None (sets EXIT_CODE and RACE_FAILED on failure)
-#
-# Usage:
-#   run_race_tests
-#
-#######################################
-function run_race_tests {
-    echo_section "Running race condition tests"
-
-    if [[ $DRY_RUN == "true" ]]; then
-        log "INFO" "DRY-RUN: Would run 'CGO_ENABLED=1 go test -race $TARGET_PATTERN'"
-        return 0
-    fi
-
-    if CGO_ENABLED=1 go test -race "$TARGET_PATTERN"; then
-        log "INFO" "Race condition tests passed"
-    else
-        log "ERROR" "Race condition tests failed"
-        EXIT_CODE=1
-        RACE_FAILED=1
-    fi
 }
 
 #######################################
@@ -719,6 +781,7 @@ function run_race_tests {
 #
 #######################################
 function main {
+    trap cleanup_temp_files EXIT
     parse_arguments "$@"
     start_time=$(date +%s)
     require_dependencies "go" "golangci-lint"
