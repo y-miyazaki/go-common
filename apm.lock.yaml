@@ -1,11 +1,11 @@
 lockfile_version: '1'
-apm_version: 0.33.0
+apm_version: 0.32.0
 dependencies:
 - repo_url: y-miyazaki/config
   name: config-aws
   host: github.com
-  resolved_commit: a00170af8db10cc0e55ab2662a12e1cefec791ca
-  resolved_ref: v1.9.0
+  resolved_commit: edb41ab1459e4450544283da50beb27fc7617e39
+  resolved_ref: v1.9.1
   version: 1.0.0
   virtual_path: .apm/packages/aws
   is_virtual: true
@@ -15,8 +15,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-common
   host: github.com
-  resolved_commit: a00170af8db10cc0e55ab2662a12e1cefec791ca
-  resolved_ref: v1.9.0
+  resolved_commit: edb41ab1459e4450544283da50beb27fc7617e39
+  resolved_ref: v1.9.1
   version: 1.0.0
   virtual_path: .apm/packages/common
   is_virtual: true
@@ -340,16 +340,16 @@ dependencies:
     .claude/skills/markdown-validation/scripts/lib/yaml_map_order.py: sha256:eb542fe34e2e1c11c08d0f78c4717cb3521fbe5ae2f6e05712317fa5478ccf80
     .claude/skills/markdown-validation/scripts/validate.sh: sha256:e3539d49e2c14344c3a36960a0af773871233964f163b9e4044ed5cefdfc9efa
     .cursor/agents/test-engineer.md: sha256:8dfd917e4b2652f8eedc6355660732645a18a85ee803cc8e82a83884d9e5c390
-    .cursor/rules/agent-skills.mdc: sha256:56fd2e38618afbf0118051ceae5eb8992a19c4b756d338750a553b2064d5c823
-    .cursor/rules/instructions.mdc: sha256:1e1080bb01e9172c6bba3c14e65599b7d77eff6bdf562d59585f5e470a0e4866
-    .cursor/rules/markdown.mdc: sha256:75df65f44fd4f213387152822fd5d3e09b52b1d2f94a252f070ffd82e32659a7
-  content_hash: sha256:a5b67e17955db6d176298221804ca32772714e329f4ad16e746598ccd034a403
+    .cursor/rules/agent-skills.mdc: sha256:aafb607db4e03bfbfc609e3836be3cf81cc67d80b4fa20836cc8b7309d27ca55
+    .cursor/rules/instructions.mdc: sha256:5a189c964fab5c53593cbb83a7bd63f9e06f7794e680747ed452f6a270767d9a
+    .cursor/rules/markdown.mdc: sha256:e77c6b8ca2523de09eb9ada60ea18e8fbbeaae6a92f70f9b6f887a4f73387fa7
+  content_hash: sha256:0bac24052d0b6ba4493beb0859f53dd4fb9977b98f19d91a8deb22f933e7dd5d
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: common-hooks-claude
   host: github.com
-  resolved_commit: a00170af8db10cc0e55ab2662a12e1cefec791ca
-  resolved_ref: v1.9.0
+  resolved_commit: edb41ab1459e4450544283da50beb27fc7617e39
+  resolved_ref: v1.9.1
   version: 2.0.0
   virtual_path: .apm/packages/common-hooks-claude
   is_virtual: true
@@ -375,8 +375,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: common-hooks-cursor
   host: github.com
-  resolved_commit: a00170af8db10cc0e55ab2662a12e1cefec791ca
-  resolved_ref: v1.9.0
+  resolved_commit: edb41ab1459e4450544283da50beb27fc7617e39
+  resolved_ref: v1.9.1
   version: 2.0.0
   virtual_path: .apm/packages/common-hooks-cursor
   is_virtual: true
@@ -397,13 +397,13 @@ dependencies:
     .cursor/hooks/common-hooks-cursor/scripts/markdownlint_cli2.sh: sha256:24111fe6fafdcd8b19a391a922488509f4eb4df1068daa36c5f4c69698991e88
     .cursor/hooks/common-hooks-cursor/scripts/prettier.sh: sha256:8c8053c1d8857cdf6c31858d0223f93fa6099659b711edf114c7c49d6c8c865f
     .cursor/hooks/common-hooks-cursor/scripts/zizmor.sh: sha256:9dc27438135f1eff1a02429f1efc85bc71e700a083245e5af1e2767b0ece320b
-  content_hash: sha256:b121debe2d981ae7802eed02e2255d078628be8e7be255964982d03367d22f54
+  content_hash: sha256:d1996304e6e635f0be07fb184fc896b9c0afe2d0bfb03ee2d2b86e66dfa4d0ec
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: config-github
   host: github.com
-  resolved_commit: a00170af8db10cc0e55ab2662a12e1cefec791ca
-  resolved_ref: v1.9.0
+  resolved_commit: edb41ab1459e4450544283da50beb27fc7617e39
+  resolved_ref: v1.9.1
   version: 1.0.0
   virtual_path: .apm/packages/github
   is_virtual: true
@@ -937,8 +937,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-github-actions
   host: github.com
-  resolved_commit: a00170af8db10cc0e55ab2662a12e1cefec791ca
-  resolved_ref: v1.9.0
+  resolved_commit: edb41ab1459e4450544283da50beb27fc7617e39
+  resolved_ref: v1.9.1
   version: 1.0.0
   virtual_path: .apm/packages/github-actions
   is_virtual: true
@@ -1112,14 +1112,14 @@ dependencies:
     .claude/skills/github-actions-validation/scripts/lib/validation.sh: sha256:90d4a03121954f13303571b84e4590976040d42d47015fbc0b591d0315d8a502
     .claude/skills/github-actions-validation/scripts/lib/yaml_map_order.py: sha256:eb542fe34e2e1c11c08d0f78c4717cb3521fbe5ae2f6e05712317fa5478ccf80
     .claude/skills/github-actions-validation/scripts/validate.sh: sha256:95a9b6a15968a74f9a4093183d104c971af0420181846745f2e5d2c25d2596e8
-    .cursor/rules/github-actions-workflow.mdc: sha256:9b7008db1503a9f24629bbb514ed6b8547850cd646a6c5866d3cc919b5239e82
-  content_hash: sha256:52911f17f99f270870d0e939acc10d982d0823da70e1b93222c5b31508a3490f
+    .cursor/rules/github-actions-workflow.mdc: sha256:1e8aa24cfc1558fac2c385b4a2f5e36205280bd32f338c55f80dafc471dba6f2
+  content_hash: sha256:9849f79eb37933a0d7e0b5c253e0c3120ce05be6e9dea1b73239a382187fc675
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: config-go
   host: github.com
-  resolved_commit: a00170af8db10cc0e55ab2662a12e1cefec791ca
-  resolved_ref: v1.9.0
+  resolved_commit: edb41ab1459e4450544283da50beb27fc7617e39
+  resolved_ref: v1.9.1
   version: 1.0.0
   virtual_path: .apm/packages/go
   is_virtual: true
@@ -1311,24 +1311,24 @@ dependencies:
     .claude/skills/go-validation/references/common-output-format.md: sha256:e21f30fe399e9851ec5b7e0a249722685f041bb647cd1255aa40b3f215062408
     .claude/skills/go-validation/references/common-troubleshooting.md: sha256:9319aa31ce634f58e366272e48b9fbbf09dce1a6f22608e8b940b48517a3f5ba
     .claude/skills/go-validation/scripts/lib/all.sh: sha256:dc9b27d00ff0b37be6f5c986a59a8107f59a83bede4de5818e453a38ae51f216
-    .claude/skills/go-validation/scripts/lib/aws.sh: sha256:8040932c1176ff8f6f011586844cee9a07fa725b90de6c5b007d5cecf7f2d67a
-    .claude/skills/go-validation/scripts/lib/common.sh: sha256:26dded5e470bfa13c48f3816b58def268413042de385a468ee851f6f578bceda
-    .claude/skills/go-validation/scripts/lib/csv.sh: sha256:f9cddbbcba29d3b3baebbe45ad9cd1c9b015ff8342c01f55a4361f3154a0cf49
-    .claude/skills/go-validation/scripts/lib/json.sh: sha256:4a865c119ac68f6635c4e9301b497d78794dc0e890df9fc214976cd8d77a1a7b
-    .claude/skills/go-validation/scripts/lib/repo_paths.sh: sha256:4175492cd08671457c500eb2fa5880cb170a5e285379f3cec3219be935d6b3b7
-    .claude/skills/go-validation/scripts/lib/terraform.sh: sha256:19d9b56a4346d68a4656ccfe61c64b8638c86ffdc02b830a7cdd84be7449551d
-    .claude/skills/go-validation/scripts/lib/validation.sh: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
-    .claude/skills/go-validation/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
-    .claude/skills/go-validation/scripts/validate.sh: sha256:4c78176c796d29534862fc5bf6727bcea24e4a0e78915005880e725540181df4
-    .cursor/rules/go-test.mdc: sha256:00834bb53cac1326ed55057849755816f2dbeb8f44a7f2ab1f5305fa19fe4aae
-    .cursor/rules/go.mdc: sha256:afee3908f7834659b2c7efc728c8cec7da9e7dd0734e62c1ebfe3f75569d724f
-  content_hash: sha256:12aae358c7c299c08a2e7efac54d7fe5b8b9237295f9c3b9d1fa697330f38d82
+    .claude/skills/go-validation/scripts/lib/aws.sh: sha256:9378617c56fa762fe44fc13b84c0eb941c593228842f6ead60a3487391a8d9dc
+    .claude/skills/go-validation/scripts/lib/common.sh: sha256:0c8d0891652260fda7e6e3b7e10f69b7346714522d8cfd1892fee7f255256109
+    .claude/skills/go-validation/scripts/lib/csv.sh: sha256:a4baeaf2d5842190c2b32c9fe131c782263766a399fda598fc83e35941e84209
+    .claude/skills/go-validation/scripts/lib/json.sh: sha256:71376538696a43cb7558ba983306d9ce7567419e0855994bf34d3658a000aacc
+    .claude/skills/go-validation/scripts/lib/repo_paths.sh: sha256:7fe7f25d870fc1520bcd33313f540d604e46898a766b379ab511635dd01b9ae4
+    .claude/skills/go-validation/scripts/lib/terraform.sh: sha256:ea6645e2a7568d82745051d539eac406a35640b033dae8e5e72fbf0f96a56b55
+    .claude/skills/go-validation/scripts/lib/validation.sh: sha256:90d4a03121954f13303571b84e4590976040d42d47015fbc0b591d0315d8a502
+    .claude/skills/go-validation/scripts/lib/yaml_map_order.py: sha256:eb542fe34e2e1c11c08d0f78c4717cb3521fbe5ae2f6e05712317fa5478ccf80
+    .claude/skills/go-validation/scripts/validate.sh: sha256:958cdfb65c2f58130cce87793a833c2ee037e8a9799ad9b7ee585d1c99d1ee07
+    .cursor/rules/go-test.mdc: sha256:6872f2f609669804498db13cb85f335f0105aadc35e0817fb5b2f47275aa4a0c
+    .cursor/rules/go.mdc: sha256:1033e017dc393ed0cc9c9c971ffaeffe1efb23fec6389b3cc2b98b4426213ac7
+  content_hash: sha256:806d34bf8b47869ac061dff61179640455a88b4c2891ecf7b946dfb8756b5b1b
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: go-hooks-claude
   host: github.com
-  resolved_commit: a00170af8db10cc0e55ab2662a12e1cefec791ca
-  resolved_ref: v1.9.0
+  resolved_commit: edb41ab1459e4450544283da50beb27fc7617e39
+  resolved_ref: v1.9.1
   version: 1.0.0
   virtual_path: .apm/packages/go-hooks-claude
   is_virtual: true
@@ -1342,8 +1342,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: go-hooks-cursor
   host: github.com
-  resolved_commit: a00170af8db10cc0e55ab2662a12e1cefec791ca
-  resolved_ref: v1.9.0
+  resolved_commit: edb41ab1459e4450544283da50beb27fc7617e39
+  resolved_ref: v1.9.1
   version: 1.0.0
   virtual_path: .apm/packages/go-hooks-cursor
   is_virtual: true
@@ -1352,13 +1352,13 @@ dependencies:
   - .cursor/hooks/go-hooks-cursor/scripts/golangci_lint.sh
   deployed_file_hashes:
     .cursor/hooks/go-hooks-cursor/scripts/golangci_lint.sh: sha256:6854f1ee5c6796fea76f24e731a3d056486b99fe12aa2732d4f28e905b4a040e
-  content_hash: sha256:fcb51710d797714113c3cebb2e8573576f37c977530fbac560699dc3de0af5ab
+  content_hash: sha256:ca1b04b00f98503388e8594ed538861aef59bc02bc9164d2d0cea74bbbb22fb9
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: config-repo-maintenance
   host: github.com
-  resolved_commit: a00170af8db10cc0e55ab2662a12e1cefec791ca
-  resolved_ref: v1.9.0
+  resolved_commit: edb41ab1459e4450544283da50beb27fc7617e39
+  resolved_ref: v1.9.1
   version: 1.0.0
   virtual_path: .apm/packages/repo-maintenance
   is_virtual: true
@@ -2270,8 +2270,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-shell-script
   host: github.com
-  resolved_commit: a00170af8db10cc0e55ab2662a12e1cefec791ca
-  resolved_ref: v1.9.0
+  resolved_commit: edb41ab1459e4450544283da50beb27fc7617e39
+  resolved_ref: v1.9.1
   version: 1.0.0
   virtual_path: .apm/packages/shell-script
   is_virtual: true
@@ -2467,24 +2467,24 @@ dependencies:
     .claude/skills/shell-script-validation/references/common-troubleshooting.md: sha256:412dd9ee08ec456680ad97bee351f01d8db3617c33afe3075be1d43145985bba
     .claude/skills/shell-script-validation/scripts/fix_function_doc_order.sh: sha256:10345aa7e81e5dc4ec991675683d9238201e51fa64f66c195f7432457e86e49c
     .claude/skills/shell-script-validation/scripts/lib/all.sh: sha256:dc9b27d00ff0b37be6f5c986a59a8107f59a83bede4de5818e453a38ae51f216
-    .claude/skills/shell-script-validation/scripts/lib/aws.sh: sha256:8040932c1176ff8f6f011586844cee9a07fa725b90de6c5b007d5cecf7f2d67a
-    .claude/skills/shell-script-validation/scripts/lib/common.sh: sha256:26dded5e470bfa13c48f3816b58def268413042de385a468ee851f6f578bceda
-    .claude/skills/shell-script-validation/scripts/lib/csv.sh: sha256:f9cddbbcba29d3b3baebbe45ad9cd1c9b015ff8342c01f55a4361f3154a0cf49
-    .claude/skills/shell-script-validation/scripts/lib/json.sh: sha256:4a865c119ac68f6635c4e9301b497d78794dc0e890df9fc214976cd8d77a1a7b
-    .claude/skills/shell-script-validation/scripts/lib/repo_paths.sh: sha256:4175492cd08671457c500eb2fa5880cb170a5e285379f3cec3219be935d6b3b7
-    .claude/skills/shell-script-validation/scripts/lib/terraform.sh: sha256:19d9b56a4346d68a4656ccfe61c64b8638c86ffdc02b830a7cdd84be7449551d
-    .claude/skills/shell-script-validation/scripts/lib/validation.sh: sha256:a2f91f635ecbd92ea0d7cea4d0703fd8fa58af0c35021c20d7cd8e1f3bd634eb
-    .claude/skills/shell-script-validation/scripts/lib/yaml_map_order.py: sha256:b6e23fe34ecb02222d077dbd27f65b597c8417eeb707406dc76702a536647803
-    .claude/skills/shell-script-validation/scripts/validate.sh: sha256:7a72768ff4e5dd30a01ff713b49f701f628349b95c3ea98ae44ff7618937a9b6
-    .cursor/rules/bats.mdc: sha256:46fa97003bbdfbe2a49c4e269c605ca920d2f652238be0f44f822d25a1f39b27
-    .cursor/rules/shell-script.mdc: sha256:5a3d9d3a3e0f52b4f68267e3c5ae78afc439f264a80563444c1879dc17bb2855
-  content_hash: sha256:5c49dcf6780ed08637e5c188c2f90103ead2f3df7e939445ce03c9de7f6ff9e2
+    .claude/skills/shell-script-validation/scripts/lib/aws.sh: sha256:9378617c56fa762fe44fc13b84c0eb941c593228842f6ead60a3487391a8d9dc
+    .claude/skills/shell-script-validation/scripts/lib/common.sh: sha256:0c8d0891652260fda7e6e3b7e10f69b7346714522d8cfd1892fee7f255256109
+    .claude/skills/shell-script-validation/scripts/lib/csv.sh: sha256:a4baeaf2d5842190c2b32c9fe131c782263766a399fda598fc83e35941e84209
+    .claude/skills/shell-script-validation/scripts/lib/json.sh: sha256:71376538696a43cb7558ba983306d9ce7567419e0855994bf34d3658a000aacc
+    .claude/skills/shell-script-validation/scripts/lib/repo_paths.sh: sha256:7fe7f25d870fc1520bcd33313f540d604e46898a766b379ab511635dd01b9ae4
+    .claude/skills/shell-script-validation/scripts/lib/terraform.sh: sha256:ea6645e2a7568d82745051d539eac406a35640b033dae8e5e72fbf0f96a56b55
+    .claude/skills/shell-script-validation/scripts/lib/validation.sh: sha256:90d4a03121954f13303571b84e4590976040d42d47015fbc0b591d0315d8a502
+    .claude/skills/shell-script-validation/scripts/lib/yaml_map_order.py: sha256:eb542fe34e2e1c11c08d0f78c4717cb3521fbe5ae2f6e05712317fa5478ccf80
+    .claude/skills/shell-script-validation/scripts/validate.sh: sha256:c8996fc182f607a11be33eac6d8a62e494461c1d0c45316bf224a2f216964b32
+    .cursor/rules/bats.mdc: sha256:9e10de6308b02f26ccf1a58051977a46b1622ab3feb04458ec6d0bb21f2694d6
+    .cursor/rules/shell-script.mdc: sha256:b03f45b6302df3015d165e718a3b60f58f73d83bb81f37c8618a904f76f11eb9
+  content_hash: sha256:b7f937aa7bf35ebcfecf50076c9a6ceba759de524d919dd28f41fb69a4d73aba
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: shell-script-hooks-claude
   host: github.com
-  resolved_commit: a00170af8db10cc0e55ab2662a12e1cefec791ca
-  resolved_ref: v1.9.0
+  resolved_commit: edb41ab1459e4450544283da50beb27fc7617e39
+  resolved_ref: v1.9.1
   version: 1.0.0
   virtual_path: .apm/packages/shell-script-hooks-claude
   is_virtual: true
@@ -2500,8 +2500,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: shell-script-hooks-cursor
   host: github.com
-  resolved_commit: a00170af8db10cc0e55ab2662a12e1cefec791ca
-  resolved_ref: v1.9.0
+  resolved_commit: edb41ab1459e4450544283da50beb27fc7617e39
+  resolved_ref: v1.9.1
   version: 1.0.0
   virtual_path: .apm/packages/shell-script-hooks-cursor
   is_virtual: true
@@ -2512,7 +2512,7 @@ dependencies:
   deployed_file_hashes:
     .cursor/hooks/shell-script-hooks-cursor/scripts/shellcheck.sh: sha256:d77a2c66cf9f6775ae8f72294410a16f0493f59ed73a54919503e830f052f5a5
     .cursor/hooks/shell-script-hooks-cursor/scripts/shfmt.sh: sha256:1ee58b42a134c92845a1b9ea81a91e6c4218e0c446dda35ed261a2a0bfd8e74f
-  content_hash: sha256:62b624a24bf105d1ad12a6b11d2d49889a927b0130967583e42f0b8cb8ef3e1b
+  content_hash: sha256:9858461d56e30ff5366883be017f4f1a173ed6672cf11f4157c61ad7f2afdbd8
   declared_license: Apache-2.0
 deployments:
 - kind: project-relative
@@ -13197,7 +13197,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/common
   active_owner: y-miyazaki/config/.apm/packages/common
-  content_hash: sha256:56fd2e38618afbf0118051ceae5eb8992a19c4b756d338750a553b2064d5c823
+  content_hash: sha256:aafb607db4e03bfbfc609e3836be3cf81cc67d80b4fa20836cc8b7309d27ca55
 - kind: project-relative
   target: cursor
   value: .cursor/rules/bats.mdc
@@ -13206,7 +13206,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/shell-script
   active_owner: y-miyazaki/config/.apm/packages/shell-script
-  content_hash: sha256:46fa97003bbdfbe2a49c4e269c605ca920d2f652238be0f44f822d25a1f39b27
+  content_hash: sha256:9e10de6308b02f26ccf1a58051977a46b1622ab3feb04458ec6d0bb21f2694d6
 - kind: project-relative
   target: cursor
   value: .cursor/rules/github-actions-workflow.mdc
@@ -13215,7 +13215,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/github-actions
   active_owner: y-miyazaki/config/.apm/packages/github-actions
-  content_hash: sha256:9b7008db1503a9f24629bbb514ed6b8547850cd646a6c5866d3cc919b5239e82
+  content_hash: sha256:1e8aa24cfc1558fac2c385b4a2f5e36205280bd32f338c55f80dafc471dba6f2
 - kind: project-relative
   target: cursor
   value: .cursor/rules/go-test.mdc
@@ -13224,7 +13224,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:00834bb53cac1326ed55057849755816f2dbeb8f44a7f2ab1f5305fa19fe4aae
+  content_hash: sha256:6872f2f609669804498db13cb85f335f0105aadc35e0817fb5b2f47275aa4a0c
 - kind: project-relative
   target: cursor
   value: .cursor/rules/go.mdc
@@ -13233,7 +13233,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/go
   active_owner: y-miyazaki/config/.apm/packages/go
-  content_hash: sha256:afee3908f7834659b2c7efc728c8cec7da9e7dd0734e62c1ebfe3f75569d724f
+  content_hash: sha256:1033e017dc393ed0cc9c9c971ffaeffe1efb23fec6389b3cc2b98b4426213ac7
 - kind: project-relative
   target: cursor
   value: .cursor/rules/instructions.mdc
@@ -13242,7 +13242,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/common
   active_owner: y-miyazaki/config/.apm/packages/common
-  content_hash: sha256:1e1080bb01e9172c6bba3c14e65599b7d77eff6bdf562d59585f5e470a0e4866
+  content_hash: sha256:5a189c964fab5c53593cbb83a7bd63f9e06f7794e680747ed452f6a270767d9a
 - kind: project-relative
   target: cursor
   value: .cursor/rules/markdown.mdc
@@ -13251,7 +13251,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/common
   active_owner: y-miyazaki/config/.apm/packages/common
-  content_hash: sha256:75df65f44fd4f213387152822fd5d3e09b52b1d2f94a252f070ffd82e32659a7
+  content_hash: sha256:e77c6b8ca2523de09eb9ada60ea18e8fbbeaae6a92f70f9b6f887a4f73387fa7
 - kind: project-relative
   target: cursor
   value: .cursor/rules/shell-script.mdc
@@ -13260,7 +13260,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/shell-script
   active_owner: y-miyazaki/config/.apm/packages/shell-script
-  content_hash: sha256:5a3d9d3a3e0f52b4f68267e3c5ae78afc439f264a80563444c1879dc17bb2855
+  content_hash: sha256:b03f45b6302df3015d165e718a3b60f58f73d83bb81f37c8618a904f76f11eb9
 mcp_servers:
 - aws-documentation-mcp-server
 - aws-knowledge-mcp-server
