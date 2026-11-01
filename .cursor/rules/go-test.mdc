@@ -1,6 +1,6 @@
 ---
-description: "Go test authoring conventions for tests, stubs, and test pairing"
-globs: "**/*.go"
+description: Go test authoring conventions for tests, stubs, and test pairing
+globs: **/*.go
 ---
 
 # Go Test Instructions
