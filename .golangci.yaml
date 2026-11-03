@@ -87,7 +87,7 @@ linters:
     - errname # Checks that sentinel errors are prefixed with the Err and error types are suffixed with the Error.
     - errorlint # Errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13.
     - exhaustive # Check exhaustiveness of enum switch statements.
-    - exhaustruct # Checks if all structure fields are initialized.
+    - exhaustruct_v5 # Checks if all structure fields are initialized.
     # - exptostd # no supported now.
     - fatcontext # Detects nested contexts in loops and function literals.
     - forbidigo # Forbids identifiers.
@@ -433,18 +433,19 @@ linters:
       # Default: false
       default-case-required: true
 
-    exhaustruct: # https://golangci-lint.run/docs/linters/configuration/#exhaustruct
+    exhaustruct_v5: # https://golangci-lint.run/docs/linters/configuration/#exhaustruct_v5
       # List of regular expressions to match struct packages and their names.
       # Regular expressions must match complete canonical struct package/name/structname.
       # If this list is empty, all structs are tested.
       # Default: []
-      include:
+      enforce-patterns:
         - '.+\.Test'
         - 'example\.com/package\.ExampleStruct[\d]{1,2}'
       # List of regular expressions to exclude struct packages and their names from checks.
       # Regular expressions must match complete canonical struct package/name/structname.
+      # Takes precedence over enforce-patterns.
       # Default: []
-      exclude:
+      ignore-patterns:
         - '.+/cobra\.Command$'
 
     forbidigo: # https://golangci-lint.run/docs/linters/configuration/#forbidigo
@@ -2972,9 +2973,14 @@ formatters: # https://golangci-lint.run/docs/formatters/configuration/
       # Module path which contains the source code being formatted.
       # Default: ""
       module-path: ""
-      # Choose whether to use the extra rules.
-      # Default: false
-      extra-rules: true
+      # Extra formatting rules.
+      extra:
+        # Groups function parameters with repeated types.
+        # Default: false
+        group-params: true
+        # Clothes naked returns in functions with named results.
+        # Default: false
+        clothe-returns: true
     goimports: # https://pkg.go.dev/golang.org/x/tools/cmd/goimports
       # A list of prefixes, which, if set, checks import paths
       # with the given prefixes are grouped after 3rd-party packages.
