@@ -447,6 +447,10 @@ linters:
       # Default: []
       ignore-patterns:
         - '.+/cobra\.Command$'
+      # When true, only types marked with //exhaustruct:enforce directive or matching enforce-patterns are checked.
+      # Required to keep v4 `include` semantics (v5 implicit mode checks every struct).
+      # Default: false
+      explicit-mode: true
 
     forbidigo: # https://golangci-lint.run/docs/linters/configuration/#forbidigo
       # Forbid the following identifiers (list of regexp).
