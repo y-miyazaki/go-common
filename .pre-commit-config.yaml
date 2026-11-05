@@ -177,7 +177,7 @@ repos:
   # For SQL
   # --------------------------------------------------------------
   # - repo: https://github.com/sqlfluff/sqlfluff
-  #   rev: 4.1.0
+  #   rev: 4.4.0
   #   hooks:
   #     - id: sqlfluff-lint
   #       args: [--dialect, mysql]
@@ -217,7 +217,7 @@ repos:
   #           "modules",
   #         ]
   # - repo: https://github.com/antonbabenko/pre-commit-terraform
-  #   rev: v1.105.0
+  #   rev: v1.109.3
   #   hooks:
   #     - id: terraform_fmt
   #     - id: terraform_tflint
