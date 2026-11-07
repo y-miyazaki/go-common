@@ -19,7 +19,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.51.6
 	github.com/danielkov/gin-helmet/ginhelmet v1.0.2
 	github.com/fsnotify/fsnotify v1.10.1
-	github.com/gin-contrib/cors v1.7.9
+	github.com/gin-contrib/cors v1.7.10
 	github.com/gin-gonic/gin v1.12.0
 	github.com/redis/go-redis/v9 v9.23.0
 	github.com/rivo/uniseg v0.4.7
