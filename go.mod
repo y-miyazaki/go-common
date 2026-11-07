@@ -24,7 +24,7 @@ require (
 	github.com/redis/go-redis/v9 v9.23.0
 	github.com/rivo/uniseg v0.4.7
 	github.com/sirupsen/logrus v1.10.2
-	github.com/slack-go/slack v0.32.0
+	github.com/slack-go/slack v0.33.0
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.12.1
 	go.uber.org/mock v0.6.0
