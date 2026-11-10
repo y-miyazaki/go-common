@@ -117,7 +117,7 @@ Apply only when the **package** has adopted the tool. Do not mix testify with th
 
 ### Table-driven tests (TBL)
 
-- TBL-01 (MUST): Default to `[]struct` + `for _, tt := range tests` + `t.Run` for unit tests — including a single case (table of one row is fine). Requires Go 1.22+ when combining `for _, tt := range tests` with `t.Parallel()` inside subtests
+- TBL-01 (SHOULD): Default to `[]struct` + `for _, tt := range tests` + `t.Run` for unit tests — including a single case (table of one row is fine). Requires Go 1.22+ when combining `for _, tt := range tests` with `t.Parallel()` inside subtests
 - TBL-02 (MUST): Put `name` as the first struct field; use lowercase descriptive subtest names
 - TBL-03 (SHOULD): When success and error paths share setup, combine them in one table with `wantErr` (or equivalent). `TestFoo_OK` and `TestFoo_Error` may be separate when fixtures or assertions differ; do not add a top-level `Test*` per table row
 - TBL-04 (SHOULD): Add edge cases as new table rows, not new top-level `Test*` functions

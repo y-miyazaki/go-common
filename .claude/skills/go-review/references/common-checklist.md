@@ -45,7 +45,7 @@
 - FUNC-03 (SHOULD): Keep generic constraints minimal and locally scoped
 
 ## Global / Base (G)
-- G-01 (SHOULD): No API keys/passwords/tokens in source
+- G-01 (MUST): No API keys/passwords/tokens in source
 - G-02 (SHOULD): Keep init() free of I/O, panics, and heavy side effects
 - G-03 (SHOULD): Prefer types whose zero value is usable
 - G-04 (SHOULD): Copy slices/maps at API boundaries
@@ -69,10 +69,10 @@
 - TEST-08 (MUST): Prefix every \*_test.go filename with the source stem under test
 
 ## Anti-Patterns (AP)
-- AP-01 (SHOULD): Discard errors with `_` without a justifying comment
+- AP-01 (MUST): Discard errors with `_` without a justifying comment
 - AP-02 (SHOULD): Store request-scoped context on structs
 - AP-03 (SHOULD): Concatenate untrusted input into SQL
-- AP-04 (SHOULD): Embed secrets in source or test data
+- AP-04 (MUST): Embed secrets in source or test data
 
 ## Test Anti-Patterns (TAP)
 - TAP-01 (SHOULD): One `Test*` function per table row when a table-driven loop would suffice

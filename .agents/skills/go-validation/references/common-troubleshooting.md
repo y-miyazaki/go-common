@@ -6,7 +6,7 @@ This guide provides detailed troubleshooting steps for validation failures. Alwa
 
 ## go mod tidy Failures
 
-## Issue: Incompatible dependency versions
+### Issue: Incompatible dependency versions
 
 ```
 go: example.com/pkg v1.0.0 requires example.com/dep v2.0.0, but go.mod has v1.0.0
@@ -19,7 +19,7 @@ go: example.com/pkg v1.0.0 requires example.com/dep v2.0.0, but go.mod has v1.0.
 3. Check for conflicting requirements in go.mod
 4. Review indirect dependencies with: `go mod graph`
 
-## Issue: Corrupted go.sum
+### Issue: Corrupted go.sum
 
 ```
 verifying checksum failed
@@ -31,7 +31,7 @@ verifying checksum failed
 2. Verify with: `go mod verify`
 3. Check for manual edits to go.sum
 
-## Issue: Replace directives not working
+### Issue: Replace directives not working
 
 ```
 replacement module without version must be directory path
@@ -44,7 +44,7 @@ replacement module without version must be directory path
 
 ## gofumpt Failures
 
-## Issue: Parse errors
+### Issue: Parse errors
 
 ```
 parse error: expected '}', found 'EOF'
@@ -57,7 +57,7 @@ parse error: expected '}', found 'EOF'
 3. Run `go build` to see detailed error
 4. Check for unmatched quotes or parentheses
 
-## Issue: File permissions
+### Issue: File permissions
 
 ```
 permission denied
@@ -70,7 +70,7 @@ permission denied
 
 ## go vet Failures
 
-## Issue: Printf format mismatches
+### Issue: Printf format mismatches
 
 ```
 Printf format %d has arg value of wrong type string
@@ -86,7 +86,7 @@ Printf format %d has arg value of wrong type string
    - `%#v` for Go-syntax representation
 2. Ensure argument types match format
 
-## Issue: Shadowed variables
+### Issue: Shadowed variables
 
 ```
 declaration of "err" shadows declaration at line 10
@@ -124,7 +124,7 @@ if err != nil {
 }
 ```
 
-## Issue: Unreachable code
+### Issue: Unreachable code
 
 ```
 unreachable code
@@ -138,10 +138,10 @@ unreachable code
 
 ## golangci-lint Failures
 
-## Issue: Unused variables
+### Issue: Unused variables
 
 ```
-variable 'result' is unused (ineffassign)
+declared and not used: result
 ```
 
 **Solutions**:
@@ -150,7 +150,7 @@ variable 'result' is unused (ineffassign)
 2. Remove unused variable
 3. Use `_` if intentionally unused: `_, err := someFunc()`
 
-## Issue: Error not checked
+### Issue: Error not checked
 
 ```
 Error return value is not checked (errcheck)
@@ -172,10 +172,10 @@ if err := someFunc(); err != nil {
 _ = file.Close() // Best effort close
 ```
 
-## Issue: Inefficient string concatenation
+### Issue: Inefficient string concatenation
 
 ```
-consider using strings.Builder (ineffassign)
+string concatenation in a loop; consider using strings.Builder (perfsprint / gocritic, when enabled)
 ```
 
 **Solutions**:
@@ -195,7 +195,7 @@ for _, s := range strings {
 result := builder.String()
 ```
 
-## Issue: Cognitive complexity too high
+### Issue: Cognitive complexity too high
 
 ```
 cognitive complexity 32 of func `ProcessData` is high (gocognit)
@@ -208,10 +208,10 @@ cognitive complexity 32 of func `ProcessData` is high (gocognit)
 3. Apply table-driven patterns
 4. Consider redesigning the function
 
-## Issue: Magic numbers
+### Issue: Magic numbers
 
 ```
-mnd: Magic number: 3600 (gomnd)
+Magic number: 3600, in <assign> detected (mnd)
 ```
 
 **Solutions**:
@@ -227,7 +227,7 @@ timeout := defaultTimeout
 
 ## Test Failures
 
-## Issue: Test logic errors
+### Issue: Test logic errors
 
 ```
 Expected: 5
@@ -241,7 +241,7 @@ Actual: 3
 3. Add debug output: `t.Logf("value: %v", value)`
 4. Use `go test -v` for verbose output
 
-## Issue: Table-driven test failures
+### Issue: Table-driven test failures
 
 ```
 Test case "negative input" failed
@@ -265,7 +265,7 @@ for _, tt := range tests {
 2. Add more descriptive test names
 3. Review specific test case data
 
-## Issue: Test timeout
+### Issue: Test timeout
 
 ```
 panic: test timed out after 10m0s
@@ -280,7 +280,7 @@ panic: test timed out after 10m0s
 
 ## Race Condition Failures
 
-## Issue: Data race detected
+### Issue: Data race detected
 
 ```
 WARNING: DATA RACE
@@ -352,7 +352,7 @@ func (c *Counter) Value() int64 {
 }
 ```
 
-## Issue: Concurrent map access
+### Issue: Concurrent map access
 
 ```
 fatal error: concurrent map writes
@@ -424,11 +424,11 @@ func mapManager(ops chan MapOp) {
 
 ## Coverage Failures
 
-## Issue: Coverage below 80%
+### Issue: Coverage below the project threshold
 
 ```
 coverage: 65.4% of statements
-FAIL: Coverage below 80%
+Coverage (65.4%) below threshold (<project threshold>%)
 ```
 
 **Solutions**:
@@ -452,7 +452,7 @@ go tool cover -html=/tmp/coverage.out
 go test -cover ./... | grep -v "no test files"
 ```
 
-## Issue: Unable to measure coverage
+### Issue: Unable to measure coverage
 
 ```
 no Go files in current directory
@@ -466,7 +466,7 @@ no Go files in current directory
 
 ## govulncheck Failures
 
-## Issue: Known vulnerability found
+### Issue: Known vulnerability found
 
 ```
 Vulnerability: CVE-2024-1234 in golang.org/x/crypto
@@ -480,7 +480,7 @@ Fixed in: golang.org/x/crypto@v0.1.0
 2. Check for patch version: `go list -m -versions golang.org/x/crypto`
 3. Update go.mod and run: `go mod tidy`
 
-## Issue: Indirect dependency vulnerability
+### Issue: Indirect dependency vulnerability
 
 ```
 Found vulnerability in transitive dependency
@@ -497,7 +497,7 @@ golang.org/x/crypto@v0.0.0 (indirect)
 replace golang.org/x/crypto => golang.org/x/crypto v0.1.0
 ```
 
-## Issue: No patch available
+### Issue: No patch available
 
 ```
 No fix available for CVE-2024-5678
@@ -506,13 +506,13 @@ No fix available for CVE-2024-5678
 **Solutions**:
 
 1. Consider alternative packages
-2. Document accepted risk in security.md
+2. Document the accepted risk where the repository records accepted security exceptions (for example its security policy)
 3. Monitor for updates
 4. Check if vulnerability affects your usage
 
 ## Validation Shell Script Issues
 
-## Issue: Shell Script not found
+### Issue: Shell Script not found
 
 ```
 bash: scripts/validate.sh: No such file or directory
@@ -531,7 +531,7 @@ ls -la scripts/validate.sh
 bash scripts/validate.sh
 ```
 
-## Issue: Permission denied
+### Issue: Permission denied
 
 ```
 permission denied: scripts/validate.sh
@@ -547,7 +547,7 @@ chmod +x scripts/validate.sh
 bash scripts/validate.sh
 ```
 
-## Issue: Command not found in shell script
+### Issue: Command not found in shell script
 
 ```
 line 42: golangci-lint: command not found

@@ -68,7 +68,9 @@ func ProcessInput(input string) error {
 
 ```go
 import (
+    "errors"
     "html"
+    "path/filepath"
     "regexp"
     "strings"
 )
@@ -90,14 +92,17 @@ func ValidateAlphanumeric(input string) error {
     return nil
 }
 
-// Sanitize file paths
-func SanitizeFilePath(path string) (string, error) {
-    // Prevent directory traversal
-    cleaned := filepath.Clean(path)
-    if strings.Contains(cleaned, "..") {
+// Resolve a user-supplied relative path under baseDir, rejecting traversal
+func SanitizeFilePath(baseDir, userPath string) (string, error) {
+    if filepath.IsAbs(userPath) {
         return "", errors.New("invalid path")
     }
-    return cleaned, nil
+    full := filepath.Join(baseDir, userPath)
+    rel, err := filepath.Rel(baseDir, full)
+    if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+        return "", errors.New("invalid path")
+    }
+    return full, nil
 }
 ```
 
@@ -219,8 +224,9 @@ func ProcessPayment(userID string, amount float64, cardNumber string) error {
 ```go
 import (
     "crypto/rand"
-    "crypto/sha256"
     "encoding/hex"
+
+    "golang.org/x/crypto/bcrypt"
 )
 
 // Generate secure random bytes
@@ -234,8 +240,6 @@ func GenerateToken() (string, error) {
 }
 
 // Hash passwords (use bcrypt or argon2)
-import "golang.org/x/crypto/bcrypt"
-
 func HashPassword(password string) (string, error) {
     hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
     if err != nil {
@@ -253,12 +257,16 @@ func CheckPassword(password, hash string) bool {
 ### Never Store Secrets in Code
 
 ```go
+import (
+    "context"
+    "log"
+    "os"
+)
+
 // Bad - Hardcoded credentials
 const dbP = "abcdefg123456"
 
 // Good - Use environment variables
-import "os"
-
 func getDBPassword() string {
     password := os.Getenv("DB_PASSWORD")
     if password == "" {
@@ -267,18 +275,13 @@ func getDBPassword() string {
     return password
 }
 
-// Better - Use secrets management
-import "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
+// Better - Use the secret manager the project already uses, behind an interface
+type SecretStore interface {
+    GetSecret(ctx context.Context, name string) (string, error)
+}
 
-func getSecret(ctx context.Context, secretID string) (string, error) {
-    client := secretsmanager.NewFromConfig(cfg)
-    output, err := client.GetSecretValue(ctx, &secretsmanager.GetSecretValueInput{
-        SecretId: aws.String(secretID),
-    })
-    if err != nil {
-        return "", err
-    }
-    return *output.SecretString, nil
+func getDBPasswordFrom(ctx context.Context, store SecretStore) (string, error) {
+    return store.GetSecret(ctx, "db-password")
 }
 ```
 
@@ -316,9 +319,10 @@ func GetUser(db *sql.DB, userID string) (*User, error) {
 
 ```go
 import (
-    "io"
+    "errors"
     "os"
     "path/filepath"
+    "strings"
 )
 
 // Validate file paths
@@ -337,7 +341,8 @@ func SafeReadFile(basePath, filename string) ([]byte, error) {
         return nil, err
     }
 
-    if !strings.HasPrefix(absPath, absBase) {
+    // Compare with a trailing separator so "/base-evil" does not match "/base"
+    if absPath != absBase && !strings.HasPrefix(absPath, absBase+string(filepath.Separator)) {
         return nil, errors.New("invalid file path")
     }
 
@@ -423,6 +428,12 @@ func (m *SafeMap) Get(key string) (interface{}, bool) {
 ### Limit Resource Consumption
 
 ```go
+import (
+    "net/http"
+
+    "golang.org/x/time/rate"
+)
+
 // Limit request body size
 func LimitRequestBody(h http.Handler, maxBytes int64) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -457,8 +468,6 @@ func (l *Limiter) Do(fn func()) {
 }
 
 // Implement rate limiting
-import "golang.org/x/time/rate"
-
 func RateLimitMiddleware(limiter *rate.Limiter) func(http.Handler) http.Handler {
     return func(next http.Handler) http.Handler {
         return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

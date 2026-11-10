@@ -1,6 +1,6 @@
 # Global / Base (G)
 
-**G-01 (SHOULD): No API keys/passwords/tokens in source**
+**G-01 (MUST): No API keys/passwords/tokens in source**
 
 Check: Are API keys, passwords, and tokens not embedded in source code?
 Why: Embedded secrets cause security breaches, credential leakage, audit violations

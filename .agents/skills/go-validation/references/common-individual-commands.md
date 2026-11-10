@@ -14,14 +14,15 @@ Use individual commands **only** when:
 
 ## Commands Overview
 
-The validation script runs these commands in order:
+The validation script runs these commands in order (see [common-checklist.md](common-checklist.md) for skip conditions):
 
 1. go mod tidy
-2. gofumpt
-3. go vet
-4. golangci-lint
-5. go test -v -race -cover
-6. govulncheck
+2. go build
+3. golangci-lint run
+4. go test, go test -race, go test -cover
+5. govulncheck
+
+The gofumpt and go vet commands below are not run as separate script steps; use them to reproduce formatting or vet findings that golangci-lint reports when those checks are enabled in its config.
 
 ## 1. go mod tidy
 
@@ -50,7 +51,7 @@ go mod verify
 
 ## 2. gofumpt
 
-**Purpose**: Format Go code (stricter than gofumpt)
+**Purpose**: Format Go code (stricter than gofmt)
 
 ```bash
 # Check all files

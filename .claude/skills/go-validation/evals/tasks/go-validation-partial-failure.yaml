@@ -12,7 +12,7 @@ tags:
 inputs:
   prompt:
     "Use go-validation. Assume one validation tool passes and another fails
-    with go vet findings in a Go package. Return ## Summary, ## Tool Results showing
+    with golangci-lint findings in a Go package. Return ## Summary, ## Tool Results showing
     mixed pass/fail status."
   context:
     target: SKILL.md

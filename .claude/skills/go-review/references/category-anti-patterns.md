@@ -1,6 +1,8 @@
 # Anti-Patterns (AP)
 
-**AP-01 (SHOULD): Discard errors with `_` without a justifying comment**
+When an AP item cites a base ItemID in parentheses, report the finding once under the base ItemID (the first one listed when several are cited); the AP item is a lookup pointer, not a second finding.
+
+**AP-01 (MUST): Discard errors with `_` without a justifying comment**
 
 Check: Are returned errors discarded with `_` and no comment (ERR-06)?
 Why: Silent discards hide failed I/O and security-sensitive failures
@@ -18,7 +20,7 @@ Check: Is SQL built with string concatenation of untrusted input (SEC-01)?
 Why: Concatenation enables injection
 Fix: Use parameterized queries or a query builder with placeholders
 
-**AP-04 (SHOULD): Embed secrets in source or test data**
+**AP-04 (MUST): Embed secrets in source or test data**
 
 Check: Are API keys, passwords, or tokens present in source, logs, or fixtures (G-01)?
 Why: Secrets in the tree leak via review, CI logs, and clones

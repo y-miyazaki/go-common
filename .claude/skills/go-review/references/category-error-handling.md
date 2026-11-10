@@ -35,3 +35,4 @@ Fix: Separate user-facing messages and internal logs, don't disclose detailed in
 Check: Is every returned `error` handled explicitly — no blank identifier assignment (`_ =` / `_, _ =`) unless a comment on the same line or immediately above justifies the discard?
 Why: Silently discarding errors hides failures and makes production incidents hard to diagnose
 Fix: Check and wrap errors; when discard is intentional, document why next to the assignment
+Note: golangci-lint `errcheck` reports unchecked error returns, but by default it ignores `_` assignments and it cannot see whether a comment justifies a discard. When validation output is supplied, take the status of unchecked-call findings from errcheck and cite it; still evaluate `_` discards for a justifying comment.
