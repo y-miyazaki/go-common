@@ -4,19 +4,19 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-aws
   host: github.com
-  resolved_commit: 692397176eb84f691ce3a5eb0ba3acb38125adf8
-  resolved_ref: v1.9.3
+  resolved_commit: afefe9039498c217f204d19a4682c95deb6e4d69
+  resolved_ref: v1.9.10
   version: 1.0.0
   virtual_path: .apm/packages/aws
   is_virtual: true
   package_type: apm_package
-  content_hash: sha256:90eb3d7469869fb625ed4d07ee77e7d1abadd30db0b82921537f50c4e32cf0e1
+  content_hash: sha256:eec05b76f954fb55491dec3fdbfc0589559ffa6640649e9e10eb165a435cd04d
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: config-common
   host: github.com
-  resolved_commit: 692397176eb84f691ce3a5eb0ba3acb38125adf8
-  resolved_ref: v1.9.3
+  resolved_commit: afefe9039498c217f204d19a4682c95deb6e4d69
+  resolved_ref: v1.9.10
   version: 1.0.0
   virtual_path: .apm/packages/common
   is_virtual: true
@@ -351,13 +351,13 @@ dependencies:
     .cursor/rules/agent-skills.mdc: sha256:bf1d491a9e6c43371389c304d28c2aae3c11d7e87a942e5ebd300d929970396b
     .cursor/rules/instructions.mdc: sha256:1e1080bb01e9172c6bba3c14e65599b7d77eff6bdf562d59585f5e470a0e4866
     .cursor/rules/markdown.mdc: sha256:75df65f44fd4f213387152822fd5d3e09b52b1d2f94a252f070ffd82e32659a7
-  content_hash: sha256:d57a2fb5b9aca73ea408ecb714b665e72d53169cf3c94ca5e05b502b6a89245b
+  content_hash: sha256:6a9da078c28a07d3a876e2b3229801437f09950089510aa34ab23cb640e11b6c
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: common-hooks-claude
   host: github.com
-  resolved_commit: 692397176eb84f691ce3a5eb0ba3acb38125adf8
-  resolved_ref: v1.9.3
+  resolved_commit: afefe9039498c217f204d19a4682c95deb6e4d69
+  resolved_ref: v1.9.10
   version: 2.0.0
   virtual_path: .apm/packages/common-hooks-claude
   is_virtual: true
@@ -383,8 +383,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: common-hooks-cursor
   host: github.com
-  resolved_commit: 692397176eb84f691ce3a5eb0ba3acb38125adf8
-  resolved_ref: v1.9.3
+  resolved_commit: afefe9039498c217f204d19a4682c95deb6e4d69
+  resolved_ref: v1.9.10
   version: 2.0.0
   virtual_path: .apm/packages/common-hooks-cursor
   is_virtual: true
@@ -410,8 +410,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-github
   host: github.com
-  resolved_commit: 692397176eb84f691ce3a5eb0ba3acb38125adf8
-  resolved_ref: v1.9.3
+  resolved_commit: afefe9039498c217f204d19a4682c95deb6e4d69
+  resolved_ref: v1.9.10
   version: 1.0.0
   virtual_path: .apm/packages/github
   is_virtual: true
@@ -702,7 +702,7 @@ dependencies:
     .agents/skills/github-issue-autofix/references/category-pr-body-links.md: sha256:0c1a6f396732fe72c39da35d06c116af0b7d30b28bfbda6c75925587c2bc5d32
     .agents/skills/github-issue-autofix/references/common-checklist.md: sha256:3d3b4aa2414d2d26850dfaf0b444d9c0b6e987e09afe227882998215ca106ecc
     .agents/skills/github-issue-autofix/references/common-output-format.md: sha256:40378fa54d157c37058b1f08ac09f1d20e54b732167a1e1d8f0d035c6c41f88c
-    .agents/skills/github-issue-autofix/scripts/detect_autofix.sh: sha256:86d7fe1ab1b82cacc4a40a4a594fd7ff0358801e8377fda2d8804b222fd9151c
+    .agents/skills/github-issue-autofix/scripts/detect_autofix.sh: sha256:0950a842746d6b0c11f7a30b51e85adb382230754b0e4687ae62d413e431d868
     .agents/skills/github-issue-autofix/scripts/lib/all.sh: sha256:dc9b27d00ff0b37be6f5c986a59a8107f59a83bede4de5818e453a38ae51f216
     .agents/skills/github-issue-autofix/scripts/lib/aws.sh: sha256:9378617c56fa762fe44fc13b84c0eb941c593228842f6ead60a3487391a8d9dc
     .agents/skills/github-issue-autofix/scripts/lib/common.sh: sha256:0c8d0891652260fda7e6e3b7e10f69b7346714522d8cfd1892fee7f255256109
@@ -725,7 +725,7 @@ dependencies:
     .agents/skills/github-issue-triage/references/category-prompt-rules.md: sha256:d9803dad983458f547ae6a071c99f7fab9832ca5e0ae4c7507a284cbf0fc65be
     .agents/skills/github-issue-triage/references/common-checklist.md: sha256:4fad6b2c7ee0a815ee9d9777a8251244aea35e6ab5a8ec26b5075dd3ff73d66b
     .agents/skills/github-issue-triage/references/common-output-format.md: sha256:1977f0f4ef115ce743c28236df09c45715fecfe3821d10532b2e1f1d148d3149
-    .agents/skills/github-issue-triage/scripts/detect_issue.sh: sha256:4a54522ba77ab78b945488eb2ff171ba285ab3e524c7422532c951529a001f6c
+    .agents/skills/github-issue-triage/scripts/detect_issue.sh: sha256:cc19c83e596ffc7fb73db2db5d789d5eedb8538adf3ca60ce732e834ae14bba8
     .agents/skills/github-issue-triage/scripts/issue_comment.sh: sha256:abee97c5cb2f018a0ac765449c39124f0cda5121b5e8a838efb98cac03bc7a23
     .agents/skills/github-issue-triage/scripts/label_fsm.sh: sha256:b4fe7d3b21aec402e0fbb7c56b1156b842023e0793d5da11dc64cc0e9fceed4b
     .agents/skills/github-issue-triage/scripts/labels.json: sha256:df7a567b6b08ca04392680d2cea769847401123dc3d3591a1dc28de5e53d4910
@@ -782,7 +782,7 @@ dependencies:
     .agents/skills/github-pr-review/references/category-review-rules.md: sha256:df1214859eb23ac3d644dadcbc9d2c45e6d345433141df00b66fa0fc1c4efb19
     .agents/skills/github-pr-review/references/common-checklist.md: sha256:0a86e21f8995d0b06d93619a203a474a5be04d8fbdd837e01f10335e24ed5a64
     .agents/skills/github-pr-review/references/common-output-format.md: sha256:c1f466de680580b0a299559bb79fc228eb3446d12f40c4b5c949146da4914239
-    .agents/skills/github-pr-review/scripts/detect_pr_review.sh: sha256:66faa513563cb22bef20bdf586da33c5c6644b7534811754402682935ea99817
+    .agents/skills/github-pr-review/scripts/detect_pr_review.sh: sha256:1bc4875c20ce4019c047942223227a04300f33918f7adb712d100bc34eaa228b
     .agents/skills/github-pr-review/scripts/lib/all.sh: sha256:dc9b27d00ff0b37be6f5c986a59a8107f59a83bede4de5818e453a38ae51f216
     .agents/skills/github-pr-review/scripts/lib/aws.sh: sha256:9378617c56fa762fe44fc13b84c0eb941c593228842f6ead60a3487391a8d9dc
     .agents/skills/github-pr-review/scripts/lib/common.sh: sha256:0c8d0891652260fda7e6e3b7e10f69b7346714522d8cfd1892fee7f255256109
@@ -808,7 +808,7 @@ dependencies:
     .agents/skills/github-pr-revise/references/category-pr-body-links.md: sha256:0f316b769a72095fdc2c912544040e5730cdaeffb5a1c21e0587a414b89ecacb
     .agents/skills/github-pr-revise/references/common-checklist.md: sha256:fa16cffc35b8f07b59804185ab171c9de5c779320d8e131ebabc98d6193ecda2
     .agents/skills/github-pr-revise/references/common-output-format.md: sha256:4bb8d1d6eb265df37f02011612160a8a002ede5203cfc490764fc60428563bdf
-    .agents/skills/github-pr-revise/scripts/detect_pr_revise.sh: sha256:6f4be0a53b4da26db5f45994cb9f838b1807d38eebec27691579152781290bd4
+    .agents/skills/github-pr-revise/scripts/detect_pr_revise.sh: sha256:e94b154744bf8d5ee7106379af4bc1810e82463e64a907d8f93631d9234364c4
     .agents/skills/github-pr-revise/scripts/lib/all.sh: sha256:dc9b27d00ff0b37be6f5c986a59a8107f59a83bede4de5818e453a38ae51f216
     .agents/skills/github-pr-revise/scripts/lib/aws.sh: sha256:9378617c56fa762fe44fc13b84c0eb941c593228842f6ead60a3487391a8d9dc
     .agents/skills/github-pr-revise/scripts/lib/common.sh: sha256:0c8d0891652260fda7e6e3b7e10f69b7346714522d8cfd1892fee7f255256109
@@ -832,7 +832,7 @@ dependencies:
     .claude/skills/github-issue-autofix/references/category-pr-body-links.md: sha256:0c1a6f396732fe72c39da35d06c116af0b7d30b28bfbda6c75925587c2bc5d32
     .claude/skills/github-issue-autofix/references/common-checklist.md: sha256:3d3b4aa2414d2d26850dfaf0b444d9c0b6e987e09afe227882998215ca106ecc
     .claude/skills/github-issue-autofix/references/common-output-format.md: sha256:40378fa54d157c37058b1f08ac09f1d20e54b732167a1e1d8f0d035c6c41f88c
-    .claude/skills/github-issue-autofix/scripts/detect_autofix.sh: sha256:86d7fe1ab1b82cacc4a40a4a594fd7ff0358801e8377fda2d8804b222fd9151c
+    .claude/skills/github-issue-autofix/scripts/detect_autofix.sh: sha256:0950a842746d6b0c11f7a30b51e85adb382230754b0e4687ae62d413e431d868
     .claude/skills/github-issue-autofix/scripts/lib/all.sh: sha256:dc9b27d00ff0b37be6f5c986a59a8107f59a83bede4de5818e453a38ae51f216
     .claude/skills/github-issue-autofix/scripts/lib/aws.sh: sha256:9378617c56fa762fe44fc13b84c0eb941c593228842f6ead60a3487391a8d9dc
     .claude/skills/github-issue-autofix/scripts/lib/common.sh: sha256:0c8d0891652260fda7e6e3b7e10f69b7346714522d8cfd1892fee7f255256109
@@ -855,7 +855,7 @@ dependencies:
     .claude/skills/github-issue-triage/references/category-prompt-rules.md: sha256:d9803dad983458f547ae6a071c99f7fab9832ca5e0ae4c7507a284cbf0fc65be
     .claude/skills/github-issue-triage/references/common-checklist.md: sha256:4fad6b2c7ee0a815ee9d9777a8251244aea35e6ab5a8ec26b5075dd3ff73d66b
     .claude/skills/github-issue-triage/references/common-output-format.md: sha256:1977f0f4ef115ce743c28236df09c45715fecfe3821d10532b2e1f1d148d3149
-    .claude/skills/github-issue-triage/scripts/detect_issue.sh: sha256:4a54522ba77ab78b945488eb2ff171ba285ab3e524c7422532c951529a001f6c
+    .claude/skills/github-issue-triage/scripts/detect_issue.sh: sha256:cc19c83e596ffc7fb73db2db5d789d5eedb8538adf3ca60ce732e834ae14bba8
     .claude/skills/github-issue-triage/scripts/issue_comment.sh: sha256:abee97c5cb2f018a0ac765449c39124f0cda5121b5e8a838efb98cac03bc7a23
     .claude/skills/github-issue-triage/scripts/label_fsm.sh: sha256:b4fe7d3b21aec402e0fbb7c56b1156b842023e0793d5da11dc64cc0e9fceed4b
     .claude/skills/github-issue-triage/scripts/labels.json: sha256:df7a567b6b08ca04392680d2cea769847401123dc3d3591a1dc28de5e53d4910
@@ -912,7 +912,7 @@ dependencies:
     .claude/skills/github-pr-review/references/category-review-rules.md: sha256:df1214859eb23ac3d644dadcbc9d2c45e6d345433141df00b66fa0fc1c4efb19
     .claude/skills/github-pr-review/references/common-checklist.md: sha256:0a86e21f8995d0b06d93619a203a474a5be04d8fbdd837e01f10335e24ed5a64
     .claude/skills/github-pr-review/references/common-output-format.md: sha256:c1f466de680580b0a299559bb79fc228eb3446d12f40c4b5c949146da4914239
-    .claude/skills/github-pr-review/scripts/detect_pr_review.sh: sha256:66faa513563cb22bef20bdf586da33c5c6644b7534811754402682935ea99817
+    .claude/skills/github-pr-review/scripts/detect_pr_review.sh: sha256:1bc4875c20ce4019c047942223227a04300f33918f7adb712d100bc34eaa228b
     .claude/skills/github-pr-review/scripts/lib/all.sh: sha256:dc9b27d00ff0b37be6f5c986a59a8107f59a83bede4de5818e453a38ae51f216
     .claude/skills/github-pr-review/scripts/lib/aws.sh: sha256:9378617c56fa762fe44fc13b84c0eb941c593228842f6ead60a3487391a8d9dc
     .claude/skills/github-pr-review/scripts/lib/common.sh: sha256:0c8d0891652260fda7e6e3b7e10f69b7346714522d8cfd1892fee7f255256109
@@ -938,7 +938,7 @@ dependencies:
     .claude/skills/github-pr-revise/references/category-pr-body-links.md: sha256:0f316b769a72095fdc2c912544040e5730cdaeffb5a1c21e0587a414b89ecacb
     .claude/skills/github-pr-revise/references/common-checklist.md: sha256:fa16cffc35b8f07b59804185ab171c9de5c779320d8e131ebabc98d6193ecda2
     .claude/skills/github-pr-revise/references/common-output-format.md: sha256:4bb8d1d6eb265df37f02011612160a8a002ede5203cfc490764fc60428563bdf
-    .claude/skills/github-pr-revise/scripts/detect_pr_revise.sh: sha256:6f4be0a53b4da26db5f45994cb9f838b1807d38eebec27691579152781290bd4
+    .claude/skills/github-pr-revise/scripts/detect_pr_revise.sh: sha256:e94b154744bf8d5ee7106379af4bc1810e82463e64a907d8f93631d9234364c4
     .claude/skills/github-pr-revise/scripts/lib/all.sh: sha256:dc9b27d00ff0b37be6f5c986a59a8107f59a83bede4de5818e453a38ae51f216
     .claude/skills/github-pr-revise/scripts/lib/aws.sh: sha256:9378617c56fa762fe44fc13b84c0eb941c593228842f6ead60a3487391a8d9dc
     .claude/skills/github-pr-revise/scripts/lib/common.sh: sha256:0c8d0891652260fda7e6e3b7e10f69b7346714522d8cfd1892fee7f255256109
@@ -948,13 +948,13 @@ dependencies:
     .claude/skills/github-pr-revise/scripts/lib/terraform.sh: sha256:ea6645e2a7568d82745051d539eac406a35640b033dae8e5e72fbf0f96a56b55
     .claude/skills/github-pr-revise/scripts/lib/validation.sh: sha256:90d4a03121954f13303571b84e4590976040d42d47015fbc0b591d0315d8a502
     .claude/skills/github-pr-revise/scripts/lib/yaml_map_order.py: sha256:eb542fe34e2e1c11c08d0f78c4717cb3521fbe5ae2f6e05712317fa5478ccf80
-  content_hash: sha256:9f53770dd5a7e5037cfe7243edb8cb183e8bf0b79cd81322b817235ecfd6faae
+  content_hash: sha256:da9d5dbc196a9b59dc815e852575000f28fa3bc051f7a89245838489c7a7d31b
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: config-github-actions
   host: github.com
-  resolved_commit: 692397176eb84f691ce3a5eb0ba3acb38125adf8
-  resolved_ref: v1.9.3
+  resolved_commit: afefe9039498c217f204d19a4682c95deb6e4d69
+  resolved_ref: v1.9.10
   version: 1.0.0
   virtual_path: .apm/packages/github-actions
   is_virtual: true
@@ -1134,8 +1134,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-go
   host: github.com
-  resolved_commit: 692397176eb84f691ce3a5eb0ba3acb38125adf8
-  resolved_ref: v1.9.3
+  resolved_commit: afefe9039498c217f204d19a4682c95deb6e4d69
+  resolved_ref: v1.9.10
   version: 1.0.0
   virtual_path: .apm/packages/go
   is_virtual: true
@@ -1343,8 +1343,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: go-hooks-claude
   host: github.com
-  resolved_commit: 692397176eb84f691ce3a5eb0ba3acb38125adf8
-  resolved_ref: v1.9.3
+  resolved_commit: afefe9039498c217f204d19a4682c95deb6e4d69
+  resolved_ref: v1.9.10
   version: 1.0.0
   virtual_path: .apm/packages/go-hooks-claude
   is_virtual: true
@@ -1358,8 +1358,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: go-hooks-cursor
   host: github.com
-  resolved_commit: 692397176eb84f691ce3a5eb0ba3acb38125adf8
-  resolved_ref: v1.9.3
+  resolved_commit: afefe9039498c217f204d19a4682c95deb6e4d69
+  resolved_ref: v1.9.10
   version: 1.0.0
   virtual_path: .apm/packages/go-hooks-cursor
   is_virtual: true
@@ -1373,8 +1373,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: config-repo-maintenance
   host: github.com
-  resolved_commit: 692397176eb84f691ce3a5eb0ba3acb38125adf8
-  resolved_ref: v1.9.3
+  resolved_commit: afefe9039498c217f204d19a4682c95deb6e4d69
+  resolved_ref: v1.9.10
   version: 1.0.0
   virtual_path: .apm/packages/repo-maintenance
   is_virtual: true
@@ -1881,7 +1881,7 @@ dependencies:
     .agents/skills/changelog/references/common-checklist.md: sha256:58c5a681eee1a6b2ec3b7c76be3504ac64f5b66820df178db7053cd238959448
     .agents/skills/changelog/references/common-output-format.md: sha256:9c77e0362f29e20ac8e0b764edb2651d49fac4e6f9ac4a7025d8553c3f5d25ae
     .agents/skills/changelog/references/common-troubleshooting.md: sha256:0107a06e1eebe955c556208ff185d9df51a310727e1a826ca8640ae26cd61b06
-    .agents/skills/changelog/scripts/detect_changelog_commits.sh: sha256:3d79987bdc6be5c31e908512213923c0c994edf520f832a497d4045137f1e139
+    .agents/skills/changelog/scripts/detect_changelog_commits.sh: sha256:77b638100f2e2c5a164bbedfe0b88628311cb6c7cd3538c1c2eb7b2e6c6a3e82
     .agents/skills/changelog/scripts/lib/all.sh: sha256:dc9b27d00ff0b37be6f5c986a59a8107f59a83bede4de5818e453a38ae51f216
     .agents/skills/changelog/scripts/lib/aws.sh: sha256:9378617c56fa762fe44fc13b84c0eb941c593228842f6ead60a3487391a8d9dc
     .agents/skills/changelog/scripts/lib/common.sh: sha256:0c8d0891652260fda7e6e3b7e10f69b7346714522d8cfd1892fee7f255256109
@@ -2113,7 +2113,7 @@ dependencies:
     .claude/skills/changelog/references/common-checklist.md: sha256:58c5a681eee1a6b2ec3b7c76be3504ac64f5b66820df178db7053cd238959448
     .claude/skills/changelog/references/common-output-format.md: sha256:9c77e0362f29e20ac8e0b764edb2651d49fac4e6f9ac4a7025d8553c3f5d25ae
     .claude/skills/changelog/references/common-troubleshooting.md: sha256:0107a06e1eebe955c556208ff185d9df51a310727e1a826ca8640ae26cd61b06
-    .claude/skills/changelog/scripts/detect_changelog_commits.sh: sha256:3d79987bdc6be5c31e908512213923c0c994edf520f832a497d4045137f1e139
+    .claude/skills/changelog/scripts/detect_changelog_commits.sh: sha256:77b638100f2e2c5a164bbedfe0b88628311cb6c7cd3538c1c2eb7b2e6c6a3e82
     .claude/skills/changelog/scripts/lib/all.sh: sha256:dc9b27d00ff0b37be6f5c986a59a8107f59a83bede4de5818e453a38ae51f216
     .claude/skills/changelog/scripts/lib/aws.sh: sha256:9378617c56fa762fe44fc13b84c0eb941c593228842f6ead60a3487391a8d9dc
     .claude/skills/changelog/scripts/lib/common.sh: sha256:0c8d0891652260fda7e6e3b7e10f69b7346714522d8cfd1892fee7f255256109
@@ -2321,13 +2321,13 @@ dependencies:
     .claude/skills/test-gap/scripts/lib/validation.sh: sha256:90d4a03121954f13303571b84e4590976040d42d47015fbc0b591d0315d8a502
     .claude/skills/test-gap/scripts/lib/yaml_map_order.py: sha256:eb542fe34e2e1c11c08d0f78c4717cb3521fbe5ae2f6e05712317fa5478ccf80
     .claude/skills/test-gap/scripts/update_test_gap_ledger.sh: sha256:ae2a12d1a38b67b24e71b507f4df15d22460afd6cbf721f1efdb7132a557ff45
-  content_hash: sha256:f4af31f9de610f19c5defcf8e16dd2660135ec33a2f09a387c1be51e1e601cdc
+  content_hash: sha256:c970a5dad9378d6cb93eb008dc25df8574bb6823edd6d2836ab025f68ac0ccf3
   declared_license: Apache-2.0
 - repo_url: y-miyazaki/config
   name: config-shell-script
   host: github.com
-  resolved_commit: 692397176eb84f691ce3a5eb0ba3acb38125adf8
-  resolved_ref: v1.9.3
+  resolved_commit: afefe9039498c217f204d19a4682c95deb6e4d69
+  resolved_ref: v1.9.10
   version: 1.0.0
   virtual_path: .apm/packages/shell-script
   is_virtual: true
@@ -2539,8 +2539,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: shell-script-hooks-claude
   host: github.com
-  resolved_commit: 692397176eb84f691ce3a5eb0ba3acb38125adf8
-  resolved_ref: v1.9.3
+  resolved_commit: afefe9039498c217f204d19a4682c95deb6e4d69
+  resolved_ref: v1.9.10
   version: 1.0.0
   virtual_path: .apm/packages/shell-script-hooks-claude
   is_virtual: true
@@ -2556,8 +2556,8 @@ dependencies:
 - repo_url: y-miyazaki/config
   name: shell-script-hooks-cursor
   host: github.com
-  resolved_commit: 692397176eb84f691ce3a5eb0ba3acb38125adf8
-  resolved_ref: v1.9.3
+  resolved_commit: afefe9039498c217f204d19a4682c95deb6e4d69
+  resolved_ref: v1.9.10
   version: 1.0.0
   virtual_path: .apm/packages/shell-script-hooks-cursor
   is_virtual: true
@@ -3245,7 +3245,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/repo-maintenance
   active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
-  content_hash: sha256:3d79987bdc6be5c31e908512213923c0c994edf520f832a497d4045137f1e139
+  content_hash: sha256:77b638100f2e2c5a164bbedfe0b88628311cb6c7cd3538c1c2eb7b2e6c6a3e82
 - kind: project-relative
   target: claude
   value: .claude/skills/changelog/scripts/lib/all.sh
@@ -4730,7 +4730,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/github
   active_owner: y-miyazaki/config/.apm/packages/github
-  content_hash: sha256:86d7fe1ab1b82cacc4a40a4a594fd7ff0358801e8377fda2d8804b222fd9151c
+  content_hash: sha256:0950a842746d6b0c11f7a30b51e85adb382230754b0e4687ae62d413e431d868
 - kind: project-relative
   target: claude
   value: .claude/skills/github-issue-autofix/scripts/lib/all.sh
@@ -4946,7 +4946,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/github
   active_owner: y-miyazaki/config/.apm/packages/github
-  content_hash: sha256:4a54522ba77ab78b945488eb2ff171ba285ab3e524c7422532c951529a001f6c
+  content_hash: sha256:cc19c83e596ffc7fb73db2db5d789d5eedb8538adf3ca60ce732e834ae14bba8
 - kind: project-relative
   target: claude
   value: .claude/skills/github-issue-triage/scripts/issue_comment.sh
@@ -5477,7 +5477,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/github
   active_owner: y-miyazaki/config/.apm/packages/github
-  content_hash: sha256:66faa513563cb22bef20bdf586da33c5c6644b7534811754402682935ea99817
+  content_hash: sha256:1bc4875c20ce4019c047942223227a04300f33918f7adb712d100bc34eaa228b
 - kind: project-relative
   target: claude
   value: .claude/skills/github-pr-review/scripts/lib/all.sh
@@ -5720,7 +5720,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/github
   active_owner: y-miyazaki/config/.apm/packages/github
-  content_hash: sha256:6f4be0a53b4da26db5f45994cb9f838b1807d38eebec27691579152781290bd4
+  content_hash: sha256:e94b154744bf8d5ee7106379af4bc1810e82463e64a907d8f93631d9234364c4
 - kind: project-relative
   target: claude
   value: .claude/skills/github-pr-revise/scripts/lib/all.sh
@@ -8573,7 +8573,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/repo-maintenance
   active_owner: y-miyazaki/config/.apm/packages/repo-maintenance
-  content_hash: sha256:3d79987bdc6be5c31e908512213923c0c994edf520f832a497d4045137f1e139
+  content_hash: sha256:77b638100f2e2c5a164bbedfe0b88628311cb6c7cd3538c1c2eb7b2e6c6a3e82
 - kind: project-relative
   target: cursor
   value: .agents/skills/changelog/scripts/lib/all.sh
@@ -10058,7 +10058,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/github
   active_owner: y-miyazaki/config/.apm/packages/github
-  content_hash: sha256:86d7fe1ab1b82cacc4a40a4a594fd7ff0358801e8377fda2d8804b222fd9151c
+  content_hash: sha256:0950a842746d6b0c11f7a30b51e85adb382230754b0e4687ae62d413e431d868
 - kind: project-relative
   target: cursor
   value: .agents/skills/github-issue-autofix/scripts/lib/all.sh
@@ -10274,7 +10274,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/github
   active_owner: y-miyazaki/config/.apm/packages/github
-  content_hash: sha256:4a54522ba77ab78b945488eb2ff171ba285ab3e524c7422532c951529a001f6c
+  content_hash: sha256:cc19c83e596ffc7fb73db2db5d789d5eedb8538adf3ca60ce732e834ae14bba8
 - kind: project-relative
   target: cursor
   value: .agents/skills/github-issue-triage/scripts/issue_comment.sh
@@ -10805,7 +10805,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/github
   active_owner: y-miyazaki/config/.apm/packages/github
-  content_hash: sha256:66faa513563cb22bef20bdf586da33c5c6644b7534811754402682935ea99817
+  content_hash: sha256:1bc4875c20ce4019c047942223227a04300f33918f7adb712d100bc34eaa228b
 - kind: project-relative
   target: cursor
   value: .agents/skills/github-pr-review/scripts/lib/all.sh
@@ -11048,7 +11048,7 @@ deployments:
   owners:
   - y-miyazaki/config/.apm/packages/github
   active_owner: y-miyazaki/config/.apm/packages/github
-  content_hash: sha256:6f4be0a53b4da26db5f45994cb9f838b1807d38eebec27691579152781290bd4
+  content_hash: sha256:e94b154744bf8d5ee7106379af4bc1810e82463e64a907d8f93631d9234364c4
 - kind: project-relative
   target: cursor
   value: .agents/skills/github-pr-revise/scripts/lib/all.sh
@@ -13586,7 +13586,7 @@ deployments:
   owners:
   - .
   active_owner: .
-  content_hash: sha256:f6fd07ce8f6ca803b18557f657a020d0804022e4ce934c01907b3a58634eb2f4
+  content_hash: sha256:4587819ae44eeb04f54f8fd37e926e30fa56b65ea8e1d21b06148b6dd7c786b4
 - kind: uri
   target: mcp
   value: aws-mcp
@@ -13622,7 +13622,7 @@ deployments:
   owners:
   - .
   active_owner: .
-  content_hash: sha256:828cc04f4f935aaada15702ddbbf02d900fa4acf3edc564cdcb07a46a9f140e2
+  content_hash: sha256:0e23ad35d10e16a4e0d08ca351e21c4cdc6ef2e488edb8aed42fdfd388097867
 - kind: uri
   target: mcp
   value: fetch
@@ -13631,7 +13631,7 @@ deployments:
   owners:
   - .
   active_owner: .
-  content_hash: sha256:2c79b7953ebbc2c8669faacbc4ff9431c8d62f33f39b0382b107123fa2497bf6
+  content_hash: sha256:c159973401eb79e445afd80b53c1274fbb54c27df37dbb52abf3eac1e91b44cd
 - kind: uri
   target: mcp
   value: github
@@ -13662,7 +13662,7 @@ mcp_configs:
     name: aws-knowledge-mcp-server
     transport: stdio
     args:
-    - mcp-proxy==0.13.3
+    - mcp-proxy==0.14.0
     - --transport
     - streamablehttp
     - https://knowledge-mcp.global.api.aws
@@ -13691,7 +13691,7 @@ mcp_configs:
     transport: stdio
     args:
     - -y
-    - '@upstash/context7-mcp@4.4.4'
+    - '@upstash/context7-mcp@4.5.0'
     registry: false
     command: npx
   fetch:
@@ -13700,7 +13700,7 @@ mcp_configs:
     args:
     - --with
     - mcp>=1.28,<2
-    - mcp-server-fetch==2026.10.28
+    - mcp-server-fetch==2026.11.4
     registry: false
     command: uvx
   github:

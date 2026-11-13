@@ -81,7 +81,7 @@ repos:
         types: [yaml]
         files: ^\.github/workflows/.*\.(ya?ml)$
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.31.1
+    rev: v1.32.0
     hooks:
       # Run the linter.
       - id: zizmor
@@ -150,7 +150,7 @@ repos:
   # For Renovate
   # --------------------------------------------------------------
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 44.206.2
+    rev: 44.221.1
     hooks:
       - id: renovate-config-validator
         # The hook default only matches renovate.json(c|5) / .renovaterc; also cover shared presets under renovate/.
