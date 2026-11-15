@@ -57,5 +57,12 @@
       "timeout": 120,
       "_apm_source": "y-miyazaki/config/.apm/packages/shell-script-hooks-cursor"
     }
+  ],
+  "beforeSubmitPrompt": [
+    {
+      "command": ".cursor/hooks/common-hooks-cursor/scripts/gitleaks_prompt.sh",
+      "timeout": 30,
+      "_apm_source": "y-miyazaki/config/.apm/packages/common-hooks-cursor"
+    }
   ]
 }
