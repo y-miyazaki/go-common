@@ -71,6 +71,17 @@
       "hooks": [
         {
           "type": "command",
+          "command": "\"${CLAUDE_PROJECT_DIR}/.claude/hooks/go-hooks-claude/scripts/go_test.sh\"",
+          "timeout": 120
+        }
+      ],
+      "_apm_source": "y-miyazaki/config/.apm/packages/go-hooks-claude"
+    },
+    {
+      "matcher": "*",
+      "hooks": [
+        {
+          "type": "command",
           "command": "\"${CLAUDE_PROJECT_DIR}/.claude/hooks/go-hooks-claude/scripts/golangci_lint.sh\"",
           "timeout": 120
         }

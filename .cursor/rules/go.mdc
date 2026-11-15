@@ -9,7 +9,7 @@ globs: **/*.go
 
 - Scope covers implementing, testing, and validating Go source code.
 - When adding or changing behavior, add or update `*_test.go` in the same change (MUST).
-- Test authoring conventions live in companion Go Test rules (stem `go-test`); companion `globs` is `**/*.go` so pairing applies when editing source files (G-05).
+- Test authoring conventions live in companion Go Test rules (stem `go-test`); the paired test rules apply to `**/*.go`, so pairing applies when editing source files (G-05).
 - Handle every returned `error` explicitly; blank-identifier discard needs a justifying comment (ERR-06).
 - Wrap errors with `fmt.Errorf("…: %w", err)` to preserve the causal chain (ERR-01).
 - Exported functions that perform I/O or may block take `context.Context` as the first parameter (CTX-01).

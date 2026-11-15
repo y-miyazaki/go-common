@@ -31,6 +31,11 @@
       "_apm_source": "y-miyazaki/config/.apm/packages/common-hooks-cursor"
     },
     {
+      "command": ".cursor/hooks/go-hooks-cursor/scripts/go_test.sh",
+      "timeout": 120,
+      "_apm_source": "y-miyazaki/config/.apm/packages/go-hooks-cursor"
+    },
+    {
       "command": ".cursor/hooks/go-hooks-cursor/scripts/golangci_lint.sh",
       "timeout": 120,
       "_apm_source": "y-miyazaki/config/.apm/packages/go-hooks-cursor"

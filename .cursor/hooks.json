@@ -26,6 +26,10 @@
         "timeout": 120
       },
       {
+        "command": ".cursor/hooks/go-hooks-cursor/scripts/go_test.sh",
+        "timeout": 120
+      },
+      {
         "command": ".cursor/hooks/go-hooks-cursor/scripts/golangci_lint.sh",
         "timeout": 120
       },

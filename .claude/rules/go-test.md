@@ -19,8 +19,6 @@ paths:
 | `**/*.go` (recommended) | Test rules must apply while editing **production** `.go` files too | Suite pairing and test templates inject on source edits (G-05 companion coverage) |
 | `**/*_test.go` only     | Test rules should inject **only** when a test file is open         | Pairing obligation is easy to miss when changing `foo.go`                         |
 
-**Why Bats lists two globs but Go uses one:** Bats pairs `*.sh` with `*.bats` — different extensions, so both must be listed. Go tests live in `*_test.go`, which already matches `**/*.go`. Listing `**/*_test.go` in addition is optional documentation only; it does not change Cursor behavior.
-
 ## Standards
 
 ### Naming Conventions

@@ -87,7 +87,7 @@ COVERAGE_PERCENT=""
 #######################################
 function show_usage {
     cat << EOF
-Usage: $(basename "$0") [options]
+Usage: $(basename "$0") [options] [directory]
 
 Description: Comprehensive Go code quality and testing script for Go projects
              Automatically detects Go directories if no specific target is provided
@@ -676,14 +676,9 @@ function run_security_checks {
         return 0
     fi
 
-    local search_root="."
-    if [[ $IS_SCOPED == "true" ]]; then
-        search_root="$TARGET_DIR"
-    fi
-
     # Check for govulncheck
     if command -v govulncheck &> /dev/null; then
-        log "INFO" "Running govulncheck... (root=$search_root)"
+        log "INFO" "Running govulncheck... (target=$TARGET_PATTERN)"
         if govulncheck "$TARGET_PATTERN"; then
             log "INFO" "No known vulnerabilities found"
         else
@@ -812,60 +807,40 @@ function main {
     end_time=$(date +%s)
     elapsed=$((end_time - start_time))
 
-    echo_section "Result (completed in ${elapsed} seconds)"
-    echo "Result:" >&2
-
-    # Report go build status
-    [[ $GO_BUILD_FAILED == "1" ]] && echo "❌ go build" >&2 || echo "✅ go build" >&2
-    if [[ $LINT_FAILED == "1" ]]; then
-        echo -n "❌ golangci-lint" >&2
-        # Use safe arithmetic comparison with default 0 to avoid bash syntax errors
-        local issue_count="${LINT_ISSUES_COUNT:-0}"
-        if [[ $issue_count != "0" && $issue_count -gt 0 ]]; then
-            echo " (${LINT_ISSUES_COUNT} issues)" >&2
-        else
-            echo "" >&2
-        fi
-    else
-        echo "✅ golangci-lint" >&2
+    local lint_detail="" test_detail="" cover_detail=""
+    if [[ ${LINT_FAILED} == "1" && ${LINT_ISSUES_COUNT:-0} -gt 0 ]]; then
+        lint_detail="|${LINT_ISSUES_COUNT} issues"
     fi
+    if [[ ${TEST_FAILED} == "1" && ${TEST_FAIL_COUNT:-0} -gt 0 ]]; then
+        test_detail="|${TEST_FAIL_COUNT} failed"
+    fi
+    if [[ -n $COVERAGE_PERCENT ]]; then
+        cover_detail="|${COVERAGE_PERCENT}% (threshold ${COVERAGE_THRESHOLD}%)"
+    fi
+    local test_status="PASS" race_status="PASS" cover_status="PASS"
     if [[ $SKIP_TESTS == "true" ]]; then
-        echo "⏭️ go test (skipped)" >&2
-        echo "⏭️ go test -race (skipped)" >&2
-        echo "⏭️ go test -cover (skipped)" >&2
+        test_status="SKIP" race_status="SKIP" cover_status="SKIP"
+        test_detail="" cover_detail=""
     else
-        if [[ $TEST_FAILED == "1" ]]; then
-            echo -n "❌ go test" >&2
-            if ((${TEST_FAIL_COUNT:-0} > 0)); then
-                echo " (${TEST_FAIL_COUNT} failed)" >&2
-            else
-                echo "" >&2
-            fi
-        else
-            echo "✅ go test" >&2
-        fi
-        [[ $RACE_FAILED == "1" ]] && echo "❌ go test -race" >&2 || echo "✅ go test -race" >&2
+        test_status="$(check_status "$TEST_FAILED")"
+        race_status="$(check_status "$RACE_FAILED")"
+        # Coverage below threshold is a warning and does not affect the exit code
+        # (a failed coverage run leaves COVERAGE_PERCENT empty and does set the exit code)
+        cover_status="PASS"
         if [[ $COVERAGE_FAILED == "1" ]]; then
-            if [[ -n $COVERAGE_PERCENT ]]; then
-                echo "⚠️ go test -cover ($COVERAGE_PERCENT% < ${COVERAGE_THRESHOLD}% threshold)" >&2
-            else
-                echo "⚠️ go test -cover" >&2
-            fi
-        else
-            if [[ -n $COVERAGE_PERCENT ]]; then
-                echo "✅ go test -cover ($COVERAGE_PERCENT%)" >&2
-            else
-                echo "✅ go test -cover" >&2
+            cover_status="WARN"
+            if [[ -z $COVERAGE_PERCENT ]]; then
+                cover_status="FAIL"
             fi
         fi
     fi
-    [[ $SECURITY_FAILED == "1" ]] && echo "❌ security checks (govulncheck)" >&2 || echo "✅ security checks (govulncheck)" >&2
-
-    if [[ $EXIT_CODE -eq 0 ]]; then
-        log "INFO" "✅ All validations passed"
-    else
-        log "ERROR" "❌ Some validations failed"
-    fi
+    print_validation_result go "$elapsed" \
+        "go_build=$(check_status "$GO_BUILD_FAILED")" \
+        "golangci_lint=$(check_status "$LINT_FAILED")${lint_detail}" \
+        "go_test=${test_status}${test_detail}" \
+        "go_test_race=${race_status}" \
+        "go_test_cover=${cover_status}${cover_detail}" \
+        "govulncheck=$(check_status "$SECURITY_FAILED")" || true
 
     exit $EXIT_CODE
 }
