@@ -185,7 +185,7 @@ This section describes how to use a VS Code devcontainer to create a reproducibl
    mkdir -p .devcontainer
    mkdir -p env/common/tmp/gh
    touch env/common/tmp/.gitconfig
-   cp -p env/example/.devcontainer/devcontainer.json .devcontainer/devcontainer.json
+   cp -p env/example/.devcontainer/cursor/devcontainer.json .devcontainer/devcontainer.json
    ```
 
 3. Configure .gitconfig  
