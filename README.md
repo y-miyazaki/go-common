@@ -51,7 +51,7 @@ This repository provides common libraries and example applications for Go langua
 | .vscode/              | VS Code settings              |
 | env/                  | Environment related files     |
 | env/common/           | Common environment settings   |
-| env/common/scripts/   | Common scripts (init.sh etc.) |
+| env/common/scripts/   | Devcontainer setup scripts    |
 | example/              | Example applications          |
 | example/gin1/         | Sample using Gin              |
 | example/...           | Other examples                |
@@ -288,7 +288,7 @@ dlv debug ./example/gin1
 - **Git push returns 403 error**  
   Check if GitHub CLI authentication is set correctly. Use `gh auth status` to verify status, and re-run `gh auth login` if necessary.
 - **devcontainer startup failure**  
-  Check execution permissions of `env/common/scripts/init.sh` and verify `/bin/sh` compatibility issues. Run with `bash` if needed.
+  Check execution permissions of the `env/common/scripts/*.sh` scripts that `devcontainer.json` runs and verify `/bin/sh` compatibility issues. Run with `bash` if needed.
 - **Dependency errors**  
   Run `go mod tidy` and ensure Go version is 1.24 or higher.
 - **Lint errors**  
