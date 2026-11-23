@@ -9,8 +9,9 @@
 #     -d, --dry-run    Run in dry-run mode (no changes made)
 #     -f, --fix        Automatically fix issues where possible
 #         --skip-tests Skip go test, race, coverage, and benchmark checks
+#         --changed-only Validate only packages with uncommitted git changes to .go, go.mod, or go.sum files (per go.mod module)
 #   arguments:
-#     directory        Package or directory to validate (optional)
+#     directory        Package or directory to validate (optional; with --changed-only it narrows the changed set)
 #
 # Design Rules:
 #   - Read-only by default: formatting and go.mod/go.sum changes are applied only with --fix.
@@ -40,13 +41,15 @@ VERBOSE=false
 DRY_RUN=false
 FIX_MODE=false
 TARGET_DIR=""
-TARGET_PATTERN="./..."
+TARGET_PATTERNS=("./...")
 COVERAGE_THRESHOLD=80
 EXIT_CODE=0
 TEMP_FILES=()
 # When true, limit checks to TARGET_DIR (not "." or "./...")
 IS_SCOPED=false
 SKIP_TESTS=false
+# When true, validate only packages with uncommitted git changes to .go files
+CHANGED_ONLY=false
 
 # Flags for individual checks
 LINT_FAILED=0
@@ -60,6 +63,8 @@ GO_BUILD_FAILED=0
 LINT_ISSUES_COUNT=0
 TEST_FAIL_COUNT=0
 COVERAGE_PERCENT=""
+# Number of modules whose checks ran under --changed-only
+CHECKED_MODULES=0
 
 # Functions are now provided by common.sh library
 
@@ -98,6 +103,11 @@ Options:
   -d, --dry-run    Run in dry-run mode (no changes made)
   -f, --fix        Automatically fix issues where possible
       --skip-tests Skip go test, race, coverage, and benchmark checks
+      --changed-only Only packages containing .go files with uncommitted git changes
+                   (staged, unstaged, untracked), checked from inside the nearest go.mod
+                   module; a changed go.mod/go.sum or a removed package validates its whole module
+                   (a removed file in a surviving package selects that package);
+                   a directory argument narrows the set
 
 Arguments:
   directory        Target directory to check (optional)
@@ -110,6 +120,7 @@ Examples:
   $(basename "$0") -f ./cmd/cloudwatch                # Check specific directory with auto-fix
   $(basename "$0") -v -f ./...                        # Check all packages recursively
   $(basename "$0") --skip-tests ./cmd/foo             # Lint/build only
+  $(basename "$0") --changed-only                     # Only packages with git changes
 EOF
     exit 0
 }
@@ -124,6 +135,7 @@ EOF
 #   TARGET_DIR - Package or directory to validate
 #   IS_SCOPED - Limit checks when TARGET_DIR is not "." or "./..."
 #   SKIP_TESTS - Skip go test, race, coverage, and benchmark checks
+#   CHANGED_ONLY - Limit checks to packages with uncommitted git changes
 #
 # Arguments:
 #   $@ - All command line arguments passed to the script
@@ -158,6 +170,10 @@ function parse_arguments {
                 ;;
             --skip-tests)
                 SKIP_TESTS=true
+                shift
+                ;;
+            --changed-only)
+                CHANGED_ONLY=true
                 shift
                 ;;
             -*)
@@ -206,6 +222,64 @@ function cleanup_temp_files {
     for f in "${TEMP_FILES[@]}"; do
         rm -f "$f"
     done
+}
+
+#######################################
+# determine_changed_patterns: List Go packages with uncommitted changes, grouped by module
+#
+# Description:
+#   Emits "module<TAB>pattern" lines for every changed .go, go.mod, or go.sum file (staged,
+#   unstaged, untracked). The module is the nearest directory at or above the file that holds a
+#   go.mod; the pattern is relative to it: "." or "./sub" for a changed .go file (one
+#   non-recursive package) and "./..." for a changed go.mod or go.sum (the whole module).
+#   Files without a go.mod ancestor are skipped with a warning; testdata and vendor are skipped.
+#
+# Globals:
+#   None
+#
+# Arguments:
+#   $1 - Scope directory (optional; "." or "./..." means the whole repository)
+#
+# Outputs:
+#   Tab-separated "module<TAB>pattern" lines to stdout, sorted and unique
+#
+# Returns:
+#   0 on success
+#
+# Usage:
+#   mapfile -t changed < <(determine_changed_patterns ./cmd)
+#
+#######################################
+function determine_changed_patterns {
+    local scope=${1:-.}
+    local -a scopes=()
+    if [[ $scope != "." && $scope != "./..." ]]; then
+        scopes=("$scope")
+    fi
+
+    local file dir module pattern
+    while IFS= read -r file; do
+        [[ -z $file ]] && continue
+        dir="$(dirname "$file")"
+        case "/$dir/" in
+            */testdata/* | */vendor/*) continue ;;
+        esac
+        if ! module="$(repo_nearest_ancestor_with "$dir" go.mod)"; then
+            log "WARN" "--changed-only: no go.mod above $file, skipping" >&2
+            continue
+        fi
+        if [[ ${file##*/} == go.mod || ${file##*/} == go.sum || ! -d $dir ]]; then
+            # Dependency changes and removed packages can break any package of the module
+            pattern="./..."
+        elif [[ $dir == "$module" ]]; then
+            pattern="."
+        elif [[ $module == "." ]]; then
+            pattern="./$dir"
+        else
+            pattern="./${dir#"$module"/}"
+        fi
+        printf '%s\t%s\n' "$module" "$pattern"
+    done < <(REPO_PATHS_INCLUDE_DELETED=true repo_emit_changed_paths '\.go$|(^|/)go\.(mod|sum)$' ${scopes[@]+"${scopes[@]}"}) | sort -u
 }
 
 #######################################
@@ -328,10 +402,10 @@ function run_benchmark_tests {
 
     if [[ -n $has_benchmarks ]]; then
         log "INFO" "Running benchmark tests..."
-        if go test -bench=. -benchmem "$TARGET_PATTERN" > /dev/null 2>&1; then
+        if go test -bench=. -benchmem "${TARGET_PATTERNS[@]}" > /dev/null 2>&1; then
             log "INFO" "Benchmark tests completed"
             if [[ $VERBOSE == "true" ]]; then
-                go test -bench=. -benchmem "$TARGET_PATTERN"
+                go test -bench=. -benchmem "${TARGET_PATTERNS[@]}"
             fi
         else
             log "WARN" "Some benchmark tests failed"
@@ -339,6 +413,169 @@ function run_benchmark_tests {
     else
         log "INFO" "No benchmark tests found"
     fi
+}
+
+#######################################
+# run_changed_modules: Run all checks once per changed Go module
+#
+# Description:
+#   Groups "module<TAB>pattern" lines by module, then runs run_checks from inside each module
+#   directory with the module's patterns. A "./..." pattern replaces the others of its module.
+#
+# Globals:
+#   IS_SCOPED - Must be false: checks run from the module root
+#   TARGET_PATTERNS - Set to the patterns of the module being checked
+#   LINT_ISSUES_COUNT, TEST_FAIL_COUNT, COVERAGE_PERCENT - Replaced by totals across modules
+#   (summed counts, lowest coverage; empty coverage when a module's coverage run failed)
+#
+# Arguments:
+#   $@ - "module<TAB>pattern" lines sorted by module
+#
+# Outputs:
+#   Progress logs and check results
+#
+# Returns:
+#   0 on success
+#
+# Usage:
+#   run_changed_modules "${changed_lines[@]}"
+#
+#######################################
+function run_changed_modules {
+    local origin
+    origin="$(pwd)"
+    local total_lint=0 total_test_fail=0 lowest_coverage="" coverage_run_failed=false any_coverage_failed=0
+
+    local -a modules=()
+    local line module
+    for line in "$@"; do
+        module="${line%%$'\t'*}"
+        if [[ ${#modules[@]} -eq 0 || ${modules[-1]} != "$module" ]]; then
+            modules+=("$module")
+        fi
+    done
+
+    for module in "${modules[@]}"; do
+        TARGET_PATTERNS=()
+        local pattern whole=false
+        for line in "$@"; do
+            [[ ${line%%$'\t'*} == "$module" ]] || continue
+            pattern="${line#*$'\t'}"
+            if [[ $pattern == "./..." ]]; then
+                whole=true
+            fi
+            TARGET_PATTERNS+=("$pattern")
+        done
+        if [[ $whole == "true" ]]; then
+            TARGET_PATTERNS=("./...")
+        fi
+        echo_section "Go module: $module"
+        log "INFO" "Target pattern: ${TARGET_PATTERNS[*]}"
+        pushd "$origin/$module" > /dev/null || {
+            log "ERROR" "Failed to change directory to module: $module"
+            EXIT_CODE=1
+            continue
+        }
+        # Keep only packages that contain Go files that apply to this platform and tags, so
+        # build-constrained packages do not make lint, test, or vulncheck fail
+        # (directories are used as patterns because golangci-lint does not take import paths)
+        local -a package_dirs=()
+        local package_dir list_output list_status=0 list_err
+        if [[ ${TARGET_PATTERNS[*]} != "./..." ]]; then
+            list_err="$(mktemp "${TMPDIR:-/tmp}/golist_err.XXXXXX")"
+            TEMP_FILES+=("$list_err")
+            list_output="$(go list -e -f '{{if or .GoFiles .CgoFiles .InvalidGoFiles .TestGoFiles .XTestGoFiles}}{{.Dir}}{{end}}' "${TARGET_PATTERNS[@]}" 2> "$list_err")" || list_status=$?
+            if [[ $list_status -ne 0 ]]; then
+                # A broken go.mod or toolchain must surface in the real checks instead of being skipped
+                log "WARN" "go list failed in module $module; checking the changed patterns unfiltered: $(cat "$list_err")"
+            else
+                mapfile -t package_dirs < <(printf '%s\n' "$list_output" | sed '/^$/d')
+                TARGET_PATTERNS=()
+                if [[ ${#package_dirs[@]} -gt 0 ]]; then
+                    for package_dir in "${package_dirs[@]}"; do
+                        if [[ $package_dir == "$PWD" ]]; then
+                            TARGET_PATTERNS+=(".")
+                        else
+                            TARGET_PATTERNS+=("./${package_dir#"$PWD"/}")
+                        fi
+                    done
+                fi
+            fi
+        fi
+        if [[ ${#TARGET_PATTERNS[@]} -eq 0 ]]; then
+            log "INFO" "No Go files apply to this platform in module $module; skipping"
+        else
+            LINT_ISSUES_COUNT=0
+            TEST_FAIL_COUNT=0
+            COVERAGE_PERCENT=""
+            COVERAGE_FAILED=0
+            run_checks
+            CHECKED_MODULES=$((CHECKED_MODULES + 1))
+            # Per-run values are overwritten by the next module, so fold them into totals
+            total_lint=$((total_lint + ${LINT_ISSUES_COUNT:-0}))
+            total_test_fail=$((total_test_fail + ${TEST_FAIL_COUNT:-0}))
+            if [[ $COVERAGE_FAILED == "1" ]]; then
+                any_coverage_failed=1
+            fi
+            if [[ -z $COVERAGE_PERCENT ]]; then
+                if [[ $COVERAGE_FAILED == "1" ]]; then
+                    coverage_run_failed=true
+                fi
+            elif [[ -z $lowest_coverage ]] || awk -v a="$COVERAGE_PERCENT" -v b="$lowest_coverage" 'BEGIN { exit !(a < b) }'; then
+                lowest_coverage="$COVERAGE_PERCENT"
+            fi
+        fi
+        popd > /dev/null || true
+    done
+
+    LINT_ISSUES_COUNT=$total_lint
+    TEST_FAIL_COUNT=$total_test_fail
+    COVERAGE_PERCENT=$lowest_coverage
+    COVERAGE_FAILED=$any_coverage_failed
+    if [[ $coverage_run_failed == "true" ]]; then
+        COVERAGE_PERCENT=""
+    fi
+}
+
+#######################################
+# run_checks: Run every enabled check against TARGET_PATTERNS from the current directory
+#
+# Description:
+#   Runs go mod tidy, build, golangci-lint, the test family (unless skipped), and the
+#   security checks in order.
+#
+# Globals:
+#   SKIP_TESTS - Skip go test, race, coverage, and benchmark checks
+#   VERBOSE - Also run benchmark tests
+#
+# Arguments:
+#   None
+#
+# Outputs:
+#   Check results
+#
+# Returns:
+#   None (sets the per-check failure flags and EXIT_CODE)
+#
+# Usage:
+#   run_checks
+#
+#######################################
+function run_checks {
+    run_go_mod_tidy
+    run_go_build
+    run_golangci_lint
+    if [[ $SKIP_TESTS != "true" ]]; then
+        run_tests
+        run_race_tests
+        run_coverage_tests
+        if [[ $VERBOSE == "true" ]]; then
+            run_benchmark_tests
+        fi
+    else
+        log "INFO" "Skipping go test, race, coverage, and benchmark checks"
+    fi
+    run_security_checks
 }
 
 #######################################
@@ -367,7 +604,7 @@ function run_coverage_tests {
     echo_section "Running coverage tests"
 
     if [[ $DRY_RUN == "true" ]]; then
-        log "INFO" "DRY-RUN: Would run coverage tests for $TARGET_PATTERN"
+        log "INFO" "DRY-RUN: Would run coverage tests for ${TARGET_PATTERNS[*]}"
         return 0
     fi
 
@@ -378,7 +615,7 @@ function run_coverage_tests {
         return 1
     }
     TEMP_FILES+=("$coverage_file")
-    if go test -coverprofile="$coverage_file" "$TARGET_PATTERN"; then
+    if go test -coverprofile="$coverage_file" "${TARGET_PATTERNS[@]}"; then
         local coverage_percent
         local coverage_output
         coverage_output=$(go tool cover -func="$coverage_file" | grep total | awk '{print $3}')
@@ -439,12 +676,29 @@ function run_go_build {
     echo_section "Running go build"
 
     if [[ $DRY_RUN == "true" ]]; then
-        log "INFO" "DRY-RUN: Would run 'go build \"$TARGET_PATTERN\"'"
+        log "INFO" "DRY-RUN: Would run 'go build \"${TARGET_PATTERNS[*]}\"'"
         return 0
     fi
 
+    # With --changed-only, build only packages that have buildable (non-test) Go files;
+    # an explicit package that has only tests or is excluded by build constraints makes go build fail
+    local -a build_targets=("${TARGET_PATTERNS[@]}")
+    if [[ $CHANGED_ONLY == "true" ]]; then
+        local list_output
+        if list_output="$(go list -e -f '{{if or .GoFiles .CgoFiles .InvalidGoFiles}}{{.ImportPath}}{{end}}' "${TARGET_PATTERNS[@]}" 2> /dev/null)"; then
+            mapfile -t build_targets < <(printf '%s\n' "$list_output" | sed '/^$/d')
+            if [[ ${#build_targets[@]} -eq 0 ]]; then
+                log "INFO" "No buildable packages among the changed packages; skipping go build"
+                return 0
+            fi
+        else
+            # go list itself failed: build the unfiltered patterns so the real error is reported
+            log "WARN" "go list failed; building the changed patterns unfiltered"
+        fi
+    fi
+
     # Attempt to build all packages matching the target pattern
-    if go build "$TARGET_PATTERN"; then
+    if go build "${build_targets[@]}"; then
         log "INFO" "go build succeeded"
     else
         log "ERROR" "go build failed"
@@ -560,7 +814,7 @@ function run_golangci_lint {
     echo_section "Running golangci-lint"
 
     if [[ $DRY_RUN == "true" ]]; then
-        log "INFO" "DRY-RUN: Would run 'golangci-lint run $TARGET_PATTERN'"
+        log "INFO" "DRY-RUN: Would run 'golangci-lint run ${TARGET_PATTERNS[*]}'"
         return 0
     fi
 
@@ -574,7 +828,7 @@ function run_golangci_lint {
         lint_args+=("-v")
     fi
 
-    lint_args+=("$TARGET_PATTERN")
+    lint_args+=("${TARGET_PATTERNS[@]}")
 
     local lint_output
     lint_output=$(mktemp "${TMPDIR:-/tmp}/golint_output.XXXXXX") || {
@@ -633,11 +887,11 @@ function run_race_tests {
     echo_section "Running race condition tests"
 
     if [[ $DRY_RUN == "true" ]]; then
-        log "INFO" "DRY-RUN: Would run 'CGO_ENABLED=1 go test -race $TARGET_PATTERN'"
+        log "INFO" "DRY-RUN: Would run 'CGO_ENABLED=1 go test -race ${TARGET_PATTERNS[*]}'"
         return 0
     fi
 
-    if CGO_ENABLED=1 go test -race "$TARGET_PATTERN"; then
+    if CGO_ENABLED=1 go test -race "${TARGET_PATTERNS[@]}"; then
         log "INFO" "Race condition tests passed"
     else
         log "ERROR" "Race condition tests failed"
@@ -678,8 +932,8 @@ function run_security_checks {
 
     # Check for govulncheck
     if command -v govulncheck &> /dev/null; then
-        log "INFO" "Running govulncheck... (target=$TARGET_PATTERN)"
-        if govulncheck "$TARGET_PATTERN"; then
+        log "INFO" "Running govulncheck... (target=${TARGET_PATTERNS[*]})"
+        if govulncheck "${TARGET_PATTERNS[@]}"; then
             log "INFO" "No known vulnerabilities found"
         else
             log "WARN" "Potential vulnerabilities found"
@@ -718,7 +972,7 @@ function run_tests {
     echo_section "Running go test"
 
     if [[ $DRY_RUN == "true" ]]; then
-        log "INFO" "DRY-RUN: Would run 'go test -v $TARGET_PATTERN'"
+        log "INFO" "DRY-RUN: Would run 'go test -v ${TARGET_PATTERNS[*]}'"
         return 0
     fi
 
@@ -728,7 +982,7 @@ function run_tests {
         test_args+=("-x")
     fi
 
-    test_args+=("$TARGET_PATTERN")
+    test_args+=("${TARGET_PATTERNS[@]}")
 
     local test_output
     test_output=$(mktemp "${TMPDIR:-/tmp}/gotest_output.XXXXXX") || {
@@ -780,29 +1034,42 @@ function main {
     parse_arguments "$@"
     start_time=$(date +%s)
     require_dependencies "go" "golangci-lint"
-    TARGET_PATTERN=$(determine_target_pattern "$TARGET_DIR")
+    local -a changed_lines=()
+    if [[ $CHANGED_ONLY == "true" ]]; then
+        # Checks run from each module root, so a directory argument only scopes the changed set
+        IS_SCOPED=false
+        mapfile -t changed_lines < <(determine_changed_patterns "$TARGET_DIR")
+        if [[ ${#changed_lines[@]} -eq 0 ]]; then
+            log "INFO" "--changed-only: no changed Go packages"
+            print_validation_result go 0 "changed_only=SKIP|no changed Go packages" || true
+            exit 0
+        fi
+    else
+        TARGET_PATTERNS=("$(determine_target_pattern "$TARGET_DIR")")
+    fi
     echo_section "Starting Go code quality checks"
     log "INFO" "Target input: $TARGET_DIR"
-    log "INFO" "Target pattern: $TARGET_PATTERN"
+    if [[ $CHANGED_ONLY != "true" ]]; then
+        log "INFO" "Target pattern: ${TARGET_PATTERNS[*]}"
+    fi
     log "INFO" "Scoped mode: $IS_SCOPED"
     log "INFO" "Verbose mode: $VERBOSE"
     log "INFO" "Dry-run mode: $DRY_RUN"
     log "INFO" "Fix mode: $FIX_MODE"
     log "INFO" "Skip tests: $SKIP_TESTS"
-    run_go_mod_tidy
-    run_go_build
-    run_golangci_lint
-    if [[ $SKIP_TESTS != "true" ]]; then
-        run_tests
-        run_race_tests
-        run_coverage_tests
-        if [[ $VERBOSE == "true" ]]; then
-            run_benchmark_tests
+    log "INFO" "Changed only: $CHANGED_ONLY"
+    if [[ $CHANGED_ONLY == "true" ]]; then
+        run_changed_modules "${changed_lines[@]}"
+        if [[ $CHECKED_MODULES -eq 0 ]]; then
+            if [[ $EXIT_CODE -eq 0 ]]; then
+                log "INFO" "--changed-only: no changed package applies to this platform"
+                print_validation_result go 0 "changed_only=SKIP|no changed package applies to this platform" || true
+            fi
+            exit $EXIT_CODE
         fi
     else
-        log "INFO" "Skipping go test, race, coverage, and benchmark checks"
+        run_checks
     fi
-    run_security_checks
     # Record end time and calculate elapsed time
     end_time=$(date +%s)
     elapsed=$((end_time - start_time))

@@ -30,12 +30,15 @@ if [[ ! -t 0 ]]; then
 fi
 
 #######################################
-# get_changed_dirs: Collect unique directories containing changed Go files
+# get_changed_dirs: Collect changed Go locations as "kind<TAB>directory" lines
 #
 # Description:
-#   Gathers modified/added/untracked Go files from git and extracts
-#   their parent directories. Each git command is guarded with || true to
-#   prevent pipefail from terminating the script.
+#   Gathers modified/added/removed/untracked Go files, go.mod and go.sum from git.
+#   Kind P (package) is emitted for a changed or removed .go file whose directory still
+#   exists. Kind M (whole module) is emitted for go.mod/go.sum changes and for removed files
+#   whose directory is gone, because importers of a removed package can break. testdata and
+#   vendor are skipped. Each git command is guarded with || true to prevent pipefail from
+#   terminating the script.
 #
 # Globals:
 #   None
@@ -44,33 +47,52 @@ fi
 #   None
 #
 # Outputs:
-#   Newline-separated unique directory list to stdout
+#   Sorted unique "kind<TAB>directory" lines to stdout
 #
 # Returns:
 #   0 on success
 #
 # Usage:
-#   mapfile -t dirs < <(get_changed_dirs)
+#   mapfile -t changes < <(get_changed_dirs)
 #
 #######################################
 function get_changed_dirs {
-    local path
+    local path dir kind
 
     while IFS= read -r path; do
         [[ -z ${path} ]] && continue
-        [[ -f ${path} ]] || continue
-        dirname "${path}"
+        dir=$(dirname "${path}")
+        case "/${dir}/" in
+            */testdata/* | */vendor/*) continue ;;
+        esac
+        case "${path##*/}" in
+            go.mod | go.sum) kind=M ;;
+            *)
+                if [[ -d ${dir} ]]; then
+                    kind=P
+                else
+                    kind=M
+                fi
+                ;;
+        esac
+        printf '%s\t%s\n' "${kind}" "${dir}"
     done < <(
         {
-            git diff --name-only --diff-filter=ACMR -- '*.go' 2> /dev/null || true
-            git diff --cached --name-only --diff-filter=ACMR -- '*.go' 2> /dev/null || true
-            git ls-files --others --exclude-standard -- '*.go' 2> /dev/null || true
+            git diff --name-only --no-renames -- '*.go' ':(glob)**/go.mod' ':(glob)**/go.sum' 2> /dev/null || true
+            git diff --cached --name-only --no-renames -- '*.go' ':(glob)**/go.mod' ':(glob)**/go.sum' 2> /dev/null || true
+            git ls-files --others --exclude-standard -- '*.go' ':(glob)**/go.mod' ':(glob)**/go.sum' 2> /dev/null || true
         } | awk 'NF' | sort -u
     ) | sort -u
 }
 
 #######################################
 # find_go_module_root: Find nearest ancestor directory containing go.mod
+#
+# Description:
+#   A starting directory that no longer exists is replaced by its nearest existing ancestor.
+#
+# Globals:
+#   None
 #
 # Arguments:
 #   $1 - Starting directory path (relative or absolute)
@@ -89,6 +111,10 @@ function find_go_module_root {
     local start_dir="$1"
     local dir
 
+    while [[ ! -d $start_dir && $start_dir != "." && $start_dir != "/" ]]; do
+        start_dir=$(dirname "$start_dir")
+    done
+
     if ! dir=$(cd "$start_dir" 2> /dev/null && pwd); then
         return 1
     fi
@@ -105,10 +131,13 @@ function find_go_module_root {
 }
 
 #######################################
-# collect_go_module_roots: Map changed-file dirs to unique Go module roots
+# collect_go_module_roots: Map changed locations to unique Go module roots
+#
+# Globals:
+#   None
 #
 # Arguments:
-#   $@ - Directories containing changed Go files
+#   $@ - "kind<TAB>directory" lines from get_changed_dirs
 #
 # Outputs:
 #   Newline-separated unique module root paths to stdout
@@ -117,19 +146,113 @@ function find_go_module_root {
 #   0 on success
 #
 # Usage:
-#   mapfile -t module_roots < <(collect_go_module_roots "${dirs[@]}")
+#   mapfile -t module_roots < <(collect_go_module_roots "${changes[@]}")
 #
 #######################################
 function collect_go_module_roots {
-    local dir
+    local line
     local mod_root
 
-    for dir in "$@"; do
-        [[ -n $dir && -d $dir ]] || continue
-        if mod_root=$(find_go_module_root "$dir"); then
+    for line in "$@"; do
+        [[ -n $line ]] || continue
+        if mod_root=$(find_go_module_root "${line#*$'\t'}"); then
             printf '%s\n' "$mod_root"
         fi
     done | sort -u
+}
+
+#######################################
+# collect_module_packages: Map changed locations to package patterns inside one Go module
+#
+# Description:
+#   Emits ./... when a location of kind M belongs to the module; otherwise one ./pkg pattern
+#   per changed package directory.
+#
+# Globals:
+#   None
+#
+# Arguments:
+#   $1 - Module root absolute path
+#   $@ - "kind<TAB>directory" lines from get_changed_dirs
+#
+# Outputs:
+#   Newline-separated unique patterns relative to the module root (./pkg or ./...) to stdout
+#
+# Returns:
+#   0 on success
+#
+# Usage:
+#   mapfile -t pkgs < <(collect_module_packages "$mod_root" "${changes[@]}")
+#
+#######################################
+function collect_module_packages {
+    local mod_root="$1"
+    shift
+    local line kind dir abs
+
+    for line in "$@"; do
+        [[ -n $line ]] || continue
+        kind="${line%%$'\t'*}"
+        dir="${line#*$'\t'}"
+        [[ $(find_go_module_root "$dir") == "$mod_root" ]] || continue
+        if [[ $kind == "M" ]]; then
+            printf './...\n'
+            continue
+        fi
+        abs=$(cd "$dir" 2> /dev/null && pwd) || continue
+        printf '.%s\n' "${abs#"$mod_root"}"
+    done | sort -u
+}
+
+#######################################
+# filter_buildable_packages: Keep only packages that have Go files for this platform
+#
+# Description:
+#   Packages whose files are all excluded by build constraints make go tools fail, so they
+#   are dropped. ./... is kept as is. When go list itself fails, the patterns are returned
+#   unfiltered so the real tool reports the error.
+#
+# Globals:
+#   None
+#
+# Arguments:
+#   $1 - Module root absolute path
+#   $@ - Package patterns relative to the module root
+#
+# Outputs:
+#   Newline-separated patterns to stdout (none when no package applies)
+#
+# Returns:
+#   0 on success
+#
+# Usage:
+#   mapfile -t pkgs < <(filter_buildable_packages "$mod_root" "${pkgs[@]}")
+#
+#######################################
+function filter_buildable_packages {
+    local mod_root="$1"
+    shift
+
+    if [[ $1 == "./..." ]] || ! command -v go > /dev/null 2>&1; then
+        printf '%s\n' "$@"
+        return 0
+    fi
+
+    local dirs
+    if ! dirs=$(cd "$mod_root" && go list -e -f '{{if or .GoFiles .CgoFiles .InvalidGoFiles .TestGoFiles .XTestGoFiles}}{{.Dir}}{{end}}' "$@" 2> /dev/null); then
+        printf '%s\n' "$@"
+        return 0
+    fi
+
+    local dir
+    while IFS= read -r dir; do
+        [[ -n $dir ]] || continue
+        if [[ $dir == "$mod_root" ]]; then
+            printf '.\n'
+        else
+            printf '.%s\n' "${dir#"$mod_root"}"
+        fi
+    done <<< "$dirs"
 }
 
 #######################################
@@ -519,7 +642,8 @@ function record_blocked_state {
 # main: Entry point
 #
 # Description:
-#   Runs golangci-lint from each Go module root that contains changed files.
+#   Runs golangci-lint from each Go module root that contains changed files, on the changed
+#   packages (the whole module when go.mod/go.sum changed or a package was removed).
 #   Collects failures and calls report_failure with a summary.
 #
 # Globals:
@@ -551,15 +675,15 @@ function main {
         exit 0
     fi
 
-    local dirs=()
-    mapfile -t dirs < <(get_changed_dirs)
+    local changes=()
+    mapfile -t changes < <(get_changed_dirs)
 
-    if ((${#dirs[@]} == 0)); then
+    if ((${#changes[@]} == 0)); then
         exit 0
     fi
 
     local module_roots=()
-    mapfile -t module_roots < <(collect_go_module_roots "${dirs[@]}")
+    mapfile -t module_roots < <(collect_go_module_roots "${changes[@]}")
 
     if ((${#module_roots[@]} == 0)); then
         exit 0
@@ -570,8 +694,20 @@ function main {
     for mod_root in "${module_roots[@]}"; do
         [[ -n $mod_root && -d $mod_root ]] || continue
         local rel_mod="${mod_root#"$root"/}"
+        local pkgs=()
+        mapfile -t pkgs < <(collect_module_packages "$mod_root" "${changes[@]}")
+        ((${#pkgs[@]} > 0)) || continue
+        local pkg
+        for pkg in "${pkgs[@]}"; do
+            if [[ $pkg == "./..." ]]; then
+                pkgs=("./...")
+                break
+            fi
+        done
+        mapfile -t pkgs < <(filter_buildable_packages "$mod_root" "${pkgs[@]}")
+        ((${#pkgs[@]} > 0)) || continue
         local result
-        result=$(cd "$mod_root" && golangci-lint run --fix ./... 2>&1) || {
+        result=$(cd "$mod_root" && golangci-lint run --fix "${pkgs[@]}" 2>&1) || {
             fails=$((fails + 1))
             output+="=== ${rel_mod:-.} ==="$'\n'
             output+="${result}"$'\n'

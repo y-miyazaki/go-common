@@ -16,6 +16,7 @@ metadata:
 - `--fix` (optional): applies `go mod tidy` and golangci-lint auto-fixes in place
 - `--verbose` (optional): tool-level diagnostics and benchmark tests
 - `--skip-tests` (optional): skip go test, race, and coverage checks
+- `--changed-only` (optional): validate only packages containing `.go` files with uncommitted git changes (staged, unstaged, untracked), run from inside the nearest `go.mod` module (nested modules are handled separately); a changed `go.mod`/`go.sum` or a removed package validates its whole module directory (a removed file in a surviving package selects that package); a directory argument narrows the set; exits 0 with nothing checked when none changed
 - `--dry-run` (optional): print planned commands without running them
 
 ## Output Specification
