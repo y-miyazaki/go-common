@@ -26,6 +26,10 @@
         "timeout": 120
       },
       {
+        "command": ".cursor/hooks/common-hooks-cursor/scripts/review_gate.sh",
+        "timeout": 15
+      },
+      {
         "command": ".cursor/hooks/go-hooks-cursor/scripts/go_test.sh",
         "timeout": 120
       },

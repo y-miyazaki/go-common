@@ -321,7 +321,12 @@ function determine_target_pattern {
         local go_files_count
         go_files_count=$(has_go_files "$base_dir")
         if [[ $go_files_count -gt 0 ]]; then
-            echo "./${base_dir#./}/..."
+            if [[ $base_dir == /* ]]; then
+                # An absolute path is already a valid package pattern; "./" would make it ".//abs"
+                echo "${base_dir%/}/..."
+            else
+                echo "./${base_dir#./}/..."
+            fi
             return 0
         fi
         error_exit "No Go files found in $base_dir or its subdirectories"
