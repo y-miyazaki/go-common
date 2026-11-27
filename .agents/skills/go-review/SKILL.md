@@ -3,6 +3,7 @@ name: go-review
 description: >-
   Review Go code for security, correctness, and maintainability.
   Use when reviewing Go PRs requiring judgment beyond automated checks.
+argument-hint: "<Go files or PR>"
 license: Apache-2.0
 metadata:
   author: y-miyazaki

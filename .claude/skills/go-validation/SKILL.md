@@ -3,6 +3,7 @@ name: go-validation
 description: >-
   Validate Go formatting, linting, tests, and vulnerabilities for maintainable and secure code delivery.
   Use when committing Go changes, running CI validation, or debugging failing checks in repositories.
+argument-hint: "[path] [--fix] [--changed-only] [--skip-tests] [--verbose] [--dry-run]"
 license: Apache-2.0
 metadata:
   author: y-miyazaki
