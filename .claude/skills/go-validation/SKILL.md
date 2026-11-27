@@ -11,8 +11,8 @@ metadata:
 
 ## Input
 
-- Go path or directory (required)
-- Validation script (required): `scripts/validate.sh` (run from the go-validation skill directory)
+- Go path or directory (optional): without one, the script targets the caller's current working directory, so pass an explicit path when the working directory is not the project
+- Validation script (required): `scripts/validate.sh` (path relative to the go-validation skill directory; the caller's working directory decides the default target)
 - `--fix` (optional): applies `go mod tidy` and golangci-lint auto-fixes in place
 - `--verbose` (optional): tool-level diagnostics and benchmark tests
 - `--skip-tests` (optional): skip go test, race, and coverage checks
